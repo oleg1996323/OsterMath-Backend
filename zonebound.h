@@ -7,7 +7,7 @@
 #include <fstream>
 #include <filesystem>
 #include <string_view>
-#include <boost/multiprecision/cpp_dec_float.hpp>
+//#include <boost/multiprecision/cpp_dec_float.hpp>
 #include <memory>
 #include "constants.h"
 
@@ -17,83 +17,85 @@ using namespace std::string_view_literals;
 
 const static std::filesystem::path bound_file_dir = std::filesystem::path("./Data/boundaries"sv);
 
-using boost::multiprecision::cpp_dec_float_50;
+//using boost::multiprecision::cpp_dec_float_50;
 
-enum class TempName{
+enum class TempBoundName{
     crt_t,ab,ef,op,cd,gh,ij,jk,mn,qu,rx,uv,wx,B23,sat_t
 };
 
-struct Parameters{
-    std::vector<int8_t> Ii;
-    std::vector<double> ni;
-};
 
-Temperature TempFunc_1(Pressure pres, const Parameters& param); //pres in MPa
 
-Temperature TempFunc_2(Pressure pres, const Parameters& param); //pres in MPa
-
-Temperature TempFunc_3(Pressure pres, const Parameters& param);//pres in MPa
-
-const static std::map<TempName,std::function<Temperature(Pressure,const Parameters&)>> equations=
-{
-    {TempName::ab,TempFunc_2},
-    {TempName::op,TempFunc_2},
-
-    {TempName::ef,TempFunc_3},  
-
-    {TempName::cd,TempFunc_1},
-    {TempName::gh,TempFunc_1},
-    {TempName::ij,TempFunc_1},
-    {TempName::jk,TempFunc_1},
-    {TempName::mn,TempFunc_1},
-    {TempName::op,TempFunc_1},
-    {TempName::qu,TempFunc_1},
-    {TempName::rx,TempFunc_1}
-};
-
-const static std::map<TempName,std::string> paths = {
-    {TempName::ab,"./Data/boundaries/ab.txt"},
-    {TempName::op,"./Data/boundaries/op.txt"},
-    {TempName::ef,"./Data/boundaries/ef.txt"},  
-    {TempName::cd,"./Data/boundaries/cd.txt"},
-    {TempName::gh,"./Data/boundaries/gh.txt"},
-    {TempName::ij,"./Data/boundaries/ij.txt"},
-    {TempName::jk,"./Data/boundaries/jk.txt"},
-    {TempName::mn,"./Data/boundaries/mn.txt"},
-    {TempName::op,"./Data/boundaries/op.txt"},
-    {TempName::qu,"./Data/boundaries/qu.txt"},
-    {TempName::rx,"./Data/boundaries/rx.txt"}
+const static std::map<TempBoundName,std::string> paths = {
+    {TempBoundName::ab,"./Data/boundaries/ab.txt"},
+    {TempBoundName::op,"./Data/boundaries/op.txt"},
+    {TempBoundName::ef,"./Data/boundaries/ef.txt"},  
+    {TempBoundName::cd,"./Data/boundaries/cd.txt"},
+    {TempBoundName::gh,"./Data/boundaries/gh.txt"},
+    {TempBoundName::ij,"./Data/boundaries/ij.txt"},
+    {TempBoundName::jk,"./Data/boundaries/jk.txt"},
+    {TempBoundName::mn,"./Data/boundaries/mn.txt"},
+    {TempBoundName::op,"./Data/boundaries/op.txt"},
+    {TempBoundName::qu,"./Data/boundaries/qu.txt"},
+    {TempBoundName::rx,"./Data/boundaries/rx.txt"}
 };
 
 class TemperatureBound{
     public:
 
-    TemperatureBound(TempName name);
+    TemperatureBound(TempBoundName name);
 
     Temperature GetTempByPressure(Pressure pres) const;
+
+    struct Parameters{
+        std::vector<int8_t> Ii;
+        std::vector<double> ni;
+    };
 
     private:
 
     void Init();
 
     Parameters param_;
-    TempName name_;
+    TempBoundName name_;
 };
 
-inline const std::map<TempName, TemperatureBound> temp_boundaries{
-    {TempName::ab,TemperatureBound(TempName::ab)},
-    {TempName::op,TemperatureBound(TempName::op)},
+inline const std::map<TempBoundName, TemperatureBound> temp_boundaries{
+    {TempBoundName::ab,TemperatureBound(TempBoundName::ab)},
+    {TempBoundName::op,TemperatureBound(TempBoundName::op)},
 
-    {TempName::ef,TemperatureBound(TempName::ef)},  
+    {TempBoundName::ef,TemperatureBound(TempBoundName::ef)},  
 
-    {TempName::cd,TemperatureBound(TempName::cd)},
-    {TempName::gh,TemperatureBound(TempName::gh)},
-    {TempName::ij,TemperatureBound(TempName::ij)},
-    {TempName::jk,TemperatureBound(TempName::jk)},
-    {TempName::mn,TemperatureBound(TempName::mn)},
-    {TempName::op,TemperatureBound(TempName::op)},
-    {TempName::qu,TemperatureBound(TempName::qu)},
-    {TempName::rx,TemperatureBound(TempName::rx)}
+    {TempBoundName::cd,TemperatureBound(TempBoundName::cd)},
+    {TempBoundName::gh,TemperatureBound(TempBoundName::gh)},
+    {TempBoundName::ij,TemperatureBound(TempBoundName::ij)},
+    {TempBoundName::jk,TemperatureBound(TempBoundName::jk)},
+    {TempBoundName::mn,TemperatureBound(TempBoundName::mn)},
+    {TempBoundName::op,TemperatureBound(TempBoundName::op)},
+    {TempBoundName::qu,TemperatureBound(TempBoundName::qu)},
+    {TempBoundName::rx,TemperatureBound(TempBoundName::rx)}
+};
+
+Temperature TempFunc_1(Pressure pres, const TemperatureBound::Parameters& param); //pres in MPa
+
+Temperature TempFunc_2(Pressure pres, const TemperatureBound::Parameters& param); //pres in MPa
+
+Temperature TempFunc_3(Pressure pres, const TemperatureBound::Parameters& param);//pres in MPa
+
+const static std::map<TempBoundName,std::function<Temperature(Pressure,const TemperatureBound::Parameters&)>> equations=
+{
+    {TempBoundName::ab,TempFunc_2},
+    {TempBoundName::op,TempFunc_2},
+
+    {TempBoundName::ef,TempFunc_3},  
+
+    {TempBoundName::cd,TempFunc_1},
+    {TempBoundName::gh,TempFunc_1},
+    {TempBoundName::ij,TempFunc_1},
+    {TempBoundName::jk,TempFunc_1},
+    {TempBoundName::mn,TempFunc_1},
+    {TempBoundName::op,TempFunc_1},
+    {TempBoundName::qu,TempFunc_1},
+    {TempBoundName::rx,TempFunc_1}
 };
 
 }

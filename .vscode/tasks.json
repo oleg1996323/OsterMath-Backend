@@ -3,7 +3,7 @@
     "tasks": [
         {
             "label": "Build",
-            "type": "cppbuild",
+            "type": "shell",
             "command": "g++",
             "args": [
                 "-std=c++17",
@@ -18,10 +18,11 @@
             ]
         },
         {
-            "type": "cppbuild",
-            "label": "C/C++: clang++ build active file",
-            "command": "/usr/bin/clang++",
+            "type": "shell",
+            "label": "C/C++: gcc build active file",
+            "command": "g++",
             "args": [
+                "-std=c++17",
                 "-Wall",
                 "-Werror",
                 "-g",
@@ -38,7 +39,7 @@
                 "$gcc"
             ],
             "group": "build",
-            "detail": "compiler: /usr/bin/clang++"
+            "detail": "compiler: /usr/bin/g++"
         }
     ]
 }

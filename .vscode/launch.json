@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "C:/Users/olegt/Documents/Hydrogen/PhysicalProperties",
-      "program": "C:/Users/olegt/Documents/Hydrogen/PhysicalProperties/Build/Windows/Debug/main.exe",
+      "cwd": "C:/Users/olegt/Electrolisys",
+      "program": "C:/Users/olegt/Electrolisys/Build/Windows/Debug/main.exe",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
@@ -27,19 +27,24 @@
       "request": "launch",
       "args": [],
       "stopAtEntry": false,
-      "externalConsole": true,
-      "cwd": "/home/oster/Документы/Hydrogen/PhysicalProperties",
-      "program": "/home/oster/Документы/Hydrogen/PhysicalProperties/Build/Ubuntu/Debug/main",
+      "environment": [],
+      "externalConsole": false,
+      "cwd": "${fileDirname}",
+      "program": "${workspaceFolder}/Build/Ubuntu/Debug/main",
       "MIMode": "gdb",
-      "miDebuggerPath": "gdb",
       "setupCommands": [
         {
           "description": "Enable pretty-printing for gdb",
           "text": "-enable-pretty-printing",
           "ignoreFailures": true
+        },
+        {
+          "description": "Set Disassembly Flavor to Intel",
+          "text": "-gdb-set disassembly-flavor intel",
+          "ignoreFailures": true
         }
       ],
-      "preLaunchTask": "C/C++: clang++ build active file",
+      "preLaunchTask": "C/C++: gcc build active file"
     }
   ]
 }

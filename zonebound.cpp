@@ -2,7 +2,7 @@
 
 using namespace Bound;
 
-Temperature TempFunc_1(Pressure pres, const Parameters& param){ //pres in MPa
+Temperature TempFunc_1(Pressure pres, const TemperatureBound::Parameters& param){ //pres in MPa
     Temperature result = 0.;
     for(int i=0;i<param.Ii.size();++i){
         result+=pow(pres,param.Ii[i])*param.ni[i];
@@ -11,7 +11,7 @@ Temperature TempFunc_1(Pressure pres, const Parameters& param){ //pres in MPa
     return result;
 }
 
-Temperature TempFunc_2(Pressure pres, const Parameters& param){ //pres in MPa
+Temperature TempFunc_2(Pressure pres, const TemperatureBound::Parameters& param){ //pres in MPa
     Temperature result = 0.;
     for(int i=0;i<param.Ii.size();++i){
         result+=pow(std::log(pres),param.Ii[i])*param.ni[i];
@@ -20,7 +20,7 @@ Temperature TempFunc_2(Pressure pres, const Parameters& param){ //pres in MPa
     return result;
 }
 
-Temperature TempFunc_3(Pressure pres, const Parameters& param){ //pres in MPa
+Temperature TempFunc_3(Pressure pres, const TemperatureBound::Parameters& param){ //pres in MPa
     return sat_deriv*(pres-crit_pres)+crit_temp;
 }
 
@@ -56,6 +56,6 @@ void TemperatureBound::Init(){
     }
 }
 
-TemperatureBound::TemperatureBound(TempName name):name_(name){
+TemperatureBound::TemperatureBound(TempBoundName name):name_(name){
     Init();
 }

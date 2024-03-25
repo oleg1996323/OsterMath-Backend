@@ -10,6 +10,11 @@ using Pressure = double; //MPa
 using boost::multiprecision::cpp_dec_float_50;
 
 
+// class ZoneManager{
+
+//     std::unordered_set<Zone,
+// }
+
 // class Properties{
 //     public:
 //     class SpecificVolume{ //interface

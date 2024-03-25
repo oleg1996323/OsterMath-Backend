@@ -4,22 +4,21 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/home/oster/boost_1_82_0"
+                "${HOME}/boost_1_82_0"
             ],
-            "compilerPath": "/usr/bin/clang++",
-            "cStandard": "c17",
-            "cppStandard": "c++20",
+            "defines": [],
+            "compilerPath": "/usr/bin/g++",
             "intelliSenseMode": "linux-gcc-x64",
-            "compilerArgs": [
-                ""
-            ],
-            "defines": []
+            "configurationProvider": "${default}",
+            "cppStandard": "c++20",
+            "cStandard": "c17"
         },
         {
             "name": "Windows",
             "includePath": [
-                "${workspaceFolder}/**",
-                "C:/boost_1_84_0"
+                "/home/oster/Electrolisys/**",
+                "/home/oster/Electrolisys/C",
+                "/boost_1_84_0"
             ],
             "defines": [
                 "_DEBUG",
@@ -28,7 +27,18 @@
             ],
             "compilerPath": "C:/w64devkit/bin/g++.exe",
             "cStandard": "c17",
-            "cppStandard": "c++17"
+            "cppStandard": "c++17",
+            "compilerPathInCppPropertiesJson": "C:/w64devkit/bin/g++.exe",
+            "mergeConfigurations": false,
+            "browse": {
+                "path": [
+                    "/home/oster/Electrolisys/**",
+                    "/home/oster/Electrolisys/C",
+                    "/boost_1_84_0",
+                    "/home/oster/Electrolisys"
+                ],
+                "limitSymbolsToIncludedHeaders": true
+            }
         }
     ],
     "version": 4
