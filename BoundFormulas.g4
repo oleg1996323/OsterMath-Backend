@@ -9,7 +9,7 @@ expr
     | (ADD | SUB) expr  # UnaryOp
     | expr (MUL | DIV) expr  # BinaryOp
     | expr (ADD | SUB) expr  # BinaryOp
-    | CELL  # Cell
+    | expr (MUL_RANGE | SUM_RANGE)  # 
     | NUMBER  # Literal
     ;
 
@@ -26,5 +26,8 @@ ADD: '+' ;
 SUB: '-' ;
 MUL: '*' ;
 DIV: '/' ;
-MUL_RANGE: "sum([0-9]{1,},[0-9]) ;
+
+VARIABLE: \w+(\d+)?             #Any variable name (may have index)
+RANGE: RANGE                    #Any range of variable
+SUM_PRODUCT: sumprod(RANGE,...);
 WS: [ \t\n\r]+ -> skip ;
