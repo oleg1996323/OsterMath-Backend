@@ -46,7 +46,7 @@ CONSTANTS:
 
 ARRAY
     :
-    '['VALUE(','VALUE)*']'
+    VALUE(','VALUE)*']'
     ;
 
 KEY
