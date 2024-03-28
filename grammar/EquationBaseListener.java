@@ -1,87 +1,76 @@
-// Generated from equation.g4 by ANTLR 4.7.2
+// Generated from Equation.g4 by ANTLR 4.13.1
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 /**
- * This class provides an empty implementation of {@link equationListener},
+ * This class provides an empty implementation of {@link EquationListener},
  * which can be extended to create a listener which only needs to handle a subset
  * of the available methods.
  */
-public class equationBaseListener implements equationListener {
+@SuppressWarnings("CheckReturnValue")
+public class EquationBaseListener implements EquationListener {
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterMain(equationParser.MainContext ctx) { }
+	@Override public void enterMain(EquationParser.MainContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitMain(equationParser.MainContext ctx) { }
+	@Override public void exitMain(EquationParser.MainContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterUnaryOp(equationParser.UnaryOpContext ctx) { }
+	@Override public void enterUnaryOp(EquationParser.UnaryOpContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitUnaryOp(equationParser.UnaryOpContext ctx) { }
+	@Override public void exitUnaryOp(EquationParser.UnaryOpContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterParens(equationParser.ParensContext ctx) { }
+	@Override public void enterParens(EquationParser.ParensContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitParens(equationParser.ParensContext ctx) { }
+	@Override public void exitParens(EquationParser.ParensContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterLiteral(equationParser.LiteralContext ctx) { }
+	@Override public void enterValueDef(EquationParser.ValueDefContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitLiteral(equationParser.LiteralContext ctx) { }
+	@Override public void exitValueDef(EquationParser.ValueDefContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSumProduct(equationParser.SumProductContext ctx) { }
+	@Override public void enterBinaryOp(EquationParser.BinaryOpContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitSumProduct(equationParser.SumProductContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterBinaryOp(equationParser.BinaryOpContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitBinaryOp(equationParser.BinaryOpContext ctx) { }
+	@Override public void exitBinaryOp(EquationParser.BinaryOpContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

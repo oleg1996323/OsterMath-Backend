@@ -17,8 +17,8 @@ endif()
 include(${CMAKE_CURRENT_SOURCE_DIR}/grammar/CMakeLists.txt)
 
 file(GLOB sources
-    *.cpp
-    *.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
 )
 
 add_library(
