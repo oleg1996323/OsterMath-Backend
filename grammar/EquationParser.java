@@ -17,8 +17,8 @@ public class EquationParser extends Parser {
 		new PredictionContextCache();
 	public static final int
 		T__0=1, T__1=2, ADD=3, SUB=4, MUL=5, DIV=6, WS=7, FUNCTIONS=8, VALUE=9, 
-		SUMPRODUCT=10, LN=11, LG=12, LOG_X=13, EXP=14, NUMBER=15, STRING=16, VARIABLE=17, 
-		CONSTANTS=18, ARRAY=19, KEY=20, MAP=21, RANGE=22, PI=23;
+		SUMPRODUCT=10, LN=11, LG=12, LOG_X=13, EXP=14, NUMBER=15, CONSTANTS=16, 
+		ARRAY=17, KEY=18, MAP=19, PI=20;
 	public static final int
 		RULE_main = 0, RULE_expr = 1;
 	private static String[] makeRuleNames() {
@@ -37,8 +37,8 @@ public class EquationParser extends Parser {
 	private static String[] makeSymbolicNames() {
 		return new String[] {
 			null, null, null, "ADD", "SUB", "MUL", "DIV", "WS", "FUNCTIONS", "VALUE", 
-			"SUMPRODUCT", "LN", "LG", "LOG_X", "EXP", "NUMBER", "STRING", "VARIABLE", 
-			"CONSTANTS", "ARRAY", "KEY", "MAP", "RANGE", "PI"
+			"SUMPRODUCT", "LN", "LG", "LOG_X", "EXP", "NUMBER", "CONSTANTS", "ARRAY", 
+			"KEY", "MAP", "PI"
 		};
 	}
 	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
@@ -370,7 +370,7 @@ public class EquationParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\u0004\u0001\u0017\u001d\u0002\u0000\u0007\u0000\u0002\u0001\u0007\u0001"+
+		"\u0004\u0001\u0014\u001d\u0002\u0000\u0007\u0000\u0002\u0001\u0007\u0001"+
 		"\u0001\u0000\u0001\u0000\u0001\u0000\u0001\u0001\u0001\u0001\u0001\u0001"+
 		"\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0003\u0001"+
 		"\u0010\b\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001"+

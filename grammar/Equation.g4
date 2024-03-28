@@ -1,7 +1,5 @@
 grammar Equation;
 
-import definitions;
-
 main:
     expr EOF
     ;
@@ -15,42 +13,80 @@ expr
     | VALUE                     # ValueDef
     ;
 
+functions
+    : LN '(' VALUE ')'
+    | LG '(' VALUE ')'
+    | LOG_X '(' VALUE ',' VALUE ')'
+    | EXP '(' VALUE ')'
+    | SUMPRODUCT '(' ARRAY ',' ARRAY (',' ARRAY)*')'
+    | VALUE
+    ;
+
 ADD: '+' ;
 SUB: '-' ;
 MUL: '*' ;
 DIV: '/' ;
-WS: [ \t\n\r]+ -> skip ; 
+WS: [ \t\n\r]+ -> skip ;
 
-FUNCTIONS
-    : '(' FUNCTIONS ')'
-    | LN
-    | LG
-    | LOG_X
-    | EXP
-    | SUMPRODUCT
+fragment INT: [-+]? UINT;
+fragment UINT: [0-9]+;
+fragment EXPONENT: [eE] INT;
+fragment FLOAT: UINT([.]UINT)? | UINT([.]UINT EXPONENT UINT);
+fragment STRING: [a-zA-Z0-9]+;
+fragment VARIABLE: '__'[a-zA-Z]+([0-9]+)?'__';
+
+NUMBER
+    : UINT EXPONENT?
+    | FLOAT
     ;
 
+CONSTANTS:
+    PI
+    ;
+
+ARRAY
+    :
+    '['VALUE(','VALUE)*']'
+    ;
+
+KEY
+    :
+    STRING
+    | NUMBER
+    | VARIABLE
+    ;
+
+MAP
+    :
+    '{'KEY':'VALUE'}'
+    ;
+
+PI: 'Pi' | 'PI' | 'pi' WS;
+
 VALUE
-    : '(' VALUE ')'
-    | FUNCTIONS
+    : functions
     | VARIABLE
     | NUMBER
     | CONSTANTS
     ;
 
 SUMPRODUCT
-    : 'sumproduct(' ARRAY ',' ARRAY (',' ARRAY)*')' 
+    : 'sumproduct'
+    | ARRAY
     ;
 LN
-    : 'Ln(' VALUE ')'
+    : 'Ln'
+    | VALUE
     ;
 LG
-    : 'Lg(' VALUE ')'
+    : 'Lg'
+    | VALUE
     ;
 LOG_X
-    : 'Log(' VALUE ',' VALUE ')'
+    : 'Log'
+    | VALUE
     ;
 EXP
-    : 'Exp(' VALUE ')'
-    | 'Exp(' UINT ')'
+    : 'Exp'
+    | VALUE
     ;
