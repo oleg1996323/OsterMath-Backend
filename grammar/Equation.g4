@@ -13,27 +13,18 @@ expr
     | VALUE                     # ValueDef
     ;
 
-functions
-    : LN '(' VALUE ')'
-    | LG '(' VALUE ')'
-    | LOG_X '(' VALUE ',' VALUE ')'
-    | EXP '(' VALUE ')'
-    | SUMPRODUCT '(' ARRAY ',' ARRAY (',' ARRAY)*')'
-    | VALUE
-    ;
+fragment INT: [-+]? UINT;
+fragment UINT: [0-9]+;
+fragment EXPONENT: [eE] INT;
+fragment FLOAT: UINT([.]UINT)? | UINT([.]UINT EXPONENT UINT);
+fragment STRING: '"'[a-zA-Z0-9]+'"';
+fragment VARIABLE: '__'[a-zA-Z]+([0-9]+)?'__';
 
 ADD: '+' ;
 SUB: '-' ;
 MUL: '*' ;
 DIV: '/' ;
 WS: [ \t\n\r]+ -> skip ;
-
-fragment INT: [-+]? UINT;
-fragment UINT: [0-9]+;
-fragment EXPONENT: [eE] INT;
-fragment FLOAT: UINT([.]UINT)? | UINT([.]UINT EXPONENT UINT);
-fragment STRING: [a-zA-Z0-9]+;
-fragment VARIABLE: '__'[a-zA-Z]+([0-9]+)?'__';
 
 NUMBER
     : UINT EXPONENT?
@@ -46,7 +37,7 @@ CONSTANTS:
 
 ARRAY
     :
-    VALUE(','VALUE)*']'
+    '[' VALUE(','VALUE)*']'
     ;
 
 KEY
@@ -71,22 +62,35 @@ VALUE
     ;
 
 SUMPRODUCT
-    : 'sumproduct'
-    | ARRAY
+    : 'sumproduct' 
     ;
 LN
     : 'Ln'
-    | VALUE
     ;
 LG
     : 'Lg'
-    | VALUE
     ;
 LOG_X
     : 'Log'
-    | VALUE
     ;
 EXP
     : 'Exp'
-    | VALUE
+    ;
+
+functions
+    :
+    functions '('functions')'
+    | LN '(' WS* VALUE WS* ')'
+    | LG '(' WS* VALUE WS* ')'
+    | LOG_X '(' WS* VALUE WS*',' WS* VALUE WS*')'
+    | EXP '(' WS* VALUE WS* ')'
+    | SUMPRODUCT '(' ARRAY ',' ARRAY (',' ARRAY)*')'
+    ;
+
+VALUE
+    :
+    | functions
+    | VARIABLE
+    | NUMBER
+    | CONSTANTS
     ;
