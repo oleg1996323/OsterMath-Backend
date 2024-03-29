@@ -11,46 +11,33 @@ expr
     '(' expr ')'                # Parens
     | (ADD | SUB) expr          # UnaryOp
     | expr (MUL | DIV) expr     # BinaryOp
-    | expr (ADD | SUB) expr     # BinaryOp              
-    | VALUE                     # ValueDef
+    | expr (ADD | SUB) expr     # BinaryOp
+    | expr POW expr             # PowerOp              
+    | functions                 # FunctionCall
+    | array                     # ArrayDef
+    | VARIABLE                  # Variable
+    | NUMBER                    # Number
+    | CONSTANTS                 # Constant
     ;
 
-ADD: '+' ;
-SUB: '-' ;
-MUL: '*' ;
-DIV: '/' ;
-WS: [ \t\n\r]+ -> skip ; 
-
-FUNCTIONS
-    : '(' FUNCTIONS ')'
-    | LN
-    | LG
-    | LOG_X
-    | EXP
-    | SUMPRODUCT
+array
+    :
+    '['(VARIABLE | NUMBER | CONSTANTS)(','VARIABLE | NUMBER | CONSTANTS)+']'
     ;
 
-VALUE
-    : '(' VALUE ')'
-    | FUNCTIONS
-    | VARIABLE
-    | NUMBER
-    | CONSTANTS
+functions
+    : '(' functions ')'                             #pares
+    | LN '(' WS? expr WS? ')'                       #Natlog
+    | LG '(' WS? expr WS? ')'                       #Declog
+    | LOG_X '(' WS? expr WS? ',' WS? expr WS? ')'   #Baselog
+    | EXP '(' WS? expr WS? ')'                      #Exponent
+    | SQRT '(' WS? expr WS? ')'                     #Squareroot
+    | SUMPRODUCT '(' expr ',' expr (',' expr )*')'  #Sumproduct
     ;
 
-SUMPRODUCT
-    : 'sumproduct(' ARRAY ',' ARRAY (',' ARRAY)*')' 
-    ;
-LN
-    : 'Ln(' VALUE ')'
-    ;
-LG
-    : 'Lg(' VALUE ')'
-    ;
-LOG_X
-    : 'Log(' VALUE ',' VALUE ')'
-    ;
-EXP
-    : 'Exp(' VALUE ')'
-    | 'Exp(' UINT ')'
-    ;
+SUMPRODUCT: 'sumproduct';
+LN: 'Ln';       
+LG: 'Lg';       
+LOG_X: 'Log';   
+EXP: 'Exp';     
+SQRT: 'Sqrt';
