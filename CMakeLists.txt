@@ -21,13 +21,18 @@ file(GLOB sources
     ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
 )
 
+execute_process(COMMAND sh -c "ls $ENV{HOME} | grep -E 'boost_[0-9]+_[0-9]+_[0-9]' | head -n 1" OUTPUT_VARIABLE BOOST_VERSION)
+string(REPLACE "\n" "" BOOST_VERSION ${BOOST_VERSION})
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/include $ENV{HOME}/${BOOST_VERSION})
+
 add_library(
     PhysProperties SHARED
     ${ANTLR_TempBoundEquations_CXX_OUTPUTS}
     ${sources}
 )
 
-target_link_libraries(PhysProperties antlr4_static)
+target_link_libraries(PhysProperties antlr4_static /home/oster/${BOOST_VERSION}/stage/lib/*.lib)
 if(MSVC)
     target_compile_options(antlr4_static PRIVATE /W0)
 endif()
