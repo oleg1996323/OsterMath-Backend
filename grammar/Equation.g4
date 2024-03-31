@@ -1,7 +1,5 @@
 grammar Equation;
 
-import definitions;
-
 main:
     expr EOF
     ;
@@ -19,6 +17,7 @@ expr
     | NUMBER                    # Number
     | CONSTANTS                 # Constant
     ;
+
 
 array
     :
