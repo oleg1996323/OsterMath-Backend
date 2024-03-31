@@ -13,8 +13,8 @@ enum class SubZoneName{
 };
 
 struct ZoneBounds{
-    Bound::TempName left_; //left side temperature bound
-    Bound::TempName right_; //right side temperature bound
+    Bound::TempBoundName left_; //left side temperature bound
+    Bound::TempBoundName right_; //right side temperature bound
 
     bool operator==(ZoneBounds other){
         return left_>=other.left_ && right_<other.right_;

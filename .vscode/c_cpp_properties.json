@@ -1,45 +1,9 @@
 {
     "configurations": [
         {
-            "name": "Linux",
-            "includePath": [
-                "${workspaceFolder}/**",
-                "${HOME}/boost_1_82_0",
-                "bin/*/*/"
-            ],
-            "defines": [],
-            "compilerPath": "/usr/bin/g++",
-            "intelliSenseMode": "linux-gcc-x64",
-            "configurationProvider": "${default}",
-            "cppStandard": "c++20",
-            "cStandard": "c17"
-        },
-        {
-            "name": "Windows",
-            "includePath": [
-                "/home/oster/Electrolisys/**",
-                "/home/oster/Electrolisys/C",
-                "/boost_1_84_0"
-            ],
-            "defines": [
-                "_DEBUG",
-                "UNICODE",
-                "_UNICODE"
-            ],
-            "compilerPath": "C:/w64devkit/bin/g++.exe",
-            "cStandard": "c17",
-            "cppStandard": "c++17",
-            "compilerPathInCppPropertiesJson": "C:/w64devkit/bin/g++.exe",
-            "mergeConfigurations": false,
-            "browse": {
-                "path": [
-                    "/home/oster/Electrolisys/**",
-                    "/home/oster/Electrolisys/C",
-                    "/boost_1_84_0",
-                    "/home/oster/Electrolisys"
-                ],
-                "limitSymbolsToIncludedHeaders": true
-            }
+            "name": "CMake",
+            "compileCommands": "${config:cmake.buildDirectory}/compile_commands.json",
+            "configurationProvider": "ms-vscode.cmake-tools"
         }
     ],
     "version": 4

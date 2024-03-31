@@ -21,8 +21,7 @@ include_directories(${ANTLR_OUTPUT_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE
 
 add_library(
     PhysProperties STATIC
-    ${ANTLR_Bounds_CXX_OUTPUTS}
-    ${ANTLR_Regions_CXX_OUTPUTS}
+    ${ANTLR_Parserules_CXX_OUTPUTS}
     ${sources}
 )
 

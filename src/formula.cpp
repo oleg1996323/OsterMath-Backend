@@ -1,8 +1,6 @@
-#include "common.h"
 #include "formula.h"
 
 #include "FormulaAST.h"
-
 
 #include <algorithm>
 #include <cassert>

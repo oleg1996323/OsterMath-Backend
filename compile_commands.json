@@ -1,57 +1,47 @@
 [
 {
   "directory": "/home/oster/Electrolisys",
-  "command": "/usr/bin/g++ -DANTLR4CPP_STATIC -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS -I/home/oster/Electrolisys/bin/antlr4cpp_generated_src/bound_coefs -I/home/oster/Electrolisys/bin/antlr4cpp_generated_src/regions -I/home/oster/Electrolisys/grammar/antlr4_runtime/runtime/src -I/home/oster/Electrolisys/src -I/home/oster/Electrolisys/include -I/home/oster/boost_1_82_0  -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -g -std=gnu++20 -o CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.cpp.o -c /home/oster/Electrolisys/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.cpp",
-  "file": "/home/oster/Electrolisys/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.cpp"
+  "command": "/usr/bin/g++ -DANTLR4CPP_STATIC -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS -I/home/oster/Electrolisys/bin/antlr4cpp_generated_src/ParseRules -I/home/oster/Electrolisys/grammar/antlr4_runtime/runtime/src -I/home/oster/Electrolisys/src -I/home/oster/Electrolisys/include -I/home/oster/boost_1_82_0  -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -g -std=gnu++20 -o CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/ParseRules/ParseRulesLexer.cpp.o -c /home/oster/Electrolisys/bin/antlr4cpp_generated_src/ParseRules/ParseRulesLexer.cpp",
+  "file": "/home/oster/Electrolisys/bin/antlr4cpp_generated_src/ParseRules/ParseRulesLexer.cpp"
 },
 {
   "directory": "/home/oster/Electrolisys",
-  "command": "/usr/bin/g++ -DANTLR4CPP_STATIC -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS -I/home/oster/Electrolisys/bin/antlr4cpp_generated_src/bound_coefs -I/home/oster/Electrolisys/bin/antlr4cpp_generated_src/regions -I/home/oster/Electrolisys/grammar/antlr4_runtime/runtime/src -I/home/oster/Electrolisys/src -I/home/oster/Electrolisys/include -I/home/oster/boost_1_82_0  -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -g -std=gnu++20 -o CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsParser.cpp.o -c /home/oster/Electrolisys/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsParser.cpp",
-  "file": "/home/oster/Electrolisys/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsParser.cpp"
+  "command": "/usr/bin/g++ -DANTLR4CPP_STATIC -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS -I/home/oster/Electrolisys/bin/antlr4cpp_generated_src/ParseRules -I/home/oster/Electrolisys/grammar/antlr4_runtime/runtime/src -I/home/oster/Electrolisys/src -I/home/oster/Electrolisys/include -I/home/oster/boost_1_82_0  -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -g -std=gnu++20 -o CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/ParseRules/ParseRulesParser.cpp.o -c /home/oster/Electrolisys/bin/antlr4cpp_generated_src/ParseRules/ParseRulesParser.cpp",
+  "file": "/home/oster/Electrolisys/bin/antlr4cpp_generated_src/ParseRules/ParseRulesParser.cpp"
 },
 {
   "directory": "/home/oster/Electrolisys",
-  "command": "/usr/bin/g++ -DANTLR4CPP_STATIC -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS -I/home/oster/Electrolisys/bin/antlr4cpp_generated_src/bound_coefs -I/home/oster/Electrolisys/bin/antlr4cpp_generated_src/regions -I/home/oster/Electrolisys/grammar/antlr4_runtime/runtime/src -I/home/oster/Electrolisys/src -I/home/oster/Electrolisys/include -I/home/oster/boost_1_82_0  -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -g -std=gnu++20 -o CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsBaseListener.cpp.o -c /home/oster/Electrolisys/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsBaseListener.cpp",
-  "file": "/home/oster/Electrolisys/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsBaseListener.cpp"
+  "command": "/usr/bin/g++ -DANTLR4CPP_STATIC -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS -I/home/oster/Electrolisys/bin/antlr4cpp_generated_src/ParseRules -I/home/oster/Electrolisys/grammar/antlr4_runtime/runtime/src -I/home/oster/Electrolisys/src -I/home/oster/Electrolisys/include -I/home/oster/boost_1_82_0  -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -g -std=gnu++20 -o CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/ParseRules/ParseRulesBaseListener.cpp.o -c /home/oster/Electrolisys/bin/antlr4cpp_generated_src/ParseRules/ParseRulesBaseListener.cpp",
+  "file": "/home/oster/Electrolisys/bin/antlr4cpp_generated_src/ParseRules/ParseRulesBaseListener.cpp"
 },
 {
   "directory": "/home/oster/Electrolisys",
-  "command": "/usr/bin/g++ -DANTLR4CPP_STATIC -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS -I/home/oster/Electrolisys/bin/antlr4cpp_generated_src/bound_coefs -I/home/oster/Electrolisys/bin/antlr4cpp_generated_src/regions -I/home/oster/Electrolisys/grammar/antlr4_runtime/runtime/src -I/home/oster/Electrolisys/src -I/home/oster/Electrolisys/include -I/home/oster/boost_1_82_0  -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -g -std=gnu++20 -o CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsListener.cpp.o -c /home/oster/Electrolisys/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsListener.cpp",
-  "file": "/home/oster/Electrolisys/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsListener.cpp"
+  "command": "/usr/bin/g++ -DANTLR4CPP_STATIC -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS -I/home/oster/Electrolisys/bin/antlr4cpp_generated_src/ParseRules -I/home/oster/Electrolisys/grammar/antlr4_runtime/runtime/src -I/home/oster/Electrolisys/src -I/home/oster/Electrolisys/include -I/home/oster/boost_1_82_0  -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -g -std=gnu++20 -o CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/ParseRules/ParseRulesListener.cpp.o -c /home/oster/Electrolisys/bin/antlr4cpp_generated_src/ParseRules/ParseRulesListener.cpp",
+  "file": "/home/oster/Electrolisys/bin/antlr4cpp_generated_src/ParseRules/ParseRulesListener.cpp"
 },
 {
   "directory": "/home/oster/Electrolisys",
-  "command": "/usr/bin/g++ -DANTLR4CPP_STATIC -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS -I/home/oster/Electrolisys/bin/antlr4cpp_generated_src/bound_coefs -I/home/oster/Electrolisys/bin/antlr4cpp_generated_src/regions -I/home/oster/Electrolisys/grammar/antlr4_runtime/runtime/src -I/home/oster/Electrolisys/src -I/home/oster/Electrolisys/include -I/home/oster/boost_1_82_0  -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -g -std=gnu++20 -o CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsLexer.cpp.o -c /home/oster/Electrolisys/bin/antlr4cpp_generated_src/regions/regionsLexer.cpp",
-  "file": "/home/oster/Electrolisys/bin/antlr4cpp_generated_src/regions/regionsLexer.cpp"
+  "command": "/usr/bin/g++ -DANTLR4CPP_STATIC -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS -I/home/oster/Electrolisys/bin/antlr4cpp_generated_src/ParseRules -I/home/oster/Electrolisys/grammar/antlr4_runtime/runtime/src -I/home/oster/Electrolisys/src -I/home/oster/Electrolisys/include -I/home/oster/boost_1_82_0  -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -g -std=gnu++20 -o CMakeFiles/PhysProperties.dir/src/FormulaAST.cpp.o -c /home/oster/Electrolisys/src/FormulaAST.cpp",
+  "file": "/home/oster/Electrolisys/src/FormulaAST.cpp"
 },
 {
   "directory": "/home/oster/Electrolisys",
-  "command": "/usr/bin/g++ -DANTLR4CPP_STATIC -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS -I/home/oster/Electrolisys/bin/antlr4cpp_generated_src/bound_coefs -I/home/oster/Electrolisys/bin/antlr4cpp_generated_src/regions -I/home/oster/Electrolisys/grammar/antlr4_runtime/runtime/src -I/home/oster/Electrolisys/src -I/home/oster/Electrolisys/include -I/home/oster/boost_1_82_0  -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -g -std=gnu++20 -o CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsParser.cpp.o -c /home/oster/Electrolisys/bin/antlr4cpp_generated_src/regions/regionsParser.cpp",
-  "file": "/home/oster/Electrolisys/bin/antlr4cpp_generated_src/regions/regionsParser.cpp"
+  "command": "/usr/bin/g++ -DANTLR4CPP_STATIC -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS -I/home/oster/Electrolisys/bin/antlr4cpp_generated_src/ParseRules -I/home/oster/Electrolisys/grammar/antlr4_runtime/runtime/src -I/home/oster/Electrolisys/src -I/home/oster/Electrolisys/include -I/home/oster/boost_1_82_0  -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -g -std=gnu++20 -o CMakeFiles/PhysProperties.dir/src/formula.cpp.o -c /home/oster/Electrolisys/src/formula.cpp",
+  "file": "/home/oster/Electrolisys/src/formula.cpp"
 },
 {
   "directory": "/home/oster/Electrolisys",
-  "command": "/usr/bin/g++ -DANTLR4CPP_STATIC -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS -I/home/oster/Electrolisys/bin/antlr4cpp_generated_src/bound_coefs -I/home/oster/Electrolisys/bin/antlr4cpp_generated_src/regions -I/home/oster/Electrolisys/grammar/antlr4_runtime/runtime/src -I/home/oster/Electrolisys/src -I/home/oster/Electrolisys/include -I/home/oster/boost_1_82_0  -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -g -std=gnu++20 -o CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsBaseListener.cpp.o -c /home/oster/Electrolisys/bin/antlr4cpp_generated_src/regions/regionsBaseListener.cpp",
-  "file": "/home/oster/Electrolisys/bin/antlr4cpp_generated_src/regions/regionsBaseListener.cpp"
-},
-{
-  "directory": "/home/oster/Electrolisys",
-  "command": "/usr/bin/g++ -DANTLR4CPP_STATIC -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS -I/home/oster/Electrolisys/bin/antlr4cpp_generated_src/bound_coefs -I/home/oster/Electrolisys/bin/antlr4cpp_generated_src/regions -I/home/oster/Electrolisys/grammar/antlr4_runtime/runtime/src -I/home/oster/Electrolisys/src -I/home/oster/Electrolisys/include -I/home/oster/boost_1_82_0  -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -g -std=gnu++20 -o CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsListener.cpp.o -c /home/oster/Electrolisys/bin/antlr4cpp_generated_src/regions/regionsListener.cpp",
-  "file": "/home/oster/Electrolisys/bin/antlr4cpp_generated_src/regions/regionsListener.cpp"
-},
-{
-  "directory": "/home/oster/Electrolisys",
-  "command": "/usr/bin/g++ -DANTLR4CPP_STATIC -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS -I/home/oster/Electrolisys/bin/antlr4cpp_generated_src/bound_coefs -I/home/oster/Electrolisys/bin/antlr4cpp_generated_src/regions -I/home/oster/Electrolisys/grammar/antlr4_runtime/runtime/src -I/home/oster/Electrolisys/src -I/home/oster/Electrolisys/include -I/home/oster/boost_1_82_0  -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -g -std=gnu++20 -o CMakeFiles/PhysProperties.dir/src/specificvolume.cpp.o -c /home/oster/Electrolisys/src/specificvolume.cpp",
+  "command": "/usr/bin/g++ -DANTLR4CPP_STATIC -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS -I/home/oster/Electrolisys/bin/antlr4cpp_generated_src/ParseRules -I/home/oster/Electrolisys/grammar/antlr4_runtime/runtime/src -I/home/oster/Electrolisys/src -I/home/oster/Electrolisys/include -I/home/oster/boost_1_82_0  -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -g -std=gnu++20 -o CMakeFiles/PhysProperties.dir/src/specificvolume.cpp.o -c /home/oster/Electrolisys/src/specificvolume.cpp",
   "file": "/home/oster/Electrolisys/src/specificvolume.cpp"
 },
 {
   "directory": "/home/oster/Electrolisys",
-  "command": "/usr/bin/g++ -DANTLR4CPP_STATIC -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS -I/home/oster/Electrolisys/bin/antlr4cpp_generated_src/bound_coefs -I/home/oster/Electrolisys/bin/antlr4cpp_generated_src/regions -I/home/oster/Electrolisys/grammar/antlr4_runtime/runtime/src -I/home/oster/Electrolisys/src -I/home/oster/Electrolisys/include -I/home/oster/boost_1_82_0  -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -g -std=gnu++20 -o CMakeFiles/PhysProperties.dir/src/zone.cpp.o -c /home/oster/Electrolisys/src/zone.cpp",
+  "command": "/usr/bin/g++ -DANTLR4CPP_STATIC -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS -I/home/oster/Electrolisys/bin/antlr4cpp_generated_src/ParseRules -I/home/oster/Electrolisys/grammar/antlr4_runtime/runtime/src -I/home/oster/Electrolisys/src -I/home/oster/Electrolisys/include -I/home/oster/boost_1_82_0  -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -g -std=gnu++20 -o CMakeFiles/PhysProperties.dir/src/zone.cpp.o -c /home/oster/Electrolisys/src/zone.cpp",
   "file": "/home/oster/Electrolisys/src/zone.cpp"
 },
 {
   "directory": "/home/oster/Electrolisys",
-  "command": "/usr/bin/g++ -DANTLR4CPP_STATIC -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS -I/home/oster/Electrolisys/bin/antlr4cpp_generated_src/bound_coefs -I/home/oster/Electrolisys/bin/antlr4cpp_generated_src/regions -I/home/oster/Electrolisys/grammar/antlr4_runtime/runtime/src -I/home/oster/Electrolisys/src -I/home/oster/Electrolisys/include -I/home/oster/boost_1_82_0  -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -g -std=gnu++20 -o CMakeFiles/PhysProperties.dir/src/zonebound.cpp.o -c /home/oster/Electrolisys/src/zonebound.cpp",
+  "command": "/usr/bin/g++ -DANTLR4CPP_STATIC -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS -I/home/oster/Electrolisys/bin/antlr4cpp_generated_src/ParseRules -I/home/oster/Electrolisys/grammar/antlr4_runtime/runtime/src -I/home/oster/Electrolisys/src -I/home/oster/Electrolisys/include -I/home/oster/boost_1_82_0  -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -g -std=gnu++20 -o CMakeFiles/PhysProperties.dir/src/zonebound.cpp.o -c /home/oster/Electrolisys/src/zonebound.cpp",
   "file": "/home/oster/Electrolisys/src/zonebound.cpp"
 },
 {

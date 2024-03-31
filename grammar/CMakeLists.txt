@@ -70,14 +70,12 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/grammar/antlr4_runtime)
 message(STATUS ${WORKING_DIRECTORY})
 make_directory(${CMAKE_CURRENT_SOURCE_DIR}/grammar/antlr4_runtime/runtime/src)
 
-antlr_target(Bounds ${CMAKE_CURRENT_SOURCE_DIR}/grammar/bound_coefs.g4 GENERATE_CPP LEXER PARSER LISTENER)
-antlr_target(Regions ${CMAKE_CURRENT_SOURCE_DIR}/grammar/regions.g4 GENERATE_CPP LEXER PARSER LISTENER)
+antlr_target(Parserules ${CMAKE_CURRENT_SOURCE_DIR}/grammar/ParseRules.g4 GENERATE_CPP LEXER PARSER LISTENER)
 
-set(ANTLR_OUTPUT_DIRS ${ANTLR_Bounds_OUTPUT_DIR} ${ANTLR_Regions_OUTPUT_DIR})
+set(ANTLR_OUTPUT_DIRS ${ANTLR_Parserules_OUTPUT_DIR})
 
 include_directories(
     ${ANTLR4_INCLUDE_DIRS}
-    ${ANTLR_Bounds_OUTPUT_DIR}
-	${ANTLR_Regions_OUTPUT_DIR}
+    ${ANTLR_Parserules_OUTPUT_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/grammar/antlr4_runtime/runtime/src
 )
