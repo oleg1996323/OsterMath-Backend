@@ -9,7 +9,8 @@
 #include <string_view>
 //#include <boost/multiprecision/cpp_dec_float.hpp>
 #include <memory>
-#include "constants.h"
+#include "def.h"
+#include "bound_coefsLexer.h"
 
 namespace Bound{
 
@@ -22,8 +23,6 @@ const static std::filesystem::path bound_file_dir = std::filesystem::path("./Dat
 enum class TempBoundName{
     crt_t,ab,ef,op,cd,gh,ij,jk,mn,qu,rx,uv,wx,B23,sat_t
 };
-
-
 
 const static std::map<TempBoundName,std::string> paths = {
     {TempBoundName::ab,"./Data/boundaries/ab.txt"},

@@ -23,15 +23,6 @@ ANTLR_BUILD_SHARED:BOOL=ON
 //Build the static library of the ANTLR runtime
 ANTLR_BUILD_STATIC:BOOL=ON
 
-//Value Computed by CMake
-AntlrGrammar_BINARY_DIR:STATIC=/home/oster/Electrolisys
-
-//Value Computed by CMake
-AntlrGrammar_IS_TOP_LEVEL:STATIC=ON
-
-//Value Computed by CMake
-AntlrGrammar_SOURCE_DIR:STATIC=/home/oster/Electrolisys
-
 //Builds the googlemock subproject
 BUILD_GMOCK:BOOL=ON
 
@@ -213,7 +204,7 @@ CMAKE_PROJECT_DESCRIPTION:STATIC=
 CMAKE_PROJECT_HOMEPAGE_URL:STATIC=
 
 //Value Computed by CMake
-CMAKE_PROJECT_NAME:STATIC=AntlrGrammar
+CMAKE_PROJECT_NAME:STATIC=PhysProperties
 
 //Value Computed by CMake
 CMAKE_PROJECT_VERSION:STATIC=1.11.0
@@ -343,15 +334,6 @@ CPACK_SOURCE_ZIP:BOOL=OFF
 //Suppress compiler warnings for all built ANTLR targets
 DISABLE_WARNINGS:BOOL=OFF
 
-//Value Computed by CMake
-Electrolisys_BINARY_DIR:STATIC=/home/oster/Electrolisys
-
-//Value Computed by CMake
-Electrolisys_IS_TOP_LEVEL:STATIC=ON
-
-//Value Computed by CMake
-Electrolisys_SOURCE_DIR:STATIC=/home/oster/Electrolisys
-
 //Directory under which to collect all populated content
 FETCHCONTENT_BASE_DIR:PATH=/home/oster/Electrolisys/_deps
 
@@ -398,13 +380,13 @@ Java_JAVAH_EXECUTABLE:FILEPATH=Java_JAVAH_EXECUTABLE-NOTFOUND
 Java_JAVA_EXECUTABLE:FILEPATH=/usr/bin/java
 
 //Value Computed by CMake
-LIBANTLR4_BINARY_DIR:STATIC=/home/oster/Electrolisys/antlr4_runtime
+LIBANTLR4_BINARY_DIR:STATIC=/home/oster/Electrolisys/grammar/antlr4_runtime
 
 //Value Computed by CMake
 LIBANTLR4_IS_TOP_LEVEL:STATIC=OFF
 
 //Value Computed by CMake
-LIBANTLR4_SOURCE_DIR:STATIC=/home/oster/Electrolisys/antlr4_runtime
+LIBANTLR4_SOURCE_DIR:STATIC=/home/oster/Electrolisys/grammar/antlr4_runtime
 
 //Value Computed by CMake
 PhysProperties_BINARY_DIR:STATIC=/home/oster/Electrolisys
@@ -413,7 +395,7 @@ PhysProperties_BINARY_DIR:STATIC=/home/oster/Electrolisys
 PhysProperties_IS_TOP_LEVEL:STATIC=ON
 
 //Dependencies for the target
-PhysProperties_LIB_DEPENDS:STATIC=general;antlr4_static;
+PhysProperties_LIB_DEPENDS:STATIC=general;antlr4_static;general;/home/oster/boost_1_82_0/stage/lib/*.lib;
 
 //Value Computed by CMake
 PhysProperties_SOURCE_DIR:STATIC=/home/oster/Electrolisys
@@ -487,15 +469,6 @@ gtest_hide_internal_symbols:BOOL=OFF
 //Dependencies for the target
 gtest_main_LIB_DEPENDS:STATIC=general;gtest;
 
-//Value Computed by CMake
-spreadsheet_BINARY_DIR:STATIC=/home/oster/Electrolisys
-
-//Value Computed by CMake
-spreadsheet_IS_TOP_LEVEL:STATIC=ON
-
-//Value Computed by CMake
-spreadsheet_SOURCE_DIR:STATIC=/home/oster/Electrolisys
-
 
 ########################
 # INTERNAL cache entries
@@ -567,6 +540,8 @@ CMAKE_EXE_LINKER_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1
 CMAKE_EXE_LINKER_FLAGS_RELEASE-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO
 CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_EXPORT_COMPILE_COMMANDS
+CMAKE_EXPORT_COMPILE_COMMANDS-ADVANCED:INTERNAL=1
 //Name of external makefile project generator.
 CMAKE_EXTRA_GENERATOR:INTERNAL=
 //Name of generator.
@@ -711,7 +686,7 @@ CPACK_SOURCE_TZ-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CPACK_SOURCE_ZIP
 CPACK_SOURCE_ZIP-ADVANCED:INTERNAL=1
 //Details about finding ANTLR
-FIND_PACKAGE_MESSAGE_DETAILS_ANTLR:INTERNAL=[/home/oster/Electrolisys/antlr-4.13.1-complete.jar][/usr/bin/java][v4.13.1()]
+FIND_PACKAGE_MESSAGE_DETAILS_ANTLR:INTERNAL=[/home/oster/Electrolisys/grammar/antlr-4.13.1-complete.jar][/usr/bin/java][v4.13.1()]
 //Details about finding Python
 FIND_PACKAGE_MESSAGE_DETAILS_Python:INTERNAL=[/usr/bin/python3.10][cfound components: Interpreter ][v3.10.12()]
 //Details about finding Threads

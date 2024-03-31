@@ -69,131 +69,284 @@ include CMakeFiles/PhysProperties.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/PhysProperties.dir/flags.make
 
-antlr4cpp_generated_src/TempBound/TempBoundLexer.interp: TempBound.g4
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/oster/Electrolisys/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building TempBoundEquations with ANTLR 4.13.1"
-	/usr/bin/java -jar /home/oster/Electrolisys/antlr-4.13.1-complete.jar TempBound.g4 -o /home/oster/Electrolisys/antlr4cpp_generated_src/TempBound -no-listener -Dlanguage=Cpp -listener
+bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.interp: grammar/bound_coefs.g4
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/oster/Electrolisys/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building Bounds with ANTLR 4.13.1"
+	/usr/bin/java -jar /home/oster/Electrolisys/grammar/antlr-4.13.1-complete.jar /home/oster/Electrolisys/grammar/bound_coefs.g4 -o /home/oster/Electrolisys/bin/antlr4cpp_generated_src/bound_coefs -no-listener -Dlanguage=Cpp -listener
 
-antlr4cpp_generated_src/TempBound/TempBoundLexer.tokens: antlr4cpp_generated_src/TempBound/TempBoundLexer.interp
-	@$(CMAKE_COMMAND) -E touch_nocreate antlr4cpp_generated_src/TempBound/TempBoundLexer.tokens
+bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.tokens: bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.interp
+	@$(CMAKE_COMMAND) -E touch_nocreate bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.tokens
 
-antlr4cpp_generated_src/TempBound/TempBoundLexer.h: antlr4cpp_generated_src/TempBound/TempBoundLexer.interp
-	@$(CMAKE_COMMAND) -E touch_nocreate antlr4cpp_generated_src/TempBound/TempBoundLexer.h
+bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.h: bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.interp
+	@$(CMAKE_COMMAND) -E touch_nocreate bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.h
 
-antlr4cpp_generated_src/TempBound/TempBoundLexer.cpp: antlr4cpp_generated_src/TempBound/TempBoundLexer.interp
-	@$(CMAKE_COMMAND) -E touch_nocreate antlr4cpp_generated_src/TempBound/TempBoundLexer.cpp
+bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.cpp: bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.interp
+	@$(CMAKE_COMMAND) -E touch_nocreate bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.cpp
 
-antlr4cpp_generated_src/TempBound/TempBoundParser.h: antlr4cpp_generated_src/TempBound/TempBoundLexer.interp
-	@$(CMAKE_COMMAND) -E touch_nocreate antlr4cpp_generated_src/TempBound/TempBoundParser.h
+bin/antlr4cpp_generated_src/bound_coefs/bound_coefsParser.h: bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.interp
+	@$(CMAKE_COMMAND) -E touch_nocreate bin/antlr4cpp_generated_src/bound_coefs/bound_coefsParser.h
 
-antlr4cpp_generated_src/TempBound/TempBoundParser.cpp: antlr4cpp_generated_src/TempBound/TempBoundLexer.interp
-	@$(CMAKE_COMMAND) -E touch_nocreate antlr4cpp_generated_src/TempBound/TempBoundParser.cpp
+bin/antlr4cpp_generated_src/bound_coefs/bound_coefsParser.cpp: bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.interp
+	@$(CMAKE_COMMAND) -E touch_nocreate bin/antlr4cpp_generated_src/bound_coefs/bound_coefsParser.cpp
 
-antlr4cpp_generated_src/TempBound/TempBoundBaseListener.h: antlr4cpp_generated_src/TempBound/TempBoundLexer.interp
-	@$(CMAKE_COMMAND) -E touch_nocreate antlr4cpp_generated_src/TempBound/TempBoundBaseListener.h
+bin/antlr4cpp_generated_src/bound_coefs/bound_coefsBaseListener.h: bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.interp
+	@$(CMAKE_COMMAND) -E touch_nocreate bin/antlr4cpp_generated_src/bound_coefs/bound_coefsBaseListener.h
 
-antlr4cpp_generated_src/TempBound/TempBoundBaseListener.cpp: antlr4cpp_generated_src/TempBound/TempBoundLexer.interp
-	@$(CMAKE_COMMAND) -E touch_nocreate antlr4cpp_generated_src/TempBound/TempBoundBaseListener.cpp
+bin/antlr4cpp_generated_src/bound_coefs/bound_coefsBaseListener.cpp: bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.interp
+	@$(CMAKE_COMMAND) -E touch_nocreate bin/antlr4cpp_generated_src/bound_coefs/bound_coefsBaseListener.cpp
 
-antlr4cpp_generated_src/TempBound/TempBoundListener.h: antlr4cpp_generated_src/TempBound/TempBoundLexer.interp
-	@$(CMAKE_COMMAND) -E touch_nocreate antlr4cpp_generated_src/TempBound/TempBoundListener.h
+bin/antlr4cpp_generated_src/bound_coefs/bound_coefsListener.h: bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.interp
+	@$(CMAKE_COMMAND) -E touch_nocreate bin/antlr4cpp_generated_src/bound_coefs/bound_coefsListener.h
 
-antlr4cpp_generated_src/TempBound/TempBoundListener.cpp: antlr4cpp_generated_src/TempBound/TempBoundLexer.interp
-	@$(CMAKE_COMMAND) -E touch_nocreate antlr4cpp_generated_src/TempBound/TempBoundListener.cpp
+bin/antlr4cpp_generated_src/bound_coefs/bound_coefsListener.cpp: bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.interp
+	@$(CMAKE_COMMAND) -E touch_nocreate bin/antlr4cpp_generated_src/bound_coefs/bound_coefsListener.cpp
 
-CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundLexer.cpp.o: CMakeFiles/PhysProperties.dir/flags.make
-CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundLexer.cpp.o: antlr4cpp_generated_src/TempBound/TempBoundLexer.cpp
-CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundLexer.cpp.o: CMakeFiles/PhysProperties.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/oster/Electrolisys/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundLexer.cpp.o"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundLexer.cpp.o -MF CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundLexer.cpp.o.d -o CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundLexer.cpp.o -c /home/oster/Electrolisys/antlr4cpp_generated_src/TempBound/TempBoundLexer.cpp
+bin/antlr4cpp_generated_src/regions/regionsLexer.interp: grammar/regions.g4
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/oster/Electrolisys/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building Regions with ANTLR 4.13.1"
+	/usr/bin/java -jar /home/oster/Electrolisys/grammar/antlr-4.13.1-complete.jar /home/oster/Electrolisys/grammar/regions.g4 -o /home/oster/Electrolisys/bin/antlr4cpp_generated_src/regions -no-listener -Dlanguage=Cpp -listener
 
-CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundLexer.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundLexer.cpp.i"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/oster/Electrolisys/antlr4cpp_generated_src/TempBound/TempBoundLexer.cpp > CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundLexer.cpp.i
+bin/antlr4cpp_generated_src/regions/regionsLexer.tokens: bin/antlr4cpp_generated_src/regions/regionsLexer.interp
+	@$(CMAKE_COMMAND) -E touch_nocreate bin/antlr4cpp_generated_src/regions/regionsLexer.tokens
 
-CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundLexer.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundLexer.cpp.s"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/oster/Electrolisys/antlr4cpp_generated_src/TempBound/TempBoundLexer.cpp -o CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundLexer.cpp.s
+bin/antlr4cpp_generated_src/regions/regionsLexer.h: bin/antlr4cpp_generated_src/regions/regionsLexer.interp
+	@$(CMAKE_COMMAND) -E touch_nocreate bin/antlr4cpp_generated_src/regions/regionsLexer.h
 
-CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundParser.cpp.o: CMakeFiles/PhysProperties.dir/flags.make
-CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundParser.cpp.o: antlr4cpp_generated_src/TempBound/TempBoundParser.cpp
-CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundParser.cpp.o: CMakeFiles/PhysProperties.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/oster/Electrolisys/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundParser.cpp.o"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundParser.cpp.o -MF CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundParser.cpp.o.d -o CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundParser.cpp.o -c /home/oster/Electrolisys/antlr4cpp_generated_src/TempBound/TempBoundParser.cpp
+bin/antlr4cpp_generated_src/regions/regionsLexer.cpp: bin/antlr4cpp_generated_src/regions/regionsLexer.interp
+	@$(CMAKE_COMMAND) -E touch_nocreate bin/antlr4cpp_generated_src/regions/regionsLexer.cpp
 
-CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundParser.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundParser.cpp.i"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/oster/Electrolisys/antlr4cpp_generated_src/TempBound/TempBoundParser.cpp > CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundParser.cpp.i
+bin/antlr4cpp_generated_src/regions/regionsParser.h: bin/antlr4cpp_generated_src/regions/regionsLexer.interp
+	@$(CMAKE_COMMAND) -E touch_nocreate bin/antlr4cpp_generated_src/regions/regionsParser.h
 
-CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundParser.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundParser.cpp.s"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/oster/Electrolisys/antlr4cpp_generated_src/TempBound/TempBoundParser.cpp -o CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundParser.cpp.s
+bin/antlr4cpp_generated_src/regions/regionsParser.cpp: bin/antlr4cpp_generated_src/regions/regionsLexer.interp
+	@$(CMAKE_COMMAND) -E touch_nocreate bin/antlr4cpp_generated_src/regions/regionsParser.cpp
 
-CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundBaseListener.cpp.o: CMakeFiles/PhysProperties.dir/flags.make
-CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundBaseListener.cpp.o: antlr4cpp_generated_src/TempBound/TempBoundBaseListener.cpp
-CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundBaseListener.cpp.o: CMakeFiles/PhysProperties.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/oster/Electrolisys/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundBaseListener.cpp.o"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundBaseListener.cpp.o -MF CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundBaseListener.cpp.o.d -o CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundBaseListener.cpp.o -c /home/oster/Electrolisys/antlr4cpp_generated_src/TempBound/TempBoundBaseListener.cpp
+bin/antlr4cpp_generated_src/regions/regionsBaseListener.h: bin/antlr4cpp_generated_src/regions/regionsLexer.interp
+	@$(CMAKE_COMMAND) -E touch_nocreate bin/antlr4cpp_generated_src/regions/regionsBaseListener.h
 
-CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundBaseListener.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundBaseListener.cpp.i"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/oster/Electrolisys/antlr4cpp_generated_src/TempBound/TempBoundBaseListener.cpp > CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundBaseListener.cpp.i
+bin/antlr4cpp_generated_src/regions/regionsBaseListener.cpp: bin/antlr4cpp_generated_src/regions/regionsLexer.interp
+	@$(CMAKE_COMMAND) -E touch_nocreate bin/antlr4cpp_generated_src/regions/regionsBaseListener.cpp
 
-CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundBaseListener.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundBaseListener.cpp.s"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/oster/Electrolisys/antlr4cpp_generated_src/TempBound/TempBoundBaseListener.cpp -o CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundBaseListener.cpp.s
+bin/antlr4cpp_generated_src/regions/regionsListener.h: bin/antlr4cpp_generated_src/regions/regionsLexer.interp
+	@$(CMAKE_COMMAND) -E touch_nocreate bin/antlr4cpp_generated_src/regions/regionsListener.h
 
-CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundListener.cpp.o: CMakeFiles/PhysProperties.dir/flags.make
-CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundListener.cpp.o: antlr4cpp_generated_src/TempBound/TempBoundListener.cpp
-CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundListener.cpp.o: CMakeFiles/PhysProperties.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/oster/Electrolisys/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundListener.cpp.o"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundListener.cpp.o -MF CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundListener.cpp.o.d -o CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundListener.cpp.o -c /home/oster/Electrolisys/antlr4cpp_generated_src/TempBound/TempBoundListener.cpp
+bin/antlr4cpp_generated_src/regions/regionsListener.cpp: bin/antlr4cpp_generated_src/regions/regionsLexer.interp
+	@$(CMAKE_COMMAND) -E touch_nocreate bin/antlr4cpp_generated_src/regions/regionsListener.cpp
 
-CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundListener.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundListener.cpp.i"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/oster/Electrolisys/antlr4cpp_generated_src/TempBound/TempBoundListener.cpp > CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundListener.cpp.i
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.cpp.o: CMakeFiles/PhysProperties.dir/flags.make
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.cpp.o: bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.cpp
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.cpp.o: CMakeFiles/PhysProperties.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/oster/Electrolisys/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.cpp.o"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.cpp.o -MF CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.cpp.o.d -o CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.cpp.o -c /home/oster/Electrolisys/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.cpp
 
-CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundListener.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundListener.cpp.s"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/oster/Electrolisys/antlr4cpp_generated_src/TempBound/TempBoundListener.cpp -o CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundListener.cpp.s
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.cpp.i"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/oster/Electrolisys/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.cpp > CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.cpp.i
+
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.cpp.s"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/oster/Electrolisys/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.cpp -o CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.cpp.s
+
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsParser.cpp.o: CMakeFiles/PhysProperties.dir/flags.make
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsParser.cpp.o: bin/antlr4cpp_generated_src/bound_coefs/bound_coefsParser.cpp
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsParser.cpp.o: CMakeFiles/PhysProperties.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/oster/Electrolisys/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsParser.cpp.o"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsParser.cpp.o -MF CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsParser.cpp.o.d -o CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsParser.cpp.o -c /home/oster/Electrolisys/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsParser.cpp
+
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsParser.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsParser.cpp.i"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/oster/Electrolisys/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsParser.cpp > CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsParser.cpp.i
+
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsParser.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsParser.cpp.s"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/oster/Electrolisys/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsParser.cpp -o CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsParser.cpp.s
+
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsBaseListener.cpp.o: CMakeFiles/PhysProperties.dir/flags.make
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsBaseListener.cpp.o: bin/antlr4cpp_generated_src/bound_coefs/bound_coefsBaseListener.cpp
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsBaseListener.cpp.o: CMakeFiles/PhysProperties.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/oster/Electrolisys/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsBaseListener.cpp.o"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsBaseListener.cpp.o -MF CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsBaseListener.cpp.o.d -o CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsBaseListener.cpp.o -c /home/oster/Electrolisys/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsBaseListener.cpp
+
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsBaseListener.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsBaseListener.cpp.i"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/oster/Electrolisys/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsBaseListener.cpp > CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsBaseListener.cpp.i
+
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsBaseListener.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsBaseListener.cpp.s"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/oster/Electrolisys/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsBaseListener.cpp -o CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsBaseListener.cpp.s
+
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsListener.cpp.o: CMakeFiles/PhysProperties.dir/flags.make
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsListener.cpp.o: bin/antlr4cpp_generated_src/bound_coefs/bound_coefsListener.cpp
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsListener.cpp.o: CMakeFiles/PhysProperties.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/oster/Electrolisys/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsListener.cpp.o"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsListener.cpp.o -MF CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsListener.cpp.o.d -o CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsListener.cpp.o -c /home/oster/Electrolisys/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsListener.cpp
+
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsListener.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsListener.cpp.i"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/oster/Electrolisys/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsListener.cpp > CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsListener.cpp.i
+
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsListener.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsListener.cpp.s"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/oster/Electrolisys/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsListener.cpp -o CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsListener.cpp.s
+
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsLexer.cpp.o: CMakeFiles/PhysProperties.dir/flags.make
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsLexer.cpp.o: bin/antlr4cpp_generated_src/regions/regionsLexer.cpp
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsLexer.cpp.o: CMakeFiles/PhysProperties.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/oster/Electrolisys/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsLexer.cpp.o"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsLexer.cpp.o -MF CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsLexer.cpp.o.d -o CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsLexer.cpp.o -c /home/oster/Electrolisys/bin/antlr4cpp_generated_src/regions/regionsLexer.cpp
+
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsLexer.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsLexer.cpp.i"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/oster/Electrolisys/bin/antlr4cpp_generated_src/regions/regionsLexer.cpp > CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsLexer.cpp.i
+
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsLexer.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsLexer.cpp.s"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/oster/Electrolisys/bin/antlr4cpp_generated_src/regions/regionsLexer.cpp -o CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsLexer.cpp.s
+
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsParser.cpp.o: CMakeFiles/PhysProperties.dir/flags.make
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsParser.cpp.o: bin/antlr4cpp_generated_src/regions/regionsParser.cpp
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsParser.cpp.o: CMakeFiles/PhysProperties.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/oster/Electrolisys/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsParser.cpp.o"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsParser.cpp.o -MF CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsParser.cpp.o.d -o CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsParser.cpp.o -c /home/oster/Electrolisys/bin/antlr4cpp_generated_src/regions/regionsParser.cpp
+
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsParser.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsParser.cpp.i"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/oster/Electrolisys/bin/antlr4cpp_generated_src/regions/regionsParser.cpp > CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsParser.cpp.i
+
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsParser.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsParser.cpp.s"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/oster/Electrolisys/bin/antlr4cpp_generated_src/regions/regionsParser.cpp -o CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsParser.cpp.s
+
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsBaseListener.cpp.o: CMakeFiles/PhysProperties.dir/flags.make
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsBaseListener.cpp.o: bin/antlr4cpp_generated_src/regions/regionsBaseListener.cpp
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsBaseListener.cpp.o: CMakeFiles/PhysProperties.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/oster/Electrolisys/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsBaseListener.cpp.o"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsBaseListener.cpp.o -MF CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsBaseListener.cpp.o.d -o CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsBaseListener.cpp.o -c /home/oster/Electrolisys/bin/antlr4cpp_generated_src/regions/regionsBaseListener.cpp
+
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsBaseListener.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsBaseListener.cpp.i"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/oster/Electrolisys/bin/antlr4cpp_generated_src/regions/regionsBaseListener.cpp > CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsBaseListener.cpp.i
+
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsBaseListener.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsBaseListener.cpp.s"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/oster/Electrolisys/bin/antlr4cpp_generated_src/regions/regionsBaseListener.cpp -o CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsBaseListener.cpp.s
+
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsListener.cpp.o: CMakeFiles/PhysProperties.dir/flags.make
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsListener.cpp.o: bin/antlr4cpp_generated_src/regions/regionsListener.cpp
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsListener.cpp.o: CMakeFiles/PhysProperties.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/oster/Electrolisys/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsListener.cpp.o"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsListener.cpp.o -MF CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsListener.cpp.o.d -o CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsListener.cpp.o -c /home/oster/Electrolisys/bin/antlr4cpp_generated_src/regions/regionsListener.cpp
+
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsListener.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsListener.cpp.i"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/oster/Electrolisys/bin/antlr4cpp_generated_src/regions/regionsListener.cpp > CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsListener.cpp.i
+
+CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsListener.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsListener.cpp.s"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/oster/Electrolisys/bin/antlr4cpp_generated_src/regions/regionsListener.cpp -o CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsListener.cpp.s
+
+CMakeFiles/PhysProperties.dir/src/specificvolume.cpp.o: CMakeFiles/PhysProperties.dir/flags.make
+CMakeFiles/PhysProperties.dir/src/specificvolume.cpp.o: src/specificvolume.cpp
+CMakeFiles/PhysProperties.dir/src/specificvolume.cpp.o: CMakeFiles/PhysProperties.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/oster/Electrolisys/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/PhysProperties.dir/src/specificvolume.cpp.o"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/PhysProperties.dir/src/specificvolume.cpp.o -MF CMakeFiles/PhysProperties.dir/src/specificvolume.cpp.o.d -o CMakeFiles/PhysProperties.dir/src/specificvolume.cpp.o -c /home/oster/Electrolisys/src/specificvolume.cpp
+
+CMakeFiles/PhysProperties.dir/src/specificvolume.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/PhysProperties.dir/src/specificvolume.cpp.i"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/oster/Electrolisys/src/specificvolume.cpp > CMakeFiles/PhysProperties.dir/src/specificvolume.cpp.i
+
+CMakeFiles/PhysProperties.dir/src/specificvolume.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/PhysProperties.dir/src/specificvolume.cpp.s"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/oster/Electrolisys/src/specificvolume.cpp -o CMakeFiles/PhysProperties.dir/src/specificvolume.cpp.s
+
+CMakeFiles/PhysProperties.dir/src/zone.cpp.o: CMakeFiles/PhysProperties.dir/flags.make
+CMakeFiles/PhysProperties.dir/src/zone.cpp.o: src/zone.cpp
+CMakeFiles/PhysProperties.dir/src/zone.cpp.o: CMakeFiles/PhysProperties.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/oster/Electrolisys/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/PhysProperties.dir/src/zone.cpp.o"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/PhysProperties.dir/src/zone.cpp.o -MF CMakeFiles/PhysProperties.dir/src/zone.cpp.o.d -o CMakeFiles/PhysProperties.dir/src/zone.cpp.o -c /home/oster/Electrolisys/src/zone.cpp
+
+CMakeFiles/PhysProperties.dir/src/zone.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/PhysProperties.dir/src/zone.cpp.i"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/oster/Electrolisys/src/zone.cpp > CMakeFiles/PhysProperties.dir/src/zone.cpp.i
+
+CMakeFiles/PhysProperties.dir/src/zone.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/PhysProperties.dir/src/zone.cpp.s"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/oster/Electrolisys/src/zone.cpp -o CMakeFiles/PhysProperties.dir/src/zone.cpp.s
+
+CMakeFiles/PhysProperties.dir/src/zonebound.cpp.o: CMakeFiles/PhysProperties.dir/flags.make
+CMakeFiles/PhysProperties.dir/src/zonebound.cpp.o: src/zonebound.cpp
+CMakeFiles/PhysProperties.dir/src/zonebound.cpp.o: CMakeFiles/PhysProperties.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/oster/Electrolisys/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/PhysProperties.dir/src/zonebound.cpp.o"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/PhysProperties.dir/src/zonebound.cpp.o -MF CMakeFiles/PhysProperties.dir/src/zonebound.cpp.o.d -o CMakeFiles/PhysProperties.dir/src/zonebound.cpp.o -c /home/oster/Electrolisys/src/zonebound.cpp
+
+CMakeFiles/PhysProperties.dir/src/zonebound.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/PhysProperties.dir/src/zonebound.cpp.i"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/oster/Electrolisys/src/zonebound.cpp > CMakeFiles/PhysProperties.dir/src/zonebound.cpp.i
+
+CMakeFiles/PhysProperties.dir/src/zonebound.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/PhysProperties.dir/src/zonebound.cpp.s"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/oster/Electrolisys/src/zonebound.cpp -o CMakeFiles/PhysProperties.dir/src/zonebound.cpp.s
 
 # Object files for target PhysProperties
 PhysProperties_OBJECTS = \
-"CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundLexer.cpp.o" \
-"CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundParser.cpp.o" \
-"CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundBaseListener.cpp.o" \
-"CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundListener.cpp.o"
+"CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.cpp.o" \
+"CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsParser.cpp.o" \
+"CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsBaseListener.cpp.o" \
+"CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsListener.cpp.o" \
+"CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsLexer.cpp.o" \
+"CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsParser.cpp.o" \
+"CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsBaseListener.cpp.o" \
+"CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsListener.cpp.o" \
+"CMakeFiles/PhysProperties.dir/src/specificvolume.cpp.o" \
+"CMakeFiles/PhysProperties.dir/src/zone.cpp.o" \
+"CMakeFiles/PhysProperties.dir/src/zonebound.cpp.o"
 
 # External object files for target PhysProperties
 PhysProperties_EXTERNAL_OBJECTS =
 
-libPhysProperties.so: CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundLexer.cpp.o
-libPhysProperties.so: CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundParser.cpp.o
-libPhysProperties.so: CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundBaseListener.cpp.o
-libPhysProperties.so: CMakeFiles/PhysProperties.dir/antlr4cpp_generated_src/TempBound/TempBoundListener.cpp.o
-libPhysProperties.so: CMakeFiles/PhysProperties.dir/build.make
-libPhysProperties.so: antlr4_runtime/runtime/libantlr4-runtime.a
-libPhysProperties.so: CMakeFiles/PhysProperties.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/oster/Electrolisys/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX shared library libPhysProperties.so"
+libPhysProperties.a: CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.cpp.o
+libPhysProperties.a: CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsParser.cpp.o
+libPhysProperties.a: CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsBaseListener.cpp.o
+libPhysProperties.a: CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/bound_coefs/bound_coefsListener.cpp.o
+libPhysProperties.a: CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsLexer.cpp.o
+libPhysProperties.a: CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsParser.cpp.o
+libPhysProperties.a: CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsBaseListener.cpp.o
+libPhysProperties.a: CMakeFiles/PhysProperties.dir/bin/antlr4cpp_generated_src/regions/regionsListener.cpp.o
+libPhysProperties.a: CMakeFiles/PhysProperties.dir/src/specificvolume.cpp.o
+libPhysProperties.a: CMakeFiles/PhysProperties.dir/src/zone.cpp.o
+libPhysProperties.a: CMakeFiles/PhysProperties.dir/src/zonebound.cpp.o
+libPhysProperties.a: CMakeFiles/PhysProperties.dir/build.make
+libPhysProperties.a: CMakeFiles/PhysProperties.dir/link.txt
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/oster/Electrolisys/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Linking CXX static library libPhysProperties.a"
+	$(CMAKE_COMMAND) -P CMakeFiles/PhysProperties.dir/cmake_clean_target.cmake
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/PhysProperties.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
-CMakeFiles/PhysProperties.dir/build: libPhysProperties.so
+CMakeFiles/PhysProperties.dir/build: libPhysProperties.a
 .PHONY : CMakeFiles/PhysProperties.dir/build
 
 CMakeFiles/PhysProperties.dir/clean:
 	$(CMAKE_COMMAND) -P CMakeFiles/PhysProperties.dir/cmake_clean.cmake
 .PHONY : CMakeFiles/PhysProperties.dir/clean
 
-CMakeFiles/PhysProperties.dir/depend: antlr4cpp_generated_src/TempBound/TempBoundBaseListener.cpp
-CMakeFiles/PhysProperties.dir/depend: antlr4cpp_generated_src/TempBound/TempBoundBaseListener.h
-CMakeFiles/PhysProperties.dir/depend: antlr4cpp_generated_src/TempBound/TempBoundLexer.cpp
-CMakeFiles/PhysProperties.dir/depend: antlr4cpp_generated_src/TempBound/TempBoundLexer.h
-CMakeFiles/PhysProperties.dir/depend: antlr4cpp_generated_src/TempBound/TempBoundLexer.interp
-CMakeFiles/PhysProperties.dir/depend: antlr4cpp_generated_src/TempBound/TempBoundLexer.tokens
-CMakeFiles/PhysProperties.dir/depend: antlr4cpp_generated_src/TempBound/TempBoundListener.cpp
-CMakeFiles/PhysProperties.dir/depend: antlr4cpp_generated_src/TempBound/TempBoundListener.h
-CMakeFiles/PhysProperties.dir/depend: antlr4cpp_generated_src/TempBound/TempBoundParser.cpp
-CMakeFiles/PhysProperties.dir/depend: antlr4cpp_generated_src/TempBound/TempBoundParser.h
+CMakeFiles/PhysProperties.dir/depend: bin/antlr4cpp_generated_src/bound_coefs/bound_coefsBaseListener.cpp
+CMakeFiles/PhysProperties.dir/depend: bin/antlr4cpp_generated_src/bound_coefs/bound_coefsBaseListener.h
+CMakeFiles/PhysProperties.dir/depend: bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.cpp
+CMakeFiles/PhysProperties.dir/depend: bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.h
+CMakeFiles/PhysProperties.dir/depend: bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.interp
+CMakeFiles/PhysProperties.dir/depend: bin/antlr4cpp_generated_src/bound_coefs/bound_coefsLexer.tokens
+CMakeFiles/PhysProperties.dir/depend: bin/antlr4cpp_generated_src/bound_coefs/bound_coefsListener.cpp
+CMakeFiles/PhysProperties.dir/depend: bin/antlr4cpp_generated_src/bound_coefs/bound_coefsListener.h
+CMakeFiles/PhysProperties.dir/depend: bin/antlr4cpp_generated_src/bound_coefs/bound_coefsParser.cpp
+CMakeFiles/PhysProperties.dir/depend: bin/antlr4cpp_generated_src/bound_coefs/bound_coefsParser.h
+CMakeFiles/PhysProperties.dir/depend: bin/antlr4cpp_generated_src/regions/regionsBaseListener.cpp
+CMakeFiles/PhysProperties.dir/depend: bin/antlr4cpp_generated_src/regions/regionsBaseListener.h
+CMakeFiles/PhysProperties.dir/depend: bin/antlr4cpp_generated_src/regions/regionsLexer.cpp
+CMakeFiles/PhysProperties.dir/depend: bin/antlr4cpp_generated_src/regions/regionsLexer.h
+CMakeFiles/PhysProperties.dir/depend: bin/antlr4cpp_generated_src/regions/regionsLexer.interp
+CMakeFiles/PhysProperties.dir/depend: bin/antlr4cpp_generated_src/regions/regionsLexer.tokens
+CMakeFiles/PhysProperties.dir/depend: bin/antlr4cpp_generated_src/regions/regionsListener.cpp
+CMakeFiles/PhysProperties.dir/depend: bin/antlr4cpp_generated_src/regions/regionsListener.h
+CMakeFiles/PhysProperties.dir/depend: bin/antlr4cpp_generated_src/regions/regionsParser.cpp
+CMakeFiles/PhysProperties.dir/depend: bin/antlr4cpp_generated_src/regions/regionsParser.h
 	cd /home/oster/Electrolisys && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/oster/Electrolisys /home/oster/Electrolisys /home/oster/Electrolisys /home/oster/Electrolisys /home/oster/Electrolisys/CMakeFiles/PhysProperties.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/PhysProperties.dir/depend
 

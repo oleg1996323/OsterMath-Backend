@@ -9,88 +9,34 @@ expr
     '(' expr ')'                # Parens
     | (ADD | SUB) expr          # UnaryOp
     | expr (MUL | DIV) expr     # BinaryOp
-    | expr (ADD | SUB) expr     # BinaryOp              
-    | VALUE                     # ValueDef
+    | expr (ADD | SUB) expr     # BinaryOp
+    | expr POW expr             # PowerOp              
+    | functions                 # FunctionCall
+    | array                     # ArrayDef
+    | VARIABLE                  # Variable
+    | NUMBER                    # Number
+    | CONSTANTS                 # Constant
     ;
 
-fragment INT: [-+]? UINT;
-fragment UINT: [0-9]+;
-fragment EXPONENT: [eE] INT;
-fragment FLOAT: UINT([.]UINT)? | UINT([.]UINT EXPONENT UINT);
-fragment STRING: '"'[a-zA-Z0-9]+'"';
-fragment VARIABLE: '__'[a-zA-Z]+([0-9]+)?'__';
 
-ADD: '+' ;
-SUB: '-' ;
-MUL: '*' ;
-DIV: '/' ;
-WS: [ \t\n\r]+ -> skip ;
-
-NUMBER
-    : UINT EXPONENT?
-    | FLOAT
-    ;
-
-CONSTANTS:
-    PI
-    ;
-
-ARRAY
+array
     :
-    '[' VALUE(','VALUE)*']'
-    ;
-
-KEY
-    :
-    STRING
-    | NUMBER
-    | VARIABLE
-    ;
-
-MAP
-    :
-    '{'KEY':'VALUE'}'
-    ;
-
-PI: 'Pi' | 'PI' | 'pi' WS;
-
-VALUE
-    : functions
-    | VARIABLE
-    | NUMBER
-    | CONSTANTS
-    ;
-
-SUMPRODUCT
-    : 'sumproduct' 
-    ;
-LN
-    : 'Ln'
-    ;
-LG
-    : 'Lg'
-    ;
-LOG_X
-    : 'Log'
-    ;
-EXP
-    : 'Exp'
+    '['(VARIABLE | NUMBER | CONSTANTS)(','VARIABLE | NUMBER | CONSTANTS)+']'
     ;
 
 functions
-    :
-    functions '('functions')'
-    | LN '(' WS* VALUE WS* ')'
-    | LG '(' WS* VALUE WS* ')'
-    | LOG_X '(' WS* VALUE WS*',' WS* VALUE WS*')'
-    | EXP '(' WS* VALUE WS* ')'
-    | SUMPRODUCT '(' ARRAY ',' ARRAY (',' ARRAY)*')'
+    : '(' functions ')'                             #pares
+    | LN '(' WS? expr WS? ')'                       #Natlog
+    | LG '(' WS? expr WS? ')'                       #Declog
+    | LOG_X '(' WS? expr WS? ',' WS? expr WS? ')'   #Baselog
+    | EXP '(' WS? expr WS? ')'                      #Exponent
+    | SQRT '(' WS? expr WS? ')'                     #Squareroot
+    | SUMPRODUCT '(' expr ',' expr (',' expr )*')'  #Sumproduct
     ;
 
-VALUE
-    :
-    | functions
-    | VARIABLE
-    | NUMBER
-    | CONSTANTS
-    ;
+SUMPRODUCT: 'sumproduct';
+LN: 'Ln';       
+LG: 'Lg';       
+LOG_X: 'Log';   
+EXP: 'Exp';     
+SQRT: 'Sqrt';

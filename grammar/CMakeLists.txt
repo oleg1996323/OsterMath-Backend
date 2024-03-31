@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
-project(AntlrGrammar)
+project(PhysProperties)
 
 set(CMAKE_CXX_STANDARD 20)
 if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
@@ -14,23 +14,67 @@ else()
     )
 endif()
 
-set(ANTLR_EXECUTABLE ${CMAKE_CURRENT_SOURCE_DIR}/antlr-4.13.1-complete.jar)
-include(${CMAKE_CURRENT_SOURCE_DIR}/FindANTLR.cmake)
+#antlr runtime installation
+message(STATUS "System name: ${CMAKE_SYSTEM_NAME}")
+if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/grammar/antlr-4.13.1-complete.jar OR NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/grammar/antlr4_runtime)
+	file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/grammar/antlr-4.13.1-complete.jar)
+	execute_process(COMMAND curl -Lo ${CMAKE_CURRENT_SOURCE_DIR}/grammar/antlr-4.13.1-complete.jar https://www.antlr.org/download/antlr-4.13.1-complete.jar	RESULT_VARIABLE CURL_RESULT)
+	if(CURL_RESULT)
+	    message(FATAL_ERROR "Error loading '${CMAKE_CURRENT_SOURCE_DIR}/grammar/antlr-4.13.1-complete.jar'. Process interrupted.")
+	else()
+	    message(STATUS "Loading '${CMAKE_CURRENT_SOURCE_DIR}/grammar/antlr-4.13.1-complete.jar' finished.")
+	endif()
+    if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/grammar/antlr4_runtime)
+        make_directory(${CMAKE_CURRENT_SOURCE_DIR}/grammar/antlr4_runtime)
+    endif()
+	execute_process(COMMAND curl -Lo ${CMAKE_CURRENT_SOURCE_DIR}/grammar/antlr4_runtime/antlr4-cpp-runtime-4.13.1-source.zip https://www.antlr.org/download/antlr4-cpp-runtime-4.13.1-source.zip	RESULT_VARIABLE CURL_RESULT)
+	if(CURL_RESULT)
+	    message(FATAL_ERROR "Error loading '${CMAKE_CURRENT_SOURCE_DIR}/grammar/antlr4_runtime/antlr4-cpp-runtime-4.13.1-source.zip'. Process interrupted.")
+	else()
+	    message(STATUS "Loading '${CMAKE_CURRENT_SOURCE_DIR}/grammar/antlr4_runtime/antlr4-cpp-runtime-4.13.1-source.zip' finished.")
+	endif()
+	message(STATUS "Распаковка архива antlr4-cpp-runtime-4.13.1-source.zip в " ${CMAKE_CURRENT_SOURCE_DIR}/grammar/antlr4_runtime)
+	execute_process(COMMAND unzip ${CMAKE_CURRENT_SOURCE_DIR}/grammar/antlr4_runtime/antlr4-cpp-runtime-4.13.1-source.zip -d ${CMAKE_CURRENT_SOURCE_DIR}/grammar/antlr4_runtime RESULT_VARIABLE UNZIP_RESULT)
+	if(UNZIP_RESULT)
+	    message(FATAL_ERROR "Error unzipping '${CMAKE_CURRENT_SOURCE_DIR}/grammar/antlr4_runtime/antlr4-cpp-runtime-4.13.1-source.zip'. Process interrupted.")
+	else()
+	    message(STATUS "Unzipping '${CMAKE_CURRENT_SOURCE_DIR}/grammar/antlr4_runtime/antlr4-cpp-runtime-4.13.1-source.zip' done.")
+	    message(STATUS "Removing '${CMAKE_CURRENT_SOURCE_DIR}/grammar/antlr4_runtime/antlr4-cpp-runtime-4.13.1-source.zip'...")
+	    execute_process(COMMAND rm ${CMAKE_CURRENT_SOURCE_DIR}/grammar/antlr4_runtime/antlr4-cpp-runtime-4.13.1-source.zip)
+	    message(STATUS "Removing '${CMAKE_CURRENT_SOURCE_DIR}/grammar/antlr4_runtime/antlr4-cpp-runtime-4.13.1-source.zip' finished")
+	endif()
+	message(STATUS "ANTLR4 installation SUCCESS")
+else()
+	message(STATUS "ANTLR4 already installed")
+endif()
+
+set(ANTLR_EXECUTABLE ${CMAKE_CURRENT_SOURCE_DIR}/grammar/antlr-4.13.1-complete.jar)
+
+set(CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bin)
+
+include(${CMAKE_CURRENT_SOURCE_DIR}/grammar/FindANTLR.cmake)
 
 add_definitions(
     -DANTLR4CPP_STATIC
-    -D_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS
+    -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS
 )
 
 set(WITH_STATIC_CRT OFF CACHE BOOL "Visual C++ static CRT for ANTLR" FORCE)
-add_subdirectory(antlr4_runtime)
 
-antlr_target(TempBoundEquations TempBound.g4 LEXER PARSER LISTENER)
+set(PROJECT_RUNTIME_ANTLR ${CMAKE_CURRENT_SOURCE_DIR}/grammar/antlr4_runtime)
+message(STATUS ${PROJECT_RUNTIME_ANTLR})
 
-make_directory(${CMAKE_CURRENT_SOURCE_DIR}/antlr4_runtime/runtime/src)
+# Создаем цель сборки для внешней директории
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/grammar/antlr4_runtime)
+
+message(STATUS ${WORKING_DIRECTORY})
+make_directory(${CMAKE_CURRENT_SOURCE_DIR}/grammar/antlr4_runtime/runtime/src)
+
+antlr_target(Bounds ${CMAKE_CURRENT_SOURCE_DIR}/grammar/bound_coefs.g4 GENERATE_CPP LEXER PARSER LISTENER)
+antlr_target(Regions ${CMAKE_CURRENT_SOURCE_DIR}/grammar/regions.g4 GENERATE_CPP LEXER PARSER LISTENER)
 
 include_directories(
     ${ANTLR4_INCLUDE_DIRS}
-    ${ANTLR_TempBoundEquations_OUTPUT_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/antlr4_runtime/runtime/src
+    ${ANTLR_OUTPUT_DIR_GENERATED}
+    ${CMAKE_CURRENT_SOURCE_DIR}/grammar/antlr4_runtime/runtime/src
 )
