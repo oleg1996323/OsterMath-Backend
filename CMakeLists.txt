@@ -11,9 +11,14 @@ file(GLOB sources
 execute_process(COMMAND sh -c "ls $ENV{HOME} | grep -E 'boost_[0-9]+_[0-9]+_[0-9]' | head -n 1" OUTPUT_VARIABLE BOOST_VERSION)
 string(REPLACE "\n" "" BOOST_VERSION ${BOOST_VERSION})
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/include $ENV{HOME}/${BOOST_VERSION})
+message(STATUS ${ANTLR_OUTPUT_DIRS})
 
-message(STATUS ${ANTLR_Bounds_CXX_OUTPUTS})
+foreach(dir ${ANTLR_OUTPUT_DIRS})
+    message(STATUS ${dir})
+    include_directories(${dir})
+endforeach()
+include_directories(${ANTLR_OUTPUT_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/include $ENV{HOME}/${BOOST_VERSION})
+
 add_library(
     PhysProperties STATIC
     ${ANTLR_Bounds_CXX_OUTPUTS}

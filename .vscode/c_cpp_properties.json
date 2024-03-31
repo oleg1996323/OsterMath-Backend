@@ -4,7 +4,8 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${HOME}/boost_1_82_0"
+                "${HOME}/boost_1_82_0",
+                "bin/*/*/"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/g++",
