@@ -1,19 +1,6 @@
 cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
 project(PhysProperties)
 
-set(CMAKE_CXX_STANDARD 20)
-if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    set(
-        CMAKE_CXX_FLAGS_DEBUG
-        "${CMAKE_CXX_FLAGS_DEBUG} /JMC"
-    )
-else()
-    set(
-        CMAKE_CXX_FLAGS
-        "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough"
-    )
-endif()
-
 include(${CMAKE_CURRENT_SOURCE_DIR}/grammar/CMakeLists.txt)
 
 file(GLOB sources
@@ -26,9 +13,11 @@ string(REPLACE "\n" "" BOOST_VERSION ${BOOST_VERSION})
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/include $ENV{HOME}/${BOOST_VERSION})
 
+message(STATUS ${ANTLR_Bounds_CXX_OUTPUTS})
 add_library(
-    PhysProperties SHARED
-    ${ANTLR_TempBoundEquations_CXX_OUTPUTS}
+    PhysProperties STATIC
+    ${ANTLR_Bounds_CXX_OUTPUTS}
+    ${ANTLR_Regions_CXX_OUTPUTS}
     ${sources}
 )
 
@@ -40,7 +29,7 @@ endif()
 install(
     TARGETS PhysProperties
     DESTINATION bin
-    EXPORT spreadsheet
+    EXPORT PhysProperties
 )
 
 set_directory_properties(PROPERTIES VS_STARTUP_PROJECT PhysProperties)
