@@ -62,13 +62,11 @@ add_definitions(
 set(WITH_STATIC_CRT OFF CACHE BOOL "Visual C++ static CRT for ANTLR" FORCE)
 
 set(PROJECT_RUNTIME_ANTLR ${CMAKE_CURRENT_SOURCE_DIR}/grammar/antlr4_runtime)
-message(STATUS ${PROJECT_RUNTIME_ANTLR})
 
 # Создаем цель сборки для внешней директории
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/grammar/antlr4_runtime)
 
-message(STATUS ${WORKING_DIRECTORY})
-make_directory(${CMAKE_CURRENT_SOURCE_DIR}/grammar/antlr4_runtime/runtime/src)
+make_directory(${PROJECT_RUNTIME_ANTLR}/runtime/src)
 
 antlr_target(Parserules ${CMAKE_CURRENT_SOURCE_DIR}/grammar/ParseRules.g4 GENERATE_CPP LEXER PARSER LISTENER)
 
@@ -77,5 +75,5 @@ set(ANTLR_OUTPUT_DIRS ${ANTLR_Parserules_OUTPUT_DIR})
 include_directories(
     ${ANTLR4_INCLUDE_DIRS}
     ${ANTLR_Parserules_OUTPUT_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/grammar/antlr4_runtime/runtime/src
+    ${PROJECT_RUNTIME_ANTLR}/runtime/src
 )

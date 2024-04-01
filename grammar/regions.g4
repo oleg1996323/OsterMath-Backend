@@ -19,10 +19,12 @@ const_zone:
     ;
 
 virial_coefs:
-    hdr EOL values;
+    hdr EOL values
+    ;
 
 values:
-    (NUMBER WS*)+ EOL;
+    (NUMBER WS*)+ EOL
+    ;
 
 bound_equation:
     functions

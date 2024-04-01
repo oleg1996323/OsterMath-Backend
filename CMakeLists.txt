@@ -8,16 +8,22 @@ file(GLOB sources
     ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
 )
 
-execute_process(COMMAND sh -c "ls $ENV{HOME} | grep -E 'boost_[0-9]+_[0-9]+_[0-9]' | head -n 1" OUTPUT_VARIABLE BOOST_VERSION)
-string(REPLACE "\n" "" BOOST_VERSION ${BOOST_VERSION})
+set(Boost_USE_STATIC_LIBS        ON)  # only find static libs
+set(Boost_USE_DEBUG_LIBS        OFF)  # ignore debug libs and
+set(Boost_USE_RELEASE_LIBS       ON)  # only find release libs
+set(Boost_USE_MULTITHREADED      ON)
+set(Boost_USE_STATIC_RUNTIME    OFF)
 
-message(STATUS ${ANTLR_OUTPUT_DIRS})
+find_package(Boost REQUIRED)
 
-foreach(dir ${ANTLR_OUTPUT_DIRS})
-    message(STATUS ${dir})
-    include_directories(${dir})
-endforeach()
-include_directories(${ANTLR_OUTPUT_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/include $ENV{HOME}/${BOOST_VERSION})
+if(Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIRS})
+else()
+    message(FATAL_ERROR "Boost not found")
+endif()
+
+include_directories(${ANTLR_OUTPUT_DIRS})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/include ${Boost_INCLUDE_DIRS})
 
 add_library(
     PhysProperties STATIC
@@ -25,7 +31,7 @@ add_library(
     ${sources}
 )
 
-target_link_libraries(PhysProperties antlr4_static /home/oster/${BOOST_VERSION}/stage/lib/*.lib)
+target_link_libraries(PhysProperties antlr4_static ${Boost_LIBRARIES})
 if(MSVC)
     target_compile_options(antlr4_static PRIVATE /W0)
 endif()
