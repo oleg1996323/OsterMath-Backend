@@ -42,4 +42,4 @@ grammar/antlr4_runtime/
 grammar/antlr-4.13.1-complete.jar  
 Makefile
 CMakeCache.txt
-.cmake/dist/
+.cmake
