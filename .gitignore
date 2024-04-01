@@ -37,8 +37,9 @@ cmake_install.cmake
 CPackConfig.cmake 
 CPackSourceConfig.cmake 
 _deps/ 
+dist/
 grammar/antlr4_runtime/ 
 grammar/antlr-4.13.1-complete.jar  
 Makefile
 CMakeCache.txt
-.cmake/
+.cmake/dist/
