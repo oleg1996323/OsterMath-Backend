@@ -63,7 +63,7 @@ functions
     ;
 
 bound_temperature:
-    equations_bound EOL bound_coefs
+    'bound_temperature' EOL equations_bound EOL bound_coefs
     ;
 
 equations_bound:
