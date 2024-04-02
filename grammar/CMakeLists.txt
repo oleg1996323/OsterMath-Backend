@@ -68,7 +68,7 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/grammar/antlr4_runtime)
 
 make_directory(${PROJECT_RUNTIME_ANTLR}/runtime/src)
 
-antlr_target(Parserules ${CMAKE_CURRENT_SOURCE_DIR}/grammar/ParseRules.g4 GENERATE_CPP LEXER PARSER LISTENER)
+antlr_target(Parserules ${CMAKE_CURRENT_SOURCE_DIR}/grammar/ParseRules.g4 LEXER PARSER LISTENER)
 
 set(ANTLR_OUTPUT_DIRS ${ANTLR_Parserules_OUTPUT_DIR})
 

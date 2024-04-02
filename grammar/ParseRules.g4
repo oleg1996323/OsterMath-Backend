@@ -42,7 +42,6 @@ expr
     | expr (ADD | SUB) expr     # BinaryOp
     | expr POW expr             # PowerOp              
     | functions                 # FunctionCall
-    | array                     # ArrayDef
     | VARIABLE                  # Variable
     | NUMBER                    # Number
     | CONSTANTS                 # Constant
@@ -55,8 +54,7 @@ array
     ;
 
 functions
-    : '(' functions ')'                             #pares
-    | LN '(' WS? expr WS? ')'                       #Natlog
+    : LN '(' WS? expr WS? ')'                       #Natlog
     | LG '(' WS? expr WS? ')'                       #Declog
     | LOG_X '(' WS? expr WS? ',' WS? expr WS? ')'   #Baselog
     | EXP '(' WS? expr WS? ')'                      #Exponent
@@ -76,16 +74,16 @@ hdr:
     (VARIABLE WS?)+
     ;
 
-values:
+values_bound:
     (VARIABLE EOL ((expr WS?)+ (EOL | EOF))+)+
     ;
 
 bound_coefs:
-    hdr EOL values
+    hdr EOL values_bound
     ;
 
 zone:
-    data_bound_zone EOL const_volume EOL virial_coefs_volume
+    'zone' EOL data_bound_zone EOL const_volume EOL virial_coefs_volume
     ;
 
 data_bound_zone:
@@ -93,16 +91,16 @@ data_bound_zone:
     ;
 
 const_volume:
-    hdr EOL values
+    hdr EOL values_volume
     ;
 
 virial_coefs_volume:
-    hdr EOL values;
+    hdr EOL values_volume;
 
 values_volume:
     (NUMBER WS*)+ EOL;
 
 bound_equation_volume:
-    functions
+    expr
     ;
 
