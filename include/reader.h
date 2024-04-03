@@ -6,8 +6,13 @@
 #include "ParseRulesListener.h"
 #include "ParseRulesParser.h"
 #include <boost/multiprecision/cpp_dec_float.hpp>
+#include <boost/json/basic_parser.hpp>
 #include <functional>
 #include <memory>
+#include <execution>
+#include <future>
+#include <string_view>
+#include <unordered_map>
 
 using namespace boost::multiprecision;
 
@@ -15,8 +20,6 @@ enum class TypeFile{
     ZONE,
     BOUNDS    
 };
-
-
 
 //в парсер рассмотреть вложенные функции func(func()) с рекурсией парсинга
 
@@ -170,7 +173,7 @@ private:
 
 class Parser: public ParseRulesParser{
 public:
-    explicit Parser(std::istream& stream, TypeFile type):
+    Parser(std::istream& stream, TypeFile type):
         ParseRulesParser((lexer_ = std::make_unique<Lexer>(stream))->GetCommonTokenStream()),
         type_(type),
         stream_(stream)
@@ -210,15 +213,38 @@ public:
     std::unique_ptr<antlr4::tree::ParseTree> tree;
 };
 
+#include <boost/json.hpp>
+#include <boost/json/src.hpp>
+
 class DataInitialize{
 
-    DataInitialize(std::istream& stream):stream_(stream),antlr_stream_(stream_){
-        
+    DataInitialize(){
+
     }
 
-    void InitializeZones(const std::string& path);
+    void Configure(){
 
-    void InitializeBounds();
+    }
+
+    void InitializeZones(){
+        std::vector<std::future<Parser>> futures;
+        for(std::string_view file:paths_.find(TypeFile::ZONE)->second){
+            futures.push_back(std::async(std::launch::async,[&file](){
+                std::ifstream&& stream = std::move(std::ifstream(std::filesystem::path(file)));
+                return Parser(stream,TypeFile::ZONE);
+            }));
+        }
+    }
+
+    void InitializeBounds(){
+        std::vector<std::future<Parser>> futures;
+        for(std::string_view file:paths_.find(TypeFile::ZONE)->second){
+            futures.push_back(std::async(std::launch::async,[&file](){
+                std::ifstream&& stream = std::move(std::ifstream(std::filesystem::path(file)));
+                return Parser(stream,TypeFile::ZONE);
+            }));
+        }
+    }
 
     void SetStream(std::istream& stream){
         stream_.rdbuf(stream.rdbuf());
@@ -227,9 +253,8 @@ class DataInitialize{
 
     private:
 
-
-
     //vector for multithreading by-directory recursive file parsing with different specifications
+    std::unordered_map<TypeFile,std::vector<std::string_view>> paths_;
     std::vector<Parser> parser_; 
 };
 

@@ -14,7 +14,7 @@ set(Boost_USE_RELEASE_LIBS       ON)  # only find release libs
 set(Boost_USE_MULTITHREADED      ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
 
-find_package(Boost REQUIRED)
+find_package(Boost REQUIRED COMPONENTS json)
 
 if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
@@ -23,13 +23,15 @@ else()
 endif()
 
 include_directories(${ANTLR_OUTPUT_DIRS})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/include ${Boost_INCLUDE_DIRS})
+include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/include ${Boost_INCLUDE_DIRS})
 
 add_library(
     PhysProperties STATIC
     ${ANTLR_Parserules_CXX_OUTPUTS}
     ${sources}
 )
+
+message(STATUS "Boost libs: ${Boost_LIBRARIES}")
 
 target_link_libraries(PhysProperties antlr4_static ${Boost_LIBRARIES})
 if(MSVC)
