@@ -20,10 +20,6 @@ const static std::filesystem::path bound_file_dir = std::filesystem::path("./Dat
 
 //using boost::multiprecision::cpp_dec_float_50;
 
-enum class TempBoundName{
-    crt_t,ab,ef,op,cd,gh,ij,jk,mn,qu,rx,uv,wx,B23,sat_t
-};
-
 const static std::map<TempBoundName,std::string> paths = {
     {TempBoundName::ab,"./Data/boundaries/ab.txt"},
     {TempBoundName::op,"./Data/boundaries/op.txt"},

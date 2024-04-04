@@ -1,12 +1,6 @@
 #include <fstream>
 #include <filesystem>
-#include "exception.h"
-#include "def.h"
-#include "ParseRulesLexer.h"
-#include "ParseRulesListener.h"
-#include "ParseRulesParser.h"
 #include <boost/multiprecision/cpp_dec_float.hpp>
-#include <boost/json/basic_parser.hpp>
 #include <functional>
 #include <memory>
 #include <execution>
@@ -14,12 +8,17 @@
 #include <string_view>
 #include <unordered_map>
 
+#include "config.h"
+
+#include "exception.h"
+#include "def.h"
+#include "ParseRulesLexer.h"
+#include "ParseRulesListener.h"
+#include "ParseRulesParser.h"
+
 using namespace boost::multiprecision;
 
-enum class TypeFile{
-    ZONE,
-    BOUNDS    
-};
+
 
 //в парсер рассмотреть вложенные функции func(func()) с рекурсией парсинга
 

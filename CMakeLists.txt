@@ -33,7 +33,7 @@ add_library(
 
 message(STATUS "Boost libs: ${Boost_LIBRARIES}")
 
-target_link_libraries(PhysProperties antlr4_static ${Boost_LIBRARIES})
+target_link_libraries(PhysProperties antlr4_static Boost::boost ${Boost_LIBRARIES})
 if(MSVC)
     target_compile_options(antlr4_static PRIVATE /W0)
 endif()
