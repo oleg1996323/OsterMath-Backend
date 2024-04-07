@@ -1,5 +1,1 @@
-{
-    "paths":{
-        "zones":"/Data/regions/",
-        "bounds":"/Data/bounds/"}
-}
+{"zones":"/Data/regions/","bounds":"/Data/bounds/"}

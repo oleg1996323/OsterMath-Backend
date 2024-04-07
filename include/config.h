@@ -1,11 +1,15 @@
+#pragma once
 #include <boost/json.hpp>
 #include <boost/json/src.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
 #include <string>
 #include <boost/static_string/static_string.hpp>
-#include <map>
+#include <unordered_map>
 #include <filesystem>
 #include <fstream>
 #include <boost/math/differentiation/autodiff.hpp>
+
 //#include <boost/json/parse.hpp>
 #include "def.h"
 
@@ -20,16 +24,24 @@ using namespace boost::json;
 class JsonConfigInit{
     public:
     JsonConfigInit(){
-        boost::json::object paths;
-        paths.emplace();
+        std::ifstream config_stream(ROOT_DIR+"/Data/config.json");
+        boost::json::value configs = std::move(boost::json::parse(config_stream));
+        
+        if(configs.is_object())
+            for(const auto& [type, dir]: configs.as_object()){
+                if(dir.is_string())
+                    paths_dir_data_[types_by_names.at(type)] = dir.as_string();
+            }
     }
 
-    const std::filesystem::path& GetPath(TypeFile type){
-        boost::json::object paths;
-        std::ifstream config_stream(ROOT_DIR+"/Data/config.json");
-        boost::json::parse(config_stream,paths);
+    std::filesystem::path GetPath(TypeFile type) const{
+        return ROOT_DIR + paths_dir_data_.at(type);
+    }
+
+    const std::unordered_map<TypeFile,std::string>& GetDataDirs() const{
+        return paths_dir_data_;
     }
 
     private:
-    std::map<std::string,std::string> paths_dir_data_;
+    std::unordered_map<TypeFile,std::string> paths_dir_data_;
 };

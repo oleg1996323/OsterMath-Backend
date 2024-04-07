@@ -14,7 +14,7 @@ set(Boost_USE_RELEASE_LIBS       ON)  # only find release libs
 set(Boost_USE_MULTITHREADED      ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
 
-find_package(Boost REQUIRED COMPONENTS json)
+find_package(Boost 1.82.0 REQUIRED COMPONENTS json)
 
 if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
