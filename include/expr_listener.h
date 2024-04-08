@@ -37,9 +37,8 @@ class BaseListener: public ParseRulesBaseListener{
     }
 
     virtual void enterVariable(ParseRulesParser::VariableContext *ctx) override{
-        if(!data_.Exists(ctx->getText()))
-            data_.AddVariable(ctx->getText());
-        else throw VariableAlreadyExists("Variable " + ctx->getText() + " already registred");
+        if(!data_.AddVariable(ctx->getText()))
+            throw VariableAlreadyExists("Variable " + ctx->getText() + " already registred");
     }
 
     virtual void exitVariable(ParseRulesParser::VariableContext *ctx) override{
@@ -105,7 +104,7 @@ class BaseListener: public ParseRulesBaseListener{
     }
 
     virtual void exitArray(ParseRulesParser::ArrayContext *ctx) override{
-
+        
     }
 
     //natural logarithm function {for example: Ln(Expr)}
@@ -163,11 +162,24 @@ class BaseListener: public ParseRulesBaseListener{
 
     }
 
+    //a typical header whitespace or tab separated. Only Variables are accepted and then defined
+    //by corespondent parser rule.
+    virtual void enterHdr(ParseRulesParser::HdrContext *ctx) override{
+
+    }
+
+    virtual void exitHdr(ParseRulesParser::HdrContext *ctx) override{
+
+    }
+
     uint8_t parens_count = 0;
     
     std::unordered_set<std::string_view> var_names_;
 
     BaseData data_;
+
+    template<typename ARRAY_T>
+    std::unique_ptr<std::vector<VariableBase>> header_vars_tmp_;
 };
 
 class ZoneListener final: public BaseListener{

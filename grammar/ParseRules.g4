@@ -70,7 +70,7 @@ equations_bound:
     (VARIABLE WS? expr EOL)+
     ;
 
-HDR:
+hdr:
     (VARIABLE WS?)+
     ;
 
@@ -79,7 +79,7 @@ values_bound:
     ;
 
 bound_coefs:
-    HDR EOL values_bound
+    hdr EOL values_bound
     ;
 
 zone:
@@ -91,11 +91,11 @@ data_bound_zone:
     ;
 
 const_volume:
-    HDR EOL values_volume
+    hdr EOL values_volume
     ;
 
 virial_coefs_volume:
-    HDR EOL values_volume;
+    hdr EOL values_volume;
 
 values_volume:
     (NUMBER WS*)+ EOL;

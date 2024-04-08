@@ -18,7 +18,7 @@ class BaseData{
 
     bool AddVariable(const std::string& name){
         if(!Exists(name)){
-            vars_.emplace(name).first;
+            vars_.emplace(name,std::nullopt).first;
             return true;
         }
         else return false;
@@ -26,7 +26,7 @@ class BaseData{
 
     bool AddVariable(std::string&& name, double value){
         if(!Exists(name)){
-            auto ref = vars_.emplace(name).first;
+            auto ref = vars_.emplace(name,std::nullopt).first;
             ref->second.emplace(std::move(VarValue(ref->first,value)));
             return true;
         }
@@ -35,7 +35,7 @@ class BaseData{
 
     bool AddVariable(std::string&& name, ValueLong&& value){
         if(!Exists(name)){
-            auto ref = vars_.emplace(name).first;
+            auto ref = vars_.emplace(name,std::nullopt).first;
             ref->second.emplace(std::move(VarValueLong(ref->first,std::move(value))));
             return true;
         }
@@ -45,7 +45,7 @@ class BaseData{
     template<typename... ARGS>
     bool AddVariable(std::string&& name, Function<double(ARGS...)> value(ARGS...)){
         if(!Exists(name)){
-            auto ref = vars_.emplace(name).first;
+            auto ref = vars_.emplace(name,std::nullopt).first;
             ref->second.emplace(std::move(VarFunction<ARGS...>(ref->first,value)));
             return true;
         }
@@ -55,7 +55,7 @@ class BaseData{
     template<typename... ARGS>
     bool AddVariable(std::string&& name, FunctionLong<ValueLong(ARGS...)> value(ARGS...)){
         if(!Exists(name)){
-            auto ref = vars_.emplace(name).first;
+            auto ref = vars_.emplace(name,std::nullopt).first;
             ref->second.emplace(std::move(VarFunctionLong<ARGS...>(ref->first,value)));
             return true;
         }
