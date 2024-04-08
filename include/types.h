@@ -41,24 +41,33 @@ class VariableBase{
 
     private:
 
-    virtual void SetValue(double value) = 0;
+    virtual void SetValue(double value){}
 
-    virtual void SetValueLong(ValueLong&& value) = 0;
+    virtual void SetValueLong(ValueLong&& value){}
     
-    virtual void SetArray(Array&& value) = 0;
+    virtual void SetArray(Array&& value){}
 
-    virtual void SetArrayLong(ArrayLong&& value) = 0;
+    virtual void SetArrayLong(ArrayLong&& value){}
 
-    virtual double GetValue() const = 0;
+    virtual double GetValue() const{
+        throw std::runtime_error("Not value. Base class method called.");
+    }
 
-    virtual const ValueLong& GetValueLong() const = 0;
+    virtual const ValueLong& GetValueLong() const{
+        throw std::runtime_error("Not value-long. Base class method called.");
+    }
 
-    virtual const Array& GetArray() const = 0;
+    virtual const Array& GetArray() const{
+        throw std::runtime_error("Not array. Base class method called.");
+    }
 
-    virtual const ArrayLong& GetArrayLong() const = 0;
+    virtual const ArrayLong& GetArrayLong() const{
+        throw std::runtime_error("Not array-long. Base class method called.");
+    }
 };
 
 class VarValue: public VariableBase{
+    public:
     explicit VarValue(std::string_view name, double value):VariableBase(name)
     {}
 

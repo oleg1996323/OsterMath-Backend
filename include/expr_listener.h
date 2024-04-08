@@ -18,6 +18,13 @@ public:
 };
 
 class BaseListener: public ParseRulesBaseListener{
+    enum class ModeBase{
+        IN_FUNCTION,
+        IN_VAR,
+        IN_NUMBER,
+        IN_CONST
+    };
+
     public:
 
     protected:
@@ -36,7 +43,7 @@ class BaseListener: public ParseRulesBaseListener{
     }
 
     virtual void exitVariable(ParseRulesParser::VariableContext *ctx) override{
-
+        
     }
 
     virtual void enterNumber(ParseRulesParser::NumberContext *ctx) override{
@@ -139,7 +146,7 @@ class BaseListener: public ParseRulesBaseListener{
 
     //root square function {for example: Sqrt(Expr)}
     virtual void enterSquareroot(ParseRulesParser::SquarerootContext *ctx) override{
-
+        
     }
 
     virtual void exitSquareroot(ParseRulesParser::SquarerootContext *ctx) override{
@@ -156,21 +163,11 @@ class BaseListener: public ParseRulesBaseListener{
 
     }
 
-    //a typical header whitespace or tab separated. Only Variables are accepted and then defined
-    //by corespondent parser rule.
-    virtual void enterHdr(ParseRulesParser::HdrContext *ctx) override{
-
-    }
-
-    virtual void exitHdr(ParseRulesParser::HdrContext *ctx) override{
-
-    }
-
     uint8_t parens_count = 0;
     
     std::unordered_set<std::string_view> var_names_;
 
-    Data data_;
+    BaseData data_;
 };
 
 class ZoneListener final: public BaseListener{
