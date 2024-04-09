@@ -18,11 +18,28 @@ public:
 };
 
 class BaseListener: public ParseRulesBaseListener{
-    enum class ModeBase{
-        IN_FUNCTION,
-        IN_VAR,
-        IN_NUMBER,
-        IN_CONST
+    protected:
+
+    enum class BASE_MODE{
+        NONE,
+        ADD,
+        SUB,
+        MUL,
+        DIV,
+        HDR,
+        SUMPRODUCT,
+        SQUAREROOT,
+        EXPONENT,
+        BASELOG,
+        DECLOG,
+        NATLOG,
+        ARRAY,
+        BINARY,
+        POWER,
+        FUNCTION,
+        CONSTANT,
+        NUMBER,
+        VARIABLE
     };
 
     public:
@@ -37,16 +54,21 @@ class BaseListener: public ParseRulesBaseListener{
     }
 
     virtual void enterVariable(ParseRulesParser::VariableContext *ctx) override{
+        assert(mode_stack_.top()==BASE_MODE::NONE || mode_stack_.top()==BASE_MODE::HDR)
         if(!data_.AddVariable(ctx->getText()))
             throw VariableAlreadyExists("Variable " + ctx->getText() + " already registred");
+        if(mode_stack_.top()==BASE_MODE::HDR)
+            header_vars_tmp_.push_back(ctx->getText());
+        else mode_stack_.push(BASE_MODE::VARIABLE);
     }
 
     virtual void exitVariable(ParseRulesParser::VariableContext *ctx) override{
-        
+
     }
 
     virtual void enterNumber(ParseRulesParser::NumberContext *ctx) override{
-        
+        ctx->chi
+        if(mode_stack_.top()==BASE_MODE)
     }
 
     virtual void exitNumber(ParseRulesParser::NumberContext *ctx) override{
@@ -165,10 +187,23 @@ class BaseListener: public ParseRulesBaseListener{
     //a typical header whitespace or tab separated. Only Variables are accepted and then defined
     //by corespondent parser rule.
     virtual void enterHdr(ParseRulesParser::HdrContext *ctx) override{
-
+        assert(!parens_count);
+        assert(header_vars_tmp_.empty());
+        mode_stack_.push(BASE_MODE::HDR);
     }
 
     virtual void exitHdr(ParseRulesParser::HdrContext *ctx) override{
+        assert(!parens_count);
+        assert(mode_stack_.top()==BASE_MODE::HDR)
+    }
+
+    //this methode permits to distingue the separation between any rules like variable-function match
+    //or anything else
+    virtual void enterEndLine(ParseRulesParser::EndLineContext * ctx*) override {
+        
+    }
+
+    virtual void exitEndLine(ParseRulesParser::EndLineContext * ctx*) override {
 
     }
 
@@ -177,9 +212,8 @@ class BaseListener: public ParseRulesBaseListener{
     std::unordered_set<std::string_view> var_names_;
 
     BaseData data_;
-
-    template<typename ARRAY_T>
-    std::unique_ptr<std::vector<VariableBase>> header_vars_tmp_;
+    std::vector<VariableBase> header_vars_tmp_;
+    std::stack<BASE_MODE> mode_stack_ = {BASE_MODE::NONE};
 };
 
 class ZoneListener final: public BaseListener{

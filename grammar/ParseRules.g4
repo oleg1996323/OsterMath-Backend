@@ -45,6 +45,7 @@ expr
     | VARIABLE                  # Variable
     | NUMBER                    # Number
     | CONSTANTS                 # Constant
+    | EOL                       # EndLine
     ;
 
 

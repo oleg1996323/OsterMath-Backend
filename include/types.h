@@ -15,56 +15,6 @@
 using namespace std::string_literals;
 using namespace std::string_view_literals;
 
-using Value = boost::multiprecision::cpp_dec_float_50;
-using Array = std::vector<Value>;
-
-template<typename... ARGS>
-using Function = std::function<Value(ARGS...)>;
-
-/*
-class StorageBase{
-    public:
-    virtual ~StorageBase(){
-
-    }
-
-    virtual void Print(ostream& out) const =0;
-};
-
-
-template<typename T_VALUE>
-class Storage:public StorageBase{
-    public:
-    template<typename S>
-    Storage(S&& val):data_(std::forward<S>(val)){}
-
-    void Print(ostream& out) const override{
-        out<<data_;
-    }
-
-    private:
-    T_VALUE data_;
-};
-
-class Any{
-    public:
-
-    template<typename T>
-    Any(T&& val){
-        using Initial = std::remove_reference_t<T>;
-        value = std::make_unique<Storage<Initial>>(std::forward<T>(val));
-    }
-
-    void Print(ostream& out) const {
-        return value->Print(out);
-    }
-
-    private:
-    std::unique_ptr<StorageBase> value;
-};
-
-*/
-
 class VariableBase{
     public:
     struct HashVar{
@@ -73,73 +23,70 @@ class VariableBase{
         }
     };
 
+    ~VariableBase(){}
+
     explicit VariableBase(std::string_view name):
         name_(name)
     {}
 
-    virtual ~VariableBase(){}
+    std::string_view GetName() const{
+        return name_;
+    }
 
-    protected:
+    private:
     std::string_view name_;
 };
 
-class VarValue: public VariableBase{
+using Value_t = boost::multiprecision::cpp_dec_float_50;
+
+class Value:public VariableBase{
     public:
-    explicit VarValue(std::string_view name, Value&& value):
+    Value(std::string_view name):
+    VariableBase(name)
+    {}
+
+    template<typename T>
+    Value(std::string_view name, T&& value):
     VariableBase(name),
-    val_(std::make_unique<Value>(std::move(value)))
+    val_(std::make_unique<Value_t>(std::forward<T>(value)))
     {}
 
     private:
-    std::unique_ptr<Value> val_;
+    std::unique_ptr<Value_t> val_;
+};
+
+class String: public std::string, public VariableBase{
+    public:
+    String(std::string_view name):
+    VariableBase(name){}
+
+    template<typename T>
+    String(std::string_view name, T&& text)
+        :std::string(std::forward<std::remove_reference<T>>(text)),
+        VariableBase(name)
+    {}
 };
 
 #include <initializer_list>
-#include <type_traits>
 
-class VarArray: public VariableBase 
-    {
+using Array_t = std::vector<Value_t>;
+
+class Array: public std::vector<Value_t>, public VariableBase{
     public:
-    VarArray(std::string_view name, Array&& value)
-        :VariableBase(name),
-        val_(std::make_unique<Array>(std::move(value)))
+    Array(std::string_view name):
+    VariableBase(name){}
+
+    template<typename T>
+    Array(std::string_view name, T&& array):
+    std::vector<Value_t>(std::forward<std::remove_reference<T>>(array)),
+    VariableBase(name)
     {}
 
-    void SetArray(Array&& value){
-        if(!val_)
-            val_ = std::make_unique<Array>(std::move(value));
-        else
-            throw std::runtime_error(std::string(name_)+" already initialized.");
-    }
-
-    const Array* GetArray() const{
-        if(!val_)
-            return val_.get();
-        else{
-            static Array* empty = nullptr;
-            return empty;
-        }
-    }
-
-    void Append(Value value) noexcept{
-        this->GetArray()->push_back(value);
-    }
-
-    void Erase(size_t pos) noexcept{
-        if(!(this->GetArray()->size()>pos))
-            this->GetArray()->erase(this->GetArray()->begin()+pos);
-    }
-
-    void PopBack() noexcept{
-        if(!this->GetArray()->empty())
-            Erase(this->GetArray()->size()-1);
-    }
-    
-    Value SumProduct(std::initializer_list<const Array>& arrays){
-        Value result = 0.;
+    static Value_t SumProduct(std::initializer_list<const Array>& arrays){
+        Value_t result = 0.;
         if(Checking_Egal_Size_Arrays(arrays)){
             for(size_t i=0;i<arrays.begin()->size();++i){
-                Value product = 1.;
+                Value_t product = 1.;
                 for(const Array& arr: arrays)
                     product *= arr.at(i);
                 result+=product;
@@ -148,7 +95,7 @@ class VarArray: public VariableBase
         return result;      
     }
 
-    bool Checking_Egal_Size_Arrays(std::initializer_list<const Array>& arrays){
+    static bool Checking_Egal_Size_Arrays(std::initializer_list<const Array>& arrays){
         size_t fst_arr_sz;
         if(arrays.size()!=0 && !arrays.begin()->empty())
             fst_arr_sz = arrays.begin()->size();
@@ -158,49 +105,35 @@ class VarArray: public VariableBase
         }
         return true;
     };
-
-    private:
-    std::unique_ptr<Array> val_;
-
-    Array* GetArray(){
-        if(!val_)
-            return val_.get();
-        else{
-            static Array* empty = nullptr;
-            return empty;
-        }
-    }
 };
-
-class VarString: public VariableBase{
-    public:
-    VarString(std::string_view name, std::string&& text)
-        :VariableBase(name),
-        val_(std::make_unique<std::string>(std::move(text)))
-    {}
-
-    private:
-    std::unique_ptr<std::string> val_;
-};
-
-#include <optional>
 
 template<typename... ARGS>
-class VarFunction: public VariableBase{
-    public:
-    VarFunction(std::string_view name, Function<ARGS...> function)
-        :VariableBase(name),
-        function_(std::make_unique<decltype(function)>(function))
-    {}
+using Function_t = std::function<Value_t(ARGS...)>;
 
-    Value operator()(ARGS&&... args) const{
+#include <optional>
+#include <functional>
+
+template<typename... ARGS>
+class Function: public VariableBase{
+    public:
+    Function(std::string_view name):VariableBase(name){}
+
+    Function(std::string_view name, Function_t<ARGS...> value):
+    VariableBase(name),
+    function_(value){}
+
+    Value_t operator()(ARGS&&... args) const{
         if(!cache_)
             cache_.emplace(this->val_(std::forward<ARGS...>(args...)));
         return cache_.value();
     }
 
+    Value_t GetValue(ARGS&&... args) const {
+        return (*this)(args...);
+    }
+
     private:
-    mutable std::optional<Value> cache_;
-    std::unique_ptr<Function<ARGS...>> function_;
+    Function_t<ARGS...> function_;
+    mutable std::optional<Value_t> cache_;
 };
 
