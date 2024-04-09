@@ -31,8 +31,8 @@ public:
             antlr4::tree::ParseTreeWalker::DEFAULT.walk(listener_.get(),tree_.get());
             break;
         default:
-            tree_ = std::unique_ptr<ZoneContext>(this->zone());
-            listener_ = std::make_unique<ZoneListener>();
+            tree_ = std::unique_ptr<ExprContext>(this->expr());
+            listener_ = std::make_unique<BaseListener>();
             antlr4::tree::ParseTreeWalker::DEFAULT.walk(listener_.get(),tree_.get());
             break;
         }

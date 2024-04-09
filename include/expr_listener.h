@@ -39,13 +39,36 @@ class BaseListener: public ParseRulesBaseListener{
         FUNCTION,
         CONSTANT,
         NUMBER,
-        VARIABLE
+        VARIABLE,
+        DEFINITION,
+        UNARY_MINUS
     };
 
     public:
 
+    BaseListener():mode_stack_({BASE_MODE::NONE}){}
+
     protected:
+    virtual void enterVardefinition(ParseRulesParser::VardefinitionContext * ctx) override {
+
+        
+    }
+    
+    virtual void exitVardefinition(ParseRulesParser::VardefinitionContext * ctx) override { 
+
+    }
+
     virtual void enterUnaryOp(ParseRulesParser::UnaryOpContext *ctx) override{
+        if(mode_stack_.top()==BASE_MODE::VARIABLE)
+            if(ctx->ADD()){
+                mode_stack_.push(BASE_MODE::DEFINITION);
+            }
+            else{
+                if(ctx->SUB())
+                mode_stack_.push(BASE_MODE::UNARY_MINUS);
+                ctx->is
+            }
+
 
     }
 
@@ -54,12 +77,15 @@ class BaseListener: public ParseRulesBaseListener{
     }
 
     virtual void enterVariable(ParseRulesParser::VariableContext *ctx) override{
-        assert(mode_stack_.top()==BASE_MODE::NONE || mode_stack_.top()==BASE_MODE::HDR)
+        assert(mode_stack_.top()==BASE_MODE::NONE || mode_stack_.top()==BASE_MODE::HDR);
         if(!data_.AddVariable(ctx->getText()))
             throw VariableAlreadyExists("Variable " + ctx->getText() + " already registred");
         if(mode_stack_.top()==BASE_MODE::HDR)
-            header_vars_tmp_.push_back(ctx->getText());
-        else mode_stack_.push(BASE_MODE::VARIABLE);
+            header_vars_tmp_.emplace_back(ctx->getText());
+        else {
+            mode_stack_.push(BASE_MODE::VARIABLE);
+            last_var_name_tmp_ = ctx->getText();
+        }
     }
 
     virtual void exitVariable(ParseRulesParser::VariableContext *ctx) override{
@@ -67,8 +93,8 @@ class BaseListener: public ParseRulesBaseListener{
     }
 
     virtual void enterNumber(ParseRulesParser::NumberContext *ctx) override{
-        ctx->chi
-        if(mode_stack_.top()==BASE_MODE)
+        if(mode_stack_.top()==BASE_MODE::VARIABLE)
+            
     }
 
     virtual void exitNumber(ParseRulesParser::NumberContext *ctx) override{
@@ -194,16 +220,16 @@ class BaseListener: public ParseRulesBaseListener{
 
     virtual void exitHdr(ParseRulesParser::HdrContext *ctx) override{
         assert(!parens_count);
-        assert(mode_stack_.top()==BASE_MODE::HDR)
+        assert(mode_stack_.top()==BASE_MODE::HDR);
     }
 
     //this methode permits to distingue the separation between any rules like variable-function match
     //or anything else
-    virtual void enterEndLine(ParseRulesParser::EndLineContext * ctx*) override {
+    virtual void enterEndLine(ParseRulesParser::EndLineContext *ctx) override {
         
     }
 
-    virtual void exitEndLine(ParseRulesParser::EndLineContext * ctx*) override {
+    virtual void exitEndLine(ParseRulesParser::EndLineContext *ctx) override {
 
     }
 
@@ -213,7 +239,8 @@ class BaseListener: public ParseRulesBaseListener{
 
     BaseData data_;
     std::vector<VariableBase> header_vars_tmp_;
-    std::stack<BASE_MODE> mode_stack_ = {BASE_MODE::NONE};
+    std::stack<BASE_MODE> mode_stack_;
+    std::string_view last_var_name_tmp_;
 };
 
 class ZoneListener final: public BaseListener{

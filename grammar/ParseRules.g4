@@ -34,20 +34,24 @@ SQRT: 'Sqrt';
 
 PI: 'Pi' | 'PI' | 'pi' WS;
 
-expr
-    : 
-    '(' expr ')'                # Parens
-    | (ADD | SUB) expr          # UnaryOp
-    | expr (MUL | DIV) expr     # BinaryOp
-    | expr (ADD | SUB) expr     # BinaryOp
-    | expr POW expr             # PowerOp              
-    | functions                 # FunctionCall
-    | VARIABLE                  # Variable
-    | NUMBER                    # Number
-    | CONSTANTS                 # Constant
-    | EOL                       # EndLine
+vardefinition
+    :
+    VARIABLE WS* '=' WS* (expr | STRING) WS* EOL
     ;
 
+expr
+    : 
+    '(' expr ')'                            # Parens
+    | (ADD | SUB) expr                      # UnaryOp
+    | expr (MUL | DIV) expr                 # BinaryOp
+    | expr (ADD | SUB) expr                 # BinaryOp
+    | expr POW expr                         # PowerOp              
+    | functions                             # FunctionCall
+    | VARIABLE                              # Variable
+    | NUMBER                                # Number
+    | CONSTANTS                             # Constant
+    | EOL                                   # EndLine
+    ;
 
 array
     :
@@ -68,15 +72,15 @@ bound_temperature:
     ;
 
 equations_bound:
-    (VARIABLE WS? expr EOL)+
+    (vardefinition)+
     ;
 
 hdr:
-    (VARIABLE WS?)+
+    (VARIABLE WS*)+
     ;
 
 values_bound:
-    (VARIABLE EOL ((expr WS?)+ (EOL | EOF))+)+
+    (VARIABLE EOL ((expr WS*)+ (EOL | EOF))+)+
     ;
 
 bound_coefs:
