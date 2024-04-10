@@ -53,6 +53,19 @@ expr
     | EOL                                   # EndLine
     ;
 
+equation:
+    : 
+    '(' expr ')'                            # Parens
+    | (ADD | SUB) expr                      # UnaryOp
+    | expr (MUL | DIV) expr                 # BinaryOp
+    | expr (ADD | SUB) expr                 # BinaryOp
+    | expr POW expr                         # PowerOp              
+    | functions                             # FunctionCall
+    | VARIABLE                              # Variable
+    | NUMBER                                # Number
+    | CONSTANTS                             # Constant
+    ;
+
 array
     :
     '['(VARIABLE | NUMBER | CONSTANTS)(','VARIABLE | NUMBER | CONSTANTS)+']'

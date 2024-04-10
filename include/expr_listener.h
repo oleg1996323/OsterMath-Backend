@@ -50,8 +50,8 @@ class BaseListener: public ParseRulesBaseListener{
 
     protected:
     virtual void enterVardefinition(ParseRulesParser::VardefinitionContext * ctx) override {
-
-        
+        mode_stack_.push(BASE_MODE::DEFINITION);
+        data_.AddVariable(ctx->VARIABLE()->getText())
     }
     
     virtual void exitVardefinition(ParseRulesParser::VardefinitionContext * ctx) override { 
@@ -59,7 +59,7 @@ class BaseListener: public ParseRulesBaseListener{
     }
 
     virtual void enterUnaryOp(ParseRulesParser::UnaryOpContext *ctx) override{
-        if(mode_stack_.top()==BASE_MODE::VARIABLE)
+        if(mode_stack_.top()==BASE_MODE::DEFINITION){
             if(ctx->ADD()){
                 mode_stack_.push(BASE_MODE::DEFINITION);
             }
@@ -68,8 +68,7 @@ class BaseListener: public ParseRulesBaseListener{
                 mode_stack_.push(BASE_MODE::UNARY_MINUS);
                 ctx->is
             }
-
-
+        }
     }
 
     virtual void exitUnaryOp(ParseRulesParser::UnaryOpContext* ctx) override {
@@ -77,9 +76,9 @@ class BaseListener: public ParseRulesBaseListener{
     }
 
     virtual void enterVariable(ParseRulesParser::VariableContext *ctx) override{
-        assert(mode_stack_.top()==BASE_MODE::NONE || mode_stack_.top()==BASE_MODE::HDR);
-        if(!data_.AddVariable(ctx->getText()))
-            throw VariableAlreadyExists("Variable " + ctx->getText() + " already registred");
+        assert(mode_stack_.top()==BASE_MODE::NONE || mode_stack_.top()==BASE_MODE::HDR || mode_stack_.top()==BASE_MODE::DEFINITION);
+        data_.AddVariable(ctx->getText())
+            throw VariableAlreadyExists("Variable " + ctx->getText() + " already de");
         if(mode_stack_.top()==BASE_MODE::HDR)
             header_vars_tmp_.emplace_back(ctx->getText());
         else {
@@ -89,7 +88,7 @@ class BaseListener: public ParseRulesBaseListener{
     }
 
     virtual void exitVariable(ParseRulesParser::VariableContext *ctx) override{
-
+        
     }
 
     virtual void enterNumber(ParseRulesParser::NumberContext *ctx) override{
@@ -98,9 +97,9 @@ class BaseListener: public ParseRulesBaseListener{
     }
 
     virtual void exitNumber(ParseRulesParser::NumberContext *ctx) override{
-
-    }
         
+    }
+    
     virtual void enterParens(ParseRulesParser::ParensContext *ctx) override{
         ++parens_count;
     }
@@ -121,7 +120,7 @@ class BaseListener: public ParseRulesBaseListener{
     //a function parser for definition any callback function for further calculations
     //{for example: Lg(sumproduct(__Ivs__, __n__))}
     virtual void enterFunctionCall(ParseRulesParser::FunctionCallContext *ctx) override{
-
+        
     }
 
     virtual void exitFunctionCall(ParseRulesParser::FunctionCallContext *ctx) override{
@@ -170,16 +169,20 @@ class BaseListener: public ParseRulesBaseListener{
     }
 
     virtual void exitDeclog(ParseRulesParser::DeclogContext *ctx) override{
+        if(mode_stack_.top()==BASE_MODE::DEFINITION)
 
     }
 
     //based logarithm function {for example: Log(Expr, Expr)}
     virtual void enterBaselog(ParseRulesParser::BaselogContext *ctx) override{
-
+        auto val_base = ctx->expr();
+        if(val_base.size()!=2 )
+            throw std::invalid_argument("Invalid input parameters");
+        std::log(val_base.at(0), val_base.at(1));
     }
 
     virtual void exitBaselog(ParseRulesParser::BaselogContext *ctx) override{
-
+        
     }
 
     //exponent function {for example: Exp(Expr)}
