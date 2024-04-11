@@ -2,10 +2,12 @@
 #include <functional>
 #include <unordered_map>
 #include <unordered_set>
+#include <optional>
 #include "def.h"
 #include "ParseRulesBaseListener.h"
 #include "types.h"
 #include "data.h"
+#include "function_proxy.h"
 
 class ErrorListener: public antlr4::BaseErrorListener {
 public:
@@ -18,6 +20,8 @@ public:
 };
 
 class BaseListener: public ParseRulesBaseListener{
+    FunctionProxy cur_function_;
+
     protected:
 
     enum class BASE_MODE{
@@ -51,22 +55,30 @@ class BaseListener: public ParseRulesBaseListener{
     protected:
     virtual void enterVardefinition(ParseRulesParser::VardefinitionContext * ctx) override {
         mode_stack_.push(BASE_MODE::DEFINITION);
-        data_.AddVariable(ctx->VARIABLE()->getText())
+        //then enterVariable
+        //then if not STRING, then enterFunction or enterConstant or enterNumber or enterParens or enterUnary
     }
     
     virtual void exitVardefinition(ParseRulesParser::VardefinitionContext * ctx) override { 
-
+        if(ctx->STRING())
+            data_.AddVariable(ctx->VARIABLE()->getText(),std::move(ctx->STRING()->getText()));
     }
 
     virtual void enterUnaryOp(ParseRulesParser::UnaryOpContext *ctx) override{
         if(mode_stack_.top()==BASE_MODE::DEFINITION){
             if(ctx->ADD()){
-                mode_stack_.push(BASE_MODE::DEFINITION);
+                auto childs = ctx->children;
+                if(childs.empty())
+                    throw std::invalid_argument("Invalid definition "+std::string(last_var_name_tmp_));
+                else
+                    data_.Define(last_var_name_tmp_,[](){
+                        
+                    });
             }
             else{
                 if(ctx->SUB())
                 mode_stack_.push(BASE_MODE::UNARY_MINUS);
-                ctx->is
+                
             }
         }
     }
@@ -76,20 +88,23 @@ class BaseListener: public ParseRulesBaseListener{
     }
 
     virtual void enterVariable(ParseRulesParser::VariableContext *ctx) override{
-        assert(mode_stack_.top()==BASE_MODE::NONE || mode_stack_.top()==BASE_MODE::HDR || mode_stack_.top()==BASE_MODE::DEFINITION);
-        data_.AddVariable(ctx->getText())
-            throw VariableAlreadyExists("Variable " + ctx->getText() + " already de");
+        assert(mode_stack_.top()==BASE_MODE::HDR || mode_stack_.top()==BASE_MODE::DEFINITION);
+        data_.AddVariable(ctx->getText());
+
+        if(data_.Defined(ctx->getText()) && mode_stack_.top()==BASE_MODE::DEFINITION)
+            throw VariableAlreadyExists("Variable " + ctx->getText() + " already defined");
+
         if(mode_stack_.top()==BASE_MODE::HDR)
             header_vars_tmp_.emplace_back(ctx->getText());
         else {
-            mode_stack_.push(BASE_MODE::VARIABLE);
+            assert(last_var_name_tmp_.empty());
             last_var_name_tmp_ = ctx->getText();
         }
     }
 
-    virtual void exitVariable(ParseRulesParser::VariableContext *ctx) override{
+    // virtual void exitVariable(ParseRulesParser::VariableContext *ctx) override{
         
-    }
+    // }
 
     virtual void enterNumber(ParseRulesParser::NumberContext *ctx) override{
         if(mode_stack_.top()==BASE_MODE::VARIABLE)
@@ -244,130 +259,6 @@ class BaseListener: public ParseRulesBaseListener{
     std::vector<VariableBase> header_vars_tmp_;
     std::stack<BASE_MODE> mode_stack_;
     std::string_view last_var_name_tmp_;
-};
-
-class ZoneListener final: public BaseListener{
-    public:
-    ZoneListener():BaseListener(){
-
-    }
+    std::optional<FunctionProxy> active_function_;
     
-    virtual void enterZone(ParseRulesParser::ZoneContext *ctx) override{
-
-    }
-
-    virtual void exitZone(ParseRulesParser::ZoneContext *ctx) override{
-
-    }
-
-    virtual void enterData_bound_zone(ParseRulesParser::Data_bound_zoneContext *ctx) override{
-
-    }
-
-    virtual void exitData_bound_zone(ParseRulesParser::Data_bound_zoneContext *ctx) override{
-
-    }
-
-    virtual void enterConst_volume(ParseRulesParser::Const_volumeContext *ctx) override{
-
-    }
-    
-    virtual void exitConst_volume(ParseRulesParser::Const_volumeContext *ctx) override{
-
-    }
-
-    virtual void enterVirial_coefs_volume(ParseRulesParser::Virial_coefs_volumeContext *ctx) override{
-
-    }
-
-    virtual void exitVirial_coefs_volume(ParseRulesParser::Virial_coefs_volumeContext *ctx) override{
-
-    }
-
-    virtual void enterValues_volume(ParseRulesParser::Values_volumeContext *ctx) override{
-
-    }
-
-    virtual void exitValues_volume(ParseRulesParser::Values_volumeContext *ctx) override{
-
-    }
-
-    virtual void enterBound_equation_volume(ParseRulesParser::Bound_equation_volumeContext *ctx) override{
-
-    }
-
-    virtual void exitBound_equation_volume(ParseRulesParser::Bound_equation_volumeContext *ctx) override{
-        
-    }
-
-    virtual void enterBound_temperature(ParseRulesParser::Bound_temperatureContext *ctx) override{
-
-    }
-
-    virtual void exitBound_temperature(ParseRulesParser::Bound_temperatureContext *ctx) override{
-
-    }
-
-    virtual void enterEquations_bound(ParseRulesParser::Equations_boundContext *ctx) override{
-
-    }
-
-    virtual void exitEquations_bound(ParseRulesParser::Equations_boundContext *ctx) override{
-
-    }
-
-    virtual void enterBound_coefs(ParseRulesParser::Bound_coefsContext *ctx) override{
-
-    }
-
-    virtual void exitBound_coefs(ParseRulesParser::Bound_coefsContext *ctx) override{
-
-    }
-
-    virtual void enterValues_bound(ParseRulesParser::Values_boundContext* ctx) override{
-
-    }
-
-    virtual void exitValues_bound(ParseRulesParser::Values_boundContext *ctx) override{
-
-    }
-};
-
-class BoundTempListener final: public BaseListener{
-    public:
-    BoundTempListener():BaseListener(){
-
-    }
-
-    virtual void enterBound_temperature(ParseRulesParser::Bound_temperatureContext *ctx) override{
-
-    }
-
-    virtual void exitBound_temperature(ParseRulesParser::Bound_temperatureContext *ctx) override{
-
-    }
-
-    virtual void enterEquations_bound(ParseRulesParser::Equations_boundContext *ctx) override{
-
-    }
-
-    virtual void exitEquations_bound(ParseRulesParser::Equations_boundContext *ctx) override{
-
-    }
-
-    virtual void enterBound_coefs(ParseRulesParser::Bound_coefsContext *ctx) override{
-
-    }
-
-    virtual void exitBound_coefs(ParseRulesParser::Bound_coefsContext *ctx) override{
-
-    }
-
-    virtual void enterValues_bound(ParseRulesParser::Values_boundContext* ctx) override{
-
-    }
-
-    virtual void exitValues_bound(ParseRulesParser::Values_boundContext *ctx) override{
-
-    }   
 };

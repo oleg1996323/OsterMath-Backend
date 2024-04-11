@@ -50,20 +50,6 @@ expr
     | VARIABLE                              # Variable
     | NUMBER                                # Number
     | CONSTANTS                             # Constant
-    | EOL                                   # EndLine
-    ;
-
-equation:
-    : 
-    '(' expr ')'                            # Parens
-    | (ADD | SUB) expr                      # UnaryOp
-    | expr (MUL | DIV) expr                 # BinaryOp
-    | expr (ADD | SUB) expr                 # BinaryOp
-    | expr POW expr                         # PowerOp              
-    | functions                             # FunctionCall
-    | VARIABLE                              # Variable
-    | NUMBER                                # Number
-    | CONSTANTS                             # Constant
     ;
 
 array
@@ -80,45 +66,14 @@ functions
     | SUMPRODUCT '(' expr ',' expr (',' expr )*')'  #Sumproduct
     ;
 
-bound_temperature:
-    'bound_temperature' EOL equations_bound EOL bound_coefs
-    ;
-
-equations_bound:
-    (vardefinition)+
-    ;
-
 hdr:
     (VARIABLE WS*)+
     ;
 
-values_bound:
-    (VARIABLE EOL ((expr WS*)+ (EOL | EOF))+)+
+numbers_line:
+    NUMBER WS+ (NUMBER WS+) EOL
     ;
 
-bound_coefs:
-    hdr EOL values_bound
+hdr_definition:
+    hdr EOL numbers_line
     ;
-
-zone:
-    'zone' EOL data_bound_zone EOL const_volume EOL virial_coefs_volume
-    ;
-
-data_bound_zone:
-    (VARIABLE WS* (STRING | NUMBER) EOL)+
-    ;
-
-const_volume:
-    hdr EOL values_volume
-    ;
-
-virial_coefs_volume:
-    hdr EOL values_volume;
-
-values_volume:
-    (NUMBER WS*)+ EOL;
-
-bound_equation_volume:
-    expr
-    ;
-

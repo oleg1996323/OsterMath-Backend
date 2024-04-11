@@ -16,6 +16,13 @@ class BaseData{
         return vars_.contains(name);
     }
 
+    bool Defined(const std::string& name) const{
+        if(Exists(name)){
+            return vars_.at(name).has_value();
+        }
+        else return false;
+    }
+
     bool AddVariable(const std::string& name){
         if(!Exists(name)){
             vars_.emplace(name,std::nullopt).first;
@@ -24,13 +31,22 @@ class BaseData{
         else return false;
     }
 
-    bool AddVariable(std::string&& name, Value_t&& value){
+    void AddVariable(std::string&& name, Value_t&& value){
         if(!Exists(name)){
             auto ref = vars_.emplace(name,std::nullopt).first;
             ref->second.emplace(std::move(Value(ref->first,std::move(value))));
-            return true;
+            return;
         }
-        else return false;
+        else return;
+    }
+
+    void AddVariable(std::string&& name, std::string&& value){
+        if(!Exists(name)){
+            auto ref = vars_.emplace(name,std::nullopt).first;
+            ref->second.emplace(std::move(String(ref->first,std::move(value))));
+            return;
+        }
+        else return;
     }
 
     template<typename... ARGS>
@@ -41,6 +57,46 @@ class BaseData{
             return true;
         }
         else return false;
+    }
+
+    void Define(std::string&& name, Value_t&& value){
+        if(Exists(name)){
+            if(!Defined(name)){
+                auto ref = vars_.find(name);
+                ref->second.emplace(std::move(Value(ref->first,std::move(value))));
+                return;
+            }
+            else
+                throw std::logic_error("Variable "+name+" already defined.");
+        }
+        else throw std::logic_error("Variable "+name+" don't exists.");
+    }
+
+    void Define(std::string&& name, std::string&& value){
+        if(Exists(name)){
+            if(!Defined(name)){
+                auto ref = vars_.find(name);
+                ref->second.emplace(std::move(String(ref->first,std::move(value))));
+                return;
+            }
+            else
+                throw std::logic_error("Variable "+name+" already defined.");
+        }
+        else throw std::logic_error("Variable "+name+" don't exists.");
+    }
+
+    template<typename... ARGS>
+    void Define(std::string&& name, Function_t<ARGS...> value(ARGS...)){
+        if(Exists(name)){
+            if(!Defined(name)){
+                auto ref = vars_.find(name);
+                ref->second.emplace(std::move(VarFunction<ARGS...>(ref->first,value)));
+                return;
+            }
+            else
+                throw std::logic_error("Variable "+name+" already defined.");
+        }
+        else throw std::logic_error("Variable "+name+" don't exists.");
     }
 
     private:

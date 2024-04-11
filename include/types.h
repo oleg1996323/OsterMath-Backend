@@ -15,6 +15,14 @@
 using namespace std::string_literals;
 using namespace std::string_view_literals;
 
+enum class VAR_TYPE{
+    VALUE,
+    ARRAY,
+    FUNCTION,
+    STRING,
+    UNKNOWN
+};
+
 class VariableBase{
     public:
     struct HashVar{
@@ -33,6 +41,9 @@ class VariableBase{
         return name_;
     }
 
+    protected:
+    VAR_TYPE type_ = VAR_TYPE::UNKNOWN;
+
     private:
     std::string_view name_;
 };
@@ -43,13 +54,17 @@ class Value:public VariableBase{
     public:
     Value(std::string_view name):
     VariableBase(name)
-    {}
+    {
+        this->type_ = VAR_TYPE::VALUE;
+    }
 
     template<typename T>
     Value(std::string_view name, T&& value):
     VariableBase(name),
     val_(std::make_unique<Value_t>(std::forward<T>(value)))
-    {}
+    {
+        type_ = VAR_TYPE::VALUE;
+    }
 
     private:
     std::unique_ptr<Value_t> val_;
@@ -58,13 +73,18 @@ class Value:public VariableBase{
 class String: public std::string, public VariableBase{
     public:
     String(std::string_view name):
-    VariableBase(name){}
+    VariableBase(name)
+    {
+        type_ = VAR_TYPE::STRING;
+    }
 
     template<typename T>
     String(std::string_view name, T&& text)
-        :std::string(std::forward<std::remove_reference<T>>(text)),
+        :std::string(std::forward<T>(text)),
         VariableBase(name)
-    {}
+    {
+        type_ = VAR_TYPE::STRING;
+    }
 };
 
 #include <initializer_list>
@@ -74,13 +94,18 @@ using Array_t = std::vector<Value_t>;
 class Array: public std::vector<Value_t>, public VariableBase{
     public:
     Array(std::string_view name):
-    VariableBase(name){}
+    VariableBase(name)
+    {
+        type_ = VAR_TYPE::ARRAY;
+    }
 
     template<typename T>
     Array(std::string_view name, T&& array):
     std::vector<Value_t>(std::forward<std::remove_reference<T>>(array)),
     VariableBase(name)
-    {}
+    {
+        type_ = VAR_TYPE::ARRAY;
+    }
 
     static Value_t SumProduct(std::initializer_list<const Array>& arrays){
         Value_t result = 0.;
@@ -116,11 +141,18 @@ using Function_t = std::function<Value_t(ARGS...)>;
 template<typename... ARGS>
 class Function: public VariableBase{
     public:
-    Function(std::string_view name):VariableBase(name){}
+    Function(std::string_view name):
+    VariableBase(name)
+    {
+        type_ = VAR_TYPE::FUNCTION;
+    }
 
     Function(std::string_view name, Function_t<ARGS...> value):
     VariableBase(name),
-    function_(value){}
+    function_(value)
+    {
+        type_ = VAR_TYPE::FUNCTION;
+    }
 
     Value_t operator()(ARGS&&... args) const{
         if(!cache_)
