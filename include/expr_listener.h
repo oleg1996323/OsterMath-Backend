@@ -260,5 +260,6 @@ class BaseListener: public ParseRulesBaseListener{
     std::stack<BASE_MODE> mode_stack_;
     std::string_view last_var_name_tmp_;
     std::optional<FunctionProxy> active_function_;
+    //сделать как в spreadsheet
     
 };

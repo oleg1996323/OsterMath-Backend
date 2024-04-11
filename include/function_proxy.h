@@ -5,9 +5,6 @@
 #include <unordered_set>
 #include <vector>
 
-template<typename... ARGS>
-using Function_t = std::function<Value_t(ARGS...)>;
-
 template <typename T>
 struct function_traits;
 

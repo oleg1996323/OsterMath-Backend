@@ -23,6 +23,8 @@ enum class VAR_TYPE{
     UNKNOWN
 };
 
+using Value_t = boost::multiprecision::cpp_dec_float_50;
+
 class VariableBase{
     public:
     struct HashVar{
@@ -47,8 +49,6 @@ class VariableBase{
     private:
     std::string_view name_;
 };
-
-using Value_t = boost::multiprecision::cpp_dec_float_50;
 
 class Value:public VariableBase{
     public:
@@ -132,13 +132,12 @@ class Array: public std::vector<Value_t>, public VariableBase{
     };
 };
 
-template<typename... ARGS>
-using Function_t = std::function<Value_t(ARGS...)>;
-
 #include <optional>
 #include <functional>
 
 template<typename... ARGS>
+using Function_t = std::function<Value_t(ARGS&&...)>;
+
 class Function: public VariableBase{
     public:
     Function(std::string_view name):
@@ -147,25 +146,30 @@ class Function: public VariableBase{
         type_ = VAR_TYPE::FUNCTION;
     }
 
-    Function(std::string_view name, Function_t<ARGS...> value):
+    #define TYPE_ARGS typename std::enable_if<all_same<ARGS...>::value, void>::type
+
+    template<typename... ARGS>
+    Function(std::string_view name, Function_t<TYPE_ARGS> value):
     VariableBase(name),
-    function_(value)
+    function_(std::forward<TYPE_ARGS>(value))
     {
         type_ = VAR_TYPE::FUNCTION;
     }
 
-    Value_t operator()(ARGS&&... args) const{
+    template<typename... ARGS>
+    Value_t operator()(TYPE_ARGS&& args...) const{
         if(!cache_)
-            cache_.emplace(this->val_(std::forward<ARGS...>(args...)));
+            cache_.emplace(this->function_(std::forward<TYPE_ARGS>(args)));
         return cache_.value();
     }
 
-    Value_t GetValue(ARGS&&... args) const {
-        return (*this)(args...);
+    template<typename... ARGS>
+    Value_t GetValue(TYPE_ARGS&& args...) const {
+        return (*this)(std::forward<TYPE_ARGS>(args));
     }
 
     private:
-    Function_t<ARGS...> function_;
+    Function_t<VariableBase> function_;
     mutable std::optional<Value_t> cache_;
 };
 

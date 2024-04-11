@@ -22,3 +22,17 @@ static const std::map<std::string,TypeFile> types_by_names = {
     {"zones",TypeFile::ZONE},
     {"bounds",TypeFile::BOUNDS}
 };
+
+#include <type_traits>
+
+template<typename... T>
+  struct all_same : std::false_type { };
+
+template<>
+  struct all_same<> : std::true_type { };
+
+template<typename T>
+  struct all_same<T> : std::true_type { };
+
+template<typename T, typename... Ts>
+  struct all_same<T, T, Ts...> : all_same<T, Ts...> { };
