@@ -50,26 +50,6 @@ class VariableBase{
     std::string_view name_;
 };
 
-class Value:public VariableBase{
-    public:
-    Value(std::string_view name):
-    VariableBase(name)
-    {
-        this->type_ = VAR_TYPE::VALUE;
-    }
-
-    template<typename T>
-    Value(std::string_view name, T&& value):
-    VariableBase(name),
-    val_(std::make_unique<Value_t>(std::forward<T>(value)))
-    {
-        type_ = VAR_TYPE::VALUE;
-    }
-
-    private:
-    std::unique_ptr<Value_t> val_;
-};
-
 class String: public std::string, public VariableBase{
     public:
     String(std::string_view name):
@@ -135,12 +115,29 @@ class Array: public std::vector<Value_t>, public VariableBase{
 #include <optional>
 #include <functional>
 
-template<typename... ARGS>
-using Function_t = std::function<Value_t(ARGS&&...)>;
 
-class Function: public VariableBase{
+
+template<typename... ARGS>
+struct Function_t_impl{
+    using type = std::function<Value_t(ARGS&&...)>;
+};
+
+template<>
+struct Function_t_impl<void>{
+    using type = std::function<Value_t(void)>;
+};
+
+template<typename... VariableBase>
+struct Function_t_impl<std::tuple<VariableBase...>> {
+    using type = std::function<Value_t(VariableBase&&...)>;
+};
+
+template<typename... ARGS>
+using Function_t = typename Function_t_impl<ARGS...>::type;
+
+class Variable: public VariableBase{
     public:
-    Function(std::string_view name):
+    Variable(std::string_view name):
     VariableBase(name)
     {
         type_ = VAR_TYPE::FUNCTION;
@@ -149,7 +146,7 @@ class Function: public VariableBase{
     #define TYPE_ARGS typename std::enable_if<all_same<ARGS...>::value, void>::type
 
     template<typename... ARGS>
-    Function(std::string_view name, Function_t<TYPE_ARGS> value):
+    Variable(std::string_view name, Function_t<TYPE_ARGS> value):
     VariableBase(name),
     function_(std::forward<TYPE_ARGS>(value))
     {

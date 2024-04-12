@@ -17,25 +17,9 @@ public:
         auto error_handler = std::make_shared<antlr4::BailErrorStrategy>();
         this->setErrorHandler(error_handler);
         this->removeErrorListeners();
-
-        switch (type_)
-        {
-        case TypeFile::ZONE:
-            tree_ = std::unique_ptr<ZoneContext>(this->zone());
-            listener_ = std::make_unique<ZoneListener>();
-            antlr4::tree::ParseTreeWalker::DEFAULT.walk(listener_.get(),tree_.get());
-            break;
-        case TypeFile::BOUNDS:
-            tree_ = std::unique_ptr<Bound_temperatureContext>(this->bound_temperature());
-            listener_ = std::make_unique<BoundTempListener>();
-            antlr4::tree::ParseTreeWalker::DEFAULT.walk(listener_.get(),tree_.get());
-            break;
-        default:
-            tree_ = std::unique_ptr<ExprContext>(this->expr());
-            listener_ = std::make_unique<BaseListener>();
-            antlr4::tree::ParseTreeWalker::DEFAULT.walk(listener_.get(),tree_.get());
-            break;
-        }
+        tree_ = std::unique_ptr<ExprContext>(this->expr());
+        listener_ = std::make_unique<BaseListener>();
+        antlr4::tree::ParseTreeWalker::DEFAULT.walk(listener_.get(),tree_.get());
     }
 
     Parser(Parser&& other):ParseRulesParser(other.input_),
@@ -46,6 +30,7 @@ public:
         listener_ = std::move(other.listener_);
         err_listener_ = std::move(other.err_listener_);
         tree_ = std::move(other.tree_);
+        
     }
     
     antlr4::ANTLRInputStream antlr_stream_;

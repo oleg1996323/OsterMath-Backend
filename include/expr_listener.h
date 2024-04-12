@@ -55,6 +55,7 @@ class BaseListener: public ParseRulesBaseListener{
     protected:
     virtual void enterVardefinition(ParseRulesParser::VardefinitionContext * ctx) override {
         mode_stack_.push(BASE_MODE::DEFINITION);
+
         //then enterVariable
         //then if not STRING, then enterFunction or enterConstant or enterNumber or enterParens or enterUnary
     }
@@ -62,18 +63,29 @@ class BaseListener: public ParseRulesBaseListener{
     virtual void exitVardefinition(ParseRulesParser::VardefinitionContext * ctx) override { 
         if(ctx->STRING())
             data_.AddVariable(ctx->VARIABLE()->getText(),std::move(ctx->STRING()->getText()));
+        else if(ctx->expr()->)
+            data_.AddVariable(ctx->VARIABLE()->getText());
     }
 
     virtual void enterUnaryOp(ParseRulesParser::UnaryOpContext *ctx) override{
         if(mode_stack_.top()==BASE_MODE::DEFINITION){
             if(ctx->ADD()){
-                auto childs = ctx->children;
-                if(childs.empty())
-                    throw std::invalid_argument("Invalid definition "+std::string(last_var_name_tmp_));
-                else
-                    data_.Define(last_var_name_tmp_,[](){
+                if(ctx->expr())
+                    active_function_.emplace(FunctionProxy()).SetFunction([&childs](){
                         
                     });
+                    data_.Define(last_var_name_tmp_,Function_t<void>((){
+                        childs.at(1)
+                    }));
+                }
+                else{
+                    active_function_.emplace(FunctionProxy()).SetFunction([&childs](){
+                        
+                    });
+                    data_.Define(last_var_name_tmp_,Function_t<void>((){
+                        childs.at(1)
+                    }));
+                }
             }
             else{
                 if(ctx->SUB())
@@ -108,7 +120,7 @@ class BaseListener: public ParseRulesBaseListener{
 
     virtual void enterNumber(ParseRulesParser::NumberContext *ctx) override{
         if(mode_stack_.top()==BASE_MODE::VARIABLE)
-            
+            ;
     }
 
     virtual void exitNumber(ParseRulesParser::NumberContext *ctx) override{
@@ -185,7 +197,7 @@ class BaseListener: public ParseRulesBaseListener{
 
     virtual void exitDeclog(ParseRulesParser::DeclogContext *ctx) override{
         if(mode_stack_.top()==BASE_MODE::DEFINITION)
-
+            ;
     }
 
     //based logarithm function {for example: Log(Expr, Expr)}
@@ -234,21 +246,13 @@ class BaseListener: public ParseRulesBaseListener{
         assert(!parens_count);
         assert(header_vars_tmp_.empty());
         mode_stack_.push(BASE_MODE::HDR);
+        
     }
 
     virtual void exitHdr(ParseRulesParser::HdrContext *ctx) override{
         assert(!parens_count);
         assert(mode_stack_.top()==BASE_MODE::HDR);
-    }
-
-    //this methode permits to distingue the separation between any rules like variable-function match
-    //or anything else
-    virtual void enterEndLine(ParseRulesParser::EndLineContext *ctx) override {
         
-    }
-
-    virtual void exitEndLine(ParseRulesParser::EndLineContext *ctx) override {
-
     }
 
     uint8_t parens_count = 0;
@@ -259,7 +263,5 @@ class BaseListener: public ParseRulesBaseListener{
     std::vector<VariableBase> header_vars_tmp_;
     std::stack<BASE_MODE> mode_stack_;
     std::string_view last_var_name_tmp_;
-    std::optional<FunctionProxy> active_function_;
-    //сделать как в spreadsheet
-    
+    std::optional<FunctionProxy> active_function_;   
 };
