@@ -31,15 +31,6 @@ class BaseData{
         else return false;
     }
 
-    void AddVariable(std::string&& name, Value_t&& value){
-        if(!Exists(name)){
-            auto ref = vars_.emplace(name,std::nullopt).first;
-            ref->second.emplace(std::move(Value(ref->first,std::move(value))));
-            return;
-        }
-        else return;
-    }
-
     void AddVariable(std::string&& name, std::string&& value){
         if(!Exists(name)){
             auto ref = vars_.emplace(name,std::nullopt).first;
@@ -49,7 +40,7 @@ class BaseData{
         else return;
     }
 
-    template<typename... ARGS>
+    template<typename... ARGS>//add arithmetic tree
     bool AddVariable(std::string&& name, Function_t<ARGS...> value(ARGS...)){
         if(!Exists(name)){
             auto ref = vars_.emplace(name,std::nullopt).first;
@@ -97,6 +88,10 @@ class BaseData{
                 throw std::logic_error("Variable "+name+" already defined.");
         }
         else throw std::logic_error("Variable "+name+" don't exists.");
+    }
+
+    void Erase(const std::string& var_name){
+        vars_.erase(var_name);
     }
 
     private:

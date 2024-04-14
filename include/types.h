@@ -1,8 +1,5 @@
 #pragma once
 #include <cassert>
-
-#include "def.h"
-#include "exception.h"
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #include <vector>
 #include <string>
@@ -11,9 +8,13 @@
 #include <hash_map>
 #include <stdexcept>
 #include <cstdarg>
+#include "def.h"
+#include "exception.h"
 
 using namespace std::string_literals;
 using namespace std::string_view_literals;
+
+class BaseData;
 
 enum class VAR_TYPE{
     VALUE,
@@ -35,35 +36,47 @@ class VariableBase{
 
     ~VariableBase(){}
 
-    explicit VariableBase(std::string_view name):
-        name_(name)
+    explicit VariableBase(std::string_view name, BaseData* data_pool):
+        name_(name),
+        data_pool_(data_pool)
     {}
 
     std::string_view GetName() const{
         return name_;
     }
 
+    virtual VAR_TYPE type(){
+        return VAR_TYPE::UNKNOWN;
+    }
+
     protected:
-    VAR_TYPE type_ = VAR_TYPE::UNKNOWN;
+    void set_data_pool(BaseData* data_pool){
+        data_pool_=data_pool;
+    }
+
+    BaseData* get_data_pool() const{
+        return data_pool_;    
+    }
 
     private:
     std::string_view name_;
+    BaseData* data_pool_;
 };
 
 class String: public std::string, public VariableBase{
     public:
-    String(std::string_view name):
-    VariableBase(name)
-    {
-        type_ = VAR_TYPE::STRING;
-    }
+    String(std::string_view name, BaseData* data_pool):
+    VariableBase(name, data_pool)
+    {}
 
     template<typename T>
-    String(std::string_view name, T&& text)
+    String(std::string_view name, T&& text, BaseData* data_pool)
         :std::string(std::forward<T>(text)),
-        VariableBase(name)
-    {
-        type_ = VAR_TYPE::STRING;
+        VariableBase(name, data_pool)
+    {}
+
+    virtual VAR_TYPE type() override{
+        return VAR_TYPE::STRING;
     }
 };
 
@@ -73,100 +86,52 @@ using Array_t = std::vector<Value_t>;
 
 class Array: public std::vector<Value_t>, public VariableBase{
     public:
-    Array(std::string_view name):
-    VariableBase(name)
-    {
-        type_ = VAR_TYPE::ARRAY;
-    }
+    Array(std::string_view name, BaseData* data_pool):
+    VariableBase(name, data_pool)
+    {}
 
     template<typename T>
-    Array(std::string_view name, T&& array):
+    Array(std::string_view name, T&& array, BaseData* data_pool):
     std::vector<Value_t>(std::forward<std::remove_reference<T>>(array)),
-    VariableBase(name)
-    {
-        type_ = VAR_TYPE::ARRAY;
-    }
+    VariableBase(name, data_pool)
+    {}
 
-    static Value_t SumProduct(std::initializer_list<const Array>& arrays){
-        Value_t result = 0.;
-        if(Checking_Egal_Size_Arrays(arrays)){
-            for(size_t i=0;i<arrays.begin()->size();++i){
-                Value_t product = 1.;
-                for(const Array& arr: arrays)
-                    product *= arr.at(i);
-                result+=product;
-            }
-        }
-        return result;      
+    virtual VAR_TYPE type() override{
+        return VAR_TYPE::ARRAY;
     }
-
-    static bool Checking_Egal_Size_Arrays(std::initializer_list<const Array>& arrays){
-        size_t fst_arr_sz;
-        if(arrays.size()!=0 && !arrays.begin()->empty())
-            fst_arr_sz = arrays.begin()->size();
-        for(const Array& arr: arrays){
-            if(arr.size()!=fst_arr_sz)
-                return false;
-        }
-        return true;
-    };
 };
 
 #include <optional>
-#include <functional>
-
-
-
-template<typename... ARGS>
-struct Function_t_impl{
-    using type = std::function<Value_t(ARGS&&...)>;
-};
-
-template<>
-struct Function_t_impl<void>{
-    using type = std::function<Value_t(void)>;
-};
-
-template<typename... VariableBase>
-struct Function_t_impl<std::tuple<VariableBase...>> {
-    using type = std::function<Value_t(VariableBase&&...)>;
-};
-
-template<typename... ARGS>
-using Function_t = typename Function_t_impl<ARGS...>::type;
+#include "arithmetic_tree.h"
 
 class Variable: public VariableBase{
     public:
-    Variable(std::string_view name):
-    VariableBase(name)
-    {
-        type_ = VAR_TYPE::FUNCTION;
+    Variable(std::string_view name, BaseData* data_pool):
+    VariableBase(name, data_pool)
+    {}
+
+    template<typename TREE>
+    Variable(std::string_view name, TREE&& tree, BaseData* data_pool):
+    VariableBase(name, data_pool),
+    function(std::forward<ArithmeticTree>(tree))
+    {}
+
+    explicit Variable(const Variable& var, BaseData* data_pool = nullptr):
+    VariableBase(var.GetName(),!data_pool?var.get_data_pool():data_pool){
+        this->function = var.function;
+        vars_dependence_ = var.vars_dependence_;
+        cache_ = var.cache_;
+        if(data_pool)
+            set_data_pool(data_pool);
     }
 
-    #define TYPE_ARGS typename std::enable_if<all_same<ARGS...>::value, void>::type
-
-    template<typename... ARGS>
-    Variable(std::string_view name, Function_t<TYPE_ARGS> value):
-    VariableBase(name),
-    function_(std::forward<TYPE_ARGS>(value))
-    {
-        type_ = VAR_TYPE::FUNCTION;
-    }
-
-    template<typename... ARGS>
-    Value_t operator()(TYPE_ARGS&& args...) const{
-        if(!cache_)
-            cache_.emplace(this->function_(std::forward<TYPE_ARGS>(args)));
-        return cache_.value();
-    }
-
-    template<typename... ARGS>
-    Value_t GetValue(TYPE_ARGS&& args...) const {
-        return (*this)(std::forward<TYPE_ARGS>(args));
+    Value_t execute() const{
+        return function.execute();
     }
 
     private:
-    Function_t<VariableBase> function_;
+    ArithmeticTree function;
+    std::unordered_set<std::string_view> vars_dependence_; //если обнаруживается взаимная зависимость переменных, то выбрасывается исключение
     mutable std::optional<Value_t> cache_;
 };
 

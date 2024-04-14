@@ -8,6 +8,7 @@
 #include "types.h"
 #include "data.h"
 #include "function_proxy.h"
+#include "arithmetic_tree.h"
 
 class ErrorListener: public antlr4::BaseErrorListener {
 public:
@@ -70,7 +71,7 @@ class BaseListener: public ParseRulesBaseListener{
     virtual void enterUnaryOp(ParseRulesParser::UnaryOpContext *ctx) override{
         if(mode_stack_.top()==BASE_MODE::DEFINITION){
             if(ctx->ADD()){
-                if(ctx->expr())
+                if(ctx->expr()){
                     active_function_.emplace(FunctionProxy()).SetFunction([&childs](){
                         
                     });
