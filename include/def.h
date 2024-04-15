@@ -36,3 +36,8 @@ template<typename T>
 
 template<typename T, typename... Ts>
   struct all_same<T, T, Ts...> : all_same<T, Ts...> { };
+
+#include <boost/multiprecision/cpp_dec_float.hpp>
+
+using Value_t = boost::multiprecision::cpp_dec_float_50;
+using Array_t = std::vector<Value_t>;

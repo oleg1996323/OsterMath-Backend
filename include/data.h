@@ -1,98 +1,29 @@
 #pragma once
 
+#include <unordered_map>
+#include <string>
+#include <optional>
 #include "def.h"
-#include "types.h"
+
+class VariableBase;
 
 class BaseData{
     public:
-    const VariableBase* GetVar(const std::string& name) const{
-        if(!Exists(name))
-            return nullptr;
-        else
-           return vars_.at(name).has_value()?&vars_.at(name).value():nullptr; 
-    };
+    const VariableBase* GetVar(const std::string& name) const;
 
-    bool Exists(const std::string& name) const{
-        return vars_.contains(name);
-    }
+    bool Exists(const std::string& name) const;
 
-    bool Defined(const std::string& name) const{
-        if(Exists(name)){
-            return vars_.at(name).has_value();
-        }
-        else return false;
-    }
+    bool Defined(const std::string& name) const;
 
-    bool AddVariable(const std::string& name){
-        if(!Exists(name)){
-            vars_.emplace(name,std::nullopt).first;
-            return true;
-        }
-        else return false;
-    }
+    bool AddVariable(const std::string& name);
 
-    void AddVariable(std::string&& name, std::string&& value){
-        if(!Exists(name)){
-            auto ref = vars_.emplace(name,std::nullopt).first;
-            ref->second.emplace(std::move(String(ref->first,std::move(value))));
-            return;
-        }
-        else return;
-    }
+    template<typename T>
+    bool AddVariable(std::string&& name, T&& value);
 
-    template<typename... ARGS>//add arithmetic tree
-    bool AddVariable(std::string&& name, Function_t<ARGS...> value(ARGS...)){
-        if(!Exists(name)){
-            auto ref = vars_.emplace(name,std::nullopt).first;
-            ref->second.emplace(std::move(VarFunction<ARGS...>(ref->first,value)));
-            return true;
-        }
-        else return false;
-    }
+    template<typename T>
+    void Define(std::string&& name, T&& value);
 
-    void Define(std::string&& name, Value_t&& value){
-        if(Exists(name)){
-            if(!Defined(name)){
-                auto ref = vars_.find(name);
-                ref->second.emplace(std::move(Value(ref->first,std::move(value))));
-                return;
-            }
-            else
-                throw std::logic_error("Variable "+name+" already defined.");
-        }
-        else throw std::logic_error("Variable "+name+" don't exists.");
-    }
-
-    void Define(std::string&& name, std::string&& value){
-        if(Exists(name)){
-            if(!Defined(name)){
-                auto ref = vars_.find(name);
-                ref->second.emplace(std::move(String(ref->first,std::move(value))));
-                return;
-            }
-            else
-                throw std::logic_error("Variable "+name+" already defined.");
-        }
-        else throw std::logic_error("Variable "+name+" don't exists.");
-    }
-
-    template<typename... ARGS>
-    void Define(std::string&& name, Function_t<ARGS...> value(ARGS...)){
-        if(Exists(name)){
-            if(!Defined(name)){
-                auto ref = vars_.find(name);
-                ref->second.emplace(std::move(VarFunction<ARGS...>(ref->first,value)));
-                return;
-            }
-            else
-                throw std::logic_error("Variable "+name+" already defined.");
-        }
-        else throw std::logic_error("Variable "+name+" don't exists.");
-    }
-
-    void Erase(const std::string& var_name){
-        vars_.erase(var_name);
-    }
+    void Erase(const std::string& var_name);
 
     private:
     std::unordered_map<std::string,std::optional<VariableBase>> vars_; 

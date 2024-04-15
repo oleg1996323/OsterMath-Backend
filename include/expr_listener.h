@@ -6,9 +6,6 @@
 #include "def.h"
 #include "ParseRulesBaseListener.h"
 #include "types.h"
-#include "data.h"
-#include "function_proxy.h"
-#include "arithmetic_tree.h"
 
 class ErrorListener: public antlr4::BaseErrorListener {
 public:

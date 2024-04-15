@@ -1,4 +1,5 @@
 #include "arithmetic_types.h"
+#include "types.h"
 
 Node* UnaryNode::first_undefined_child_node(){
     if(!child_)
@@ -33,6 +34,10 @@ Value_t UnaryNode::execute(){
             break;
         }
     }
+}
+
+void UnaryNode::refresh(){
+    
 }
 
 Node* BinaryNode::first_undefined_child_node(){
@@ -73,18 +78,22 @@ Value_t BinaryNode::execute(){
             break;
         }
     }
+    else
+        throw std::runtime_error("Undefined binary operation");
+}
+
+void BinaryNode::refresh(){
+    execute();
+    if(parent())
+        parent()->refresh();
 }
 
 Value_t VariableNode::execute(){
     std::shared_ptr<VariableBase> ptr = var_.lock();
-    var_.expired();
-    if(ptr){
-        VAR_TYPE type = ptr->type();
-        if(type==VAR_TYPE::FUNCTION){
-            Variable* func_var = reinterpret_cast<Variable*>(ptr.get());
-            return func_var->execute();
-        }
+    if(!ptr->is_arithmetic_tree() || ptr->is_value()){
+        return ptr->get<Value_t>();
     }
+    else throw std::invalid_argument("Invalid type of variable");
 }
 
 Node* MultiArgumentNode::child(size_t id) const{

@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <optional>
 #include "arithmetic_functions.h"
 
 enum class ARITHM_NODE_TYPE{
@@ -43,13 +44,13 @@ class Node{
     public:
     Node(Node* parent):parent_(std::unique_ptr<Node>(parent)){}
 
-    virtual Node* next() = 0;
-
     virtual ARITHM_NODE_TYPE type() const = 0;
 
     virtual Node* first_undefined_child_node() = 0;
 
     virtual Value_t execute() = 0;
+
+    virtual void refresh() = 0;
 
     virtual ~Node(){}
 
@@ -89,6 +90,8 @@ class UnaryNode:public Node{
 
     virtual Value_t execute() override;
 
+    virtual void refresh() override;
+
     private:
     std::shared_ptr<Node> child_;
     UNARY_OP operation;
@@ -113,6 +116,8 @@ class BinaryNode:public Node{
     virtual Node* first_undefined_child_node() override;
 
     virtual Value_t execute() override;
+
+    virtual void refresh() override;
 
     std::shared_ptr<Node>& lhs(){
         return lhs_;
@@ -152,6 +157,8 @@ class ValueNode:public Node{
         return val_;
     }
 
+    virtual void refresh() override;
+
     private:
     Value_t val_;
 };
@@ -171,6 +178,8 @@ class VariableNode:public Node{
     }
 
     virtual Value_t execute() override;
+
+    virtual void refresh() override;
 
     private:
     std::weak_ptr<VariableBase> var_;
@@ -195,6 +204,11 @@ class MultiArgumentNode:public Node{
         return nullptr;
     }
 
+    virtual Value_t execute() override;
+
+    virtual void refresh() override;
+
     private:
     std::vector<Node*> childs_;
+    MULTI_ARG_OP operation;
 };

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <memory>
+#include <optional>
 #include "arithmetic_types.h"
 
 class Node;
