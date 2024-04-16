@@ -27,15 +27,15 @@ size_t VariableBase::HashVar::operator()(const VariableBase& var){
     return std::hash<std::string_view>()(var.name_);
 }
 
-VariableBase::VariableBase(std::string_view name, BaseData* data_pool):
+VariableBase::VariableBase(std::string_view name, BaseData* data_base):
     name_(name),
-    data_pool_(data_pool)
+    data_base_(data_base)
 {}
 
 template<typename T>
-VariableBase::VariableBase(std::string_view name, T&& value, BaseData* data_pool):
+VariableBase::VariableBase(std::string_view name, T&& value, BaseData* data_base):
     name_(name),
-    data_pool_(data_pool)
+    data_base_(data_base)
 {
     this->emplace(std::forward<T>(value));
 }
@@ -48,12 +48,12 @@ void VariableBase::Refresh() const{
     node_->refresh();
 }
 
-void VariableBase::set_data_pool(BaseData* data_pool){
-    data_pool_=data_pool;
+void VariableBase::set_data_base(BaseData* data_base){
+    data_base_=data_base;
 }
 
-BaseData* VariableBase::get_data_pool() const{
-    return data_pool_;
+BaseData* VariableBase::get_data_base() const{
+    return data_base_;
 }
 
 template<typename T>

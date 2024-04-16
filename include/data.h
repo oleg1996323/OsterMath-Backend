@@ -15,10 +15,10 @@ class BaseData{
 
     bool Defined(const std::string& name) const;
 
-    bool AddVariable(const std::string& name);
+    std::shared_ptr<VariableBase>& AddVariable(const std::string& name);
 
     template<typename T>
-    bool AddVariable(std::string&& name, T&& value);
+    std::shared_ptr<VariableBase>& AddVariable(std::string&& name, T&& value);
 
     template<typename T>
     void Define(std::string&& name, T&& value);
@@ -26,7 +26,19 @@ class BaseData{
     void Erase(const std::string& var_name);
 
     private:
-    std::unordered_map<std::string,std::optional<VariableBase>> vars_; 
+    std::unordered_map<std::string,std::shared_ptr<VariableBase>> vars_; 
+};
+
+class DataPool{
+    public:
+    DataPool() = default;
+
+    void add_data();
+
+    BaseData* get(std::string_view name_data) const;
+
+    private:
+    std::unordered_map<std::string,BaseData> pools_;
 };
 
 class TemperatureBound:public BaseData{

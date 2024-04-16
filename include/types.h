@@ -24,10 +24,10 @@ class VariableBase: private std::variant<std::monostate,Value_t,std::string, Arr
         size_t operator()(const VariableBase& var);
     };
     virtual ~VariableBase(){}
-    explicit VariableBase(std::string_view name, BaseData* data_pool);
+    explicit VariableBase(std::string_view name, BaseData* data_base);
 
     template<typename T>
-    VariableBase(std::string_view name, T&& value, BaseData* data_pool);
+    VariableBase(std::string_view name, T&& value, BaseData* data_base);
 
     std::string_view GetName() const;
     void Refresh() const;
@@ -40,11 +40,11 @@ class VariableBase: private std::variant<std::monostate,Value_t,std::string, Arr
     bool is_array() const;
 
     protected:
-    void set_data_pool(BaseData* data_pool);
-    BaseData* get_data_pool() const;
+    void set_data_base(BaseData* data_pool);
+    BaseData* get_data_base() const;
 
     private:
     Node* node_;
     std::string_view name_;
-    BaseData* data_pool_;
+    BaseData* data_base_;
 };

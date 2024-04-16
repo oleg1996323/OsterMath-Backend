@@ -1,6 +1,15 @@
 #include "arithmetic_types.h"
 #include "types.h"
 
+void Node::refresh(){
+    execute();
+    if(parent()){
+        caller_ = true;
+        parent()->refresh();
+        caller_ = false;
+    }
+}
+
 Node* UnaryNode::first_undefined_child_node(){
     if(!child_)
         return this;
@@ -34,10 +43,9 @@ Value_t UnaryNode::execute(){
             break;
         }
     }
-}
-
-void UnaryNode::refresh(){
-    
+    else
+        throw std::runtime_error("Undefined unary operation");
+    return 0.;
 }
 
 Node* BinaryNode::first_undefined_child_node(){
@@ -54,38 +62,50 @@ Node* BinaryNode::first_undefined_child_node(){
     }
 }
 
+void BinaryNode::refresh(){
+    execute();
+    if(parent()){
+        caller_ = true;
+        parent()->refresh();
+        caller_ = false;
+    }
+}
+
 Value_t BinaryNode::execute(){
     using namespace boost::multiprecision;
     if(lhs_ && rhs_){
+        if(lhs_->caller()) //left branch call refreshing
+            lhs_->execute();
+        else if(rhs_->caller()) //right branch call refreshing
+            rhs_->execute();
+        else{
+            lhs_cache() = lhs_->execute();
+            rhs_cache() = rhs_->execute();
+        }
         switch (operation)
         {
-        case BINARY_OP::ADD:
-            return lhs_->execute()+rhs_->execute();
-            break;
-        case BINARY_OP::SUB:
-            return lhs_->execute()-rhs_->execute();
-            break;
-        case BINARY_OP::MUL:
-            return lhs_->execute()*rhs_->execute();
-            break;
-        case BINARY_OP::DIV:
-            return lhs_->execute()/rhs_->execute();
-            break;
-        case BINARY_OP::POW:
-            return pow(lhs_->execute(),rhs_->execute());
-            break;
-        default:
-            break;
+            case BINARY_OP::ADD:
+                return lhs_cache()+rhs_cache();
+                break;
+            case BINARY_OP::SUB:
+                return lhs_cache()-rhs_cache();
+                break;
+            case BINARY_OP::MUL:
+                return lhs_cache()*rhs_cache();
+                break;
+            case BINARY_OP::DIV:
+                return lhs_cache()/rhs_cache();
+                break;
+            case BINARY_OP::POW:
+                return pow(lhs_cache(),rhs_cache());
+                break;
+            default:
+                break;
         }
     }
     else
         throw std::runtime_error("Undefined binary operation");
-}
-
-void BinaryNode::refresh(){
-    execute();
-    if(parent())
-        parent()->refresh();
+    return 0.;
 }
 
 Value_t VariableNode::execute(){

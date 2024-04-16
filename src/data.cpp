@@ -4,7 +4,7 @@
         if(!Exists(name))
             return nullptr;
         else
-           return vars_.at(name).has_value()?&vars_.at(name).value():nullptr; 
+           return vars_.at(name)?vars_.at(name).get():nullptr; 
     };
 
     bool BaseData::Exists(const std::string& name) const{
@@ -13,27 +13,28 @@
 
     bool BaseData::Defined(const std::string& name) const{
         if(Exists(name)){
-            return vars_.at(name).has_value();
+            if(vars_.at(name))
+                return true;
+            else return false;
         }
         else return false;
     }
 
-    bool BaseData::AddVariable(const std::string& name){
+    std::shared_ptr<VariableBase>& BaseData::AddVariable(const std::string& name){
         if(!Exists(name)){
-            vars_.emplace(name,std::nullopt).first;
-            return true;
+            return vars_.emplace(name,std::nullopt).first->second;
         }
-        else return false;
+        else return vars_.find(name)->second;
     }
 
     template<typename T>
-    bool BaseData::AddVariable(std::string&& name, T&& value){
+    std::shared_ptr<VariableBase>& BaseData::AddVariable(std::string&& name, T&& value){
         if(!Exists(name)){
             auto ref = vars_.emplace(name,std::nullopt).first;
-            ref->second.emplace(std::move(String(ref->first,std::forward<T>(value))));
-            return true;
+            ref->second = std::make_shared<VariableBase>(std::move(ref->first,std::forward<T>(value)));
+            return ref->second;
         }
-        else return false;
+        else return vars_.find(name)->second;
     }
 
     template<typename T>
@@ -41,7 +42,7 @@
         if(Exists(name)){
             if(!Defined(name)){
                 auto ref = vars_.find(name);
-                ref->second.emplace(std::forward<T>(value));
+                ref->second = std::shared_ptr<VariableBase>(ref->first,std::forward<T>(value));
                 return;
             }
             else

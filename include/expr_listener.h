@@ -6,6 +6,7 @@
 #include "def.h"
 #include "ParseRulesBaseListener.h"
 #include "types.h"
+#include "data.h"
 
 class ErrorListener: public antlr4::BaseErrorListener {
 public:
@@ -18,79 +19,37 @@ public:
 };
 
 class BaseListener: public ParseRulesBaseListener{
-    FunctionProxy cur_function_;
-
-    protected:
-
-    enum class BASE_MODE{
-        NONE,
-        ADD,
-        SUB,
-        MUL,
-        DIV,
-        HDR,
-        SUMPRODUCT,
-        SQUAREROOT,
-        EXPONENT,
-        BASELOG,
-        DECLOG,
-        NATLOG,
-        ARRAY,
-        BINARY,
-        POWER,
-        FUNCTION,
-        CONSTANT,
-        NUMBER,
-        VARIABLE,
-        DEFINITION,
-        UNARY_MINUS
+    enum class MODE{
+        VARDEF,
+        HDRDEF,
+        TABLEDEF
     };
 
+    BaseData* data_base_;
+    std::weak_ptr<VariableBase> current_var_;
+    std::vector<std::string_view> hdr_vars_; 
+    std::stack<MODE> mode_;
+
     public:
+    BaseListener(BaseData* data_base):
+    data_base_(data_base)
+    {}
 
-    BaseListener():mode_stack_({BASE_MODE::NONE}){}
-
-    protected:
+    private:
     virtual void enterVardefinition(ParseRulesParser::VardefinitionContext * ctx) override {
-        mode_stack_.push(BASE_MODE::DEFINITION);
-
-        //then enterVariable
-        //then if not STRING, then enterFunction or enterConstant or enterNumber or enterParens or enterUnary
+        mode_.push(MODE::VARDEF);
     }
     
     virtual void exitVardefinition(ParseRulesParser::VardefinitionContext * ctx) override { 
-        if(ctx->STRING())
-            data_.AddVariable(ctx->VARIABLE()->getText(),std::move(ctx->STRING()->getText()));
-        else if(ctx->expr()->)
-            data_.AddVariable(ctx->VARIABLE()->getText());
+        assert(mode_.top()==MODE::VARDEF);
+        current_var_.reset();
+        mode_.pop();
     }
 
     virtual void enterUnaryOp(ParseRulesParser::UnaryOpContext *ctx) override{
-        if(mode_stack_.top()==BASE_MODE::DEFINITION){
-            if(ctx->ADD()){
-                if(ctx->expr()){
-                    active_function_.emplace(FunctionProxy()).SetFunction([&childs](){
-                        
-                    });
-                    data_.Define(last_var_name_tmp_,Function_t<void>((){
-                        childs.at(1)
-                    }));
-                }
-                else{
-                    active_function_.emplace(FunctionProxy()).SetFunction([&childs](){
-                        
-                    });
-                    data_.Define(last_var_name_tmp_,Function_t<void>((){
-                        childs.at(1)
-                    }));
-                }
-            }
-            else{
-                if(ctx->SUB())
-                mode_stack_.push(BASE_MODE::UNARY_MINUS);
-                
-            }
-        }
+        assert(!mode_.empty());
+        if(ctx->ADD)
+            current_var_.lock();
     }
 
     virtual void exitUnaryOp(ParseRulesParser::UnaryOpContext* ctx) override {
@@ -98,27 +57,19 @@ class BaseListener: public ParseRulesBaseListener{
     }
 
     virtual void enterVariable(ParseRulesParser::VariableContext *ctx) override{
-        assert(mode_stack_.top()==BASE_MODE::HDR || mode_stack_.top()==BASE_MODE::DEFINITION);
-        data_.AddVariable(ctx->getText());
-
-        if(data_.Defined(ctx->getText()) && mode_stack_.top()==BASE_MODE::DEFINITION)
-            throw VariableAlreadyExists("Variable " + ctx->getText() + " already defined");
-
-        if(mode_stack_.top()==BASE_MODE::HDR)
-            header_vars_tmp_.emplace_back(ctx->getText());
+        assert(!mode_.empty());
+        if(mode_.top()==MODE::VARDEF)
+            current_var_ = data_base_->AddVariable(ctx->VARIABLE()->getSymbol()->getText());
+        else if(mode_.top()==MODE::HDRDEF){
+            hdr_vars_.push_back()
+        }
         else {
-            assert(last_var_name_tmp_.empty());
-            last_var_name_tmp_ = ctx->getText();
+
         }
     }
 
-    // virtual void exitVariable(ParseRulesParser::VariableContext *ctx) override{
-        
-    // }
-
     virtual void enterNumber(ParseRulesParser::NumberContext *ctx) override{
-        if(mode_stack_.top()==BASE_MODE::VARIABLE)
-            ;
+
     }
 
     virtual void exitNumber(ParseRulesParser::NumberContext *ctx) override{
@@ -126,11 +77,11 @@ class BaseListener: public ParseRulesBaseListener{
     }
     
     virtual void enterParens(ParseRulesParser::ParensContext *ctx) override{
-        ++parens_count;
+
     }
 
     virtual void exitParens(ParseRulesParser::ParensContext *ctx) override{
-        --parens_count;
+        
     }
 
     //a connstant definition {for example: Lg(Expr)}
@@ -194,16 +145,12 @@ class BaseListener: public ParseRulesBaseListener{
     }
 
     virtual void exitDeclog(ParseRulesParser::DeclogContext *ctx) override{
-        if(mode_stack_.top()==BASE_MODE::DEFINITION)
-            ;
+        
     }
 
     //based logarithm function {for example: Log(Expr, Expr)}
     virtual void enterBaselog(ParseRulesParser::BaselogContext *ctx) override{
-        auto val_base = ctx->expr();
-        if(val_base.size()!=2 )
-            throw std::invalid_argument("Invalid input parameters");
-        std::log(val_base.at(0), val_base.at(1));
+        
     }
 
     virtual void exitBaselog(ParseRulesParser::BaselogContext *ctx) override{
@@ -241,25 +188,20 @@ class BaseListener: public ParseRulesBaseListener{
     //a typical header whitespace or tab separated. Only Variables are accepted and then defined
     //by corespondent parser rule.
     virtual void enterHdr(ParseRulesParser::HdrContext *ctx) override{
-        assert(!parens_count);
-        assert(header_vars_tmp_.empty());
-        mode_stack_.push(BASE_MODE::HDR);
+        mode_=MODE::HDRDEF;
+    }
+
+    virtual void exitHdr(ParseRulesParser::HdrContext *ctx) override{}
+
+    virtual void enterHdr_definition(ParseRulesParser::Hdr_definitionContext* ctx) override{}
+
+    virtual void exitHdr_definition(ParseRulesParser::Hdr_definitionContext* ctx) override{}
+
+    virtual void enterNumbers_line(ParseRulesParser::Numbers_lineContext* ctx) override{
         
     }
 
-    virtual void exitHdr(ParseRulesParser::HdrContext *ctx) override{
-        assert(!parens_count);
-        assert(mode_stack_.top()==BASE_MODE::HDR);
-        
+    virtual void exitNumbers_line(ParseRulesParser::Numbers_lineContext* ctx) override{
+        mode_=MODE::NONE;
     }
-
-    uint8_t parens_count = 0;
-    
-    std::unordered_set<std::string_view> var_names_;
-
-    BaseData data_;
-    std::vector<VariableBase> header_vars_tmp_;
-    std::stack<BASE_MODE> mode_stack_;
-    std::string_view last_var_name_tmp_;
-    std::optional<FunctionProxy> active_function_;   
 };
