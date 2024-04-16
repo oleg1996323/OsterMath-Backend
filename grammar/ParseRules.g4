@@ -74,6 +74,6 @@ numbers_line:
     NUMBER WS+ (NUMBER WS+) EOL
     ;
 
-hdr_definition:
+table_definition:
     hdr EOL numbers_line
     ;

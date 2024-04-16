@@ -1,28 +1,6 @@
 #include "types.h"
 #include "arithmetic_tree.h"
 
-struct VariableVisitor{
-    void operator()(std::monostate) const{
-        throw std::runtime_error("Undefined variable");
-    }
-
-    const Value_t& operator()(const Value_t& value) const{
-        return value;
-    }
-
-    const Array_t& operator()(const Array_t& array) const{
-        return array;
-    }
-
-    const std::string& operator()(const std::string& string) const{
-        return string;
-    }
-
-    const ArithmeticTree& operator()(const ArithmeticTree& tree) const{
-        return tree;
-    }
-};
-
 size_t VariableBase::HashVar::operator()(const VariableBase& var){
     return std::hash<std::string_view>()(var.name_);
 }
@@ -56,9 +34,12 @@ BaseData* VariableBase::get_data_base() const{
     return data_base_;
 }
 
-template<typename T>
-const T& VariableBase::get() const{
-    return std::visit<const T&>(VariableVisitor(), *this);
+const VariableBase::variant& VariableBase::get() const{
+    return *this;
+}
+
+VariableBase::variant& VariableBase::get(){
+    return *this;
 }
 
 bool VariableBase::is_arithmetic_tree() const{

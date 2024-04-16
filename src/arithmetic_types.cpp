@@ -111,7 +111,7 @@ Value_t BinaryNode::execute(){
 Value_t VariableNode::execute(){
     std::shared_ptr<VariableBase> ptr = var_.lock();
     if(!ptr->is_arithmetic_tree() || ptr->is_value()){
-        return ptr->get<Value_t>();
+        return std::visit<Value_t>(VariableVisitor(),ptr->get());
     }
     else throw std::invalid_argument("Invalid type of variable");
 }

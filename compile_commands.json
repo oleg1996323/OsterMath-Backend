@@ -61,6 +61,11 @@
 },
 {
   "directory": "/home/oster/Electrolisys",
+  "command": "/usr/bin/g++ -DANTLR4CPP_STATIC -DBOOST_CONTAINER_NO_LIB -DBOOST_JSON_NO_LIB -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS -I/home/oster/Electrolisys/include -I/home/oster/Electrolisys/src -I/home/oster/Electrolisys/bin/antlr4cpp_generated_src/ParseRules -I/home/oster/Electrolisys/grammar/antlr4_runtime/runtime/src  -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -g -std=gnu++20 -o CMakeFiles/PhysProperties.dir/src/types.cpp.o -c /home/oster/Electrolisys/src/types.cpp",
+  "file": "/home/oster/Electrolisys/src/types.cpp"
+},
+{
+  "directory": "/home/oster/Electrolisys",
   "command": "/usr/bin/g++ -DANTLR4CPP_STATIC -DBOOST_CONTAINER_NO_LIB -DBOOST_JSON_NO_LIB -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS -I/home/oster/Electrolisys/include -I/home/oster/Electrolisys/src -I/home/oster/Electrolisys/bin/antlr4cpp_generated_src/ParseRules -I/home/oster/Electrolisys/grammar/antlr4_runtime/runtime/src  -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -g -std=gnu++20 -o CMakeFiles/PhysProperties.dir/src/zone.cpp.o -c /home/oster/Electrolisys/src/zone.cpp",
   "file": "/home/oster/Electrolisys/src/zone.cpp"
 },

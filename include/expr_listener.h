@@ -8,6 +8,8 @@
 #include "types.h"
 #include "data.h"
 
+using namespace std::string_view_literals;
+
 class ErrorListener: public antlr4::BaseErrorListener {
 public:
     void syntaxError(antlr4::Recognizer* /* recognizer */, antlr4::Token* /* offendingSymbol */,
@@ -22,11 +24,12 @@ class BaseListener: public ParseRulesBaseListener{
     enum class MODE{
         VARDEF,
         HDRDEF,
-        TABLEDEF
+        TABLEDEF,
+        TABVALDEF
     };
 
     BaseData* data_base_;
-    std::weak_ptr<VariableBase> current_var_;
+    mutable std::string_view current_var_;
     std::vector<std::string_view> hdr_vars_; 
     std::stack<MODE> mode_;
 
@@ -42,30 +45,35 @@ class BaseListener: public ParseRulesBaseListener{
     
     virtual void exitVardefinition(ParseRulesParser::VardefinitionContext * ctx) override { 
         assert(mode_.top()==MODE::VARDEF);
-        current_var_.reset();
+        current_var_=""sv;
         mode_.pop();
-    }
-
-    virtual void enterUnaryOp(ParseRulesParser::UnaryOpContext *ctx) override{
-        assert(!mode_.empty());
-        if(ctx->ADD)
-            current_var_.lock();
-    }
-
-    virtual void exitUnaryOp(ParseRulesParser::UnaryOpContext* ctx) override {
-        
     }
 
     virtual void enterVariable(ParseRulesParser::VariableContext *ctx) override{
         assert(!mode_.empty());
         if(mode_.top()==MODE::VARDEF)
-            current_var_ = data_base_->AddVariable(ctx->VARIABLE()->getSymbol()->getText());
-        else if(mode_.top()==MODE::HDRDEF){
-            hdr_vars_.push_back()
-        }
+            current_var_ = data_base_->AddVariable(ctx->VARIABLE()->getSymbol()->getText())->GetName();
         else {
+            assert(mode_.top()==MODE::HDRDEF);
+            hdr_vars_.push_back(data_base_->AddVariable(ctx->VARIABLE()->getSymbol()->getText())->GetName());
 
         }
+    }
+
+    virtual void enterUnaryOp(ParseRulesParser::UnaryOpContext *ctx) override{
+        assert(!mode_.empty());
+        if(ctx->ADD()){
+            if(mode_.top()==MODE::VARDEF)
+                if(data_base_->GetVar(current_var_)->is_arithmetic_tree())
+                data_base_->GetVar()->;
+        }
+        else{
+
+        }
+    }
+
+    virtual void exitUnaryOp(ParseRulesParser::UnaryOpContext* ctx) override {
+        
     }
 
     virtual void enterNumber(ParseRulesParser::NumberContext *ctx) override{
@@ -114,6 +122,7 @@ class BaseListener: public ParseRulesBaseListener{
 
     //binary operator {for example: Expr + Expr or Expr / Expr}
     virtual void enterBinaryOp(ParseRulesParser::BinaryOpContext *ctx) override{
+        iif(ctx->ADD())
 
     }
 
@@ -123,11 +132,11 @@ class BaseListener: public ParseRulesBaseListener{
 
     //an array definition {for example: [1,2,3,...]}
     virtual void enterArray(ParseRulesParser::ArrayContext *ctx) override{
-
+        //unnamed variable
     }
 
     virtual void exitArray(ParseRulesParser::ArrayContext *ctx) override{
-        
+        //unnamed variable
     }
 
     //natural logarithm function {for example: Ln(Expr)}
@@ -185,23 +194,34 @@ class BaseListener: public ParseRulesBaseListener{
 
     }
 
+    virtual void enterTable_definition(ParseRulesParser::Table_definitionContext* ctx) override{
+        mode_.push(MODE::TABLEDEF);
+    }
+
+    virtual void exitTable_definition(ParseRulesParser::Table_definitionContext* ctx) override{
+        assert(mode_.top()==MODE::TABLEDEF);
+        mode_.pop();
+    }
+
     //a typical header whitespace or tab separated. Only Variables are accepted and then defined
     //by corespondent parser rule.
     virtual void enterHdr(ParseRulesParser::HdrContext *ctx) override{
-        mode_=MODE::HDRDEF;
+        assert(mode_.top()==MODE::TABLEDEF);
+        mode_.push(MODE::HDRDEF);
     }
 
-    virtual void exitHdr(ParseRulesParser::HdrContext *ctx) override{}
-
-    virtual void enterHdr_definition(ParseRulesParser::Hdr_definitionContext* ctx) override{}
-
-    virtual void exitHdr_definition(ParseRulesParser::Hdr_definitionContext* ctx) override{}
+    virtual void exitHdr(ParseRulesParser::HdrContext *ctx) override{
+        assert(mode_.top()==MODE::HDRDEF);
+        mode_.pop();
+    }
 
     virtual void enterNumbers_line(ParseRulesParser::Numbers_lineContext* ctx) override{
-        
+        assert(mode_.top()==MODE::TABLEDEF);
+        mode_.push(MODE::TABVALDEF);
     }
 
     virtual void exitNumbers_line(ParseRulesParser::Numbers_lineContext* ctx) override{
-        mode_=MODE::NONE;
+        assert(mode_.top()==MODE::TABVALDEF);
+        mode_.pop();
     }
 };

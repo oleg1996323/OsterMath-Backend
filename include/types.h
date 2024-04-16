@@ -16,6 +16,28 @@ class Node;
 using namespace std::string_literals;
 using namespace std::string_view_literals;
 
+struct VariableVisitor{
+    void operator()(std::monostate) const{
+        throw std::runtime_error("Undefined variable");
+    }
+
+    const Value_t& operator()(const Value_t& value) const{
+        return value;
+    }
+
+    const Array_t& operator()(const Array_t& array) const{
+        return array;
+    }
+
+    const std::string& operator()(const std::string& string) const{
+        return string;
+    }
+
+    const ArithmeticTree& operator()(const ArithmeticTree& tree) const{
+        return tree;
+    }
+};
+
 class VariableBase: private std::variant<std::monostate,Value_t,std::string, Array_t, ArithmeticTree> {
     using variant::variant;
 
@@ -32,8 +54,8 @@ class VariableBase: private std::variant<std::monostate,Value_t,std::string, Arr
     std::string_view GetName() const;
     void Refresh() const;
 
-    template<typename T>
-    const T& get() const;
+    const variant& get() const;
+    variant& get();
     bool is_arithmetic_tree() const;
     bool is_value() const;
     bool is_string() const;

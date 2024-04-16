@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_map>
+#include <unordered_set>
 #include <string>
 #include <optional>
 #include "def.h"
@@ -9,24 +10,25 @@ class VariableBase;
 
 class BaseData{
     public:
-    const VariableBase* GetVar(const std::string& name) const;
+    const VariableBase* GetVar(std::string_view name) const;
 
-    bool Exists(const std::string& name) const;
+    bool Exists(std::string_view name) const;
 
-    bool Defined(const std::string& name) const;
+    bool Defined(std::string_view name) const;
 
-    std::shared_ptr<VariableBase>& AddVariable(const std::string& name);
+    std::shared_ptr<VariableBase>& AddVariable(std::string&& name);
 
     template<typename T>
     std::shared_ptr<VariableBase>& AddVariable(std::string&& name, T&& value);
 
     template<typename T>
-    void Define(std::string&& name, T&& value);
+    void Define(std::string_view name, T&& value);
 
-    void Erase(const std::string& var_name);
+    void Erase(std::string_view var_name);
 
     private:
-    std::unordered_map<std::string,std::shared_ptr<VariableBase>> vars_; 
+    std::unordered_set<std::string> var_names_;
+    std::unordered_map<std::string_view,std::shared_ptr<VariableBase>> vars_; 
 };
 
 class DataPool{
