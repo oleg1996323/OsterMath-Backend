@@ -1,64 +1,79 @@
 #include "data.h"
 
-    using namespace std::string_literals;
+using namespace std::string_literals;
 
-    const VariableBase* BaseData::GetVar(std::string_view name) const{
-        if(!Exists(name))
-            return nullptr;
-        else
-           return vars_.at(name)?vars_.at(name).get():nullptr; 
-    };
+const VariableBase* BaseData::get(std::string_view name) const{
+    if(!exists(name))
+        return nullptr;
+    else
+        return vars_.at(name)?vars_.at(name).get():nullptr; 
+};
 
-    bool BaseData::Exists(std::string_view name) const{
-        return vars_.contains(name);
-    }
+bool BaseData::exists(std::string_view name) const{
+    return vars_.contains(name);
+}
 
-    bool BaseData::Defined(std::string_view name) const{
-        if(Exists(name)){
-            if(vars_.at(name))
-                return true;
-            else return false;
-        }
+bool BaseData::defined(std::string_view name) const{
+    if(exists(name)){
+        if(vars_.at(name))
+            return true;
         else return false;
     }
+    else return false;
+}
 
-    std::shared_ptr<VariableBase>& BaseData::AddVariable(std::string&& name){
-        if(!Exists(name)){
-            return vars_.emplace(
-                *var_names_.emplace(name).first,
-                std::nullopt).first->second;
+std::shared_ptr<VariableBase>& BaseData::add_variable(std::string&& name){
+    if(!exists(name)){
+        auto str_name = var_names_.emplace(name).first;
+        return vars_.emplace(
+            *str_name,
+            std::make_shared<VariableBase>(*str_name,this)).first->second;
+    }
+    else return vars_.find(name)->second;
+}
+
+template<typename T>
+std::shared_ptr<VariableBase>& BaseData::add_variable(std::string&& name, T&& value){
+    if(!exists(name)){
+        auto str_name = var_names_.emplace(name).first;
+        return vars_.emplace(
+            *str_name,
+            std::make_shared<VariableBase>(*str_name,std::forward<T>(value),this)).first->second;
+    }
+    else return vars_.find(name)->second;
+}
+
+template<typename T>
+void BaseData::define(std::string_view name, T&& value){
+    if(exists(name)){
+        if(!defined(name)){
+            auto ref = vars_.find(name);
+            ref->second = std::shared_ptr<VariableBase>(ref->first,std::forward<T>(value));
+            return;
         }
-        else return vars_.find(name)->second;
+        else
+            throw std::logic_error("Variable "s+std::string(name)+" already defined."s);
     }
+    else throw std::logic_error("Variable "s+std::string(name)+" don't exists."s);
+}
 
-    template<typename T>
-    std::shared_ptr<VariableBase>& BaseData::AddVariable(std::string&& name, T&& value){
-        if(!Exists(name)){
-            auto ref = vars_.emplace(
-                *var_names_.emplace(name).first,
-                std::nullopt).first;
-            ref->second = std::make_shared<VariableBase>(
-                std::move(ref->first,
-                std::forward<T>(value)));
-            return ref->second;
-        }
-        else return vars_.find(name)->second;
-    }
+void BaseData::erase(std::string_view var_name){
+    vars_.erase(var_name);
+}
 
-    template<typename T>
-    void BaseData::Define(std::string_view name, T&& value){
-        if(Exists(name)){
-            if(!Defined(name)){
-                auto ref = vars_.find(name);
-                ref->second = std::shared_ptr<VariableBase>(ref->first,std::forward<T>(value));
-                return;
-            }
-            else
-                throw std::logic_error("Variable "s+std::string(name.)+" already defined."s);
-        }
-        else throw std::logic_error("Variable "s+std::string(name)+" don't exists."s);
-    }
+#include "expr_parser.h"
 
-    void BaseData::Erase(std::string_view var_name){
-        vars_.erase(var_name);
-    }
+void BaseData::setstream(std::iostream& stream){
+    parser_=std::make_unique<Parser>(stream);
+}
+
+std::ostream& BaseData::print(std::ostream& stream, std::string_view name){
+    stream<<get(name)->get();
+    return stream;
+}
+
+DataPool::DataPool(const std::string& name):name_(name){}
+
+std::string_view DataPool::name(){
+    return name_;
+}

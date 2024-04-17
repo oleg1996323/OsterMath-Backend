@@ -20,14 +20,21 @@ ArithmeticTree& ArithmeticTree::operator=(const ArithmeticTree& other){
             this->root_ = std::make_shared<Node>(*other.root_.get());
         else this->root_.reset();
 
-        if(other.cache_.has_value())
-            this->cache_.emplace(other.cache_.value());
-        else this->cache_.reset();
+        this->cache_=other.cache_;
 
         if(root_)
             last_incomplete_ = root_->first_undefined_child_node();
     }
     return *this;
+}
+
+const Value_t& ArithmeticTree::value() const{
+    return cache_;
+}
+
+std::ostream& operator<<(std::ostream& stream, const ArithmeticTree& tree){
+    stream<<tree.value();
+    return stream;
 }
 
 Value_t ArithmeticTree::execute() const{

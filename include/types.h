@@ -38,7 +38,11 @@ struct VariableVisitor{
     }
 };
 
-class VariableBase: private std::variant<std::monostate,Value_t,std::string, Array_t, ArithmeticTree> {
+using Variable = std::variant<std::monostate,Value_t,std::string, Array_t, ArithmeticTree>;
+
+std::ostream& operator<<(std::ostream& stream, Variable);
+
+class VariableBase: private Variable {
     using variant::variant;
 
     public:
@@ -51,8 +55,11 @@ class VariableBase: private std::variant<std::monostate,Value_t,std::string, Arr
     template<typename T>
     VariableBase(std::string_view name, T&& value, BaseData* data_base);
 
-    std::string_view GetName() const;
-    void Refresh() const;
+    template<typename T>
+    void define(T&& value);
+
+    std::string_view name() const;
+    void refresh() const;
 
     const variant& get() const;
     variant& get();

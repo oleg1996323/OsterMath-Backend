@@ -3,44 +3,55 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <string>
-#include <optional>
+#include <memory>
 #include "def.h"
 
+
 class VariableBase;
+class Parser;
 
 class BaseData{
     public:
-    const VariableBase* GetVar(std::string_view name) const;
+    const VariableBase* get(std::string_view name) const;
 
-    bool Exists(std::string_view name) const;
+    bool exists(std::string_view name) const;
 
-    bool Defined(std::string_view name) const;
+    bool defined(std::string_view name) const;
 
-    std::shared_ptr<VariableBase>& AddVariable(std::string&& name);
-
-    template<typename T>
-    std::shared_ptr<VariableBase>& AddVariable(std::string&& name, T&& value);
+    std::shared_ptr<VariableBase>& add_variable(std::string&& name);
 
     template<typename T>
-    void Define(std::string_view name, T&& value);
+    std::shared_ptr<VariableBase>& add_variable(std::string&& name, T&& value);
 
-    void Erase(std::string_view var_name);
+    template<typename T>
+    void define(std::string_view name, T&& value);
+
+    void erase(std::string_view var_name);
+
+    void setstream(std::iostream& stream);
+
+    std::ostream& print(std::ostream& stream, std::string_view name);
 
     private:
     std::unordered_set<std::string> var_names_;
-    std::unordered_map<std::string_view,std::shared_ptr<VariableBase>> vars_; 
+    std::unordered_map<std::string_view,std::shared_ptr<VariableBase>> vars_;
+    std::unique_ptr<Parser> parser_; 
 };
 
 class DataPool{
     public:
-    DataPool() = default;
+    DataPool(const std::string& name);
 
     void add_data();
+
+    std::string_view name();
 
     BaseData* get(std::string_view name_data) const;
 
     private:
-    std::unordered_map<std::string,BaseData> pools_;
+    std::string name_;
+    std::unordered_set<std::string> data_names_;
+    std::unordered_map<std::string_view,BaseData> data_bases_;
 };
 
 class TemperatureBound:public BaseData{

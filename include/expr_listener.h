@@ -52,10 +52,10 @@ class BaseListener: public ParseRulesBaseListener{
     virtual void enterVariable(ParseRulesParser::VariableContext *ctx) override{
         assert(!mode_.empty());
         if(mode_.top()==MODE::VARDEF)
-            current_var_ = data_base_->AddVariable(ctx->VARIABLE()->getSymbol()->getText())->GetName();
+            current_var_ = data_base_->add_variable(ctx->VARIABLE()->getSymbol()->getText())->name();
         else {
             assert(mode_.top()==MODE::HDRDEF);
-            hdr_vars_.push_back(data_base_->AddVariable(ctx->VARIABLE()->getSymbol()->getText())->GetName());
+            hdr_vars_.push_back(data_base_->add_variable(ctx->VARIABLE()->getSymbol()->getText())->name());
 
         }
     }
@@ -64,8 +64,8 @@ class BaseListener: public ParseRulesBaseListener{
         assert(!mode_.empty());
         if(ctx->ADD()){
             if(mode_.top()==MODE::VARDEF)
-                if(data_base_->GetVar(current_var_)->is_arithmetic_tree())
-                data_base_->GetVar()->;
+                if(data_base_->get(current_var_)->is_arithmetic_tree())
+                    data_base_->get()->get();
         }
         else{
 

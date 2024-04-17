@@ -20,6 +20,8 @@ class ArithmeticTree{
 
     Value_t execute() const;
 
+    const Value_t& value() const;
+
     void insert(Node* node);
 
     bool is_ready() const;
@@ -27,5 +29,5 @@ class ArithmeticTree{
     private:
     std::shared_ptr<Node> root_;
     mutable Node* last_incomplete_;
-    std::optional<Value_t> cache_;
+    Value_t cache_ = 0.;
 };

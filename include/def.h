@@ -41,3 +41,12 @@ template<typename T, typename... Ts>
 
 using Value_t = boost::multiprecision::cpp_dec_float_50;
 using Array_t = std::vector<Value_t>;
+
+class ArithmeticTree;
+
+std::ostream& operator<<(std::ostream& stream, const ArithmeticTree& tree);
+
+std::ostream& operator<<(std::ostream& stream, const Array_t& arr);
+
+#include <variant>
+std::ostream& operator<<(std::ostream& stream, std::monostate empty);
