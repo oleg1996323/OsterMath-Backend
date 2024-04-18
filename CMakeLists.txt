@@ -1,47 +1,27 @@
 cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
-project(PhysProperties)
+project(PhysicalProps)
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/grammar/CMakeLists.txt)
-
-file(GLOB sources
+file(GLOB physprop_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
 )
 
-set(Boost_USE_STATIC_LIBS        ON)  # only find static libs
-set(Boost_USE_DEBUG_LIBS        OFF)  # ignore debug libs and
-set(Boost_USE_RELEASE_LIBS       ON)  # only find release libs
-set(Boost_USE_MULTITHREADED      ON)
-set(Boost_USE_STATIC_RUNTIME    OFF)
+include(${CMAKE_CURRENT_SOURCE_DIR}/parsing/CMakeLists.txt)
+include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-find_package(Boost 1.82.0 REQUIRED COMPONENTS json)
+set(CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 
-if(Boost_FOUND)
-    include_directories(${Boost_INCLUDE_DIRS})
-else()
-    message(FATAL_ERROR "Boost not found")
-endif()
+add_executable(physical_props ${physprop_sources})
 
-include_directories(${ANTLR_OUTPUT_DIRS})
-include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/include ${Boost_INCLUDE_DIRS})
+message(STATUS ${Boost_LIBRARIES})
 
-add_library(
-    PhysProperties STATIC
-    ${ANTLR_Parserules_CXX_OUTPUTS}
-    ${sources}
-)
-
-message(STATUS "Boost libs: ${Boost_LIBRARIES}")
-
-target_link_libraries(PhysProperties antlr4_static Boost::boost ${Boost_LIBRARIES})
-if(MSVC)
-    target_compile_options(antlr4_static PRIVATE /W0)
-endif()
+target_link_libraries(physical_props STATIC ${Boost_LIBRARIES} formula_parsing)
 
 install(
-    TARGETS PhysProperties
+    TARGETS physical_props
     DESTINATION bin
-    EXPORT PhysProperties
+    EXPORT physical_props
 )
 
-set_directory_properties(PROPERTIES VS_STARTUP_PROJECT PhysProperties)
+message(STATUS ${CMAKE_CURRENT_SOURCE_DIR})
