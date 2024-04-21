@@ -7,40 +7,42 @@
 #include "expr_listener.h"
 #include "expr_lexer.h"
 
-class Parser: public ParseRulesParser{
+//SignalizerStream (если finished() и переданы данные)
+
+class Parser{
 public:
     Parser(std::istream& stream, BaseData* data_base):
-    ParseRulesParser((lexer_ = std::make_unique<Lexer>((antlr_stream_=antlr4::ANTLRInputStream(stream))))->GetCommonTokenStream()),
-    data_(data_base),
-    stream_(stream)
+        antlr_stream_(stream),
+        lexer_(antlr_stream_),
+        input_(lexer_.GetCommonTokenStream()),
+        base_parser_(input_),
+        data_(std::move(std::shared_ptr<BaseData>(data_base))),
+        stream_(stream)
 {
-    input_ = lexer_->GetCommonTokenStream();
     auto error_handler = std::make_shared<antlr4::BailErrorStrategy>();
-    this->setErrorHandler(error_handler);
-    this->removeErrorListeners();
-    tree_ = std::unique_ptr<ExprContext>(this->expr());
+    base_parser_.setErrorHandler(error_handler);
+    base_parser_.removeErrorListeners();
+    tree_ = std::unique_ptr<ParseRulesParser::ExpressionsContext>(base_parser_.expressions());
     listener_ = std::make_unique<BaseListener>(data_.get());
-}
-
-    Parser(Parser&& other):ParseRulesParser(other.input_),
-    stream_(other.stream_)
-{
-    lexer_ = std::move(other.lexer_);
-    listener_ = std::move(other.listener_);
-    err_listener_ = std::move(other.err_listener_);
-    tree_ = std::move(other.tree_);
-    data_ = std::move(other.data_);
+    antlr4::tree::ParseTreeWalker::DEFAULT.walk(listener_.get(),tree_.get());
 }
 
 void parse_entry(){
-    return antlr4::tree::ParseTreeWalker::DEFAULT.walk(listener_.get(),tree_.get());
+    
+    antlr_stream_.load(stream_);
+    lexer_.setInputStream(&antlr_stream_);
+    input_=lexer_.GetCommonTokenStream();
+    base_parser_.setTokenStream(input_);
+    antlr4::tree::ParseTreeWalker::DEFAULT.walk(listener_.get(),tree_.get());
 }
     
     antlr4::ANTLRInputStream antlr_stream_;
+    Lexer lexer_;
     antlr4::CommonTokenStream* input_;
+    ParseRulesParser base_parser_;
 
     std::shared_ptr<BaseData> data_;
-    std::unique_ptr<Lexer> lexer_;
+
     std::unique_ptr<BaseListener> listener_;
     std::unique_ptr<ErrorListener> err_listener_;
     std::unique_ptr<antlr4::tree::ParseTree> tree_;

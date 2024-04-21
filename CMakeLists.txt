@@ -3,24 +3,44 @@ project(PhysicalProps)
 
 set(CMAKE_CXX_STANDARD 20)
 
-include(${CMAKE_CURRENT_LIST_DIR}/arithmetictree/CMakeLists.txt)
-include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/include)
+include(${CMAKE_CURRENT_SOURCE_DIR}/arithmetictree/CMakeLists.txt)
 
-file(GLOB physprop_sources
+file(GLOB physprop_SOURCE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
+)
+
+file(GLOB physprop_INCLUDE
     ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
 )
 
-set(CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bin)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
+set(Boost_USE_STATIC_LIBS        ON)  # only find static libs
+set(Boost_USE_DEBUG_LIBS        ON)  # ignore debug libs and
+set(Boost_USE_RELEASE_LIBS       ON)  # only find release libs
+set(Boost_USE_MULTITHREADED      ON)
+set(Boost_USE_STATIC_RUNTIME    OFF)
 
-add_executable(physical_props ${physprop_sources})
+find_package(Boost 1.75.0 REQUIRED COMPONENTS json)
 
-message(STATUS ${Boost_LIBRARIES})
+if(Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIRS})
+else()
+    message(FATAL_ERROR "Boost not found")
+endif()
 
-message(STATUS ${arithmetictree})
-message(STATUS ${arithmetic_tree_INCLUDE_DIR})
-#target_include_directories(physical_props PUBLIC ${arithmetic_tree_INCLUDE_DIR})
-target_link_libraries(physical_props PUBLIC arithmetictree PRIVATE Boost::boost ${Boost_LIBRARIES})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+add_executable(physical_props ${physprop_SOURCE})
+
+message(STATUS ${ARITHM_TREE_INCLUDE_DIR})
+target_link_directories(physical_props PUBLIC ${ARITHM_TREE_LIBRARY_DIR})
+target_link_libraries(physical_props PUBLIC arithmetictree Boost::boost ${Boost_LIBRARIES})
+target_include_directories(physical_props PUBLIC ${ARITHM_TREE_INCLUDE_DIR} ${Boost_INCLUDE_DIRS})
+
+set_target_properties(physical_props
+    PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/shared"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/bin"
+)
 
 message(STATUS ${CMAKE_CURRENT_SOURCE_DIR})

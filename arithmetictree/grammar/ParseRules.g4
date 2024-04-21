@@ -36,7 +36,7 @@ PI: 'Pi' | 'PI' | 'pi' WS;
 
 vardefinition
     :
-    VARIABLE WS* '=' WS* (expr | STRING) WS* EOL
+    VARIABLE WS* '=' WS* (expr | STRING) WS* (EOL|EOF)
     ;
 
 expr
@@ -67,13 +67,20 @@ functions
     ;
 
 hdr:
-    (VARIABLE WS*)+
+    (VARIABLE WS*)+ (EOL|EOF)
     ;
 
 numbers_line:
-    NUMBER WS+ (NUMBER WS+) EOL
+    NUMBER WS+ (NUMBER WS+) (EOL|EOF)
     ;
 
 table_definition:
-    hdr EOL numbers_line
+    hdr EOL numbers_line (EOL|EOF)
+    ;
+
+expressions:
+    expr
+    | table_definition
+    | vardefinition
+    | (EOL|EOF)
     ;

@@ -41,32 +41,6 @@ std::shared_ptr<VariableBase>& BaseData::add_variable(std::string&& name){
     else return vars_.find(name)->second;
 }
 
-template<typename T>
-std::shared_ptr<VariableBase>& BaseData::add_variable(std::string&& name, T&& value){
-    if(!exists(name)){
-        auto str_name = var_names_.emplace(name).first;
-        return vars_.emplace(
-            *str_name,
-            std::make_shared<VariableBase>(*str_name,std::forward<T>(value),this)).first->second;
-    }
-    else return vars_.find(name)->second;
-}
-
-template<typename T>
-void BaseData::define(std::string_view name, T&& value){
-    if(exists(name)){
-        if(!defined(name)){
-            auto ref = vars_.find(name);
-            ref->second = std::shared_ptr<VariableBase>(ref->first,std::forward<T>(value));
-
-            return;
-        }
-        else
-            throw std::logic_error("Variable "s+std::string(name)+" already defined."s);
-    }
-    else throw std::logic_error("Variable "s+std::string(name)+" don't exists."s);
-}
-
 void BaseData::erase(std::string_view var_name){
     vars_.erase(var_name);
 }
@@ -101,14 +75,14 @@ void DataPool::add_data(const std::string& name){
     return;
 }
 
-bool DataPool::exists(const std::string& name) const{
-    return data_names_.contains(name);
+bool DataPool::exists(std::string_view name) const{
+    return data_bases_.contains(name);
 }
 
-void DataPool::erase(const std::string& name){
+void DataPool::erase(std::string_view name){
     if(exists(name)){
         data_bases_.erase(name);
-        data_names_.erase(name);
+        data_names_.erase(std::string(name));
     }
 }
 
@@ -116,4 +90,10 @@ void DataPool::replace(const std::string& name) noexcept{
     if(exists(name)){
         data_bases_.at(name) = BaseData(*data_names_.find(name));
     }
+}
+
+BaseData* DataPool::get(std::string_view name_data) noexcept{
+    if(exists(name_data))
+        return &data_bases_.at(name_data);
+    else return nullptr;
 }

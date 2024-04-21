@@ -72,6 +72,15 @@ make_directory(${PROJECT_RUNTIME_ANTLR}/runtime/src)
 
 antlr_target(Parserules ${CMAKE_CURRENT_LIST_DIR}/ParseRules.g4 LEXER PARSER LISTENER)
 
+target_include_directories(antlr4_static PUBLIC ${PROJECT_RUNTIME_ANTLR}/runtime/src)
+
+set_target_properties(antlr4_static
+    PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/lib"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/bin"
+)
+
 include_directories(
     ${ANTLR4_INCLUDE_DIRS}
     ${ANTLR_Parserules_OUTPUT_DIR}

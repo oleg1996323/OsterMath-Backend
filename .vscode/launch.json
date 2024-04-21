@@ -1,0 +1,12 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceRoot}/bin/physical_props",
+            "cwd": "${workspaceRoot}"
+        }
+    ]
+}

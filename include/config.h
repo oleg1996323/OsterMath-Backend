@@ -8,7 +8,6 @@
 #include <unordered_map>
 #include <filesystem>
 #include <fstream>
-#include <boost/math/differentiation/autodiff.hpp>
 
 //#include <boost/json/parse.hpp>
 #include "def.h"
