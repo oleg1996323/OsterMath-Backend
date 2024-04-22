@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <optional>
+#include <vector>
 #include "def.h"
 #include "ParseRulesBaseListener.h"
 #include "exception.h"
@@ -21,6 +22,8 @@ public:
     }
 };
 
+class VariableBase;
+
 class BaseListener: public ParseRulesBaseListener{
     enum class MODE{
         VARDEF,
@@ -30,16 +33,17 @@ class BaseListener: public ParseRulesBaseListener{
     };
 
     BaseData* data_base_;
-    mutable std::string_view current_var_;
-    std::vector<std::string_view> hdr_vars_; 
+    mutable VariableBase* current_var_;
+    std::vector<VariableBase*> hdr_vars_; 
     std::stack<MODE> mode_;
+    size_t line_counter_ = 0;
+    size_t col_counter_ = 0;
 
     public:
     BaseListener(BaseData* data_base):
     data_base_(data_base)
     {}
 
-    private:
     virtual void enterVardefinition(ParseRulesParser::VardefinitionContext * ctx) override;
     
     virtual void exitVardefinition(ParseRulesParser::VardefinitionContext * ctx) override;

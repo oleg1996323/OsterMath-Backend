@@ -30,7 +30,9 @@ std::ostream& operator<<(std::ostream& stream, Variable var){
 VariableBase::VariableBase(std::string_view name, BaseData* data_base):
     name_(name),
     data_base_(data_base)
-{}
+{
+
+}
 
 std::string_view VariableBase::name() const{
     return name_;
@@ -58,6 +60,10 @@ const Variable& VariableBase::get() const{
     return *this;
 }
 
+Node* VariableBase::node(){
+    return node_;
+}
+
 bool VariableBase::is_arithmetic_tree() const{
     return std::holds_alternative<ArithmeticTree>(*this);
 }
@@ -72,4 +78,17 @@ bool VariableBase::is_string() const{
 
 bool VariableBase::is_array() const{
     return std::holds_alternative<Array_t>(*this);
+}
+
+bool VariableBase::is_undef() const{
+    return std::holds_alternative<std::monostate>(*this);
+}
+
+void VariableBase::__new_variable_node__() noexcept{
+    node_ = new VariableNode(this);
+}
+
+VariableBase::~VariableBase(){
+    if(!is_arithmetic_tree())
+        delete node_;
 }

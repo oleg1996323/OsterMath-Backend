@@ -16,24 +16,27 @@ public:
         lexer_(antlr_stream_),
         input_(lexer_.GetCommonTokenStream()),
         base_parser_(input_),
-        data_(std::move(std::shared_ptr<BaseData>(data_base))),
+        data_(data_base),
+        listener_(data_base),
         stream_(stream)
 {
     auto error_handler = std::make_shared<antlr4::BailErrorStrategy>();
     base_parser_.setErrorHandler(error_handler);
     base_parser_.removeErrorListeners();
-    tree_ = std::unique_ptr<ParseRulesParser::ExpressionsContext>(base_parser_.expressions());
-    listener_ = std::make_unique<BaseListener>(data_.get());
-    antlr4::tree::ParseTreeWalker::DEFAULT.walk(listener_.get(),tree_.get());
+    tree_ = base_parser_.input();
+    antlr4::tree::ParseTreeWalker::DEFAULT.walk(&listener_,tree_);
+}
+
+void set_stream(std::istream& stream){
+    stream_.rdbuf(stream.rdbuf());
 }
 
 void parse_entry(){
-    
     antlr_stream_.load(stream_);
     lexer_.setInputStream(&antlr_stream_);
     input_=lexer_.GetCommonTokenStream();
     base_parser_.setTokenStream(input_);
-    antlr4::tree::ParseTreeWalker::DEFAULT.walk(listener_.get(),tree_.get());
+    antlr4::tree::ParseTreeWalker::DEFAULT.walk(&listener_,tree_);
 }
     
     antlr4::ANTLRInputStream antlr_stream_;
@@ -41,10 +44,10 @@ void parse_entry(){
     antlr4::CommonTokenStream* input_;
     ParseRulesParser base_parser_;
 
-    std::shared_ptr<BaseData> data_;
+    BaseData* data_;
 
-    std::unique_ptr<BaseListener> listener_;
-    std::unique_ptr<ErrorListener> err_listener_;
-    std::unique_ptr<antlr4::tree::ParseTree> tree_;
+    BaseListener listener_;
+    ErrorListener err_listener_;
+    antlr4::tree::ParseTree* tree_;
     std::istream& stream_;
 };

@@ -8,15 +8,14 @@
 #include "def.h"
 #include "exception.h"
 #include "data.h"
-#include "types.h"
 #include "arithmetic_tree.h"
+
+class VariableNode;
 
 using Variable = std::variant<std::monostate,Value_t,std::string, Array_t, ArithmeticTree>;
 
 using namespace std::string_literals;
 using namespace std::string_view_literals;
-
-class ArithmeticTree;
 
 class VariableBase: private Variable {
     using variant::variant;
@@ -25,7 +24,9 @@ class VariableBase: private Variable {
     struct HashVar{
         size_t operator()(const VariableBase& var);
     };
-    virtual ~VariableBase(){}
+
+    virtual ~VariableBase();
+
     explicit VariableBase(std::string_view name, BaseData* data_base);
 
     template<typename T>
@@ -40,22 +41,31 @@ class VariableBase: private Variable {
     const Variable& get() const;
     Variable& get();
 
+    template<typename TO>
+    void convert();
+
     template<typename T>
     const T& get() const;
 
     template<typename T>
     T& get();
 
+    Node* node();
+
     bool is_arithmetic_tree() const;
     bool is_value() const;
     bool is_string() const;
     bool is_array() const;
+    bool is_undef() const;
 
     protected:
     void set_data_base(BaseData* data_pool);
     BaseData* get_data_base() const;
 
     private:
+
+    void __new_variable_node__() noexcept;
+
     Node* node_;
     std::string_view name_;
     BaseData* data_base_;
@@ -111,5 +121,18 @@ VariableBase::VariableBase(std::string_view name, T&& value, BaseData* data_base
     name_(name),
     data_base_(data_base)
 {
-    this->emplace(std::forward<T>(value));
+    this->get()=std::forward<T>(value);
+    if(is_arithmetic_tree()){
+        node_ = get<ArithmeticTree>().root();
+    }
+    else{
+        __new_variable_node__();
+    }
+}
+
+template<typename TO>
+void VariableBase::convert(){
+    if constexpr (std::is_same_v<Value_t, TO>){
+        
+    }
 }

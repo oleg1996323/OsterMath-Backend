@@ -6,9 +6,60 @@ MUL: '*' ;
 DIV: '/' ;
 POW: '^' ;
 
+vardefinition
+    :
+    VARIABLE WS* '=' WS* (expr | STRING) WS* EOL
+    ;
+
+input:
+    table_definition
+    | vardefinition
+    | EOF
+    ;
+
+table_definition:
+    hdr EOL numbers_line EOL
+    ;
+
+hdr:
+    VARIABLE (WS+ VARIABLE)+
+    ;
+
+numbers_line:
+    NUMBER (WS+ NUMBER)
+    ;
+
+expr
+    : 
+    '(' expr ')'                            # Parens
+    | VARIABLE                              # Variable
+    | (ADD | SUB) expr                      # UnaryOp
+    | expr (MUL | DIV) expr                 # BinaryOp
+    | expr (ADD | SUB) expr                 # BinaryOp
+    | expr POW expr                         # PowerOp              
+    | functions                             # FunctionCall
+    | NUMBER                                # Number
+    | CONSTANTS                             # Constant
+    ;
+
+array
+    :
+    '['(VARIABLE | NUMBER | CONSTANTS)(','VARIABLE | NUMBER | CONSTANTS)+']'
+    ;
+
+functions
+    : LN '(' WS? expr WS? ')'                       #Natlog
+    | LG '(' WS? expr WS? ')'                       #Declog
+    | LOG_X '(' WS? expr WS? ',' WS? expr WS? ')'   #Baselog
+    | EXP '(' WS? expr WS? ')'                      #Exponent
+    | SQRT '(' WS? expr WS? ')'                     #Squareroot
+    | SUMPRODUCT '(' expr ',' expr (',' expr )*')'  #Sumproduct
+    ;
+
+QUOTE: '\'';
+VARIABLE: '__'([a-zA-Z])+ '*'* QUOTE*([0-9]*)?'__';
 STRING: '"'[a-zA-Z0-9 .,:;!?]+'"';
-VARIABLE: '__'[a-zA-Z*']+([0-9]*)?'__';
-VARIABLE_RANGE: '__'[a-zA-Z*']+([0-9]*)?'_arr__';
+VARIABLE_RANGE: '__'([a-zA-Z])+ '*'* QUOTE*([0-9]*)?'_arr__';
 WS: [ \t]+ -> skip;
 EOL: '\r'? '\n';
 
@@ -33,54 +84,3 @@ EXP: 'Exp';
 SQRT: 'Sqrt';
 
 PI: 'Pi' | 'PI' | 'pi' WS;
-
-vardefinition
-    :
-    VARIABLE WS* '=' WS* (expr | STRING) WS* (EOL|EOF)
-    ;
-
-expr
-    : 
-    '(' expr ')'                            # Parens
-    | (ADD | SUB) expr                      # UnaryOp
-    | expr (MUL | DIV) expr                 # BinaryOp
-    | expr (ADD | SUB) expr                 # BinaryOp
-    | expr POW expr                         # PowerOp              
-    | functions                             # FunctionCall
-    | VARIABLE                              # Variable
-    | NUMBER                                # Number
-    | CONSTANTS                             # Constant
-    ;
-
-array
-    :
-    '['(VARIABLE | NUMBER | CONSTANTS)(','VARIABLE | NUMBER | CONSTANTS)+']'
-    ;
-
-functions
-    : LN '(' WS? expr WS? ')'                       #Natlog
-    | LG '(' WS? expr WS? ')'                       #Declog
-    | LOG_X '(' WS? expr WS? ',' WS? expr WS? ')'   #Baselog
-    | EXP '(' WS? expr WS? ')'                      #Exponent
-    | SQRT '(' WS? expr WS? ')'                     #Squareroot
-    | SUMPRODUCT '(' expr ',' expr (',' expr )*')'  #Sumproduct
-    ;
-
-hdr:
-    (VARIABLE WS*)+ (EOL|EOF)
-    ;
-
-numbers_line:
-    NUMBER WS+ (NUMBER WS+) (EOL|EOF)
-    ;
-
-table_definition:
-    hdr EOL numbers_line (EOL|EOF)
-    ;
-
-expressions:
-    expr
-    | table_definition
-    | vardefinition
-    | (EOL|EOF)
-    ;

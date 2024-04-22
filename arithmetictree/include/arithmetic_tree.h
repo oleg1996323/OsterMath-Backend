@@ -28,6 +28,8 @@ class ArithmeticTree{
 
     bool is_ready() const;
 
+    Node* root() const;
+
     private:
     std::shared_ptr<Node> root_;
     mutable Node* last_incomplete_;

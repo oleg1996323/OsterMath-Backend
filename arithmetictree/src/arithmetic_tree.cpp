@@ -86,3 +86,7 @@ bool ArithmeticTree::is_ready() const{
     else
         return false;
 }
+
+Node* ArithmeticTree::root() const{
+    return root_.get();
+}

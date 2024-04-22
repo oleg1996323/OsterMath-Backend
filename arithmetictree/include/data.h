@@ -41,8 +41,8 @@ class BaseData{
     private:
     std::unordered_set<std::string> var_names_;
     std::unordered_map<std::string_view,std::shared_ptr<VariableBase>> vars_;
-    std::unique_ptr<Parser> parser_; 
     std::string_view name_;
+    std::unique_ptr<Parser> parser_;
 };
 
 class DataPool{

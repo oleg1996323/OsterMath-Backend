@@ -49,7 +49,11 @@ void BaseData::erase(std::string_view var_name){
 #include "expr_parser.h"
 
 void BaseData::setstream(std::istream& stream){
-    parser_=std::make_unique<Parser>(stream, this);
+    if(parser_)
+        parser_->set_stream(stream);
+    else{
+        parser_=std::make_unique<Parser>(stream,this);
+    }
 }
 
 void BaseData::parse_entry(){

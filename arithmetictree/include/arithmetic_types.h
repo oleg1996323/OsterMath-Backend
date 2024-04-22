@@ -178,7 +178,7 @@ class ValueNode:public Node{
 
 class VariableNode:public Node{
     public:
-    VariableNode(const std::shared_ptr<VariableBase>& variable):
+    VariableNode(VariableBase* variable):
     var_(variable){}
     
     virtual ARITHM_NODE_TYPE type() const override{
@@ -192,7 +192,7 @@ class VariableNode:public Node{
     virtual Value_t execute() override;
 
     private:
-    std::weak_ptr<VariableBase> var_;
+    VariableBase* var_;
 };
 
 class MultiArgumentNode:public Node{

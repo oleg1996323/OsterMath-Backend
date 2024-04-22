@@ -109,11 +109,13 @@ Value_t BinaryNode::execute(){
 }
 
 Value_t VariableNode::execute(){
-    std::shared_ptr<VariableBase> ptr = var_.lock();
-    if(!ptr->is_arithmetic_tree() || ptr->is_value()){
-        return ptr->get<Value_t>();
+    if(var_){
+        if(var_ && !var_->is_arithmetic_tree() || var_->is_value()){
+            return var_->get<Value_t>();
+        }
+        else throw std::invalid_argument("Invalid type of variable");
     }
-    else throw std::invalid_argument("Invalid type of variable");
+    else throw std::runtime_error("Uninitialized variable");
 }
 
 Node* MultiArgumentNode::child(size_t id) const{
