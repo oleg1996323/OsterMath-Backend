@@ -22,10 +22,10 @@ void BaseListener::enterVariable(ParseRulesParser::VariableContext *ctx) {
     if(mode_.top()==MODE::VARDEF){
         auto ptr = data_base_->add_variable(ctx->VARIABLE()->getSymbol()->getText()).get();
         if(current_var_->is_arithmetic_tree())
-            current_var_->get<ArithmeticTree>().insert(std::shared_ptr<VariableNode>(ptr));
+            current_var_->get<ArithmeticTree>().insert(std::make_shared<VariableNode>(ptr));
         else if(current_var_->is_undef()){
             current_var_->get() = ArithmeticTree();
-            current_var_->get<ArithmeticTree>().insert(std::shared_ptr<VariableNode>(ptr));
+            current_var_->get<ArithmeticTree>().insert(std::make_shared<VariableNode>(ptr));
             assert(current_var_->is_arithmetic_tree());
         }
         else if(current_var_->is_value()){
@@ -76,24 +76,16 @@ void BaseListener::exitUnaryOp(ParseRulesParser::UnaryOpContext* ctx)  {
 
 void BaseListener::enterNumber(ParseRulesParser::NumberContext *ctx) {
     assert(!mode_.empty());
-    // if(current_var_->is_arithmetic_tree())
-    //         current_var_->get<ArithmeticTree>().insert(std::make_shared<UnaryNode>(ctx->ADD()?UNARY_OP::ADD:UNARY_OP::SUB));
-    //     else if(current_var_->is_undef()){
-    //         current_var_->get() = ctx->ADD()?1:-1;
-    //         assert(current_var_->is_value());
-    //     }
-    //     else assert(false);
-    //     // else if(current_var_->is_value()){
-    //     //     //Value_t val_buf;
-    //     //     //current_var_->get() = ArithmeticTree();
-    //     //     //assert(current_var_->is_arithmetic_tree());
-    //     //     assert(false);
-    //     //     //current_var_->get<ArithmeticTree>().insert(std::make_shared<ValueNode>(std::move(val_buf)));
-    //     // }
-    // else if(mode_.top()==MODE::TABVALDEF){
-    //     assert(current_var_->is_array());
-    //     current_var_->get<Array_t>().push_back(ctx->ADD()?1:-1);
-    // }
+    if(current_var_->is_undef()){
+        std::cout<<ctx->getText()<<std::endl;
+        current_var_->get()=Value_t(ctx->getText());
+        return;
+    }
+    else if(!current_var_->is_arithmetic_tree()){
+        throw std::invalid_argument("Invalid type of variable");
+    }
+    current_var_->get<ArithmeticTree>().insert(std::make_shared<ValueNode>(Value_t(ctx->getText())));
+    return;
 }
 
 void BaseListener::exitNumber(ParseRulesParser::NumberContext *ctx) {
@@ -127,19 +119,30 @@ void BaseListener::exitFunctionCall(ParseRulesParser::FunctionCallContext *ctx) 
     return;
 }
 
-//power operator {for example: __Ivs__^__j12__}
-void BaseListener::enterPowerOp(ParseRulesParser::PowerOpContext *ctx) {
-    return;
-}
-
-void BaseListener::exitPowerOp(ParseRulesParser::PowerOpContext *ctx) {
-    return;
-}
-
 //binary operator {for example: Expr + Expr or Expr / Expr}
 void BaseListener::enterBinaryOp(ParseRulesParser::BinaryOpContext *ctx) {
+    assert(!mode_.empty() && current_var_);
+    if(current_var_->is_value()){
+        current_var_->value_to_tree();
+        assert(current_var_->is_arithmetic_tree());
+    }
+    else if(current_var_->is_undef()){
+        current_var_->get()=ArithmeticTree();
+    }
+    else if(!current_var_->is_arithmetic_tree()){
+        throw std::invalid_argument("Invalid type of variable");
+    }
     if(ctx->ADD())
-        return;
+        current_var_->get<ArithmeticTree>().insert(std::make_shared<BinaryNode>(BINARY_OP::ADD));
+    else if(ctx->SUB())
+        current_var_->get<ArithmeticTree>().insert(std::make_shared<BinaryNode>(BINARY_OP::SUB));
+    else if(ctx->MUL())
+        current_var_->get<ArithmeticTree>().insert(std::make_shared<BinaryNode>(BINARY_OP::MUL));
+    else if(ctx->DIV())
+        current_var_->get<ArithmeticTree>().insert(std::make_shared<BinaryNode>(BINARY_OP::DIV));
+    else
+        current_var_->get<ArithmeticTree>().insert(std::make_shared<BinaryNode>(BINARY_OP::POW));
+    return;
 }
 
 void BaseListener::exitBinaryOp(ParseRulesParser::BinaryOpContext *ctx) {

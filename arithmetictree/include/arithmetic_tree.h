@@ -9,6 +9,7 @@ class Node;
 
 class ArithmeticTree{
     public:
+    using type = Value_t;
 
     ArithmeticTree() = default;
 
@@ -28,10 +29,10 @@ class ArithmeticTree{
 
     bool is_ready() const;
 
-    Node* root() const;
+    const std::shared_ptr<Node>& root() const;
 
     private:
     std::shared_ptr<Node> root_;
     mutable Node* last_incomplete_;
-    Value_t cache_ = 0.;
+    mutable std::optional<Value_t> cache_;
 };

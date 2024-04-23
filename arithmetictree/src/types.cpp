@@ -31,7 +31,7 @@ VariableBase::VariableBase(std::string_view name, BaseData* data_base):
     name_(name),
     data_base_(data_base)
 {
-
+    node_=std::make_shared<VariableNode>(this);
 }
 
 std::string_view VariableBase::name() const{
@@ -60,35 +60,43 @@ const Variable& VariableBase::get() const{
     return *this;
 }
 
-Node* VariableBase::node(){
+const std::shared_ptr<VariableNode>& VariableBase::node() const{
     return node_;
 }
 
 bool VariableBase::is_arithmetic_tree() const{
-    return std::holds_alternative<ArithmeticTree>(*this);
+    return std::holds_alternative<ArithmeticTree>(get());
 }
 
 bool VariableBase::is_value() const{
-    return std::holds_alternative<Value_t>(*this);
+    return std::holds_alternative<Value_t>(get());
 }
 
 bool VariableBase::is_string() const{
-    return std::holds_alternative<std::string>(*this);
+    return std::holds_alternative<std::string>(get());
 }
 
 bool VariableBase::is_array() const{
-    return std::holds_alternative<Array_t>(*this);
+    return std::holds_alternative<Array_t>(get());
 }
 
 bool VariableBase::is_undef() const{
-    return std::holds_alternative<std::monostate>(*this);
+    return std::holds_alternative<std::monostate>(get());
 }
 
-void VariableBase::__new_variable_node__() noexcept{
-    node_ = new VariableNode(this);
+void VariableBase::value_to_tree(){
+    if(is_value()){
+        ArithmeticTree tree;
+        tree.insert(std::make_shared<ValueNode>(std::move(get<Value_t>())));
+        this->get()=std::move(tree);
+    }
+}
+
+void VariableBase::tree_to_value(){
+    if(is_arithmetic_tree())
+        get() = get<ArithmeticTree>().execute();
 }
 
 VariableBase::~VariableBase(){
-    if(!is_arithmetic_tree())
-        delete node_;
+
 }

@@ -41,8 +41,9 @@ class VariableBase: private Variable {
     const Variable& get() const;
     Variable& get();
 
-    template<typename TO>
-    void convert();
+    void value_to_tree();
+
+    void tree_to_value();
 
     template<typename T>
     const T& get() const;
@@ -50,7 +51,7 @@ class VariableBase: private Variable {
     template<typename T>
     T& get();
 
-    Node* node();
+    const std::shared_ptr<VariableNode>& node() const;
 
     bool is_arithmetic_tree() const;
     bool is_value() const;
@@ -63,10 +64,7 @@ class VariableBase: private Variable {
     BaseData* get_data_base() const;
 
     private:
-
-    void __new_variable_node__() noexcept;
-
-    Node* node_;
+    std::shared_ptr<VariableNode> node_; //shared, так как может быть передан в любое арифметическое дерево
     std::string_view name_;
     BaseData* data_base_;
 };
@@ -103,17 +101,17 @@ struct VariableVisitor{
 
 template<typename T>
 T& VariableBase::get(){
-    return std::get<T>(*this);
+    return std::get<T>(get());
 }
 
 template<typename T>
 const T& VariableBase::get() const{
-    return std::get<const T>(*this);
+    return std::get<const T>(get());
 }
 
 template<typename T>
 void VariableBase::define(T&& value){
-    *this=std::forward<T>(value);
+    get()=std::forward<T>(value);
 }
 
 template<typename T>
@@ -121,18 +119,6 @@ VariableBase::VariableBase(std::string_view name, T&& value, BaseData* data_base
     name_(name),
     data_base_(data_base)
 {
-    this->get()=std::forward<T>(value);
-    if(is_arithmetic_tree()){
-        node_ = get<ArithmeticTree>().root();
-    }
-    else{
-        __new_variable_node__();
-    }
-}
-
-template<typename TO>
-void VariableBase::convert(){
-    if constexpr (std::is_same_v<Value_t, TO>){
-        
-    }
+    node_=std::make_shared<VariableNode>(this);
+    get()=std::forward<T>(value);
 }

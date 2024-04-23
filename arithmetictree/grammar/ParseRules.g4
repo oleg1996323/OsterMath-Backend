@@ -36,7 +36,7 @@ expr
     | (ADD | SUB) expr                      # UnaryOp
     | expr (MUL | DIV) expr                 # BinaryOp
     | expr (ADD | SUB) expr                 # BinaryOp
-    | expr POW expr                         # PowerOp              
+    | expr POW expr                         # BinaryOp             
     | functions                             # FunctionCall
     | NUMBER                                # Number
     | CONSTANTS                             # Constant

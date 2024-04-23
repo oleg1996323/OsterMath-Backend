@@ -16,6 +16,10 @@ Node* UnaryNode::first_undefined_child_node(){
     else return child_->first_undefined_child_node();
 }
 
+Node*& Node::parent(){
+    return parent_;
+}
+
 Value_t UnaryNode::execute(){
     using namespace boost::multiprecision;
     if(child_){
@@ -108,10 +112,22 @@ Value_t BinaryNode::execute(){
     return 0.;
 }
 
+VariableNode::VariableNode(VariableBase* variable):
+    var_(variable){}
+
+const VariableBase* VariableNode::variable() const{
+    if(var_)
+        return var_;
+    else throw "Variable don't exists"s;
+}
+
 Value_t VariableNode::execute(){
     if(var_){
-        if(var_ && !var_->is_arithmetic_tree() || var_->is_value()){
+        if(var_->is_value()){
             return var_->get<Value_t>();
+        }
+        else if(var_->is_arithmetic_tree()){
+            return var_->get<ArithmeticTree>().execute();
         }
         else throw std::invalid_argument("Invalid type of variable");
     }

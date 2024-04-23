@@ -73,11 +73,6 @@ class BaseListener: public ParseRulesBaseListener{
 
     virtual void exitFunctionCall(ParseRulesParser::FunctionCallContext *ctx) override;
 
-    //power operator {for example: __Ivs__^__j12__}
-    virtual void enterPowerOp(ParseRulesParser::PowerOpContext *ctx) override;
-
-    virtual void exitPowerOp(ParseRulesParser::PowerOpContext *ctx) override;
-
     //binary operator {for example: Expr + Expr or Expr / Expr}
     virtual void enterBinaryOp(ParseRulesParser::BinaryOpContext *ctx) override;
 

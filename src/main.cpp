@@ -10,6 +10,6 @@ int main()
     pool.add_data("any");
     BaseData* data = pool.get("any");
     data->setstream(std::cin);
-    std::cout<<data->get("__I__")<<std::endl;
+    std::cout<<data->get("__I__")->get()<<std::endl;
     return 0;
 }

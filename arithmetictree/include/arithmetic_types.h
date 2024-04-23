@@ -55,13 +55,7 @@ class Node{
 
     virtual ~Node(){}
 
-    std::shared_ptr<Node>& parent(){
-        return parent_;
-    }
-
-    const std::shared_ptr<Node>& parent() const{
-        return parent_;
-    }
+    Node*& parent();
 
     bool caller() const{
         return caller_;
@@ -71,7 +65,7 @@ class Node{
     bool caller_ = false;
 
     private:
-    std::shared_ptr<Node> parent_;
+    Node* parent_;
 };
 
 class UnaryNode:public Node{
@@ -109,7 +103,7 @@ class BinaryNode:public Node{
     friend ValueNode;
     friend VariableNode;
     public:
-    BinaryNode(Node* lhs, BINARY_OP op, Node* rhs){}
+    BinaryNode(BINARY_OP op):operation(op){}
 
     Value_t get(){
         return 0.;
@@ -178,8 +172,7 @@ class ValueNode:public Node{
 
 class VariableNode:public Node{
     public:
-    VariableNode(VariableBase* variable):
-    var_(variable){}
+    VariableNode(VariableBase* variable);
     
     virtual ARITHM_NODE_TYPE type() const override{
         return ARITHM_NODE_TYPE::VARIABLE;
@@ -188,6 +181,8 @@ class VariableNode:public Node{
     virtual Node* first_undefined_child_node() override{
         return nullptr;
     }
+
+    const VariableBase* variable() const;
 
     virtual Value_t execute() override;
 

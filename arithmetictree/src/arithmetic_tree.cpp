@@ -34,7 +34,9 @@ ArithmeticTree& ArithmeticTree::operator=(ArithmeticTree&& other) noexcept{
 }
 
 const Value_t& ArithmeticTree::value() const{
-    return cache_;
+    if(!cache_.has_value())
+        cache_.emplace(execute());
+    return cache_.value();
 }
 
 std::ostream& operator<<(std::ostream& stream, const ArithmeticTree& tree){
@@ -49,6 +51,10 @@ Value_t ArithmeticTree::execute() const{
 }
 
 void ArithmeticTree::insert(const std::shared_ptr<Node>& node){
+    if(!root_){
+        root_=node;
+        return;
+    }
     if(!is_ready()){
         if(last_incomplete_->type()==ARITHM_NODE_TYPE::UNARY)
             reinterpret_cast<UnaryNode*>(last_incomplete_)->child() = node;
@@ -59,16 +65,16 @@ void ArithmeticTree::insert(const std::shared_ptr<Node>& node){
             }
             else ptr->rhs() = node;
         }
-        node->parent().reset(last_incomplete_);
+        node->parent()=last_incomplete_;
     }
     else{
         if(node->type()==ARITHM_NODE_TYPE::UNARY){
-            root_->parent() = node;
+            root_->parent() = node.get();
             reinterpret_cast<UnaryNode*>(node.get())->child() = std::shared_ptr<Node>(root_);
             root_ = std::shared_ptr<Node>(node);
         }
         else if(node->type()==ARITHM_NODE_TYPE::BINARY){
-            root_->parent() = node;
+            root_->parent() = node.get();
             BinaryNode* ptr = reinterpret_cast<BinaryNode*>(node.get());
             ptr->lhs() = root_;
             root_ = std::shared_ptr<Node>(ptr);
@@ -87,6 +93,6 @@ bool ArithmeticTree::is_ready() const{
         return false;
 }
 
-Node* ArithmeticTree::root() const{
-    return root_.get();
+const std::shared_ptr<Node>& ArithmeticTree::root() const{
+    return root_;
 }
