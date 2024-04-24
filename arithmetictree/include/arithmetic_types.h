@@ -74,7 +74,7 @@ class UnaryNode:public Node{
     friend ValueNode;
     friend VariableNode;
     public:
-    UnaryNode(UNARY_OP operation){}
+    UnaryNode(UNARY_OP op):operation(op){}
 
     virtual Node* first_undefined_child_node() override;
 

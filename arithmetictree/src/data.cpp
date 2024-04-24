@@ -60,11 +60,6 @@ void BaseData::parse_entry(){
     return parser_->parse_entry();
 }
 
-std::ostream& BaseData::print(std::ostream& stream, std::string_view name){
-    stream<<get(name)->get();
-    return stream;
-}
-
 DataPool::DataPool(const std::string& name):name_(name){}
 
 std::string_view DataPool::name(){

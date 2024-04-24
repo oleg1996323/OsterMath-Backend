@@ -36,8 +36,6 @@ class BaseData{
 
     void parse_entry();
 
-    std::ostream& print(std::ostream& stream, std::string_view name);
-
     private:
     std::unordered_set<std::string> var_names_;
     std::unordered_map<std::string_view,std::shared_ptr<VariableBase>> vars_;

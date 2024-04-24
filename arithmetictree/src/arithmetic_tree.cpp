@@ -39,11 +39,6 @@ const Value_t& ArithmeticTree::value() const{
     return cache_.value();
 }
 
-std::ostream& operator<<(std::ostream& stream, const ArithmeticTree& tree){
-    stream<<tree.value();
-    return stream;
-}
-
 Value_t ArithmeticTree::execute() const{
     if(root_)
         return root_->execute();

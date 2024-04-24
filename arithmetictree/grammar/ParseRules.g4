@@ -12,9 +12,13 @@ vardefinition
     ;
 
 input:
-    table_definition
-    | vardefinition
+    line_input+
     | EOF
+    ;
+
+line_input:
+    table_definition+
+    | vardefinition+
     ;
 
 table_definition:

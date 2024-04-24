@@ -9,6 +9,8 @@ using namespace std::string_view_literals;
 void BaseListener::enterVardefinition(ParseRulesParser::VardefinitionContext * ctx){
     mode_.push(MODE::VARDEF);
     current_var_ = data_base_->add_variable(ctx->VARIABLE()->getText()).get();
+    if(!current_var_->is_undef())
+        current_var_->get()=std::monostate();
 }
 
 void BaseListener::exitVardefinition(ParseRulesParser::VardefinitionContext * ctx){ 
@@ -17,28 +19,27 @@ void BaseListener::exitVardefinition(ParseRulesParser::VardefinitionContext * ct
     mode_.pop();
 }
 
+// __I__=__J__+__C__
+// __J__=__C__+2000
+// __C__=__A__
+// __C__=__A__^2
+// __A__=100
+
 void BaseListener::enterVariable(ParseRulesParser::VariableContext *ctx) {
     assert(!mode_.empty());
     if(mode_.top()==MODE::VARDEF){
-        auto ptr = data_base_->add_variable(ctx->VARIABLE()->getSymbol()->getText()).get();
+        auto ptr = data_base_->add_variable(ctx->VARIABLE()->getText()).get();
         if(current_var_->is_arithmetic_tree())
-            current_var_->get<ArithmeticTree>().insert(std::make_shared<VariableNode>(ptr));
+            current_var_->get<ArithmeticTree>().insert(ptr->node());
         else if(current_var_->is_undef()){
             current_var_->get() = ArithmeticTree();
-            current_var_->get<ArithmeticTree>().insert(std::make_shared<VariableNode>(ptr));
+            current_var_->get<ArithmeticTree>().insert(ptr->node());
             assert(current_var_->is_arithmetic_tree());
         }
         else if(current_var_->is_value()){
 
         }
         else assert(false);
-        // else if(current_var_->is_value()){
-        //     //Value_t val_buf;
-        //     //current_var_->get() = ArithmeticTree();
-        //     //assert(current_var_->is_arithmetic_tree());
-        //     assert(false);
-        //     //current_var_->get<ArithmeticTree>().insert(std::make_shared<ValueNode>(std::move(val_buf)));
-        // }
     }
     else {
         assert(mode_.top()==MODE::HDRDEF);
@@ -51,18 +52,6 @@ void BaseListener::enterUnaryOp(ParseRulesParser::UnaryOpContext *ctx) {
     if(mode_.top()==MODE::VARDEF){
         if(current_var_->is_arithmetic_tree())
             current_var_->get<ArithmeticTree>().insert(std::make_shared<UnaryNode>(ctx->ADD()?UNARY_OP::ADD:UNARY_OP::SUB));
-        else if(current_var_->is_undef()){
-            current_var_->get() = ctx->ADD()?1:-1;
-            assert(current_var_->is_value());
-        }
-        else assert(false);
-        // else if(current_var_->is_value()){
-        //     //Value_t val_buf;
-        //     //current_var_->get() = ArithmeticTree();
-        //     //assert(current_var_->is_arithmetic_tree());
-        //     assert(false);
-        //     //current_var_->get<ArithmeticTree>().insert(std::make_shared<ValueNode>(std::move(val_buf)));
-        // }
     }
     else if(mode_.top()==MODE::TABVALDEF){
         assert(current_var_->is_array());
@@ -71,20 +60,27 @@ void BaseListener::enterUnaryOp(ParseRulesParser::UnaryOpContext *ctx) {
 }
 
 void BaseListener::exitUnaryOp(ParseRulesParser::UnaryOpContext* ctx)  {
+    if(mode_.top()==MODE::VARDEF){
+        if(current_var_->is_value()){
+            current_var_->get<Value_t>()*=ctx->ADD()?1:-1;
+            assert(current_var_->is_value());
+        }
+    }
     return;
 }
 
 void BaseListener::enterNumber(ParseRulesParser::NumberContext *ctx) {
     assert(!mode_.empty());
-    if(current_var_->is_undef()){
-        std::cout<<ctx->getText()<<std::endl;
-        current_var_->get()=Value_t(ctx->getText());
-        return;
+    if(mode_.top()==MODE::VARDEF){
+        if(current_var_->is_undef()){
+            current_var_->get()=Value_t(ctx->getText());
+            return;
+        }
+        else if(!current_var_->is_arithmetic_tree()){
+            throw std::invalid_argument("Invalid type of variable");
+        }
+        current_var_->get<ArithmeticTree>().insert(std::make_shared<ValueNode>(Value_t(ctx->getText())));
     }
-    else if(!current_var_->is_arithmetic_tree()){
-        throw std::invalid_argument("Invalid type of variable");
-    }
-    current_var_->get<ArithmeticTree>().insert(std::make_shared<ValueNode>(Value_t(ctx->getText())));
     return;
 }
 

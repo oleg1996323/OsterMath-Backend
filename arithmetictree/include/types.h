@@ -75,7 +75,7 @@ std::ostream& operator<<(std::ostream& stream, const Array_t& arr);
 
 std::ostream& operator<<(std::ostream& stream, std::monostate empty);
 
-std::ostream& operator<<(std::ostream& stream, Variable var);
+std::ostream& operator<<(std::ostream& stream, const Variable& var);
 
 struct VariableVisitor{
     void operator()(std::monostate) const{

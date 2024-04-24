@@ -129,7 +129,10 @@ Value_t VariableNode::execute(){
         else if(var_->is_arithmetic_tree()){
             return var_->get<ArithmeticTree>().execute();
         }
-        else throw std::invalid_argument("Invalid type of variable");
+        else if(var_->is_undef())
+            return 0.;
+        else
+        throw std::invalid_argument("Invalid type of variable");
     }
     else throw std::runtime_error("Uninitialized variable");
 }

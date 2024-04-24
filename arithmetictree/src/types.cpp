@@ -22,8 +22,13 @@ std::ostream& operator<<(std::ostream& stream, std::monostate empty){
     return stream;
 }
 
-std::ostream& operator<<(std::ostream& stream, Variable var){
+std::ostream& operator<<(std::ostream& stream, const Variable& var){
     std::visit([&stream](const auto& x) { stream << x; }, var);
+    return stream;
+}
+
+std::ostream& operator<<(std::ostream& stream, const ArithmeticTree& tree){
+    stream<<tree.value();
     return stream;
 }
 
