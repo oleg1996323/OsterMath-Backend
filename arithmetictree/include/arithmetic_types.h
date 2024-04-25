@@ -103,7 +103,7 @@ class BinaryNode:public Node{
     friend ValueNode;
     friend VariableNode;
     public:
-    BinaryNode(BINARY_OP op):operation(op){}
+    BinaryNode(BINARY_OP op):operation_(op){}
 
     Value_t get(){
         return 0.;
@@ -143,11 +143,15 @@ class BinaryNode:public Node{
         return cache_.second;
     }
 
+    BINARY_OP operation() const{
+        return operation_;
+    }
+
     private:
     std::shared_ptr<Node> lhs_;
     std::shared_ptr<Node> rhs_;
     mutable std::pair<Value_t,Value_t> cache_;
-    BINARY_OP operation;
+    BINARY_OP operation_;
 };
 
 class ValueNode:public Node{

@@ -53,17 +53,13 @@ Value_t UnaryNode::execute(){
 }
 
 Node* BinaryNode::first_undefined_child_node(){
-    if(!lhs_ || !rhs_)
-        return this;
-    else{
-        Node* lhs_ptr = lhs_->first_undefined_child_node();
-        if(lhs_ptr)
-            return lhs_ptr;
-        else{
-            Node* rhs_ptr = rhs_->first_undefined_child_node();
-            return rhs_ptr?rhs_ptr:nullptr;
-        }
+    Node* ptr;
+    if(lhs_ && (ptr = lhs_->first_undefined_child_node()))
+        return ptr;
+    else if(rhs_ && (ptr = rhs_->first_undefined_child_node())){
+        return ptr;
     }
+    else return this;
 }
 
 void BinaryNode::refresh(){
@@ -86,7 +82,7 @@ Value_t BinaryNode::execute(){
             lhs_cache() = lhs_->execute();
             rhs_cache() = rhs_->execute();
         }
-        switch (operation)
+        switch (operation_)
         {
             case BINARY_OP::ADD:
                 return lhs_cache()+rhs_cache();

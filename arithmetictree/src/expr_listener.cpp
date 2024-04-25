@@ -117,6 +117,10 @@ void BaseListener::exitFunctionCall(ParseRulesParser::FunctionCallContext *ctx) 
 
 //binary operator {for example: Expr + Expr or Expr / Expr}
 void BaseListener::enterBinaryOp(ParseRulesParser::BinaryOpContext *ctx) {
+    std::cout<<ctx->getText()<<std::endl;
+    for(auto i:ctx->expr()){
+        std::cout<<i->getText()<<std::endl;
+    }
     assert(!mode_.empty() && current_var_);
     if(current_var_->is_value()){
         current_var_->value_to_tree();
@@ -153,61 +157,6 @@ void BaseListener::enterArray(ParseRulesParser::ArrayContext *ctx) {
 
 void BaseListener::exitArray(ParseRulesParser::ArrayContext *ctx) {
     //unnamed variable
-    return;
-}
-
-//natural logarithm function {for example: Ln(Expr)}
-void BaseListener::enterNatlog(ParseRulesParser::NatlogContext *ctx) {
-    return;
-}
-
-void BaseListener::exitNatlog(ParseRulesParser::NatlogContext *ctx) {
-    return;
-}
-
-//decimal logarithm function {for example: Lg(Expr)}
-void BaseListener::enterDeclog(ParseRulesParser::DeclogContext *ctx) {
-    return;
-}
-
-void BaseListener::exitDeclog(ParseRulesParser::DeclogContext *ctx) {
-    return;
-}
-
-//based logarithm function {for example: Log(Expr, Expr)}
-void BaseListener::enterBaselog(ParseRulesParser::BaselogContext *ctx) {
-    return;
-}
-
-void BaseListener::exitBaselog(ParseRulesParser::BaselogContext *ctx) {
-    return;
-}
-
-//exponent function {for example: Exp(Expr)}
-void BaseListener::enterExponent(ParseRulesParser::ExponentContext *ctx) {
-    return;
-}
-
-void BaseListener::exitExponent(ParseRulesParser::ExponentContext *ctx) {
-    return;
-}
-
-//root square function {for example: Sqrt(Expr)}
-void BaseListener::enterSquareroot(ParseRulesParser::SquarerootContext *ctx) {
-    return;
-}
-
-void BaseListener::exitSquareroot(ParseRulesParser::SquarerootContext *ctx) {
-    return;
-}
-
-//sum of production (for arrays) {for example: sumproduct(Expr, Expr, ...)}.
-//Variables are accepted, if are implemented as arrays.
-void BaseListener::enterSumproduct(ParseRulesParser::SumproductContext *ctx) {
-    return;
-}
-
-void BaseListener::exitSumproduct(ParseRulesParser::SumproductContext *ctx) {
     return;
 }
 

@@ -83,37 +83,6 @@ class BaseListener: public ParseRulesBaseListener{
 
     virtual void exitArray(ParseRulesParser::ArrayContext *ctx) override;
 
-    //natural logarithm function {for example: Ln(Expr)}
-    virtual void enterNatlog(ParseRulesParser::NatlogContext *ctx) override;
-
-    virtual void exitNatlog(ParseRulesParser::NatlogContext *ctx) override;
-
-    //decimal logarithm function {for example: Lg(Expr)}
-    virtual void enterDeclog(ParseRulesParser::DeclogContext *ctx) override;
-
-    virtual void exitDeclog(ParseRulesParser::DeclogContext *ctx) override;
-
-    //based logarithm function {for example: Log(Expr, Expr)}
-    virtual void enterBaselog(ParseRulesParser::BaselogContext *ctx) override;
-
-    virtual void exitBaselog(ParseRulesParser::BaselogContext *ctx) override;
-
-    //exponent function {for example: Exp(Expr)}
-    virtual void enterExponent(ParseRulesParser::ExponentContext *ctx) override;
-
-    virtual void exitExponent(ParseRulesParser::ExponentContext *ctx) override;
-
-    //root square function {for example: Sqrt(Expr)}
-    virtual void enterSquareroot(ParseRulesParser::SquarerootContext *ctx) override;
-
-    virtual void exitSquareroot(ParseRulesParser::SquarerootContext *ctx) override;
-
-    //sum of production (for arrays) {for example: sumproduct(Expr, Expr, ...)}.
-    //Variables are accepted, if are implemented as arrays.
-    virtual void enterSumproduct(ParseRulesParser::SumproductContext *ctx) override;
-
-    virtual void exitSumproduct(ParseRulesParser::SumproductContext *ctx) override;
-
     virtual void enterTable_definition(ParseRulesParser::Table_definitionContext* ctx) override;
 
     virtual void exitTable_definition(ParseRulesParser::Table_definitionContext* ctx) override;

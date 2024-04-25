@@ -38,9 +38,9 @@ expr
     '(' expr ')'                            # Parens
     | VARIABLE                              # Variable
     | (ADD | SUB) expr                      # UnaryOp
+    | expr POW expr                         # BinaryOp  
     | expr (MUL | DIV) expr                 # BinaryOp
-    | expr (ADD | SUB) expr                 # BinaryOp
-    | expr POW expr                         # BinaryOp             
+    | expr (ADD | SUB) expr                 # BinaryOp           
     | functions                             # FunctionCall
     | NUMBER                                # Number
     | CONSTANTS                             # Constant
@@ -52,12 +52,12 @@ array
     ;
 
 functions
-    : LN '(' WS? expr WS? ')'                       #Natlog
-    | LG '(' WS? expr WS? ')'                       #Declog
-    | LOG_X '(' WS? expr WS? ',' WS? expr WS? ')'   #Baselog
-    | EXP '(' WS? expr WS? ')'                      #Exponent
-    | SQRT '(' WS? expr WS? ')'                     #Squareroot
-    | SUMPRODUCT '(' expr ',' expr (',' expr )*')'  #Sumproduct
+    : LN '(' WS? expr WS? ')'
+    | LG '(' WS? expr WS? ')'
+    | LOG_X '(' WS? expr WS? ',' WS? expr WS? ')'
+    | EXP '(' WS? expr WS? ')'
+    | SQRT '(' WS? expr WS? ')'
+    | SUMPRODUCT '(' expr ',' expr (',' expr )*')'
     ;
 
 QUOTE: '\'';
