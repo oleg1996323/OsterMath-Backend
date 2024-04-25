@@ -31,6 +31,10 @@ class ArithmeticTree{
 
     const std::shared_ptr<Node>& root() const;
 
+    Node* last() const{
+        return last_incomplete_;
+    }
+
     private:
     std::shared_ptr<Node> root_;
     mutable Node* last_incomplete_;

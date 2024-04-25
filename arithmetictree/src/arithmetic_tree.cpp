@@ -51,6 +51,13 @@ void ArithmeticTree::insert(const std::shared_ptr<Node>& node){
         return;
     }
     if(!is_ready()){
+        // if(node->type()==ARITHM_NODE_TYPE::BINARY){
+        //     root_->parent() = node.get();
+        //     const std::shared_ptr<BinaryNode>& ptr = reinterpret_cast<const std::shared_ptr<BinaryNode>&>(node);
+        //     ptr->lhs() = root_;
+        //     root_=ptr;
+        //     return;
+        // }
         if(last_incomplete_->type()==ARITHM_NODE_TYPE::UNARY)
             reinterpret_cast<UnaryNode*>(last_incomplete_)->child() = node;
         else if(last_incomplete_->type()==ARITHM_NODE_TYPE::BINARY){
@@ -60,19 +67,18 @@ void ArithmeticTree::insert(const std::shared_ptr<Node>& node){
             }
             else ptr->rhs() = node;
         }
-        node->parent()=last_incomplete_;
     }
     else{
         if(node->type()==ARITHM_NODE_TYPE::UNARY){
             root_->parent() = node.get();
-            reinterpret_cast<UnaryNode*>(node.get())->child() = std::shared_ptr<Node>(root_);
-            root_ = std::shared_ptr<Node>(node);
+            reinterpret_cast<UnaryNode*>(node.get())->child()=root_;
+            root_=node;
         }
         else if(node->type()==ARITHM_NODE_TYPE::BINARY){
             root_->parent() = node.get();
             BinaryNode* ptr = reinterpret_cast<BinaryNode*>(node.get());
             ptr->lhs() = root_;
-            root_ = std::shared_ptr<Node>(ptr);
+            root_.reset(ptr);
         }
         else throw std::invalid_argument("Error function definition");
     }
