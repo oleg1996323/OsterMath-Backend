@@ -45,6 +45,10 @@ Value_t ArithmeticTree::execute() const{
     else return 0.;
 }
 
+void ArithmeticTree::print() const{
+    root_->print();
+}
+
 void ArithmeticTree::insert(const std::shared_ptr<Node>& node){
     if(!root_){
         root_=node;
@@ -56,11 +60,11 @@ void ArithmeticTree::insert(const std::shared_ptr<Node>& node){
             reinterpret_cast<UnaryNode*>(last_incomplete_)->child() = node;
         else if(last_incomplete_->type()==ARITHM_NODE_TYPE::BINARY){
             BinaryNode* ptr = reinterpret_cast<BinaryNode*>(last_incomplete_);
-            if(!ptr->lhs()){
+            if(!ptr->lhs())
                 ptr->lhs() = node;
-            }
             else ptr->rhs() = node;
         }
+        node->parent()=last_incomplete_;
     }
     else{
         if(node->type()==ARITHM_NODE_TYPE::UNARY){

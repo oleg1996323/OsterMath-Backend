@@ -1,6 +1,8 @@
 #include "arithmetic_types.h"
 #include "types.h"
 
+#define ENUM_NAME(p) #p;
+
 void Node::refresh(){
     execute();
     if(parent()){
@@ -18,6 +20,13 @@ Node* UnaryNode::first_undefined_child_node(){
 
 Node*& Node::parent(){
     return parent_;
+}
+
+void UnaryNode::print() const{
+    std::cout<<std::endl;
+    std::cout<<'{'<<ENUM_NAME(ARITHM_NODE_TYPE::UNARY);
+    std::cout<<'}'<<std::endl;
+    child_->print();
 }
 
 Value_t UnaryNode::execute(){
@@ -59,7 +68,25 @@ Node* BinaryNode::first_undefined_child_node(){
     else if(rhs_ && (ptr = rhs_->first_undefined_child_node())){
         return ptr;
     }
-    else return this;
+    return this;
+}
+
+void BinaryNode::print() const{
+    std::cout<<std::endl;
+    std::cout<<'{'<<ENUM_NAME(ARITHM_NODE_TYPE::BINARY);
+    std::cout<<"; ";
+    if(operation_==BINARY_OP::ADD){
+        std::cout<<ENUM_NAME(BINARY_OP::ADD);}
+    else if(operation_==BINARY_OP::SUB){
+        std::cout<<ENUM_NAME(BINARY_OP::SUB);}
+    else if(operation_==BINARY_OP::MUL){
+        std::cout<<ENUM_NAME(BINARY_OP::MUL);}
+    else if(operation_==BINARY_OP::DIV){
+        std::cout<<ENUM_NAME(BINARY_OP::DIV);}
+    else std::cout<<ENUM_NAME(BINARY_OP::POW);
+    std::cout<<'}'<<std::endl;
+    lhs_->print();
+    rhs_->print();
 }
 
 void BinaryNode::refresh(){
@@ -108,6 +135,11 @@ Value_t BinaryNode::execute(){
     return 0.;
 }
 
+void ValueNode::print() const{
+    std::cout<<'{'<<ENUM_NAME(ARITHM_NODE_TYPE::VALUE);
+    std::cout<<"; "<<val_<<'}';
+}
+
 VariableNode::VariableNode(VariableBase* variable):
     var_(variable){}
 
@@ -115,6 +147,11 @@ const VariableBase* VariableNode::variable() const{
     if(var_)
         return var_;
     else throw "Variable don't exists"s;
+}
+
+void VariableNode::print() const{
+    std::cout<<'{'<<ENUM_NAME(ARITHM_NODE_TYPE::VARIABLE);
+    std::cout<<var_->name()<<'}'<<std::endl;
 }
 
 Value_t VariableNode::execute(){
@@ -138,4 +175,10 @@ Node* MultiArgumentNode::child(size_t id) const{
         return childs_.at(id);
     else
         throw std::invalid_argument("Incorrect child's id");
+}
+
+void MultiArgumentNode::print() const{
+    std::cout<<'{'<<ENUM_NAME(ARITHM_NODE_TYPE::MULTIARG);
+    std::cout<<ENUM_NAME(operation());
+    std::cout<<'}'<<std::endl;
 }

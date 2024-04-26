@@ -53,6 +53,10 @@ class Node{
 
     virtual void refresh();
 
+    virtual void print() const{
+        std::cout<<"Undef node"<<std::endl;
+    }
+
     virtual ~Node(){}
 
     Node*& parent();
@@ -91,6 +95,8 @@ class UnaryNode:public Node{
     }
 
     virtual Value_t execute() override;
+
+    virtual void print() const override;
 
     private:
     std::shared_ptr<Node> child_;
@@ -147,6 +153,8 @@ class BinaryNode:public Node{
         return operation_;
     }
 
+    virtual void print() const override;
+
     private:
     std::shared_ptr<Node> lhs_;
     std::shared_ptr<Node> rhs_;
@@ -170,6 +178,8 @@ class ValueNode:public Node{
         return val_;
     }
 
+    virtual void print() const;
+
     private:
     Value_t val_;
 };
@@ -189,6 +199,8 @@ class VariableNode:public Node{
     const VariableBase* variable() const;
 
     virtual Value_t execute() override;
+
+    virtual void print() const;
 
     private:
     VariableBase* var_;
@@ -213,6 +225,8 @@ class MultiArgumentNode:public Node{
     }
 
     virtual Value_t execute() override;
+
+    virtual void print() const;
 
     private:
     std::vector<Node*> childs_;

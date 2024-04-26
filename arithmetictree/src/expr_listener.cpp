@@ -79,7 +79,8 @@ void BaseListener::enterNumber(ParseRulesParser::NumberContext *ctx) {
         else if(!current_var_->is_arithmetic_tree()){
             throw std::invalid_argument("Invalid type of variable");
         }
-        current_var_->get<ArithmeticTree>().insert(std::make_shared<ValueNode>(Value_t(ctx->getText())));
+        std::cout<<ctx->getText()<<std::endl;
+        current_var_->get<ArithmeticTree>().insert(std::make_shared<ValueNode>(std::move(Value_t(ctx->getText()))));
     }
     return;
 }
