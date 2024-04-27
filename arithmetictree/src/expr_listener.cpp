@@ -79,8 +79,8 @@ void BaseListener::enterNumber(ParseRulesParser::NumberContext *ctx) {
         else if(!current_var_->is_arithmetic_tree()){
             throw std::invalid_argument("Invalid type of variable");
         }
-        std::cout<<ctx->getText()<<std::endl;
-        current_var_->get<ArithmeticTree>().insert(std::make_shared<ValueNode>(std::move(Value_t(ctx->getText()))));
+        //std::cout<<ctx->getText()<<std::endl;
+        current_var_->get<ArithmeticTree>().insert(std::make_shared<ValueNode>(ctx->getText()));
     }
     return;
 }
@@ -109,6 +109,25 @@ void BaseListener::exitConstant(ParseRulesParser::ConstantContext *ctx) {
 //a function parser for definition any callback function for further calculations
 //{for example: Lg(sumproduct(__Ivs__, __n__))}
 void BaseListener::enterFunctionCall(ParseRulesParser::FunctionCallContext *ctx) {
+    assert(!mode_.empty() && current_var_);
+        if(current_var_->is_value()){
+        current_var_->value_to_tree();
+        assert(current_var_->is_arithmetic_tree());
+    }
+    else if(current_var_->is_undef()){
+        current_var_->get()=ArithmeticTree();
+    }
+    else if(!current_var_->is_arithmetic_tree()){
+        throw std::invalid_argument("Invalid type of variable");
+    }
+    if(ctx->functions()->EXP())
+        current_var_->get<ArithmeticTree>().insert(std::make_shared<UnaryNode>(UNARY_OP::EXP));
+    else if(ctx->functions()->LG())
+        current_var_->get<ArithmeticTree>().insert(std::make_shared<UnaryNode>(UNARY_OP::LG10));
+    else if(ctx->functions()->LN())
+        current_var_->get<ArithmeticTree>().insert(std::make_shared<UnaryNode>(UNARY_OP::LN));
+    else if(ctx->functions()->LN())
+        current_var_->get<ArithmeticTree>().insert(std::make_shared<UnaryNode>(UNARY_OP::LN));
     return;
 }
 
@@ -118,10 +137,6 @@ void BaseListener::exitFunctionCall(ParseRulesParser::FunctionCallContext *ctx) 
 
 //binary operator {for example: Expr + Expr or Expr / Expr}
 void BaseListener::enterBinaryOp(ParseRulesParser::BinaryOpContext *ctx) {
-    std::cout<<ctx->getText()<<std::endl;
-    for(auto i:ctx->expr()){
-        std::cout<<i->getText()<<std::endl;
-    }
     assert(!mode_.empty() && current_var_);
     if(current_var_->is_value()){
         current_var_->value_to_tree();

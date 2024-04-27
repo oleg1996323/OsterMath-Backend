@@ -51,18 +51,30 @@ void ArithmeticTree::print() const{
 
 void ArithmeticTree::insert(const std::shared_ptr<Node>& node){
     if(!root_){
+        std::cout<<"Add to root: ";
+        node->print();
         root_=node;
         last_incomplete_=root_.get();
         return;
     }
     if(!is_ready()){
-        if(last_incomplete_->type()==ARITHM_NODE_TYPE::UNARY)
+        if(last_incomplete_->type()==ARITHM_NODE_TYPE::UNARY){
+            std::cout<<"Add to unary: ";
+            node->print();
             reinterpret_cast<UnaryNode*>(last_incomplete_)->child() = node;
+        }
         else if(last_incomplete_->type()==ARITHM_NODE_TYPE::BINARY){
             BinaryNode* ptr = reinterpret_cast<BinaryNode*>(last_incomplete_);
-            if(!ptr->lhs())
+            if(!ptr->lhs()){
+                std::cout<<"Add to binary left: ";
+                node->print();
                 ptr->lhs() = node;
-            else ptr->rhs() = node;
+            }
+            else {
+                std::cout<<"Add to binary right: ";
+                node->print();
+                ptr->rhs() = node;
+            }
         }
         node->parent()=last_incomplete_;
     }

@@ -52,11 +52,11 @@ array
     ;
 
 functions
-    : LN '(' WS? expr WS? ')'
-    | LG '(' WS? expr WS? ')'
-    | LOG_X '(' WS? expr WS? ',' WS? expr WS? ')'
-    | EXP '(' WS? expr WS? ')'
-    | SQRT '(' WS? expr WS? ')'
+    : LN '(' WS* expr WS* ')'
+    | LG '(' WS* expr WS* ')'
+    | LOG_X '(' WS* expr WS* ',' WS* expr WS* ')'
+    | EXP '(' WS* expr WS* ')'
+    | SQRT '(' WS* expr WS* ')'
     | SUMPRODUCT '(' expr ',' expr (',' expr )*')'
     ;
 
@@ -81,10 +81,10 @@ CONSTANTS:
     ;
 
 SUMPRODUCT: 'sumproduct';
-LN: 'Ln';       
-LG: 'Lg';       
-LOG_X: 'Log';   
-EXP: 'Exp';     
-SQRT: 'Sqrt';
+LN: [lL][nN];       
+LG: [lL][gG];       
+LOG_X: [lL][oO][gG]'_'[xX];   
+EXP: [eE][xX][pP];     
+SQRT: [sS][qQ][rR][tT];
 
-PI: 'Pi' | 'PI' | 'pi' WS;
+PI: [pP][iI] WS;

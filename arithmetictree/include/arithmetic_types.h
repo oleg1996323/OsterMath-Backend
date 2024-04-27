@@ -166,6 +166,8 @@ class ValueNode:public Node{
     public:   
     ValueNode(Value_t&& value):val_(std::move(value)){}
 
+    ValueNode(std::string&& value):val_(value){}
+
     virtual ARITHM_NODE_TYPE type() const override{
         return ARITHM_NODE_TYPE::VALUE;
     }

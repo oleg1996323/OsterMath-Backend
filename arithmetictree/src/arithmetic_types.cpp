@@ -23,10 +23,8 @@ Node*& Node::parent(){
 }
 
 void UnaryNode::print() const{
-    std::cout<<std::endl;
     std::cout<<'{'<<ENUM_NAME(ARITHM_NODE_TYPE::UNARY);
     std::cout<<'}'<<std::endl;
-    child_->print();
 }
 
 Value_t UnaryNode::execute(){
@@ -63,16 +61,18 @@ Value_t UnaryNode::execute(){
 
 Node* BinaryNode::first_undefined_child_node(){
     Node* ptr;
-    if(lhs_ && (ptr = lhs_->first_undefined_child_node()))
+    if(!lhs_)
+        return this;
+    else if((ptr = lhs_->first_undefined_child_node()))
         return ptr;
-    else if(rhs_ && (ptr = rhs_->first_undefined_child_node())){
+    else if(!rhs_)
+        return this;
+    else if((ptr = rhs_->first_undefined_child_node()))
         return ptr;
-    }
-    return this;
+    return nullptr;
 }
 
 void BinaryNode::print() const{
-    std::cout<<std::endl;
     std::cout<<'{'<<ENUM_NAME(ARITHM_NODE_TYPE::BINARY);
     std::cout<<"; ";
     if(operation_==BINARY_OP::ADD){
@@ -85,8 +85,6 @@ void BinaryNode::print() const{
         std::cout<<ENUM_NAME(BINARY_OP::DIV);}
     else std::cout<<ENUM_NAME(BINARY_OP::POW);
     std::cout<<'}'<<std::endl;
-    lhs_->print();
-    rhs_->print();
 }
 
 void BinaryNode::refresh(){
@@ -137,7 +135,7 @@ Value_t BinaryNode::execute(){
 
 void ValueNode::print() const{
     std::cout<<'{'<<ENUM_NAME(ARITHM_NODE_TYPE::VALUE);
-    std::cout<<"; "<<val_<<'}';
+    std::cout<<"; "<<val_<<'}'<<std::endl;
 }
 
 VariableNode::VariableNode(VariableBase* variable):
@@ -181,4 +179,8 @@ void MultiArgumentNode::print() const{
     std::cout<<'{'<<ENUM_NAME(ARITHM_NODE_TYPE::MULTIARG);
     std::cout<<ENUM_NAME(operation());
     std::cout<<'}'<<std::endl;
+}
+
+Value_t MultiArgumentNode::execute(){
+    
 }
