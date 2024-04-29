@@ -31,6 +31,7 @@ enum class UNARY_OP{
 
 enum class MULTI_ARG_OP{
     SUMPRODUCT,
+    CONCAT,
     LOG_BASE
 };
 
@@ -59,17 +60,17 @@ class Node{
 
     virtual ~Node(){}
 
-    Node*& parent();
+    virtual void add_parent(Node*);
+
+    virtual bool has_parent() const;
 
     bool caller() const{
         return caller_;
     }
 
     protected:
-    bool caller_ = false;
-
-    private:
     Node* parent_;
+    bool caller_ = false;
 };
 
 class UnaryNode:public Node{
@@ -121,8 +122,6 @@ class BinaryNode:public Node{
 
     virtual Node* first_undefined_child_node() override;
 
-    virtual void refresh() override;
-
     virtual Value_t execute() override;
 
     std::shared_ptr<Node>& lhs(){
@@ -166,6 +165,8 @@ class ValueNode:public Node{
     public:   
     ValueNode(Value_t&& value):val_(std::move(value)){}
 
+    ValueNode(const Value_t& value):val_(value){}
+
     ValueNode(std::string&& value):val_(value){}
 
     virtual ARITHM_NODE_TYPE type() const override{
@@ -198,25 +199,34 @@ class VariableNode:public Node{
         return nullptr;
     }
 
+    virtual void refresh() override;
+
     const VariableBase* variable() const;
 
     virtual Value_t execute() override;
 
     virtual void print() const;
 
+    virtual void add_parent(Node* parent) override; 
+
     private:
+    mutable std::unordered_set<Node*> parents_;
     VariableBase* var_;
+
+    void refresh_parent_links() const;
 };
 
 class MultiArgumentNode:public Node{
     public:
-    MultiArgumentNode(){}
+    MultiArgumentNode(MULTI_ARG_OP op):operation_(op){}
 
     const std::vector<Node*>& childs() const{
         return childs_;
     }
 
     Node* child(size_t id) const;
+
+    void add_child(Node*);
 
     virtual ARITHM_NODE_TYPE type() const override{
         return ARITHM_NODE_TYPE::MULTIARG;
@@ -232,5 +242,6 @@ class MultiArgumentNode:public Node{
 
     private:
     std::vector<Node*> childs_;
-    MULTI_ARG_OP operation;
+    MULTI_ARG_OP operation_;
+    std::optional<Value_t> cache_;
 };

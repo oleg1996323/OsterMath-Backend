@@ -23,6 +23,7 @@ public:
 };
 
 class VariableBase;
+class MultiArgumentNode;
 
 class BaseListener: public ParseRulesBaseListener{
     enum class MODE{
@@ -33,7 +34,8 @@ class BaseListener: public ParseRulesBaseListener{
     };
 
     BaseData* data_base_;
-    mutable VariableBase* current_var_;
+    VariableBase* current_var_;
+    std::shared_ptr<MultiArgumentNode> tmp_node_;
     std::vector<VariableBase*> hdr_vars_; 
     std::stack<MODE> mode_;
     size_t line_counter_ = 0;
@@ -54,9 +56,9 @@ class BaseListener: public ParseRulesBaseListener{
 
     virtual void exitUnaryOp(ParseRulesParser::UnaryOpContext* ctx) override;
 
-    virtual void enterNumber(ParseRulesParser::NumberContext *ctx) override;
+    virtual void enterLiteral(ParseRulesParser::LiteralContext *ctx) override;
 
-    virtual void exitNumber(ParseRulesParser::NumberContext *ctx) override;
+    virtual void exitLiteral(ParseRulesParser::LiteralContext *ctx) override;
     
     virtual void enterParens(ParseRulesParser::ParensContext *ctx) override;
 
@@ -82,6 +84,10 @@ class BaseListener: public ParseRulesBaseListener{
     virtual void enterArray(ParseRulesParser::ArrayContext *ctx) override;
 
     virtual void exitArray(ParseRulesParser::ArrayContext *ctx) override;
+
+    virtual void enterItemArray(ParseRulesParser::ItemArrayContext *ctx) override;
+
+    virtual void exitItemArray(ParseRulesParser::ItemArrayContext *ctx) override;
 
     virtual void enterTable_definition(ParseRulesParser::Table_definitionContext* ctx) override;
 

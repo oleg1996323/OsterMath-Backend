@@ -5,21 +5,25 @@
 
 void Node::refresh(){
     execute();
-    if(parent()){
+    if(has_parent()){
         caller_ = true;
-        parent()->refresh();
+        parent_->refresh();
         caller_ = false;
     }
+}
+
+void Node::add_parent(Node* parent){
+    parent_=parent;
+}
+
+bool Node::has_parent() const{
+    return parent_!=nullptr;
 }
 
 Node* UnaryNode::first_undefined_child_node(){
     if(!child_)
         return this;
     else return child_->first_undefined_child_node();
-}
-
-Node*& Node::parent(){
-    return parent_;
 }
 
 void UnaryNode::print() const{
@@ -87,15 +91,6 @@ void BinaryNode::print() const{
     std::cout<<'}'<<std::endl;
 }
 
-void BinaryNode::refresh(){
-    execute();
-    if(parent()){
-        caller_ = true;
-        parent()->refresh();
-        caller_ = false;
-    }
-}
-
 Value_t BinaryNode::execute(){
     using namespace boost::multiprecision;
     if(lhs_ && rhs_){
@@ -147,6 +142,17 @@ const VariableBase* VariableNode::variable() const{
     else throw "Variable don't exists"s;
 }
 
+void VariableNode::refresh(){
+    execute();
+    if(has_parent()){
+        caller_ = true;
+        refresh_parent_links();
+        for(auto parent:parents_)
+            parent->refresh();
+        caller_ = false;
+    }
+}
+
 void VariableNode::print() const{
     std::cout<<'{'<<ENUM_NAME(ARITHM_NODE_TYPE::VARIABLE);
     std::cout<<var_->name()<<'}'<<std::endl;
@@ -168,6 +174,18 @@ Value_t VariableNode::execute(){
     else throw std::runtime_error("Uninitialized variable");
 }
 
+void VariableNode::add_parent(Node* parent){
+    if(parents_.contains(parent))
+        parents_.erase(parent);
+    parents_.insert(parent);
+}
+
+void VariableNode::refresh_parent_links() const{
+    for(auto iterator_node = parents_.begin();iterator_node!=parents_.end();++iterator_node)
+        if(!(*iterator_node))
+            parents_.erase(iterator_node);
+    }
+
 Node* MultiArgumentNode::child(size_t id) const{
     if(id<childs_.size())
         return childs_.at(id);
@@ -182,5 +200,30 @@ void MultiArgumentNode::print() const{
 }
 
 Value_t MultiArgumentNode::execute(){
-    
+    if(!cache_.has_value()){
+        if(operation_==MULTI_ARG_OP::LOG_BASE){
+            if(childs_.size()!=2)
+                throw std::invalid_argument("Invalid function parameters");
+            cache_.emplace(log(childs_.at(0)->execute())/log(childs_.at(1)->execute()));
+        }
+        else if(operation_==MULTI_ARG_OP::SUMPRODUCT){
+            if(childs_.empty())
+                throw std::invalid_argument("Invalid function parameters");
+            std::vector<std::reference_wrapper<const Array_t>> params;
+            for(Node* child:childs_){
+                if(child->type()==ARITHM_NODE_TYPE::VARIABLE){
+                    auto ptr = reinterpret_cast<VariableNode*>(child)->variable();
+                    if(ptr->is_array())
+                        params.push_back(ptr->get<Array_t>());
+                    else throw std::invalid_argument("Invalid function parameter");
+                }
+            }
+            cache_.emplace(SumProduct(std::move(params)));
+        }
+    }
+    return cache_.value();
+}
+
+void MultiArgumentNode::add_child(Node* node){
+    childs_.push_back(node);
 }

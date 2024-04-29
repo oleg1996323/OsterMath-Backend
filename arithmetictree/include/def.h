@@ -39,5 +39,44 @@ template<typename T, typename... Ts>
 
 #include <boost/multiprecision/cpp_dec_float.hpp>
 
+class Array_val;
+class VariableBase;
+class ArithmeticTree;
+class Array_t;
+
+#include <variant>
+
 using Value_t = boost::multiprecision::cpp_dec_float_50;
-using Array_t = std::vector<Value_t>;
+using Arr_value = std::variant<std::monostate,Value_t,std::string, VariableBase*>;
+using __types__ = std::variant<std::monostate,Value_t,std::string, Array_t, ArithmeticTree>;
+
+// class __types_proxy__:private __types__{
+//     public:
+//     bool is_arithmetic_tree() const;
+//     bool is_value() const;
+//     bool is_string() const;
+//     bool is_array() const;
+//     bool is_undef() const;
+
+//     __types__& get();
+
+//     const __types__& get() const;
+
+//     template<typename T>
+//     const T& get() const;
+
+//     template<typename T>
+//     T& get();
+// };
+
+// template<typename T>
+// T& __types_proxy__::get(){
+//     return std::get<T>(get());
+// }
+
+// template<typename T>
+// const T& __types_proxy__::get() const{
+//     return std::get<T>(get());
+// }
+
+// std::ostream& operator<<(std::ostream& stream, const __types_proxy__& var);

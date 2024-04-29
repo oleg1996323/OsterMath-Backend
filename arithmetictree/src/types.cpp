@@ -3,16 +3,65 @@
 #include "arithmetic_tree.h"
 #include "data.h"
 
+bool Array_val::is_undef() const{
+    return std::holds_alternative<std::monostate>(*this) || (is_variable() && get<VariableBase*>());
+}
+
+bool Array_val::is_variable() const{
+    return std::holds_alternative<VariableBase*>(*this);
+}
+
+bool Array_val::is_value() const{
+    return std::holds_alternative<Value_t>(*this);
+}
+
+bool Array_val::is_numeric() const{
+    if(is_variable()){
+        auto ptr = get<VariableBase*>();
+        if(ptr && (ptr->is_arithmetic_tree() || ptr->is_value())){
+            return true;
+        }
+    }
+    return is_value();
+}
+
+bool Array_val::is_string() const{
+    if(is_variable()){
+        auto ptr = get<VariableBase*>();
+        if(ptr && ptr->is_string()){
+            return true;
+        }
+    }
+    return !is_numeric();
+}
+
 size_t VariableBase::HashVar::operator()(const VariableBase& var){
     return std::hash<std::string_view>()(var.name_);
+}
+
+std::ostream& VariableBase::operator<<(std::ostream& stream){
+    stream<<*this;
+    return stream;
+}
+
+std::ostream& operator<<(std::ostream& stream, const Arr_value& val){
+    std::visit([&stream](const auto& x) { stream << x; }, val);
+    return stream;
 }
 
 std::ostream& operator<<(std::ostream& stream, const Array_t& arr){
     stream<<'[';
     if(!arr.empty()){
-        stream<<arr.front();
-        for(size_t i=1;i<arr.size();++i)
-            stream<<' '<<arr.at(i);
+        if(arr.front().is_variable() && arr.front().get<VariableBase*>()!=nullptr)
+            stream<<arr.front().get<VariableBase*>()->get();
+        else
+            stream<<arr.front().get();
+        for(size_t i=1;i<arr.size();++i){
+            if(arr.at(i).is_variable() && arr.at(i).get<VariableBase*>()!=nullptr)
+                stream<<' '<<arr.at(i).get<VariableBase*>()->get();
+            else
+            stream<<' '<<arr.at(i).get();
+        }
     }
     stream<<']';
     return stream;
@@ -22,7 +71,7 @@ std::ostream& operator<<(std::ostream& stream, std::monostate empty){
     return stream;
 }
 
-std::ostream& operator<<(std::ostream& stream, const Variable& var){
+std::ostream& operator<<(std::ostream& stream, const Variable_t& var){
     std::visit([&stream](const auto& x) { stream << x; }, var);
     return stream;
 }
@@ -57,11 +106,11 @@ BaseData* VariableBase::get_data_base() const{
     return data_base_;
 }
 
-Variable& VariableBase::get(){
+Variable_t& VariableBase::get(){
     return *this;
 }
 
-const Variable& VariableBase::get() const{
+const Variable_t& VariableBase::get() const{
     return *this;
 }
 
@@ -99,7 +148,7 @@ void VariableBase::value_to_tree(){
 
 void VariableBase::tree_to_value(){
     if(is_arithmetic_tree())
-        get() = get<ArithmeticTree>().execute();
+        get() = get<ArithmeticTree>().value();
 }
 
 VariableBase::~VariableBase(){

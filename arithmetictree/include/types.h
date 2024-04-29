@@ -11,13 +11,88 @@
 #include "arithmetic_tree.h"
 
 class VariableNode;
+class VariableBase;
+class Array_val;
 
-using Variable = std::variant<std::monostate,Value_t,std::string, Array_t, ArithmeticTree>;
+struct Variable_ref{
+    std::string_view var_name_;
+    std::string_view db_name_;
+};
+
+class Array_val:private Arr_value{
+    using variant::variant;
+    public:
+    bool is_undef() const;
+
+    bool is_variable() const;
+
+    bool is_value() const;
+
+    bool is_numeric() const;
+
+    bool is_string() const;
+
+    template<typename T>
+    const T& get() const{
+        return std::get<T>(*this);
+    }
+
+    template<typename T>
+    T& get(){
+        return std::get<T>(*this);
+    }
+
+    Arr_value& get(){
+        return *this;
+    }
+
+    const Arr_value& get() const{
+        return *this;
+    }
+};
+
+class Array_t : public std::vector<Array_val>{
+    public:
+
+    enum class TYPE{
+        UNKNOWN,
+        STRING,
+        NUMERIC
+    };
+
+    void push_back(const Array_val& val){
+        if(type_==TYPE::UNKNOWN){
+            std::vector<Array_val>::push_back(val);
+            if(val.is_string())
+                type_=TYPE::STRING;
+            else if(val.is_numeric())
+                type_=TYPE::NUMERIC;
+            else throw std::runtime_error("Undefined type");
+        }
+        else{
+            if(type_==TYPE::NUMERIC && val.is_numeric()){
+                std::vector<Array_val>::push_back(val);
+            }
+            else if(type_==TYPE::STRING && val.is_string()){
+                std::vector<Array_val>::push_back(val);
+            }
+            else throw std::runtime_error("Undefined type");
+        }
+    }
+
+    TYPE type() const{
+        return type_;
+    }
+    private:
+    TYPE type_ = TYPE::UNKNOWN; 
+};
+
+using Variable_t = std::variant<std::monostate,Value_t,std::string, Array_t, ArithmeticTree>;
 
 using namespace std::string_literals;
 using namespace std::string_view_literals;
 
-class VariableBase: private Variable {
+class VariableBase: private Variable_t{
     using variant::variant;
 
     public:
@@ -38,8 +113,8 @@ class VariableBase: private Variable {
     std::string_view name() const;
     void refresh() const;
 
-    const Variable& get() const;
-    Variable& get();
+    const Variable_t& get() const;
+    Variable_t& get();
 
     void value_to_tree();
 
@@ -59,6 +134,8 @@ class VariableBase: private Variable {
     bool is_array() const;
     bool is_undef() const;
 
+    std::ostream& operator<<(std::ostream& stream);
+
     protected:
     void set_data_base(BaseData* data_pool);
     BaseData* get_data_base() const;
@@ -75,29 +152,31 @@ std::ostream& operator<<(std::ostream& stream, const Array_t& arr);
 
 std::ostream& operator<<(std::ostream& stream, std::monostate empty);
 
-std::ostream& operator<<(std::ostream& stream, const Variable& var);
+std::ostream& operator<<(std::ostream& stream, const Variable_t& var);
 
-struct VariableVisitor{
-    void operator()(std::monostate) const{
-        throw std::runtime_error("Undefined variable");
-    }
+std::ostream& operator<<(std::ostream& stream, const Array_val& val);
 
-    const Value_t& operator()(const Value_t& value) const{
-        return value;
-    }
+// struct VariableVisitor{
+//     void operator()(std::monostate) const{
+//         throw std::runtime_error("Undefined variable");
+//     }
 
-    const Array_t& operator()(const Array_t& array) const{
-        return array;
-    }
+//     const Value_t& operator()(const Value_t& value) const{
+//         return value;
+//     }
 
-    const std::string& operator()(const std::string& string) const{
-        return string;
-    }
+//     const Array_t& operator()(const Array_t& array) const{
+//         return array;
+//     }
 
-    const ArithmeticTree& operator()(const ArithmeticTree& tree) const{
-        return tree;
-    }
-};
+//     const std::string& operator()(const std::string& string) const{
+//         return string;
+//     }
+
+//     const ArithmeticTree& operator()(const ArithmeticTree& tree) const{
+//         return tree;
+//     }
+// };
 
 template<typename T>
 T& VariableBase::get(){
@@ -106,7 +185,7 @@ T& VariableBase::get(){
 
 template<typename T>
 const T& VariableBase::get() const{
-    return std::get<const T>(get());
+    return std::get<T>(get());
 }
 
 template<typename T>
