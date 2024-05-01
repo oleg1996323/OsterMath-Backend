@@ -21,9 +21,9 @@ class ArithmeticTree{
 
     ArithmeticTree& operator=(ArithmeticTree&& other) noexcept;
 
-    Value_t execute() const;
+    virtual Value_t execute() const;
 
-    const Value_t& value() const;
+    virtual const Value_t& value() const;
 
     void insert(const std::shared_ptr<Node>& node);
 
@@ -37,8 +37,20 @@ class ArithmeticTree{
 
     void print() const;
 
-    private:
+    protected:
     std::shared_ptr<Node> root_;
     mutable Node* last_incomplete_;
     mutable std::optional<Value_t> cache_;
 };
+
+namespace ranges{
+
+class ArithmeticTree:public ::ArithmeticTree{
+    public:
+    using type = Value_t;
+
+    Value_t execute(size_t index) const;
+
+    const Value_t& value(size_t index) const;
+};
+}

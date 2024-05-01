@@ -22,7 +22,7 @@ bool Array_val::is_numeric() const{
             return true;
         }
     }
-    return is_value();
+    return is_value() || is_expression();
 }
 
 bool Array_val::is_string() const{
@@ -32,7 +32,11 @@ bool Array_val::is_string() const{
             return true;
         }
     }
-    return !is_numeric();
+    return std::holds_alternative<std::string>(*this);
+}
+
+bool Array_val::is_expression() const{
+    return std::holds_alternative<ArithmeticTree>(*this);
 }
 
 size_t VariableBase::HashVar::operator()(const VariableBase& var){

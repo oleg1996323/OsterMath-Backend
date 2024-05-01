@@ -4,6 +4,7 @@
 #include <unordered_set>
 #include <optional>
 #include <vector>
+#include <stack>
 #include "def.h"
 #include "ParseRulesBaseListener.h"
 #include "exception.h"
@@ -24,6 +25,7 @@ public:
 
 class VariableBase;
 class MultiArgumentNode;
+class RangeOperationNode;
 
 class BaseListener: public ParseRulesBaseListener{
     enum class MODE{
@@ -33,9 +35,12 @@ class BaseListener: public ParseRulesBaseListener{
         TABVALDEF
     };
 
+    void __function_input__(ArithmeticTree& tree_input,ParseRulesParser::FunctionCallContext* func_ctx);
+
     BaseData* data_base_;
     VariableBase* current_var_;
-    std::shared_ptr<MultiArgumentNode> tmp_node_;
+    std::shared_ptr<MultiArgumentNode> tmp_multiarg_node_;
+    std::stack<std::shared_ptr<RangeOperationNode>> tmp_range_node_;
     std::vector<VariableBase*> hdr_vars_; 
     std::stack<MODE> mode_;
     size_t line_counter_ = 0;
@@ -102,4 +107,16 @@ class BaseListener: public ParseRulesBaseListener{
     virtual void enterNumbers_line(ParseRulesParser::Numbers_lineContext* ctx) override;
 
     virtual void exitNumbers_line(ParseRulesParser::Numbers_lineContext* ctx) override;
+
+    virtual void enterRangefunction(ParseRulesParser::RangefunctionContext* ctx) override;
+
+    virtual void exitRangefunction(ParseRulesParser::RangefunctionContext* ctx) override;
+
+    virtual void enterVariable_range_input(ParseRulesParser::Variable_range_inputContext* ctx) override;
+
+    virtual void exitVariable_range_input(ParseRulesParser::Variable_range_inputContext* ctx) override;
+
+    virtual void enterNumber(ParseRulesParser::NumberContext* ctx) override;
+
+    virtual void exitNumber(ParseRulesParser::NumberContext* ctx) override;
 };

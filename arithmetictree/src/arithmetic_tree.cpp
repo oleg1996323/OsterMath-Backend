@@ -39,6 +39,12 @@ const Value_t& ArithmeticTree::value() const{
     return cache_.value();
 }
 
+const Value_t& ranges::ArithmeticTree::value(size_t index) const{
+    if(!cache_.has_value())
+        cache_.emplace(execute(index));
+    return cache_.value();
+}
+
 Value_t ArithmeticTree::execute() const{
     if(root_)
         return root_->execute();
@@ -106,4 +112,8 @@ bool ArithmeticTree::is_ready() const{
 
 const std::shared_ptr<Node>& ArithmeticTree::root() const{
     return root_;
+}
+
+Value_t ranges::ArithmeticTree::execute(size_t index) const{
+    return root_->execute(index);
 }

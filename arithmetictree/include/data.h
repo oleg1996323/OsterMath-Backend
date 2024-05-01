@@ -27,6 +27,11 @@ class BaseData{
     template<typename T>
     std::shared_ptr<VariableBase>& add_variable(std::string&& name, T&& value);
 
+    std::shared_ptr<VariableBase>& add_anonymous_var();
+
+    template<typename T>
+    std::shared_ptr<VariableBase>& add_anonymous_var(T&& value);
+
     template<typename T>
     void define(std::string_view name, T&& value);
 
@@ -41,6 +46,8 @@ class BaseData{
     std::unordered_map<std::string_view,std::shared_ptr<VariableBase>> vars_;
     std::string_view name_;
     std::unique_ptr<Parser> parser_;
+
+    std::string generate_hash_name();
 };
 
 class DataPool{

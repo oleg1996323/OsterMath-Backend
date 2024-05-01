@@ -9,3 +9,12 @@ Array_t::TYPE getting_arrays_type(std::vector<std::reference_wrapper<const Array
 
 Value_t SumProduct(std::vector<std::reference_wrapper<const Array_t>>&& arrays);
 
+Value_t SumProduct_i();
+
+Value_t Sum(std::vector<std::reference_wrapper<const Array_t>>&& arrays);
+
+Value_t Sum_i();
+
+Value_t Product(std::vector<std::reference_wrapper<const Array_t>>&& arrays);
+
+Value_t Product_i();

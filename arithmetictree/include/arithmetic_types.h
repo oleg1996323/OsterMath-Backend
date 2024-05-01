@@ -26,13 +26,26 @@ enum class UNARY_OP{
     EXP,
     ADD,
     SUB,
-    PARENS
+    PARENS,
+    COS,
+    ACOS,
+    SIN,
+    ASIN,
+    FACTORIAL
 };
 
 enum class MULTI_ARG_OP{
     SUMPRODUCT,
+    SUM,
+    PROD,
     CONCAT,
     LOG_BASE
+};
+
+enum class RANGE_OP{
+    SUMPRODUCT,
+    SUM,
+    PROD
 };
 
 class Node;
@@ -41,6 +54,7 @@ class BinaryNode;
 class ValueNode;
 class VariableNode;
 class MultiArgumentNode;
+class RangeOperationNode;
 
 class Node{
     public:
@@ -51,6 +65,8 @@ class Node{
     virtual Node* first_undefined_child_node() = 0;
 
     virtual Value_t execute() = 0;
+
+    virtual Value_t execute(size_t index) = 0;
 
     virtual void refresh();
 
@@ -97,9 +113,13 @@ class UnaryNode:public Node{
 
     virtual Value_t execute() override;
 
+    virtual Value_t execute(size_t index) override;
+
     virtual void print() const override;
 
     private:
+    Value_t __calculate__(Value_t&& child_exec);
+
     std::shared_ptr<Node> child_;
     UNARY_OP operation;
 };
@@ -123,6 +143,8 @@ class BinaryNode:public Node{
     virtual Node* first_undefined_child_node() override;
 
     virtual Value_t execute() override;
+
+    virtual Value_t execute(size_t index) override;
 
     std::shared_ptr<Node>& lhs(){
         return lhs_;
@@ -155,6 +177,8 @@ class BinaryNode:public Node{
     virtual void print() const override;
 
     private:
+    Value_t __calculate__();
+
     std::shared_ptr<Node> lhs_;
     std::shared_ptr<Node> rhs_;
     mutable std::pair<Value_t,Value_t> cache_;
@@ -181,6 +205,10 @@ class ValueNode:public Node{
         return val_;
     }
 
+    virtual Value_t execute(size_t index) override{
+        return val_;
+    }
+
     virtual void print() const;
 
     private:
@@ -204,6 +232,8 @@ class VariableNode:public Node{
     const VariableBase* variable() const;
 
     virtual Value_t execute() override;
+
+    virtual Value_t execute(size_t index) override;
 
     virtual void print() const;
 
@@ -238,10 +268,58 @@ class MultiArgumentNode:public Node{
 
     virtual Value_t execute() override;
 
+    virtual Value_t execute(size_t index) override;
+
     virtual void print() const;
 
     private:
     std::vector<Node*> childs_;
     MULTI_ARG_OP operation_;
+    std::optional<Value_t> cache_;
+};
+
+//calculate some expressions by range of input values, if 
+class RangeOperationNode:public Node{
+    public:
+    RangeOperationNode(RANGE_OP op):operation_(op){}
+
+    void add_child(VariableNode*);
+
+    virtual ARITHM_NODE_TYPE type() const override{
+        return ARITHM_NODE_TYPE::MULTIARG;
+    }
+
+    virtual Node* first_undefined_child_node() override{
+        return nullptr;
+    }
+
+    virtual Value_t execute() override;
+
+    virtual Value_t execute(size_t index) override;
+
+    virtual void print() const{}
+
+    ranges::ArithmeticTree& expression();
+
+    private:
+    bool __checking_childs__() const{
+        for( auto& child:childs_){
+            if(range_size==0 && child->variable() && child->variable()->is_array()){
+
+                if((range_size=child->variable()->get<Array_t>().size())==0)
+                    throw std::invalid_argument("Null size array input in range function");
+            }
+            if(!child->variable() || !child->variable()->is_array() || !child->variable()->get<Array_t>().is_numeric())
+                return false;
+            if(range_size!=child->variable()->get<Array_t>().size())
+                return false;
+        }
+        return false;
+    }
+
+    std::unordered_set<VariableNode*> childs_;
+    mutable size_t range_size = 0;
+    ranges::ArithmeticTree range_expression;
+    RANGE_OP operation_;
     std::optional<Value_t> cache_;
 };

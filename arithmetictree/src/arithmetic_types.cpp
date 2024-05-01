@@ -31,32 +31,47 @@ void UnaryNode::print() const{
     std::cout<<'}'<<std::endl;
 }
 
+Value_t UnaryNode::__calculate__(Value_t&& child_exec){
+    switch (operation)
+        {
+        case UNARY_OP::LN:
+            return log(child_exec);
+            break;
+        case UNARY_OP::LG10:
+            return log10(child_exec);
+            break;
+        case UNARY_OP::ADD:
+            return child_exec;
+            break;
+        case UNARY_OP::SUB:
+            return (-1)*(child_exec);
+            break;
+        case UNARY_OP::EXP:
+            return exp(child_exec);
+            break;
+        case UNARY_OP::PARENS:
+            return child_exec;
+            break;
+        default:
+            throw std::invalid_argument("Unknown type of unary expression");
+            break;
+        }
+}
+
 Value_t UnaryNode::execute(){
     using namespace boost::multiprecision;
     if(child_){
-        switch (operation)
-        {
-        case UNARY_OP::LN:
-            return log(child_->execute());
-            break;
-        case UNARY_OP::LG10:
-            return log10(child_->execute());
-            break;
-        case UNARY_OP::ADD:
-            return child_->execute();
-            break;
-        case UNARY_OP::SUB:
-            return (-1)*(child_->execute());
-            break;
-        case UNARY_OP::EXP:
-            return exp(child_->execute());
-            break;
-        case UNARY_OP::PARENS:
-            return child_->execute();
-            break;
-        default:
-            break;
-        }
+        return __calculate__(std::move(child_->execute()));
+    }
+    else
+        throw std::runtime_error("Undefined unary operation");
+    return 0.;
+}
+
+Value_t UnaryNode::execute(size_t index){
+    using namespace boost::multiprecision;
+    if(child_){
+        return __calculate__(std::move(child_->execute(index)));
     }
     else
         throw std::runtime_error("Undefined unary operation");
@@ -91,6 +106,30 @@ void BinaryNode::print() const{
     std::cout<<'}'<<std::endl;
 }
 
+Value_t BinaryNode::__calculate__(){
+    switch (operation_)
+    {
+        case BINARY_OP::ADD:
+            return lhs_cache()+rhs_cache();
+            break;
+        case BINARY_OP::SUB:
+            return lhs_cache()-rhs_cache();
+            break;
+        case BINARY_OP::MUL:
+            return lhs_cache()*rhs_cache();
+            break;
+        case BINARY_OP::DIV:
+            return lhs_cache()/rhs_cache();
+            break;
+        case BINARY_OP::POW:
+            return pow(lhs_cache(),rhs_cache());
+            break;
+        default:
+            throw std::invalid_argument("Unknown type of binary expression");
+            break;
+    }
+}
+
 Value_t BinaryNode::execute(){
     using namespace boost::multiprecision;
     if(lhs_ && rhs_){
@@ -102,26 +141,25 @@ Value_t BinaryNode::execute(){
             lhs_cache() = lhs_->execute();
             rhs_cache() = rhs_->execute();
         }
-        switch (operation_)
-        {
-            case BINARY_OP::ADD:
-                return lhs_cache()+rhs_cache();
-                break;
-            case BINARY_OP::SUB:
-                return lhs_cache()-rhs_cache();
-                break;
-            case BINARY_OP::MUL:
-                return lhs_cache()*rhs_cache();
-                break;
-            case BINARY_OP::DIV:
-                return lhs_cache()/rhs_cache();
-                break;
-            case BINARY_OP::POW:
-                return pow(lhs_cache(),rhs_cache());
-                break;
-            default:
-                break;
+        return __calculate__();
+    }
+    else
+        throw std::runtime_error("Undefined binary operation");
+    return 0.;
+}
+
+Value_t BinaryNode::execute(size_t index){
+    using namespace boost::multiprecision;
+    if(lhs_ && rhs_){
+        if(lhs_->caller()) //left branch call refreshing
+            lhs_->execute(index);
+        else if(rhs_->caller()) //right branch call refreshing
+            rhs_->execute(index);
+        else{
+            lhs_cache() = lhs_->execute(index);
+            rhs_cache() = rhs_->execute(index);
         }
+        return __calculate__();
     }
     else
         throw std::runtime_error("Undefined binary operation");
@@ -169,9 +207,20 @@ Value_t VariableNode::execute(){
         else if(var_->is_undef())
             return 0.;
         else
-        throw std::invalid_argument("Invalid type of variable");
+        throw std::invalid_argument("Invalid type of variable: not calculable");
     }
     else throw std::runtime_error("Uninitialized variable");
+}
+
+Value_t VariableNode::execute(size_t index){
+    if(var_){
+        if(var_->is_array()){
+            return var_->get<Array_t>().at(index).get<Value_t>();
+        }
+        throw std::invalid_argument("Invalid type of variable: must be array");
+    }
+    else throw std::runtime_error("Uninitialized variable");
+    
 }
 
 void VariableNode::add_parent(Node* parent){
@@ -224,6 +273,39 @@ Value_t MultiArgumentNode::execute(){
     return cache_.value();
 }
 
+Value_t MultiArgumentNode::execute(size_t index){
+    return execute();
+}
+
 void MultiArgumentNode::add_child(Node* node){
     childs_.push_back(node);
+}
+
+Value_t RangeOperationNode::execute(){
+    Value_t result;
+    if(!__checking_childs__())
+        throw std::invalid_argument("Invalid input of variables");
+    if(operation_==RANGE_OP::SUM)
+        result = 0.;
+    else if(operation_==RANGE_OP::PROD)
+        result = 1.;
+    else if(operation_==RANGE_OP::SUMPRODUCT)
+        result = 0.;
+    for(size_t i=0;i<range_size;++i){
+        if(operation_==RANGE_OP::SUM)
+            result+=execute(i);
+        else if(operation_==RANGE_OP::PROD)
+            result*=execute(i);
+        else if(operation_==RANGE_OP::SUMPRODUCT)
+            result+=execute(i);
+    }
+    return result;
+}
+
+Value_t RangeOperationNode::execute(size_t index){
+    return range_expression.execute(index);
+}
+
+ranges::ArithmeticTree& RangeOperationNode::expression(){
+    return range_expression;
 }

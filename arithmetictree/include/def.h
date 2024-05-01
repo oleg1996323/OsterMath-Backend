@@ -47,7 +47,9 @@ class Array_t;
 #include <variant>
 
 using Value_t = boost::multiprecision::cpp_dec_float_50;
-using Arr_value = std::variant<std::monostate,Value_t,std::string, VariableBase*>;
+
+//needed for using variables and values in array
+using Arr_value = std::variant<std::monostate,Value_t,std::string, VariableBase*, ArithmeticTree>;
 using __types__ = std::variant<std::monostate,Value_t,std::string, Array_t, ArithmeticTree>;
 
 // class __types_proxy__:private __types__{

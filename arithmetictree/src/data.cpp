@@ -41,6 +41,16 @@ std::shared_ptr<VariableBase>& BaseData::add_variable(std::string&& name){
     else return vars_.find(name)->second;
 }
 
+
+#include <chrono>
+
+std::string BaseData::generate_hash_name(){
+    using namespace std::chrono;
+    std::time_t time = system_clock::to_time_t(system_clock::now());
+    std::string current_time = std::string(std::ctime(&time));
+    return std::to_string(std::hash<std::string>()(current_time) | std::hash<std::string_view>()(name_));
+}
+
 void BaseData::erase(std::string_view var_name){
     vars_.erase(var_name);
 }
@@ -60,7 +70,9 @@ void BaseData::parse_entry(){
     return parser_->parse_entry();
 }
 
-DataPool::DataPool(const std::string& name):name_(name){}
+DataPool::DataPool(const std::string& name):name_(name){
+    add_data("anon"s);
+}
 
 std::string_view DataPool::name(){
     return name_;

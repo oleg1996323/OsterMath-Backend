@@ -32,6 +32,8 @@ class Array_val:private Arr_value{
 
     bool is_string() const;
 
+    bool is_expression() const;
+
     template<typename T>
     const T& get() const{
         return std::get<T>(*this);
@@ -60,29 +62,45 @@ class Array_t : public std::vector<Array_val>{
         NUMERIC
     };
 
-    void push_back(const Array_val& val){
-        if(type_==TYPE::UNKNOWN){
-            std::vector<Array_val>::push_back(val);
-            if(val.is_string())
-                type_=TYPE::STRING;
-            else if(val.is_numeric())
-                type_=TYPE::NUMERIC;
-            else throw std::runtime_error("Undefined type");
+    void define_back(const Array_val& val){
+        if(!back().is_undef()){
+            throw std::invalid_argument("Array item already defined");
+            return;
         }
-        else{
-            if(type_==TYPE::NUMERIC && val.is_numeric()){
-                std::vector<Array_val>::push_back(val);
+        if(type_!=TYPE::UNKNOWN){
+            if(type_==TYPE::NUMERIC && !val.is_numeric()){
+                throw std::invalid_argument("Input value type don't correspond numeric type of array");
+                return;
             }
-            else if(type_==TYPE::STRING && val.is_string()){
-                std::vector<Array_val>::push_back(val);
+            else if(type_==TYPE::STRING && !val.is_string()){
+                throw std::invalid_argument("Input value type don't correspond string type of array");
+                return;
             }
-            else throw std::runtime_error("Undefined type");
         }
+
+        back() = val; //при вводе неопределённой переменной тип определяется неверно
+        if(val.is_string())
+            type_=TYPE::STRING;
+        else if(val.is_numeric())
+            type_=TYPE::NUMERIC;
     }
 
     TYPE type() const{
         return type_;
     }
+
+    bool is_numeric() const{
+        return type_==TYPE::NUMERIC;
+    }
+
+    bool is_string() const{
+        return type_==TYPE::STRING;
+    }
+
+    bool is_unknown() const{
+        return type_==TYPE::UNKNOWN;
+    }
+
     private:
     TYPE type_ = TYPE::UNKNOWN; 
 };
