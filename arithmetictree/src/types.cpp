@@ -39,6 +39,33 @@ bool Array_val::is_expression() const{
     return std::holds_alternative<ArithmeticTree>(*this);
 }
 
+void Array_t::define_back(const Array_val& val){
+    if(!back().is_undef()){
+        throw std::invalid_argument("Array item already defined");
+        return;
+    }
+    if(val.is_variable())
+        val.get<VariableBase*>()->node()->add_parent(parent_->node());
+
+    if(type_!=TYPE::UNKNOWN){
+        if(type_==TYPE::NUMERIC && !val.is_numeric()){
+            throw std::invalid_argument("Input value type don't correspond numeric type of array");
+            return;
+        }
+        else if(type_==TYPE::STRING && !val.is_string()){
+            throw std::invalid_argument("Input value type don't correspond string type of array");
+            return;
+        }
+    }
+
+
+    back() = val; //при вводе неопределённой переменной тип определяется неверно
+    if(val.is_string())
+        type_=TYPE::STRING;
+    else if(val.is_numeric())
+        type_=TYPE::NUMERIC;
+}
+
 size_t VariableBase::HashVar::operator()(const VariableBase& var){
     return std::hash<std::string_view>()(var.name_);
 }

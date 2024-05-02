@@ -56,34 +56,15 @@ class Array_val:private Arr_value{
 class Array_t : public std::vector<Array_val>{
     public:
 
+    Array_t(VariableBase* parent):parent_(parent){}
+
     enum class TYPE{
         UNKNOWN,
         STRING,
         NUMERIC
     };
 
-    void define_back(const Array_val& val){
-        if(!back().is_undef()){
-            throw std::invalid_argument("Array item already defined");
-            return;
-        }
-        if(type_!=TYPE::UNKNOWN){
-            if(type_==TYPE::NUMERIC && !val.is_numeric()){
-                throw std::invalid_argument("Input value type don't correspond numeric type of array");
-                return;
-            }
-            else if(type_==TYPE::STRING && !val.is_string()){
-                throw std::invalid_argument("Input value type don't correspond string type of array");
-                return;
-            }
-        }
-
-        back() = val; //при вводе неопределённой переменной тип определяется неверно
-        if(val.is_string())
-            type_=TYPE::STRING;
-        else if(val.is_numeric())
-            type_=TYPE::NUMERIC;
-    }
+    void define_back(const Array_val& val);
 
     TYPE type() const{
         return type_;
@@ -102,7 +83,8 @@ class Array_t : public std::vector<Array_val>{
     }
 
     private:
-    TYPE type_ = TYPE::UNKNOWN; 
+    TYPE type_ = TYPE::UNKNOWN;
+    VariableBase* parent_; 
 };
 
 using Variable_t = std::variant<std::monostate,Value_t,std::string, Array_t, ArithmeticTree>;
