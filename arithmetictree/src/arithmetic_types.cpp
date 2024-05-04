@@ -185,8 +185,13 @@ void VariableNode::refresh(){
     if(has_parent()){
         caller_ = true;
         refresh_parent_links();
-        for(auto parent:parents_)
+        for(auto parent:parents_){
+            if(parent->type()==ARITHM_NODE_TYPE::VARIABLE){
+                auto ptr = reinterpret_cast<VariableNode*>(parent)->variable();
+                if(ptr->is_array() && ptr->get<Array_t>().())
+            }
             parent->refresh();
+        }
         caller_ = false;
     }
 }

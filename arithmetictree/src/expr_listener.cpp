@@ -64,7 +64,7 @@ void BaseListener::enterVariable(ParseRulesParser::VariableContext *ctx) {
     }
     else {
         assert(mode_.top()==MODE::HDRDEF);
-        hdr_vars_.push_back(data_base_->add_variable(ctx->VARIABLE()->getSymbol()->getText(), Array_t()).get());
+        //hdr_vars_.push_back(data_base_->add_variable(ctx->VARIABLE()->getSymbol()->getText(), Array_t()).get());
     }
 }
 
@@ -281,7 +281,7 @@ void BaseListener::enterArray(ParseRulesParser::ArrayContext *ctx) {
     assert(!mode_.empty() && current_var_);
     if(mode_.top()==MODE::VARDEF){
         if(current_var_->is_undef())
-            current_var_->get()=Array_t();
+            current_var_->get()=Array_t(current_var_);
         else throw std::invalid_argument("Invalid type of variable");
     }
     return;

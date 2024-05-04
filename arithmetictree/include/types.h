@@ -19,6 +19,12 @@ struct Variable_ref{
     std::string_view db_name_;
 };
 
+enum class TYPE{
+    UNKNOWN,
+    STRING,
+    NUMERIC
+};
+
 class Array_val:private Arr_value{
     using variant::variant;
     public:
@@ -57,12 +63,6 @@ class Array_t : public std::vector<Array_val>{
     public:
 
     Array_t(VariableBase* parent):parent_(parent){}
-
-    enum class TYPE{
-        UNKNOWN,
-        STRING,
-        NUMERIC
-    };
 
     void define_back(const Array_val& val);
 
@@ -144,6 +144,7 @@ class VariableBase: private Variable_t{
     std::shared_ptr<VariableNode> node_; //shared, так как может быть передан в любое арифметическое дерево
     std::string_view name_;
     BaseData* data_base_;
+    TYPE type_;
 };
 
 std::ostream& operator<<(std::ostream& stream, const ArithmeticTree& tree);

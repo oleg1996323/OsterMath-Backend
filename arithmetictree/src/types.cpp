@@ -1,5 +1,6 @@
 #include "def.h"
 #include "types.h"
+#include "arithmetic_types.h"
 #include "arithmetic_tree.h"
 #include "data.h"
 
@@ -45,7 +46,7 @@ void Array_t::define_back(const Array_val& val){
         return;
     }
     if(val.is_variable())
-        val.get<VariableBase*>()->node()->add_parent(parent_->node());
+        val.get<VariableBase*>()->node()->add_parent(parent_->node().get());
 
     if(type_!=TYPE::UNKNOWN){
         if(type_==TYPE::NUMERIC && !val.is_numeric()){
