@@ -9,6 +9,7 @@
 #include "exception.h"
 #include "data.h"
 #include "arithmetic_tree.h"
+#include "format.h"
 
 class VariableNode;
 class VariableBase;
@@ -66,24 +67,26 @@ class Array_t : public std::vector<Array_val>{
 
     void define_back(const Array_val& val);
 
+    VariableBase* parent() const{
+        return parent_;
+    }
+
     TYPE type() const{
-        return type_;
-    }
-
-    bool is_numeric() const{
-        return type_==TYPE::NUMERIC;
-    }
-
-    bool is_string() const{
-        return type_==TYPE::STRING;
-    }
-
-    bool is_unknown() const{
-        return type_==TYPE::UNKNOWN;
+        TYPE type = TYPE::UNKNOWN;
+        for(auto& val:*this)
+            if(val.is_numeric()){
+                if(type==TYPE::UNKNOWN)
+                    type=TYPE::NUMERIC;
+            }
+            else if(val.is_string()){
+                if(type==TYPE::UNKNOWN)
+                    type=TYPE::STRING;
+            }
+            else throw std::invalid_argument("Incorrect array type");
+        return type;
     }
 
     private:
-    TYPE type_ = TYPE::UNKNOWN;
     VariableBase* parent_; 
 };
 
@@ -92,7 +95,7 @@ using Variable_t = std::variant<std::monostate,Value_t,std::string, Array_t, Ari
 using namespace std::string_literals;
 using namespace std::string_view_literals;
 
-class VariableBase: private Variable_t{
+class VariableBase: private Variable_t, public FormattingData{
     using variant::variant;
 
     public:
@@ -127,14 +130,18 @@ class VariableBase: private Variable_t{
     T& get();
 
     const std::shared_ptr<VariableNode>& node() const;
+    const std::shared_ptr<VariableNode>& node();
 
     bool is_arithmetic_tree() const;
     bool is_value() const;
     bool is_string() const;
     bool is_array() const;
     bool is_undef() const;
+    bool is_numeric() const;
 
     std::ostream& operator<<(std::ostream& stream);
+
+    void print();
 
     protected:
     void set_data_base(BaseData* data_pool);
@@ -156,28 +163,6 @@ std::ostream& operator<<(std::ostream& stream, std::monostate empty);
 std::ostream& operator<<(std::ostream& stream, const Variable_t& var);
 
 std::ostream& operator<<(std::ostream& stream, const Array_val& val);
-
-// struct VariableVisitor{
-//     void operator()(std::monostate) const{
-//         throw std::runtime_error("Undefined variable");
-//     }
-
-//     const Value_t& operator()(const Value_t& value) const{
-//         return value;
-//     }
-
-//     const Array_t& operator()(const Array_t& array) const{
-//         return array;
-//     }
-
-//     const std::string& operator()(const std::string& string) const{
-//         return string;
-//     }
-
-//     const ArithmeticTree& operator()(const ArithmeticTree& tree) const{
-//         return tree;
-//     }
-// };
 
 template<typename T>
 T& VariableBase::get(){

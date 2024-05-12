@@ -48,23 +48,7 @@ void Array_t::define_back(const Array_val& val){
     if(val.is_variable())
         val.get<VariableBase*>()->node()->add_parent(parent_->node().get());
 
-    if(type_!=TYPE::UNKNOWN){
-        if(type_==TYPE::NUMERIC && !val.is_numeric()){
-            throw std::invalid_argument("Input value type don't correspond numeric type of array");
-            return;
-        }
-        else if(type_==TYPE::STRING && !val.is_string()){
-            throw std::invalid_argument("Input value type don't correspond string type of array");
-            return;
-        }
-    }
-
-
     back() = val; //при вводе неопределённой переменной тип определяется неверно
-    if(val.is_string())
-        type_=TYPE::STRING;
-    else if(val.is_numeric())
-        type_=TYPE::NUMERIC;
 }
 
 size_t VariableBase::HashVar::operator()(const VariableBase& var){
@@ -72,8 +56,20 @@ size_t VariableBase::HashVar::operator()(const VariableBase& var){
 }
 
 std::ostream& VariableBase::operator<<(std::ostream& stream){
+    if(get_type()!=FormattingData::OUTPUT_TYPE::DEFAULT){
+        stream<<std::setprecision(get_precision());
+        if(get_type()==FormattingData::OUTPUT_TYPE::SCIENTIFIC)
+            stream<<std::scientific;
+        else if(get_type()==FormattingData::OUTPUT_TYPE::FIXED)
+            stream<<std::fixed;
+        else throw std::runtime_error("Unknown format");
+    }
     stream<<*this;
     return stream;
+}
+
+void VariableBase::print(){
+    get_stream()<<*this<<std::endl;
 }
 
 std::ostream& operator<<(std::ostream& stream, const Arr_value& val){
@@ -104,12 +100,12 @@ std::ostream& operator<<(std::ostream& stream, std::monostate empty){
 }
 
 std::ostream& operator<<(std::ostream& stream, const Variable_t& var){
-    std::visit([&stream](const auto& x) { stream << x; }, var);
+    std::visit([&stream](const auto& x) { stream << std::defaultfloat<<x; }, var);
     return stream;
 }
 
 std::ostream& operator<<(std::ostream& stream, const ArithmeticTree& tree){
-    stream<<tree.value();
+    stream<<std::defaultfloat<<tree.value();
     return stream;
 }
 
@@ -150,6 +146,10 @@ const std::shared_ptr<VariableNode>& VariableBase::node() const{
     return node_;
 }
 
+const std::shared_ptr<VariableNode>& VariableBase::node(){
+    return node_;
+}
+
 bool VariableBase::is_arithmetic_tree() const{
     return std::holds_alternative<ArithmeticTree>(get());
 }
@@ -168,6 +168,10 @@ bool VariableBase::is_array() const{
 
 bool VariableBase::is_undef() const{
     return std::holds_alternative<std::monostate>(get());
+}
+
+bool VariableBase::is_numeric() const{
+    return !is_undef() && !is_string() && !(is_array() && this->get<Array_t>().type()!=TYPE::STRING);
 }
 
 void VariableBase::value_to_tree(){

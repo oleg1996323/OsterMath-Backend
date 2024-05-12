@@ -42,7 +42,13 @@ void BaseListener::enterVariable(ParseRulesParser::VariableContext *ctx) {
     assert(!mode_.empty());
     auto ptr = data_base_->add_variable(ctx->VARIABLE()->getText()).get();
     if(mode_.top()==MODE::VARDEF){
-        if(!tmp_multiarg_node_){
+        if(tmp_multiarg_node_){
+            tmp_multiarg_node_->add_child(ptr->node().get());
+        }
+        else if(!tmp_range_node_.empty()){
+            tmp_range_node_.top()->add_child(ptr->node().get());
+        }
+        else{
             if(current_var_->is_arithmetic_tree())
                 current_var_->get<ArithmeticTree>().insert(ptr->node());
             else if(current_var_->is_undef()){
@@ -57,9 +63,6 @@ void BaseListener::enterVariable(ParseRulesParser::VariableContext *ctx) {
             }
             else if (current_var_->is_array())
                 current_var_->get<Array_t>().define_back(data_base_->add_variable(ctx->VARIABLE()->getText()).get());
-        }
-        else{
-            tmp_multiarg_node_->add_child(ptr->node().get());
         }
     }
     else {
@@ -141,6 +144,14 @@ __C__=[2,2,2]
 __D__=[2,2,2]
 */
 
+/*
+__I__=[__A__,__B__]
+__A__=sum(__C__,__D__)
+__B__=2
+__C__=[2,2,2]
+__D__=[2,2,2]
+*/
+
 //a connstant definition {for example: Lg(Expr)}
 void BaseListener::enterConstant(ParseRulesParser::ConstantContext *ctx) {
     //std::cout<<ctx->getText()<<std::endl;
@@ -200,6 +211,10 @@ void BaseListener::enterFunctionCall(ParseRulesParser::FunctionCallContext *ctx)
             tmp_multiarg_node_ = std::make_shared<MultiArgumentNode>(MULTI_ARG_OP::SUMPRODUCT);
         else if(ctx->multiargfunction()->LOG_X())
             tmp_multiarg_node_ = std::make_shared<MultiArgumentNode>(MULTI_ARG_OP::LOG_BASE);
+        else if(ctx->multiargfunction()->SUM())
+            tmp_multiarg_node_ = std::make_shared<MultiArgumentNode>(MULTI_ARG_OP::SUM);
+        else if(ctx->multiargfunction()->PRODUCT())
+            tmp_multiarg_node_ = std::make_shared<MultiArgumentNode>(MULTI_ARG_OP::PROD);
         return;
     }
 }

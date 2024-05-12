@@ -258,6 +258,8 @@ class MultiArgumentNode:public Node{
 
     void add_child(Node*);
 
+    virtual void refresh() override;
+
     virtual ARITHM_NODE_TYPE type() const override{
         return ARITHM_NODE_TYPE::MULTIARG;
     }
@@ -276,9 +278,12 @@ class MultiArgumentNode:public Node{
     std::vector<Node*> childs_;
     MULTI_ARG_OP operation_;
     std::optional<Value_t> cache_;
+
+    auto __register_array_input__();
 };
 
-//calculate some expressions by range of input values, if 
+//calculate some expressions by range of input values.
+//Childs should be only numeric variable-arrays and have same length
 class RangeOperationNode:public Node{
     public:
     RangeOperationNode(RANGE_OP op):operation_(op){}
@@ -293,6 +298,8 @@ class RangeOperationNode:public Node{
         return nullptr;
     }
 
+    virtual void refresh() override;
+
     virtual Value_t execute() override;
 
     virtual Value_t execute(size_t index) override;
@@ -301,20 +308,41 @@ class RangeOperationNode:public Node{
 
     ranges::ArithmeticTree& expression();
 
+    size_t range_length() const{
+        return range_size;
+    }
+
     private:
+
+    //checks the childs types and them correct vals types
+    //Childs should be only numeric variable-arrays and have same length
     bool __checking_childs__() const{
         for( auto& child:childs_){
-            if(range_size==0 && child->variable() && child->variable()->is_array()){
-
-                if((range_size=child->variable()->get<Array_t>().size())==0)
-                    throw std::invalid_argument("Null size array input in range function");
+            if(child->variable()){
+                if(child->variable()->is_array()){
+                    if(range_size==0)
+                        if((range_size=child->variable()->get<Array_t>().size())==0)
+                            throw std::invalid_argument("Null size array input in range function");
+                        else continue;
+                    else{
+                        if(range_size!=child->variable()->get<Array_t>().size())
+                            throw std::invalid_argument("Unequal size array input in range function");
+                        else continue;
+                    }
+                }
+                else return false;
             }
-            if(!child->variable() || !child->variable()->is_array() || !child->variable()->get<Array_t>().is_numeric())
-                return false;
+            else return 0L;
+
+            //checking same range-length. If not return false (NULL val)
+            if(!child->variable() || !child->variable()->is_array())
+                return 0L;
+
+            //checking same range-length. If not return false (NULL val)
             if(range_size!=child->variable()->get<Array_t>().size())
-                return false;
+                return 0L;
         }
-        return false;
+        return range_size;
     }
 
     std::unordered_set<VariableNode*> childs_;

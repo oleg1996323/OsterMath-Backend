@@ -186,10 +186,6 @@ void VariableNode::refresh(){
         caller_ = true;
         refresh_parent_links();
         for(auto parent:parents_){
-            if(parent->type()==ARITHM_NODE_TYPE::VARIABLE){
-                auto ptr = reinterpret_cast<VariableNode*>(parent)->variable();
-                if(ptr->is_array() && ptr->get<Array_t>().())
-            }
             parent->refresh();
         }
         caller_ = false;
@@ -253,6 +249,21 @@ void MultiArgumentNode::print() const{
     std::cout<<'}'<<std::endl;
 }
 
+auto MultiArgumentNode::__register_array_input__(){
+    if(childs_.empty())
+        throw std::invalid_argument("Invalid function parameters");
+    std::vector<std::reference_wrapper<const Array_t>> params;
+    for(Node* child:childs_){
+        if(child->type()==ARITHM_NODE_TYPE::VARIABLE){
+            auto ptr = reinterpret_cast<VariableNode*>(child)->variable();
+            if(ptr->is_array())
+                params.push_back(ptr->get<Array_t>());
+            else throw std::invalid_argument("Invalid function parameter");
+        }
+    }
+    return params;
+}
+
 Value_t MultiArgumentNode::execute(){
     if(!cache_.has_value()){
         if(operation_==MULTI_ARG_OP::LOG_BASE){
@@ -272,8 +283,37 @@ Value_t MultiArgumentNode::execute(){
                     else throw std::invalid_argument("Invalid function parameter");
                 }
             }
-            cache_.emplace(SumProduct(std::move(params)));
+            cache_.emplace(functions::Arithmetic::SumProduct(std::move(params)));
         }
+        else if(operation_==MULTI_ARG_OP::SUM){
+            if(childs_.empty())
+                throw std::invalid_argument("Invalid function parameters");
+            std::vector<std::reference_wrapper<const Array_t>> params;
+            for(Node* child:childs_){
+                if(child->type()==ARITHM_NODE_TYPE::VARIABLE){
+                    auto ptr = reinterpret_cast<VariableNode*>(child)->variable();
+                    if(ptr->is_array())
+                        params.push_back(ptr->get<Array_t>());
+                    else throw std::invalid_argument("Invalid function parameter");
+                }
+            }
+            cache_.emplace(functions::Arithmetic::Sum(std::move(params)));
+        }
+        else if(operation_==MULTI_ARG_OP::PROD){
+            if(childs_.empty())
+                throw std::invalid_argument("Invalid function parameters");
+            std::vector<std::reference_wrapper<const Array_t>> params;
+            for(Node* child:childs_){
+                if(child->type()==ARITHM_NODE_TYPE::VARIABLE){
+                    auto ptr = reinterpret_cast<VariableNode*>(child)->variable();
+                    if(ptr->is_array())
+                        params.push_back(ptr->get<Array_t>());
+                    else throw std::invalid_argument("Invalid function parameter");
+                }
+            }
+            cache_.emplace(functions::Arithmetic::Product(std::move(params)));
+        }
+        else throw std::invalid_argument("Unknown multiargument operation");
     }
     return cache_.value();
 }
@@ -313,4 +353,28 @@ Value_t RangeOperationNode::execute(size_t index){
 
 ranges::ArithmeticTree& RangeOperationNode::expression(){
     return range_expression;
+}
+
+//can has only one parent (unlike the variable node)
+void RangeOperationNode::refresh(){
+    execute();
+    if(has_parent()){
+        caller_ = true;
+        parent_->refresh();
+        caller_ = false;
+    }
+}
+
+//can has only one parent (unlike the variable node)
+void MultiArgumentNode::refresh(){
+    execute();
+    if(has_parent()){
+        caller_ = true;
+        parent_->refresh();
+        caller_ = false;
+    }
+}
+
+void RangeOperationNode::add_child(VariableNode* var){
+    this->childs_.insert(var);
 }
