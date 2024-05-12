@@ -36,6 +36,7 @@ add_library(
 )
 
 target_link_libraries(arithmetictree PRIVATE antlr4_static Boost::boost)
+target_compile_definitions(arithmetictree PRIVATE $<$<CONFIG:Debug>:DEBUG>)
 if(MSVC)
     target_compile_options(antlr4_static PRIVATE /W0)
 endif()

@@ -6,7 +6,6 @@
 #include "def.h"
 
 class Node;
-
 class ArithmeticTree{
     public:
     using type = Value_t;

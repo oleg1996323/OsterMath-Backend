@@ -23,7 +23,7 @@ number
     ;
 
 SUMPRODUCT: [sS][uU][mM][pP][rR][oO][dD][uU][cC][tT];
-SUMPRODUCT_I: SUMPRODUCT '-'[iI];
+SUMPRODUCT_I: SUMPRODUCT '_' [iI];
 SUM: [sS][uU][mM];
 SUM_I: SUM '_' [iI];
 PRODUCT: [pP][rR][oO][dD][uU][cC][tT];

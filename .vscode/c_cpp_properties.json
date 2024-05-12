@@ -7,7 +7,11 @@
             "cppStandard": "c++20",
             "cStandard": "c17",
             "intelliSenseMode": "gcc-x64",
-            "compilerPath": "/usr/bin/g++"
+            "compilerPath": "/usr/bin/g++",
+            "compilerArgs": [],
+            "defines": [
+                "CMAKE_BUILD_TYPE=Debug"
+            ]
         }
     ],
     "version": 4

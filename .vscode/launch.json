@@ -6,7 +6,11 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceRoot}/bin/physical_props",
-            "cwd": "${workspaceRoot}"
+            "cwd": "${workspaceRoot}",
+            "logging": {"engineLogging":"warning",
+                        "exceptions": true},
+            "targetArchitecture":"x64",
+            "externalConsole": false
         }
     ]
 }

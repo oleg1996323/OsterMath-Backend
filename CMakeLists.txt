@@ -3,13 +3,17 @@ project(PhysicalProps)
 
 set(CMAKE_CXX_STANDARD 20)
 
+if(NOT CMAKE_BUILD_TYPE)
+    message(FATAL_ERROR "Not defined config")
+endif()
+
 include(${CMAKE_CURRENT_SOURCE_DIR}/arithmetictree/CMakeLists.txt)
 
-file(GLOB physprop_SOURCE
+file(GLOB_RECURSE physprop_SOURCE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
 )
 
-file(GLOB physprop_INCLUDE
+file(GLOB_RECURSE physprop_INCLUDE
     ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
 )
 
@@ -35,6 +39,7 @@ message(STATUS ${ARITHM_TREE_INCLUDE_DIR})
 target_link_directories(physical_props PUBLIC ${ARITHM_TREE_LIBRARY_DIR})
 target_link_libraries(physical_props PUBLIC arithmetictree Boost::boost ${Boost_LIBRARIES})
 target_include_directories(physical_props PUBLIC ${ARITHM_TREE_INCLUDE_DIR} ${Boost_INCLUDE_DIRS})
+target_compile_definitions(physical_props PRIVATE $<$<CONFIG:Debug>:DEBUG>)
 
 set_target_properties(physical_props
     PROPERTIES
