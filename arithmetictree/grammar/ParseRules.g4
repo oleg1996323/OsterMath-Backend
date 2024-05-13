@@ -118,7 +118,7 @@ multiargfunction
 
 rangefunction
     :
-    SUMPRODUCT_I '(' expr (','WS* variable_range_input WS*)* ')'
-    | SUM_I '(' expr (','WS* variable_range_input WS*)* ')'
-    | PRODUCT_I '(' expr (','WS* variable_range_input WS*)* ')'
+    SUMPRODUCT_I '(' WS* variable_range_input WS* (','WS* variable_range_input WS*)* ')'
+    | SUM_I '(' WS* variable_range_input WS* (','WS* variable_range_input WS*)* ')'
+    | PRODUCT_I '(' WS* variable_range_input WS* (','WS* variable_range_input WS*)* ')'
     ;
