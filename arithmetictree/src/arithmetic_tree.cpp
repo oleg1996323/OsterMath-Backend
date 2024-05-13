@@ -51,14 +51,19 @@ Value_t ArithmeticTree::execute() const{
     else return 0.;
 }
 
+#ifdef DEBUG
 void ArithmeticTree::print() const{
     root_->print();
 }
+#endif
 
 void ArithmeticTree::insert(const std::shared_ptr<Node>& node){
     if(!root_){
         std::cout<<"Add to root: ";
+
+#ifdef DEBUG
         node->print();
+#endif
         root_=node;
         last_incomplete_=root_.get();
         return;
@@ -66,19 +71,25 @@ void ArithmeticTree::insert(const std::shared_ptr<Node>& node){
     if(!is_ready()){
         if(last_incomplete_->type()==ARITHM_NODE_TYPE::UNARY){
             std::cout<<"Add to unary: ";
+#ifdef DEBUG
             node->print();
+#endif
             reinterpret_cast<UnaryNode*>(last_incomplete_)->child() = node;
         }
         else if(last_incomplete_->type()==ARITHM_NODE_TYPE::BINARY){
             BinaryNode* ptr = reinterpret_cast<BinaryNode*>(last_incomplete_);
             if(!ptr->lhs()){
                 std::cout<<"Add to binary left: ";
+#ifdef DEBUG
                 node->print();
+#endif
                 ptr->lhs() = node;
             }
             else {
                 std::cout<<"Add to binary right: ";
+#ifdef DEBUG
                 node->print();
+#endif
                 ptr->rhs() = node;
             }
         }

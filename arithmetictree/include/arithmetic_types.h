@@ -9,7 +9,8 @@ enum class ARITHM_NODE_TYPE{
     BINARY, 
     VALUE, 
     VARIABLE,
-    MULTIARG
+    MULTIARG,
+    RANGEOP
 };
 
 enum class BINARY_OP{
@@ -70,9 +71,11 @@ class Node{
 
     virtual void refresh();
 
+    #ifdef DEBUG
     virtual void print() const{
         std::cout<<"Undef node"<<std::endl;
     }
+    #endif
 
     virtual ~Node(){}
 
@@ -115,7 +118,9 @@ class UnaryNode:public Node{
 
     virtual Value_t execute(size_t index) override;
 
-    virtual void print() const override;
+    #ifdef DEBUG
+    virtual void print() const;
+    #endif
 
     private:
     Value_t __calculate__(Value_t&& child_exec);
@@ -174,7 +179,9 @@ class BinaryNode:public Node{
         return operation_;
     }
 
-    virtual void print() const override;
+    #ifdef DEBUG
+    virtual void print() const;
+    #endif
 
     private:
     Value_t __calculate__();
@@ -209,7 +216,9 @@ class ValueNode:public Node{
         return val_;
     }
 
+    #ifdef DEBUG
     virtual void print() const;
+    #endif
 
     private:
     Value_t val_;
@@ -235,7 +244,9 @@ class VariableNode:public Node{
 
     virtual Value_t execute(size_t index) override;
 
+    #ifdef DEBUG
     virtual void print() const;
+    #endif
 
     virtual void add_parent(Node* parent) override; 
 
@@ -272,7 +283,9 @@ class MultiArgumentNode:public Node{
 
     virtual Value_t execute(size_t index) override;
 
+    #ifdef DEBUG
     virtual void print() const;
+    #endif
 
     private:
     std::vector<Node*> childs_;
@@ -304,7 +317,9 @@ class RangeOperationNode:public Node{
 
     virtual Value_t execute(size_t index) override;
 
-    virtual void print() const{}
+    #ifdef DEBUG
+    virtual void print() const;
+    #endif
 
     ranges::ArithmeticTree& expression();
 
@@ -330,6 +345,8 @@ class RangeOperationNode:public Node{
                         else continue;
                     }
                 }
+                else if(child->variable()->is_numeric())
+                    continue;
                 else return false;
             }
             else return 0L;

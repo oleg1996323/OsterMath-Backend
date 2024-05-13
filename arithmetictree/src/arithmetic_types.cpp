@@ -26,11 +26,6 @@ Node* UnaryNode::first_undefined_child_node(){
     else return child_->first_undefined_child_node();
 }
 
-void UnaryNode::print() const{
-    std::cout<<'{'<<ENUM_NAME(ARITHM_NODE_TYPE::UNARY);
-    std::cout<<'}'<<std::endl;
-}
-
 Value_t UnaryNode::__calculate__(Value_t&& child_exec){
     switch (operation)
         {
@@ -89,21 +84,6 @@ Node* BinaryNode::first_undefined_child_node(){
     else if((ptr = rhs_->first_undefined_child_node()))
         return ptr;
     return nullptr;
-}
-
-void BinaryNode::print() const{
-    std::cout<<'{'<<ENUM_NAME(ARITHM_NODE_TYPE::BINARY);
-    std::cout<<"; ";
-    if(operation_==BINARY_OP::ADD){
-        std::cout<<ENUM_NAME(BINARY_OP::ADD);}
-    else if(operation_==BINARY_OP::SUB){
-        std::cout<<ENUM_NAME(BINARY_OP::SUB);}
-    else if(operation_==BINARY_OP::MUL){
-        std::cout<<ENUM_NAME(BINARY_OP::MUL);}
-    else if(operation_==BINARY_OP::DIV){
-        std::cout<<ENUM_NAME(BINARY_OP::DIV);}
-    else std::cout<<ENUM_NAME(BINARY_OP::POW);
-    std::cout<<'}'<<std::endl;
 }
 
 Value_t BinaryNode::__calculate__(){
@@ -166,11 +146,6 @@ Value_t BinaryNode::execute(size_t index){
     return 0.;
 }
 
-void ValueNode::print() const{
-    std::cout<<'{'<<ENUM_NAME(ARITHM_NODE_TYPE::VALUE);
-    std::cout<<"; "<<val_<<'}'<<std::endl;
-}
-
 VariableNode::VariableNode(VariableBase* variable):
     var_(variable){}
 
@@ -190,11 +165,6 @@ void VariableNode::refresh(){
         }
         caller_ = false;
     }
-}
-
-void VariableNode::print() const{
-    std::cout<<'{'<<ENUM_NAME(ARITHM_NODE_TYPE::VARIABLE);
-    std::cout<<var_->name()<<'}'<<std::endl;
 }
 
 Value_t VariableNode::execute(){
@@ -218,7 +188,14 @@ Value_t VariableNode::execute(size_t index){
         if(var_->is_array()){
             return var_->get<Array_t>().at(index).get<Value_t>();
         }
-        throw std::invalid_argument("Invalid type of variable: must be array");
+        else if(var_->is_numeric()){
+            if(var_->is_value())
+                return var_->get<Value_t>();
+            else if(var_->is_arithmetic_tree())
+                return var_->get<ArithmeticTree>().value();
+            else throw std::invalid_argument("Invalid type of variable");
+        }
+        throw std::invalid_argument("Invalid type of variable: not array or numeric");
     }
     else throw std::runtime_error("Uninitialized variable");
     
@@ -241,12 +218,6 @@ Node* MultiArgumentNode::child(size_t id) const{
         return childs_.at(id);
     else
         throw std::invalid_argument("Incorrect child's id");
-}
-
-void MultiArgumentNode::print() const{
-    std::cout<<'{'<<ENUM_NAME(ARITHM_NODE_TYPE::MULTIARG);
-    std::cout<<ENUM_NAME(operation());
-    std::cout<<'}'<<std::endl;
 }
 
 auto MultiArgumentNode::__register_array_input__(){
@@ -378,3 +349,54 @@ void MultiArgumentNode::refresh(){
 void RangeOperationNode::add_child(VariableNode* var){
     this->childs_.insert(var);
 }
+
+#ifdef DEBUG
+
+void UnaryNode::print() const{
+    std::cout<<'{'<<ENUM_NAME(ARITHM_NODE_TYPE::UNARY);
+    std::cout<<'}'<<std::endl;
+}
+
+void BinaryNode::print() const{
+    std::cout<<'{'<<ENUM_NAME(ARITHM_NODE_TYPE::BINARY);
+    std::cout<<"; ";
+    if(operation_==BINARY_OP::ADD){
+        std::cout<<ENUM_NAME(BINARY_OP::ADD);}
+    else if(operation_==BINARY_OP::SUB){
+        std::cout<<ENUM_NAME(BINARY_OP::SUB);}
+    else if(operation_==BINARY_OP::MUL){
+        std::cout<<ENUM_NAME(BINARY_OP::MUL);}
+    else if(operation_==BINARY_OP::DIV){
+        std::cout<<ENUM_NAME(BINARY_OP::DIV);}
+    else std::cout<<ENUM_NAME(BINARY_OP::POW);
+    std::cout<<'}'<<std::endl;
+}
+
+void ValueNode::print() const{
+    std::cout<<'{'<<ENUM_NAME(ARITHM_NODE_TYPE::VALUE);
+    std::cout<<"; "<<val_<<'}'<<std::endl;
+}
+
+void VariableNode::print() const{
+    std::cout<<'{'<<ENUM_NAME(ARITHM_NODE_TYPE::VARIABLE);
+    std::cout<<var_->name()<<'}'<<std::endl;
+}
+
+void MultiArgumentNode::print() const{
+    std::cout<<'{'<<ENUM_NAME(ARITHM_NODE_TYPE::MULTIARG);
+    std::cout<<ENUM_NAME(operation());
+    std::cout<<'}'<<std::endl;
+}
+
+void RangeOperationNode::print() const{
+    std::cout<<'{'<<ENUM_NAME(ARITHM_NODE_TYPE::RANGEOP);
+    if(operation_==RANGE_OP::PROD)
+        std::cout<<ENUM_NAME(RANGE_OP::PROD);
+    if(operation_==RANGE_OP::SUM)
+        std::cout<<ENUM_NAME(RANGE_OP::SUM);
+    if(operation_==RANGE_OP::SUMPRODUCT)
+        std::cout<<ENUM_NAME(RANGE_OP::SUMPRODUCT);
+    std::cout<<'}'<<std::endl;
+}
+
+#endif

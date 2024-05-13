@@ -34,7 +34,9 @@ class ArithmeticTree{
         return last_incomplete_;
     }
 
+    #ifdef DEBUG
     void print() const;
+    #endif
 
     protected:
     std::shared_ptr<Node> root_;

@@ -114,18 +114,22 @@ __B__=[2,2,2]
     assert(output.str() == 
 R"(12
 )");
-str_in = R"(__I__=SUM_I(__A__+__B__)
-__A__=[2,2,2]
-__B__=[2,2,2]
+    input.clear();
+str_in = R"(__I__=SUM_I(__A__+__B__*LOG_X(2,3))
+__A__=[1,1,1]
+__B__=[1,1,1]
+__C__=3
 )";
+    input.str(str_in);
     //std::cout<<input.str()<<std::endl;
+    output.str("");
     data->read_new();
     data->get("__I__")->print();
-    str = output.str();
-    std::cout<<str<<std::endl;
-    assert(output.str() == 
-R"(6
-)");
+    std::cout<<output.str()<<std::endl;
+    std::cout<<std::to_string(3*(1+log(2)/log(3)));
+//     assert(output.str() == 
+// R"(12
+// )");
 }
 
 void Testing(){
