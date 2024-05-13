@@ -47,6 +47,7 @@ void BaseListener::enterVariable(ParseRulesParser::VariableContext *ctx) {
         }
         else if(!tmp_range_node_.empty()){
             tmp_range_node_.top()->add_child(ptr->node().get());
+            tmp_range_node_.top()->expression().insert(ptr->node());
         }
         else{
             if(current_var_->is_arithmetic_tree())
@@ -377,14 +378,6 @@ void BaseListener::exitRangefunction(ParseRulesParser::RangefunctionContext* ctx
         } //может быть выражением
         tmp_range_node_.pop();
     }
-}
-
-void BaseListener::enterVariable_range_input(ParseRulesParser::Variable_range_inputContext* ctx){
-    
-}
-
-void BaseListener::exitVariable_range_input(ParseRulesParser::Variable_range_inputContext* ctx){
-
 }
 
 void BaseListener::enterNumber(ParseRulesParser::NumberContext* ctx){

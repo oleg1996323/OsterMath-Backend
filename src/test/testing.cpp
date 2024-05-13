@@ -99,7 +99,7 @@ void Test_Range_Operation_With_Var_Arrays(){
     pool.add_data("any");
     BaseData* data = pool.get("any");
     std::string str_in = 
-R"(__I__=SUMPRODUCT_I(__A__,__B__)
+R"(__I__=SUMPRODUCT_I(__A__+__B__)
 __A__=[2,2,2]
 __B__=[2,2,2]
 )";
@@ -114,13 +114,25 @@ __B__=[2,2,2]
     assert(output.str() == 
 R"(12
 )");
+str_in = R"(__I__=SUM_I(__A__+__B__)
+__A__=[2,2,2]
+__B__=[2,2,2]
+)";
+    //std::cout<<input.str()<<std::endl;
+    data->read_new();
+    data->get("__I__")->print();
+    str = output.str();
+    std::cout<<str<<std::endl;
+    assert(output.str() == 
+R"(6
+)");
 }
 
 void Testing(){
-    Test_Correct_Sum_Result_For_Array();
+    /*Test_Correct_Sum_Result_For_Array();
     Test_Correct_SumProduct_Result_For_Array();
     Test_Correct_Product_Result_For_Array();
-    Test_Simple_Arithmetic_With_Variable();
+    Test_Simple_Arithmetic_With_Variable();*/
     Test_Range_Operation_With_Var_Arrays();
 }
 

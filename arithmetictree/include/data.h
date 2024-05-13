@@ -39,6 +39,8 @@ class BaseData{
 
     void setstream(std::istream& stream);
 
+    void read_new();
+
     void parse_entry();
 
     private:

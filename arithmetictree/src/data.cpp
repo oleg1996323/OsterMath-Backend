@@ -66,6 +66,11 @@ void BaseData::setstream(std::istream& stream){
     }
 }
 
+void BaseData::read_new(){
+    if(parser_)
+        parser_->parse_entry();
+}
+
 void BaseData::parse_entry(){
     return parser_->parse_entry();
 }

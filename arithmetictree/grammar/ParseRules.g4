@@ -9,7 +9,6 @@ POW: '^' ;
 QUOTE: '\'';
 VARIABLE: '__'([a-zA-Z])+ [*'0-9]*'__';
 STRING: '"'[a-zA-Z0-9 .,:;!?]+'"';
-VARIABLE_RANGE: VARIABLE'()';
 WS: [ \t]+ -> skip;
 EOL: '\r'? '\n';
 
@@ -104,10 +103,6 @@ function
     | FACTORIAL '('WS* expr WS*')'
     ;
 
-variable_range_input:
-    VARIABLE_RANGE
-    ;
-
 multiargfunction
     :
     LOG_X '(' WS* expr WS* ',' WS* expr WS* ')'
@@ -118,7 +113,7 @@ multiargfunction
 
 rangefunction
     :
-    SUMPRODUCT_I '(' WS* variable_range_input WS* (','WS* variable_range_input WS*)* ')'
-    | SUM_I '(' WS* variable_range_input WS* (','WS* variable_range_input WS*)* ')'
-    | PRODUCT_I '(' WS* variable_range_input WS* (','WS* variable_range_input WS*)* ')'
+    SUMPRODUCT_I '(' WS* expr WS* ')'
+    | SUM_I '(' WS* expr WS* ')'
+    | PRODUCT_I '(' WS* expr WS* ')'
     ;

@@ -112,10 +112,6 @@ class BaseListener: public ParseRulesBaseListener{
 
     virtual void exitRangefunction(ParseRulesParser::RangefunctionContext* ctx) override;
 
-    virtual void enterVariable_range_input(ParseRulesParser::Variable_range_inputContext* ctx) override;
-
-    virtual void exitVariable_range_input(ParseRulesParser::Variable_range_inputContext* ctx) override;
-
     virtual void enterNumber(ParseRulesParser::NumberContext* ctx) override;
 
     virtual void exitNumber(ParseRulesParser::NumberContext* ctx) override;
