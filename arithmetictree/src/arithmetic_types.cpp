@@ -149,7 +149,7 @@ Value_t BinaryNode::execute(size_t index){
 VariableNode::VariableNode(VariableBase* variable):
     var_(variable){}
 
-const VariableBase* VariableNode::variable() const{
+VariableBase* VariableNode::variable() const{
     if(var_)
         return var_;
     else throw "Variable don't exists"s;

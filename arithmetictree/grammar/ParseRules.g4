@@ -82,12 +82,12 @@ numbers_line:
 expr
     : 
     '(' expr ')'                                            # Parens
+    | (function | multiargfunction | rangefunction)         # FunctionCall
     | VARIABLE                                              # Variable
     | (ADD | SUB) expr                                      # UnaryOp
     | expr POW expr                                         # BinaryOp  
     | expr (MUL | DIV) expr                                 # BinaryOp
     | expr (ADD | SUB) expr                                 # BinaryOp           
-    | (function | multiargfunction | rangefunction)         # FunctionCall
     | (number | constant)                                   # Literal
     ;
 

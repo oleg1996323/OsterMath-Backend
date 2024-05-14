@@ -238,7 +238,7 @@ class VariableNode:public Node{
 
     virtual void refresh() override;
 
-    const VariableBase* variable() const;
+    VariableBase* variable() const;
 
     virtual Value_t execute() override;
 
