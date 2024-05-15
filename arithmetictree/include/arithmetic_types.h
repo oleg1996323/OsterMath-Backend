@@ -10,7 +10,8 @@ enum class ARITHM_NODE_TYPE{
     VALUE, 
     VARIABLE,
     MULTIARG,
-    RANGEOP
+    RANGEOP,
+    FUNCTION
 };
 
 enum class BINARY_OP{
