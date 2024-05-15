@@ -35,16 +35,14 @@ enum class UNARY_OP{
     FACTORIAL
 };
 
-enum class MULTI_ARG_OP{
+enum MULTI_ARG_OP{
     SUMPRODUCT,
     SUM,
     PROD,
-    CONCAT,
     LOG_BASE
 };
 
 enum class RANGE_OP{
-    SUMPRODUCT,
     SUM,
     PROD
 };
@@ -168,11 +166,19 @@ class BinaryNode:public Node{
     }
 
     Value_t& lhs_cache() const{
-        return cache_.first;
+        return cache_.at(0).lhs_;
     }
 
     Value_t& rhs_cache() const{
-        return cache_.second;
+        return cache_.at(0).rhs_;
+    }
+
+    Value_t& lhs_cache(size_t index) const{
+        return cache_.at(index).lhs_;
+    }
+
+    Value_t& rhs_cache(size_t index) const{
+        return cache_.at(index).rhs_;
     }
 
     BINARY_OP operation() const{
@@ -184,11 +190,57 @@ class BinaryNode:public Node{
     #endif
 
     private:
+    class __cache__{
+        public:
+        __cache__() = default;
+
+        __cache__(const __cache__& other){
+            *this = other;
+        }
+
+        __cache__(__cache__&& other){
+            *this=other;
+        }
+
+        __cache__& operator=(const __cache__& other){
+            if(&other != this){
+                lhs_ = other.lhs_;
+                rhs_ = other.rhs_;
+            }
+            return *this;
+        }
+
+        __cache__& operator=(__cache__&& other){
+            if(&other != this){
+                std::swap(lhs_,other.lhs_);
+                std::swap(rhs_,other.rhs_);
+            }
+            return *this;
+        }
+
+        Value_t lhs_;
+        Value_t rhs_;
+    };
     Value_t __calculate__();
+    Value_t __calculate__(size_t index);
+
+    Value_t& lhs_cache(size_t index){
+        if(cache_.size()-1<index)
+            cache_.resize(index+1);
+        return cache_[index].lhs_;
+    }
+
+    Value_t& rhs_cache(size_t index){
+        if(cache_.size()-1<index)
+            cache_.resize(index+1);
+        return cache_[index].rhs_;
+    }
 
     std::shared_ptr<Node> lhs_;
     std::shared_ptr<Node> rhs_;
-    mutable std::pair<Value_t,Value_t> cache_;
+    mutable std::vector<__cache__> cache_=[](){std::vector<__cache__> res;
+    res.resize(1);
+    return res;}();
     BINARY_OP operation_;
 };
 
@@ -257,9 +309,18 @@ class VariableNode:public Node{
     void refresh_parent_links() const;
 };
 
+constexpr bool ARRAY_TYPE_MULTIARG [MULTI_ARG_OP::LOG_BASE+1] = 
+{
+    /*SUMPRODUCT*/{true}, 
+    /*SUM*/{true}, 
+    /*PROD*/{true}, 
+    /*LOG_X*/{false}};
+
 class MultiArgumentNode:public Node{
     public:
-    MultiArgumentNode(MULTI_ARG_OP op):operation_(op){}
+    MultiArgumentNode(MULTI_ARG_OP op):operation_(op){
+        array_type_function = ARRAY_TYPE_MULTIARG[op];
+    }
 
     const std::vector<Node*>& childs() const{
         return childs_;
@@ -273,6 +334,10 @@ class MultiArgumentNode:public Node{
 
     virtual ARITHM_NODE_TYPE type() const override{
         return ARITHM_NODE_TYPE::MULTIARG;
+    }
+
+    bool is_array_function() const{
+        return array_type_function;
     }
 
     virtual Node* first_undefined_child_node() override{
@@ -291,6 +356,7 @@ class MultiArgumentNode:public Node{
     std::vector<Node*> childs_;
     MULTI_ARG_OP operation_;
     std::optional<Value_t> cache_;
+    bool array_type_function;
 
     auto __register_array_input__();
 };
@@ -304,7 +370,7 @@ class RangeOperationNode:public Node{
     void add_child(VariableNode*);
 
     virtual ARITHM_NODE_TYPE type() const override{
-        return ARITHM_NODE_TYPE::MULTIARG;
+        return ARITHM_NODE_TYPE::RANGEOP;
     }
 
     virtual Node* first_undefined_child_node() override{

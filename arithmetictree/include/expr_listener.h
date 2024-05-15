@@ -47,6 +47,8 @@ class BaseListener: public ParseRulesBaseListener{
     bool is_table_values_definition() const;
 
     void __insert_to_variable__(const std::shared_ptr<Node>& node) const;
+    void __insert_to_variable__(std::string&& node) const;
+    void __insert_to_variable__(Value_t&& node) const;
     void __insert_to_range_operation__(const std::shared_ptr<Node>& node) const;
     void __insert_to_multiarg_operation__(const std::shared_ptr<Node>& node) const;
 
@@ -86,12 +88,6 @@ class BaseListener: public ParseRulesBaseListener{
     virtual void enterConstant(ParseRulesParser::ConstantContext *ctx) override;
 
     virtual void exitConstant(ParseRulesParser::ConstantContext *ctx) override;
-
-    //a function parser for definition any callback function for further calculations
-    //{for example: Lg(sumproduct(__Ivs__, __n__))}
-    virtual void enterFunctionCall(ParseRulesParser::FunctionCallContext *ctx) override;
-
-    virtual void exitFunctionCall(ParseRulesParser::FunctionCallContext *ctx) override;
 
     //binary operator {for example: Expr + Expr or Expr / Expr}
     virtual void enterBinaryOp(ParseRulesParser::BinaryOpContext *ctx) override;

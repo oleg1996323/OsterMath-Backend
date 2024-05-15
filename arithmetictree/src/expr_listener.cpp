@@ -62,11 +62,26 @@ void BaseListener::__insert_to_variable__(const std::shared_ptr<Node>& node) con
         current_var_->get<ArithmeticTree>().insert(node);
     }
     else if (current_var_->is_array()){
-        if(node->type()==ARITHM_NODE_TYPE::VARIABLE)
-        current_var_->get<Array_t>().define_back(Array_val(static_cast<VariableNode*>(node.get())->variable()));
-        //if(current_var_->get<Array_t>().back().is_expression())
-        //current_var_->get<Array_t>().back().get<ArithmeticTree>().insert(node);
+        current_var_->get<Array_t>().define_back(node);
     } //может быть выражением
+}
+
+void BaseListener::__insert_to_variable__(std::string&& node) const{
+    if(current_var_->is_undef())
+        current_var_->get()=node;
+    else throw std::runtime_error("Variable already defined");
+}
+
+void BaseListener::__insert_to_variable__(Value_t&& val) const{
+    if(current_var_->is_undef())
+        current_var_->get()=val;
+    else if(current_var_->is_arithmetic_tree())
+        __insert_to_variable__(std::make_shared<ValueNode>(val));
+    else if(current_var_->is_array())
+        current_var_->get<Array_t>().define_back(val);
+    else
+        throw std::runtime_error("Variable already defined");
+    
 }
 
 void BaseListener::__insert_to_range_operation__(const std::shared_ptr<Node>& node) const{
@@ -92,12 +107,12 @@ void BaseListener::exitVardefinition(ParseRulesParser::VardefinitionContext * ct
 
 void BaseListener::enterVariable(ParseRulesParser::VariableContext *ctx) {
     assert(!mode_.empty());
-    auto ptr = data_base_->add_variable(ctx->VARIABLE()->getText()).get();
+    VariableBase* ptr = data_base_->add_variable(ctx->VARIABLE()->getText()).get();
     if(is_variable_definition()){
         __insert_to_variable__(ptr->node());
     }
     else if(is_range_operation()){
-        __insert_to_variable__(ptr->node());
+        __insert_to_range_operation__(ptr->node());
         tmp_range_node_.top()->add_child(ptr->node().get());
     }
     else if(is_multiarg_operation()){
@@ -171,10 +186,12 @@ void BaseListener::enterConstant(ParseRulesParser::ConstantContext *ctx) {
         }
     }
     else if(is_range_operation()){
-        if(ctx->EXP())
-            tmp_range_node_.top()->expression().insert(std::make_shared<ValueNode>(boost::math::constants::e<Value_t>()));
-        else if(ctx->PI())
-            tmp_range_node_.top()->expression().insert(std::make_shared<ValueNode>(boost::math::constants::pi<Value_t>()));
+        if(ctx->EXP()){
+            __insert_to_range_operation__(std::make_shared<ValueNode>(boost::math::constants::e<Value_t>()));
+        }
+        else if(ctx->PI()){
+            __insert_to_range_operation__(std::make_shared<ValueNode>(boost::math::constants::pi<Value_t>()));
+        }
         else throw std::runtime_error("Error when constant added to range expression");
     }
     else throw std::runtime_error("Error when added constant value");
@@ -186,94 +203,37 @@ void BaseListener::exitConstant(ParseRulesParser::ConstantContext *ctx) {
 
 //a function parser for definition any callback function for further calculations
 //{for example: Lg(sumproduct(__Ivs__, __n__))}
-void BaseListener::enterFunctionCall(ParseRulesParser::FunctionCallContext *ctx) {
-    // assert(!mode_.empty());
-    // if(is_range_operation()){
-    //     assert(!tmp_range_node_.empty());
-    //     __function_input__(tmp_range_node_.top()->expression(),ctx);
-    //     return;
-    // }
-    // else if(is_variable_definition()){
-    //     assert(current_var_);
-    //     if(current_var_->is_value()){
-    //         current_var_->value_to_tree();
-    //     assert(current_var_->is_arithmetic_tree());
-    //     }
-    //     else if(current_var_->is_undef()){
-    //         current_var_->get()=ArithmeticTree();
-    //     }
-    //     else if(!current_var_->is_arithmetic_tree()){
-    //         throw std::invalid_argument("Invalid type of variable");
-    //     }
-    // }
-    // else if(is_multiarg_operation()){}
-
-    
-    // if(ctx->function()){
-    //     __function_input__(current_var_->get<ArithmeticTree>(),ctx);
-    // }
-    // else if(ctx->multiargfunction()){
-    //     if(ctx->multiargfunction()->SUMPRODUCT())
-    //         tmp_multiarg_node_ = std::make_shared<MultiArgumentNode>(MULTI_ARG_OP::SUMPRODUCT);
-    //     else if(ctx->multiargfunction()->LOG_X())
-    //         tmp_multiarg_node_ = std::make_shared<MultiArgumentNode>(MULTI_ARG_OP::LOG_BASE);
-    //     else if(ctx->multiargfunction()->SUM())
-    //         tmp_multiarg_node_ = std::make_shared<MultiArgumentNode>(MULTI_ARG_OP::SUM);
-    //     else if(ctx->multiargfunction()->PRODUCT())
-    //         tmp_multiarg_node_ = std::make_shared<MultiArgumentNode>(MULTI_ARG_OP::PROD);
-    //     return;
-    // }
-}
-
-void BaseListener::exitFunctionCall(ParseRulesParser::FunctionCallContext *ctx) {
-    // if(ctx->multiargfunction() && is_multiarg_operation()){
-    //     current_var_->get<ArithmeticTree>().insert(tmp_multiarg_node_.top());
-    //     tmp_multiarg_node_.pop();
-    //     mode_.pop();
-    // }
-    return;
-}
 
 //binary operator {for example: Expr + Expr or Expr / Expr}
 void BaseListener::enterBinaryOp(ParseRulesParser::BinaryOpContext *ctx) {
-    assert(!mode_.empty() && current_var_);
-
     //entering in the arithmetictree of range_function
-    if(!tmp_range_node_.empty()){
+    if(is_range_operation()){
         if(ctx->ADD())
-            tmp_range_node_.top()->expression().insert(std::make_shared<BinaryNode>(BINARY_OP::ADD));
+            __insert_to_range_operation__(std::make_shared<BinaryNode>(BINARY_OP::ADD));
         else if(ctx->SUB())
-            tmp_range_node_.top()->expression().insert(std::make_shared<BinaryNode>(BINARY_OP::SUB));
+            __insert_to_range_operation__(std::make_shared<BinaryNode>(BINARY_OP::SUB));
         else if(ctx->MUL())
-            tmp_range_node_.top()->expression().insert(std::make_shared<BinaryNode>(BINARY_OP::MUL));
+            __insert_to_range_operation__(std::make_shared<BinaryNode>(BINARY_OP::MUL));
         else if(ctx->DIV())
-            tmp_range_node_.top()->expression().insert(std::make_shared<BinaryNode>(BINARY_OP::DIV));
+            __insert_to_range_operation__(std::make_shared<BinaryNode>(BINARY_OP::DIV));
         else
-            tmp_range_node_.top()->expression().insert(std::make_shared<BinaryNode>(BINARY_OP::POW));
+            __insert_to_range_operation__(std::make_shared<BinaryNode>(BINARY_OP::POW));
         return;
     }
-
-    if(current_var_->is_value()){
-        current_var_->value_to_tree();
-        assert(current_var_->is_arithmetic_tree());
+    else if(is_variable_definition()){
+        if(ctx->ADD())
+            __insert_to_variable__(std::make_shared<BinaryNode>(BINARY_OP::ADD));
+        else if(ctx->SUB())
+            __insert_to_variable__(std::make_shared<BinaryNode>(BINARY_OP::SUB));
+        else if(ctx->MUL())
+            __insert_to_variable__(std::make_shared<BinaryNode>(BINARY_OP::MUL));
+        else if(ctx->DIV())
+            __insert_to_variable__(std::make_shared<BinaryNode>(BINARY_OP::DIV));
+        else
+            __insert_to_variable__(std::make_shared<BinaryNode>(BINARY_OP::POW));
+        return;
     }
-    else if(current_var_->is_undef()){
-        current_var_->get()=ArithmeticTree();
-    }
-    else if(!current_var_->is_arithmetic_tree()){
-        throw std::invalid_argument("Invalid type of variable");
-    }
-    if(ctx->ADD())
-        current_var_->get<ArithmeticTree>().insert(std::make_shared<BinaryNode>(BINARY_OP::ADD));
-    else if(ctx->SUB())
-        current_var_->get<ArithmeticTree>().insert(std::make_shared<BinaryNode>(BINARY_OP::SUB));
-    else if(ctx->MUL())
-        current_var_->get<ArithmeticTree>().insert(std::make_shared<BinaryNode>(BINARY_OP::MUL));
-    else if(ctx->DIV())
-        current_var_->get<ArithmeticTree>().insert(std::make_shared<BinaryNode>(BINARY_OP::DIV));
-    else
-        current_var_->get<ArithmeticTree>().insert(std::make_shared<BinaryNode>(BINARY_OP::POW));
-    return;
+    else throw std::runtime_error("Invalid input binary operation");
 }
 
 void BaseListener::exitBinaryOp(ParseRulesParser::BinaryOpContext *ctx) {
@@ -287,9 +247,9 @@ __B__=[2,2,2]*/
 
 void BaseListener::enterItemArray(ParseRulesParser::ItemArrayContext *ctx){
     assert(!mode_.empty());
-    if(mode_.top()==MODE::VARDEF){
+    if(is_variable_definition()){
         assert(current_var_->is_array());
-            current_var_->get<Array_t>().push_back(Array_val());
+        current_var_->get<Array_t>().push_back(Array_val());
         return;
     }
 }
@@ -352,66 +312,50 @@ void BaseListener::exitNumbers_line(ParseRulesParser::Numbers_lineContext* ctx) 
 }
 
 void BaseListener::enterRangefunction(ParseRulesParser::RangefunctionContext* ctx){
+    assert(ctx);
+    mode_.push(MODE::RANGEOPERATION);
     if(ctx->SUM_I())
         tmp_range_node_.push(std::make_shared<RangeOperationNode>(RANGE_OP::SUM));
-    else if(ctx->SUMPRODUCT_I())
-        tmp_range_node_.push(std::make_shared<RangeOperationNode>(RANGE_OP::SUMPRODUCT));
     else if(ctx->PRODUCT_I())
         tmp_range_node_.push(std::make_shared<RangeOperationNode>(RANGE_OP::PROD));
     else throw std::invalid_argument("Invalid type of function");
+    assert(tmp_range_node_.top()->type()==ARITHM_NODE_TYPE::RANGEOP);
 }
 
 void BaseListener::exitRangefunction(ParseRulesParser::RangefunctionContext* ctx){
-    assert(!tmp_range_node_.empty() && current_var_);
-    if(tmp_range_node_.size()>1){ //if the range function in other range function
-        const std::shared_ptr<RangeOperationNode>& node = tmp_range_node_.top();
-        tmp_range_node_.pop();
-        tmp_range_node_.top()->expression().insert(node);
+    assert(!tmp_range_node_.empty());
+    assert(!mode_.empty());
+    assert(mode_.top()==MODE::RANGEOPERATION);
+    mode_.pop();
+    std::shared_ptr<RangeOperationNode> ptr = tmp_range_node_.top();
+    assert(ptr->type()==ARITHM_NODE_TYPE::RANGEOP);
+    tmp_range_node_.pop();
+    assert(ptr->type()==ARITHM_NODE_TYPE::RANGEOP);
+    if(is_variable_definition()){
+        assert(!mode_.empty() && mode_.top()==MODE::VARDEF);
+        assert(ptr->type()==ARITHM_NODE_TYPE::RANGEOP);
+        __insert_to_variable__(ptr);
     }
-    else{   //if the range function in variable definition or array input
-        if(current_var_->is_undef())
-            current_var_->get() = ArithmeticTree();
-
-        if(current_var_->is_arithmetic_tree())
-            current_var_->get<ArithmeticTree>().insert(tmp_range_node_.top());
-        else if(current_var_->is_value()){
-            current_var_->value_to_tree();
-            current_var_->get<ArithmeticTree>().insert(tmp_range_node_.top());
-        }
-        else if (current_var_->is_array()){
-            if(current_var_->get<Array_t>().back().is_expression())
-            current_var_->get<Array_t>().back().get<ArithmeticTree>().insert(tmp_range_node_.top());
-        } //может быть выражением
-        tmp_range_node_.pop();
+    else if(is_range_operation()){
+        assert(!mode_.empty() && mode_.top()==MODE::RANGEOPERATION);
+        __insert_to_range_operation__(ptr);
+    }
+    else if(is_multiarg_operation()){
+        assert(!mode_.empty() && mode_.top()==MODE::MULTIARGOPERATION);
+        __insert_to_multiarg_operation__(ptr);
     }
 }
 
 void BaseListener::enterNumber(ParseRulesParser::NumberContext* ctx){
-    //entering in the arithmetictree of range_function
-    if(!tmp_range_node_.empty()){
-        tmp_range_node_.top()->expression().insert(std::make_shared<ValueNode>(ctx->getText()));
+    if(is_range_operation()){
+        __insert_to_range_operation__(std::make_shared<ValueNode>(ctx->getText()));
         return;
     }
-
-    //entering in simple var definition
-    if(current_var_->is_undef()){
-        current_var_->get()=Value_t(ctx->getText());
-        return;
-    }
-    else if(current_var_->is_arithmetic_tree()){
-            current_var_->get<ArithmeticTree>().insert(std::make_shared<ValueNode>(ctx->getText()));
-        return;
-    }
-    else if(current_var_->is_array()){
-        if(current_var_->get<Array_t>().back().is_undef())
-            current_var_->get<Array_t>().back() = Value_t(ctx->getText());
-        else if(current_var_->get<Array_t>().back().is_expression())
-            current_var_->get<Array_t>().back().get<ArithmeticTree>().insert(std::make_shared<ValueNode>(ctx->getText()));
-        else assert(false);
-        return;
-    }
-    else
-        throw std::runtime_error("Error parsing constant");
+    else if(is_variable_definition())
+        __insert_to_variable__(std::move(Value_t(ctx->getText())));
+    else if(is_multiarg_operation() && !tmp_multiarg_node_.top()->is_array_function())
+        __insert_to_multiarg_operation__(std::make_shared<ValueNode>(ctx->getText()));
+    else throw std::runtime_error("Unknown parsing type");
     return;
 }
 
@@ -429,7 +373,7 @@ void BaseListener::enterMultiargfunction(ParseRulesParser::MultiargfunctionConte
 
 void BaseListener::exitMultiargfunction(ParseRulesParser::MultiargfunctionContext* ctx){
     mode_.pop();
-    const auto& ptr = tmp_multiarg_node_.top();
+    std::shared_ptr<MultiArgumentNode> ptr = tmp_multiarg_node_.top();
     tmp_multiarg_node_.pop();
     if(is_variable_definition())
         __insert_to_variable__(ptr);

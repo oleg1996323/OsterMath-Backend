@@ -90,19 +90,53 @@ Value_t BinaryNode::__calculate__(){
     switch (operation_)
     {
         case BINARY_OP::ADD:
+            std::cout<<"Add: "<<lhs_cache()<<" and "<<rhs_cache()<<std::endl;
             return lhs_cache()+rhs_cache();
             break;
         case BINARY_OP::SUB:
+            std::cout<<"Sub: "<<lhs_cache()<<" and "<<rhs_cache()<<std::endl;
             return lhs_cache()-rhs_cache();
             break;
         case BINARY_OP::MUL:
+            std::cout<<"Mul: "<<lhs_cache()<<" and "<<rhs_cache()<<std::endl;
             return lhs_cache()*rhs_cache();
             break;
         case BINARY_OP::DIV:
+            std::cout<<"Div: "<<lhs_cache()<<" and "<<rhs_cache()<<std::endl;
             return lhs_cache()/rhs_cache();
             break;
         case BINARY_OP::POW:
+            std::cout<<"Pow: "<<lhs_cache()<<" and "<<rhs_cache()<<std::endl;
             return pow(lhs_cache(),rhs_cache());
+            break;
+        default:
+            throw std::invalid_argument("Unknown type of binary expression");
+            break;
+    }
+}
+
+Value_t BinaryNode::__calculate__(size_t index){
+    switch (operation_)
+    {
+        case BINARY_OP::ADD:
+            std::cout<<"Add: "<<lhs_cache(index)<<" and "<<rhs_cache(index)<<std::endl;
+            return lhs_cache(index)+rhs_cache(index);
+            break;
+        case BINARY_OP::SUB:
+            std::cout<<"Sub: "<<lhs_cache(index)<<" and "<<rhs_cache(index)<<std::endl;
+            return lhs_cache(index)-rhs_cache(index);
+            break;
+        case BINARY_OP::MUL:
+            std::cout<<"Mul: "<<lhs_cache(index)<<" and "<<rhs_cache(index)<<std::endl;
+            return lhs_cache(index)*rhs_cache(index);
+            break;
+        case BINARY_OP::DIV:
+            std::cout<<"Div: "<<lhs_cache(index)<<" and "<<rhs_cache(index)<<std::endl;
+            return lhs_cache(index)/rhs_cache(index);
+            break;
+        case BINARY_OP::POW:
+            std::cout<<"Pow: "<<lhs_cache(index)<<" and "<<rhs_cache(index)<<std::endl;
+            return pow(lhs_cache(index),rhs_cache(index));
             break;
         default:
             throw std::invalid_argument("Unknown type of binary expression");
@@ -120,6 +154,8 @@ Value_t BinaryNode::execute(){
         else{
             lhs_cache() = lhs_->execute();
             rhs_cache() = rhs_->execute();
+            std::cout<<"lhs: "<<lhs_cache()<<std::endl;
+            std::cout<<"rhs: "<<rhs_cache()<<std::endl;
         }
         return __calculate__();
     }
@@ -136,10 +172,10 @@ Value_t BinaryNode::execute(size_t index){
         else if(rhs_->caller()) //right branch call refreshing
             rhs_->execute(index);
         else{
-            lhs_cache() = lhs_->execute(index);
-            rhs_cache() = rhs_->execute(index);
+            lhs_cache(index) = lhs_->execute(index);
+            rhs_cache(index) = rhs_->execute(index);
         }
-        return __calculate__();
+        return __calculate__(index);
     }
     else
         throw std::runtime_error("Undefined binary operation");
@@ -240,6 +276,8 @@ Value_t MultiArgumentNode::execute(){
         if(operation_==MULTI_ARG_OP::LOG_BASE){
             if(childs_.size()!=2)
                 throw std::invalid_argument("Invalid function parameters");
+            std::cout<<"log_x: "<<log(childs_.at(0)->execute())<<std::endl;
+            std::cout<<"log_x base: "<<log(childs_.at(1)->execute())<<std::endl;
             cache_.emplace(log(childs_.at(0)->execute())/log(childs_.at(1)->execute()));
         }
         else if(operation_==MULTI_ARG_OP::SUMPRODUCT){
@@ -305,15 +343,11 @@ Value_t RangeOperationNode::execute(){
         result = 0.;
     else if(operation_==RANGE_OP::PROD)
         result = 1.;
-    else if(operation_==RANGE_OP::SUMPRODUCT)
-        result = 0.;
     for(size_t i=0;i<range_size;++i){
         if(operation_==RANGE_OP::SUM)
             result+=execute(i);
         else if(operation_==RANGE_OP::PROD)
             result*=execute(i);
-        else if(operation_==RANGE_OP::SUMPRODUCT)
-            result+=execute(i);
     }
     return result;
 }
@@ -394,8 +428,6 @@ void RangeOperationNode::print() const{
         std::cout<<ENUM_NAME(RANGE_OP::PROD);
     if(operation_==RANGE_OP::SUM)
         std::cout<<ENUM_NAME(RANGE_OP::SUM);
-    if(operation_==RANGE_OP::SUMPRODUCT)
-        std::cout<<ENUM_NAME(RANGE_OP::SUMPRODUCT);
     std::cout<<'}'<<std::endl;
 }
 

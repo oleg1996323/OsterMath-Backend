@@ -67,6 +67,8 @@ class Array_t : public std::vector<Array_val>{
 
     void define_back(const Array_val& val);
 
+    void define_back(const std::shared_ptr<Node> & node);
+
     VariableBase* parent() const{
         return parent_;
     }
@@ -87,7 +89,9 @@ class Array_t : public std::vector<Array_val>{
     }
 
     private:
-    VariableBase* parent_; 
+    VariableBase* parent_;
+
+    void __value_to_tree_for_last__();
 };
 
 using Variable_t = std::variant<std::monostate,Value_t,std::string, Array_t, ArithmeticTree>;
@@ -151,7 +155,6 @@ class VariableBase: private Variable_t, public FormattingData{
     std::shared_ptr<VariableNode> node_; //shared, так как может быть передан в любое арифметическое дерево
     std::string_view name_;
     BaseData* data_base_;
-    TYPE type_;
 };
 
 std::ostream& operator<<(std::ostream& stream, const ArithmeticTree& tree);

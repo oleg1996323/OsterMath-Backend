@@ -51,6 +51,26 @@ void Array_t::define_back(const Array_val& val){
     back() = val; //при вводе неопределённой переменной тип определяется неверно
 }
 
+void Array_t::define_back(const std::shared_ptr<Node> & node){
+    if(back().is_undef()){
+        back() = ArithmeticTree();
+    }
+    else if(back().is_value())
+        __value_to_tree_for_last__();
+
+
+    assert(back().is_expression());
+    back().get<ArithmeticTree>().insert(node);
+    return;
+}
+
+void Array_t::__value_to_tree_for_last__(){
+    assert(back().is_value());
+    ArithmeticTree tree;
+    tree.insert(std::make_shared<ValueNode>(std::move(back().get<Value_t>())));
+    back().get()=std::move(tree);
+}
+
 size_t VariableBase::HashVar::operator()(const VariableBase& var){
     return std::hash<std::string_view>()(var.name_);
 }
