@@ -8,8 +8,6 @@
 #include "expr_listener.h"
 #include "expr_lexer.h"
 
-//SignalizerStream (если finished() и переданы данные)
-
 class Parser{
 struct ParseItems{
     ParseItems(std::istream& stream, BaseData* data_base):

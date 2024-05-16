@@ -6,31 +6,6 @@
 
 using namespace std::string_view_literals;
 
-// void BaseListener::__function_input__(ArithmeticTree& tree_input,ParseRulesParser::FunctionCallContext* func_ctx){
-//     if(func_ctx->function()){
-//         if(func_ctx->function()->EXP())
-//             tree_input.insert(std::make_shared<FunctionNode>(FUNCTION_OP::EXP));
-//         else if(func_ctx->function()->LG())
-//             tree_input.insert(std::make_shared<FunctionNode>(FUNCTION_OP::LG10));
-//         else if(func_ctx->function()->LN())
-//             tree_input.insert(std::make_shared<FunctionNode>(FUNCTION_OP::LN));
-//         else if(func_ctx->multiargfunction()->LOG_X())
-//             tmp_function_node_.top() = std::make_shared<FunctionNode>(FUNCTION_OP::LOG_BASE);
-//         else throw std::invalid_argument("Unknown input of function context");
-//     }
-//     else if(func_ctx->multiargfunction()){
-//         if(func_ctx->multiargfunction()->SUMPRODUCT())
-//             tmp_function_node_.top() = std::make_shared<FunctionNode>(FUNCTION_OP::SUMPRODUCT);
-//         else if(func_ctx->multiargfunction()->SUM())
-//             tmp_function_node_.top() = std::make_shared<FunctionNode>(FUNCTION_OP::SUM);
-//         else if(func_ctx->multiargfunction()->PRODUCT())
-//             tmp_function_node_.top() = std::make_shared<FunctionNode>(FUNCTION_OP::PROD);
-//         tree_input.insert(tmp_function_node_.top());
-//         return;
-//     }
-//     else __assert_fail("func_ctx->function() == nullptr",__FILE__,__LINE__,__func__);
-// }
-
 bool BaseListener::is_header_definition() const{
     return !mode_.empty() && mode_.top()==MODE::HDRDEF;
 }

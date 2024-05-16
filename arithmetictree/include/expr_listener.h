@@ -38,8 +38,6 @@ class BaseListener: public ParseRulesBaseListener{
         FUNCTIONOPERATION
     };
 
-    void __function_input__(ArithmeticTree& tree_input,ParseRulesParser::FunctionCallContext* func_ctx);
-
     bool is_range_operation() const;
     bool is_function_operation() const;
     bool is_header_definition() const;
