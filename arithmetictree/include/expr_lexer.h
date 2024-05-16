@@ -19,5 +19,4 @@ public:
 
 private:
     std::unique_ptr<antlr4::CommonTokenStream> token_stream_;
-    TypeFile type_;
 };

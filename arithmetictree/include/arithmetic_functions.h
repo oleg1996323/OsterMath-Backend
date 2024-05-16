@@ -6,9 +6,7 @@
 namespace functions{
     namespace auxiliary{
         bool checking_egal_size_arrays(std::vector<std::reference_wrapper<const Array_t>>& arrays);
-
         TYPE getting_arrays_type(std::vector<std::reference_wrapper<const Array_t>>& arrays);
-
     }
 
     namespace Arithmetic{

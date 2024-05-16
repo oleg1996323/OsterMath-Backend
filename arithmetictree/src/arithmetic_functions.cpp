@@ -27,16 +27,6 @@ TYPE functions::auxiliary::getting_arrays_type(std::vector<std::reference_wrappe
     return type;
 }
 
-/*__I__=sumproduct(__A__,__B__)       
-__A__=[2,2,2]
-__B__=[2,2,2]
-*/
-
-/*__I__=sum(__A__,__B__)       
-__A__=[2,2,2]
-__B__=[2,2,2]
-*/
-
 bool functions::Arithmetic::checking(std::vector<std::reference_wrapper<const Array_t>>& arrays){
     if(auxiliary::getting_arrays_type(arrays)==TYPE::NUMERIC)
         return auxiliary::checking_egal_size_arrays(arrays);
