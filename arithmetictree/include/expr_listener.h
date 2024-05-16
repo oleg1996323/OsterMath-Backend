@@ -24,7 +24,7 @@ public:
 };
 
 class VariableBase;
-class MultiArgumentNode;
+class FunctionNode;
 class RangeOperationNode;
 class Node;
 
@@ -35,13 +35,13 @@ class BaseListener: public ParseRulesBaseListener{
         TABLEDEF,
         TABVALDEF,
         RANGEOPERATION,
-        MULTIARGOPERATION
+        FUNCTIONOPERATION
     };
 
     void __function_input__(ArithmeticTree& tree_input,ParseRulesParser::FunctionCallContext* func_ctx);
 
     bool is_range_operation() const;
-    bool is_multiarg_operation() const;
+    bool is_function_operation() const;
     bool is_header_definition() const;
     bool is_variable_definition() const;
     bool is_table_values_definition() const;
@@ -50,11 +50,11 @@ class BaseListener: public ParseRulesBaseListener{
     void __insert_to_variable__(std::string&& node) const;
     void __insert_to_variable__(Value_t&& node) const;
     void __insert_to_range_operation__(const std::shared_ptr<Node>& node) const;
-    void __insert_to_multiarg_operation__(const std::shared_ptr<Node>& node) const;
+    void __insert_to_function_operation__(const std::shared_ptr<Node>& node) const;
 
     BaseData* data_base_;
     VariableBase* current_var_;
-    std::stack<std::shared_ptr<MultiArgumentNode>> tmp_multiarg_node_;
+    std::stack<std::shared_ptr<FunctionNode>> tmp_function_node_;
     std::stack<std::shared_ptr<RangeOperationNode>> tmp_range_node_;
     std::vector<VariableBase*> hdr_vars_; 
     std::stack<MODE> mode_;
@@ -123,9 +123,11 @@ class BaseListener: public ParseRulesBaseListener{
 
     virtual void enterNumber(ParseRulesParser::NumberContext* ctx) override;
 
-    virtual void exitNumber(ParseRulesParser::NumberContext* ctx) override;
-
     virtual void enterMultiargfunction(ParseRulesParser::MultiargfunctionContext* ctx) override;
 
     virtual void exitMultiargfunction(ParseRulesParser::MultiargfunctionContext* ctx) override;
+
+    virtual void enterFunction(ParseRulesParser::FunctionContext* ctx) override;
+
+    virtual void exitFunction(ParseRulesParser::FunctionContext* ctx) override;
 };

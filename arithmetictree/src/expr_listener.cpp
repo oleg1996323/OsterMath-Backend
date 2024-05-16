@@ -6,37 +6,37 @@
 
 using namespace std::string_view_literals;
 
-void BaseListener::__function_input__(ArithmeticTree& tree_input,ParseRulesParser::FunctionCallContext* func_ctx){
-    if(func_ctx->function()){
-        if(func_ctx->function()->EXP())
-            tree_input.insert(std::make_shared<UnaryNode>(UNARY_OP::EXP));
-        else if(func_ctx->function()->LG())
-            tree_input.insert(std::make_shared<UnaryNode>(UNARY_OP::LG10));
-        else if(func_ctx->function()->LN())
-            tree_input.insert(std::make_shared<UnaryNode>(UNARY_OP::LN));
-        else throw std::invalid_argument("Unknown input of function context");
-    }
-    else if(func_ctx->multiargfunction()){
-        if(func_ctx->multiargfunction()->SUMPRODUCT())
-            tmp_multiarg_node_.top() = std::make_shared<MultiArgumentNode>(MULTI_ARG_OP::SUMPRODUCT);
-        else if(func_ctx->multiargfunction()->LOG_X())
-            tmp_multiarg_node_.top() = std::make_shared<MultiArgumentNode>(MULTI_ARG_OP::LOG_BASE);
-        else if(func_ctx->multiargfunction()->SUM())
-            tmp_multiarg_node_.top() = std::make_shared<MultiArgumentNode>(MULTI_ARG_OP::SUM);
-        else if(func_ctx->multiargfunction()->PRODUCT())
-            tmp_multiarg_node_.top() = std::make_shared<MultiArgumentNode>(MULTI_ARG_OP::PROD);
-        tree_input.insert(tmp_multiarg_node_.top());
-        return;
-    }
-    else __assert_fail("func_ctx->function() == nullptr",__FILE__,__LINE__,__func__);
-}
+// void BaseListener::__function_input__(ArithmeticTree& tree_input,ParseRulesParser::FunctionCallContext* func_ctx){
+//     if(func_ctx->function()){
+//         if(func_ctx->function()->EXP())
+//             tree_input.insert(std::make_shared<FunctionNode>(FUNCTION_OP::EXP));
+//         else if(func_ctx->function()->LG())
+//             tree_input.insert(std::make_shared<FunctionNode>(FUNCTION_OP::LG10));
+//         else if(func_ctx->function()->LN())
+//             tree_input.insert(std::make_shared<FunctionNode>(FUNCTION_OP::LN));
+//         else if(func_ctx->multiargfunction()->LOG_X())
+//             tmp_function_node_.top() = std::make_shared<FunctionNode>(FUNCTION_OP::LOG_BASE);
+//         else throw std::invalid_argument("Unknown input of function context");
+//     }
+//     else if(func_ctx->multiargfunction()){
+//         if(func_ctx->multiargfunction()->SUMPRODUCT())
+//             tmp_function_node_.top() = std::make_shared<FunctionNode>(FUNCTION_OP::SUMPRODUCT);
+//         else if(func_ctx->multiargfunction()->SUM())
+//             tmp_function_node_.top() = std::make_shared<FunctionNode>(FUNCTION_OP::SUM);
+//         else if(func_ctx->multiargfunction()->PRODUCT())
+//             tmp_function_node_.top() = std::make_shared<FunctionNode>(FUNCTION_OP::PROD);
+//         tree_input.insert(tmp_function_node_.top());
+//         return;
+//     }
+//     else __assert_fail("func_ctx->function() == nullptr",__FILE__,__LINE__,__func__);
+// }
 
 bool BaseListener::is_header_definition() const{
     return !mode_.empty() && mode_.top()==MODE::HDRDEF;
 }
 
-bool BaseListener::is_multiarg_operation() const{
-    return !mode_.empty() && mode_.top()==MODE::MULTIARGOPERATION;
+bool BaseListener::is_function_operation() const{
+    return !mode_.empty() && mode_.top()==MODE::FUNCTIONOPERATION;
 }
 
 bool BaseListener::is_table_values_definition() const{
@@ -88,8 +88,8 @@ void BaseListener::__insert_to_range_operation__(const std::shared_ptr<Node>& no
     tmp_range_node_.top()->expression().insert(node);
 }
 
-void BaseListener::__insert_to_multiarg_operation__(const std::shared_ptr<Node>& node) const{
-    tmp_multiarg_node_.top()->add_child(node.get());
+void BaseListener::__insert_to_function_operation__(const std::shared_ptr<Node>& node) const{
+    tmp_function_node_.top()->add_child(node);
 }
 
 void BaseListener::enterVardefinition(ParseRulesParser::VardefinitionContext * ctx){
@@ -115,8 +115,8 @@ void BaseListener::enterVariable(ParseRulesParser::VariableContext *ctx) {
         __insert_to_range_operation__(ptr->node());
         tmp_range_node_.top()->add_child(ptr->node().get());
     }
-    else if(is_multiarg_operation()){
-        __insert_to_multiarg_operation__(ptr->node());
+    else if(is_function_operation()){
+        __insert_to_function_operation__(ptr->node());
     }
     else throw std::runtime_error("Error when variable inserted");
 }
@@ -191,6 +191,15 @@ void BaseListener::enterConstant(ParseRulesParser::ConstantContext *ctx) {
         }
         else if(ctx->PI()){
             __insert_to_range_operation__(std::make_shared<ValueNode>(boost::math::constants::pi<Value_t>()));
+        }
+        else throw std::runtime_error("Error when constant added to range expression");
+    }
+    else if(is_function_operation()){
+        if(ctx->EXP()){
+            __insert_to_function_operation__(std::make_shared<ValueNode>(boost::math::constants::e<Value_t>()));
+        }
+        else if(ctx->PI()){
+            __insert_to_function_operation__(std::make_shared<ValueNode>(boost::math::constants::pi<Value_t>()));
         }
         else throw std::runtime_error("Error when constant added to range expression");
     }
@@ -311,6 +320,54 @@ void BaseListener::exitNumbers_line(ParseRulesParser::Numbers_lineContext* ctx) 
     mode_.pop();
 }
 
+void BaseListener::enterNumber(ParseRulesParser::NumberContext* ctx){
+    if(is_range_operation()){
+        __insert_to_range_operation__(std::make_shared<ValueNode>(ctx->getText()));
+        return;
+    }
+    else if(is_variable_definition())
+        __insert_to_variable__(std::move(Value_t(ctx->getText())));
+    else if(is_function_operation() && !tmp_function_node_.top()->is_array_function())
+        __insert_to_function_operation__(std::make_shared<ValueNode>(ctx->getText()));
+    else throw std::runtime_error("Unknown parsing type");
+    return;
+}
+
+void BaseListener::enterMultiargfunction(ParseRulesParser::MultiargfunctionContext* ctx){
+    mode_.push(MODE::FUNCTIONOPERATION);
+    if(ctx->PRODUCT())
+        tmp_function_node_.push(std::make_unique<FunctionNode>(FUNCTION_OP::PROD));
+    else if(ctx->SUMPRODUCT())
+        tmp_function_node_.push(std::make_unique<FunctionNode>(FUNCTION_OP::SUMPRODUCT));
+    else if(ctx->SUM())
+        tmp_function_node_.push(std::make_unique<FunctionNode>(FUNCTION_OP::SUM));
+}
+
+void BaseListener::enterFunction(ParseRulesParser::FunctionContext* ctx){
+    mode_.push(MODE::FUNCTIONOPERATION);
+    if(ctx){
+        if(ctx->EXP())
+            tmp_function_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::EXP));
+        else if(ctx->LG())
+            tmp_function_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::LG10));
+        else if(ctx->LN())
+            tmp_function_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::LN));
+        else if(ctx->LOG_X())
+            tmp_function_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::LOG_BASE));
+        else if(ctx->SIN())
+            tmp_function_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::SIN));
+        else if(ctx->COS())
+            tmp_function_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::COS));
+        else if(ctx->ASIN())
+            tmp_function_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::ASIN));
+        else if(ctx->ACOS())
+            tmp_function_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::ACOS));
+        else if(ctx->FACTORIAL())
+            tmp_function_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::FACTORIAL));
+        else throw std::invalid_argument("Unknown input of function context");
+    }
+}
+
 void BaseListener::enterRangefunction(ParseRulesParser::RangefunctionContext* ctx){
     assert(ctx);
     mode_.push(MODE::RANGEOPERATION);
@@ -322,67 +379,43 @@ void BaseListener::enterRangefunction(ParseRulesParser::RangefunctionContext* ct
     assert(tmp_range_node_.top()->type()==ARITHM_NODE_TYPE::RANGEOP);
 }
 
-void BaseListener::exitRangefunction(ParseRulesParser::RangefunctionContext* ctx){
-    assert(!tmp_range_node_.empty());
-    assert(!mode_.empty());
-    assert(mode_.top()==MODE::RANGEOPERATION);
+void BaseListener::exitFunction(ParseRulesParser::FunctionContext* ctx){
     mode_.pop();
-    std::shared_ptr<RangeOperationNode> ptr = tmp_range_node_.top();
-    assert(ptr->type()==ARITHM_NODE_TYPE::RANGEOP);
-    tmp_range_node_.pop();
-    assert(ptr->type()==ARITHM_NODE_TYPE::RANGEOP);
-    if(is_variable_definition()){
-        assert(!mode_.empty() && mode_.top()==MODE::VARDEF);
-        assert(ptr->type()==ARITHM_NODE_TYPE::RANGEOP);
-        __insert_to_variable__(ptr);
-    }
-    else if(is_range_operation()){
-        assert(!mode_.empty() && mode_.top()==MODE::RANGEOPERATION);
-        __insert_to_range_operation__(ptr);
-    }
-    else if(is_multiarg_operation()){
-        assert(!mode_.empty() && mode_.top()==MODE::MULTIARGOPERATION);
-        __insert_to_multiarg_operation__(ptr);
-    }
-}
-
-void BaseListener::enterNumber(ParseRulesParser::NumberContext* ctx){
-    if(is_range_operation()){
-        __insert_to_range_operation__(std::make_shared<ValueNode>(ctx->getText()));
-        return;
-    }
-    else if(is_variable_definition())
-        __insert_to_variable__(std::move(Value_t(ctx->getText())));
-    else if(is_multiarg_operation() && !tmp_multiarg_node_.top()->is_array_function())
-        __insert_to_multiarg_operation__(std::make_shared<ValueNode>(ctx->getText()));
-    else throw std::runtime_error("Unknown parsing type");
-    return;
-}
-
-void BaseListener::enterMultiargfunction(ParseRulesParser::MultiargfunctionContext* ctx){
-    mode_.push(MODE::MULTIARGOPERATION);
-    if(ctx->LOG_X())
-        tmp_multiarg_node_.push(std::make_unique<MultiArgumentNode>(MULTI_ARG_OP::LOG_BASE));
-    else if(ctx->PRODUCT())
-        tmp_multiarg_node_.push(std::make_unique<MultiArgumentNode>(MULTI_ARG_OP::PROD));
-    else if(ctx->SUMPRODUCT())
-        tmp_multiarg_node_.push(std::make_unique<MultiArgumentNode>(MULTI_ARG_OP::SUMPRODUCT));
-    else if(ctx->SUM())
-        tmp_multiarg_node_.push(std::make_unique<MultiArgumentNode>(MULTI_ARG_OP::SUM));
-}
-
-void BaseListener::exitMultiargfunction(ParseRulesParser::MultiargfunctionContext* ctx){
-    mode_.pop();
-    std::shared_ptr<MultiArgumentNode> ptr = tmp_multiarg_node_.top();
-    tmp_multiarg_node_.pop();
+    std::shared_ptr<FunctionNode> ptr = tmp_function_node_.top();
+    tmp_function_node_.pop();
     if(is_variable_definition())
         __insert_to_variable__(ptr);
     else if(is_range_operation())
         __insert_to_range_operation__(ptr);
-    else if(is_multiarg_operation())
-        __insert_to_multiarg_operation__(ptr);
+    else if(is_function_operation())
+        __insert_to_function_operation__(ptr);
 }
 
-void BaseListener::exitNumber(ParseRulesParser::NumberContext* ctx){
+void BaseListener::exitMultiargfunction(ParseRulesParser::MultiargfunctionContext* ctx){
+    mode_.pop();
+    std::shared_ptr<FunctionNode> ptr = tmp_function_node_.top();
+    tmp_function_node_.pop();
+    if(is_variable_definition())
+        __insert_to_variable__(ptr);
+    else if(is_range_operation())
+        __insert_to_range_operation__(ptr);
+    else if(is_function_operation())
+        __insert_to_function_operation__(ptr);
+}
 
+void BaseListener::exitRangefunction(ParseRulesParser::RangefunctionContext* ctx){
+    assert(!tmp_range_node_.empty());
+    assert(!mode_.empty());
+    mode_.pop();
+    std::shared_ptr<RangeOperationNode> ptr = tmp_range_node_.top();
+    tmp_range_node_.pop();
+    if(is_variable_definition()){
+        __insert_to_variable__(ptr);
+    }
+    else if(is_range_operation()){
+        __insert_to_range_operation__(ptr);
+    }
+    else if(is_function_operation()){
+        __insert_to_function_operation__(ptr);
+    }
 }

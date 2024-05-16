@@ -115,7 +115,7 @@ __B__=[2,2,2]
 R"(64
 )");
     input.clear();
-str_in = R"(__I__=SUM_I(__A__+__B__*LOG_X(2,3))
+str_in = R"(__I__=SUM_I(__A__+__B__*__C__)
 __A__=[1,1,1]
 __B__=[1,1,1]
 __C__=3
@@ -128,8 +128,42 @@ __C__=3
     std::cout<<output.str()<<std::endl;
     //std::cout<<3*(1+log(2)/log(3));
     assert(output.str() == 
-R"(6
+R"(12
 )");
+str_in = R"(__I__=SUM_I(__A__+(__B__*__C__)^__D__)
+__A__=[1,1,1]
+__B__=[1,1,LOG_X(EXP(2),pi)]
+__C__=3
+__D__=[2,3,4]
+)";/**LOG_X(2,3)*/
+    input.str(str_in);
+    //std::cout<<input.str()<<std::endl;
+    output.str("");
+    data->read_new();
+    data->get("__I__")->print();
+    std::cout<<output.str()<<std::endl;
+    //std::cout<<3*(1+log(2)/log(3));
+//     assert(output.str() == 
+// R"(12
+// )");
+
+str_in = R"(__I__=SUM_I(__A__+(__B__*__C__)^__D__)
+__A__=[1,1,1]
+__B__=[1,1,LOG_X(EXP(2),pi)]
+__C__=3
+__D__=[2,3,4,5]
+)";/**LOG_X(2,3)*/
+    input.str(str_in);
+    //std::cout<<input.str()<<std::endl;
+    output.str("");
+    try{
+        data->read_new();
+        data->get("__I__")->print();
+        std::cout<<output.str()<<std::endl;
+    }
+    catch(const std::invalid_argument& err){
+        std::cout<<err.what()<<std::endl;
+    }
 }
 
 void Testing(){

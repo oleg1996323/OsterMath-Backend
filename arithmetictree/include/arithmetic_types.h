@@ -9,7 +9,6 @@ enum class ARITHM_NODE_TYPE{
     BINARY, 
     VALUE, 
     VARIABLE,
-    MULTIARG,
     RANGEOP,
     FUNCTION
 };
@@ -23,24 +22,24 @@ enum class BINARY_OP{
 };
 
 enum class UNARY_OP{
+    ADD,
+    SUB,
+    PARENS
+};
+
+enum class FUNCTION_OP{
     LN,
     LG10,
     EXP,
-    ADD,
-    SUB,
-    PARENS,
     COS,
     ACOS,
     SIN,
     ASIN,
-    FACTORIAL
-};
-
-enum MULTI_ARG_OP{
-    SUMPRODUCT,
+    FACTORIAL,
+    LOG_BASE,
     SUM,
     PROD,
-    LOG_BASE
+    SUMPRODUCT
 };
 
 enum class RANGE_OP{
@@ -310,31 +309,53 @@ class VariableNode:public Node{
     void refresh_parent_links() const;
 };
 
-constexpr bool ARRAY_TYPE_MULTIARG [MULTI_ARG_OP::LOG_BASE+1] = 
-{
-    /*SUMPRODUCT*/{true}, 
+constexpr bool ARRAY_TYPE_FUNCTION [int(FUNCTION_OP::SUMPRODUCT)+1] = 
+{   
+    /*LN*/{false},
+    /*LG10*/{false},
+    /*EXP*/{false},
+    /*SIN*/{false},
+    /*COS*/{false},
+    /*ACOS*/{false},
+    /*ASIN*/{false},
+    /*FACTORIAL*/{false},
+    /*LOG_X*/{false},
     /*SUM*/{true}, 
     /*PROD*/{true}, 
-    /*LOG_X*/{false}};
+    /*SUMPRODUCT*/{true}};
 
-class MultiArgumentNode:public Node{
+//0 - if 1 or more
+constexpr size_t NUMBER_OF_ARGUMENT [int(FUNCTION_OP::SUMPRODUCT)+1] = {
+    /*LN*/{1},
+    /*LG10*/{1},
+    /*EXP*/{1},
+    /*SIN*/{1},
+    /*COS*/{1},
+    /*ACOS*/{1},
+    /*ASIN*/{1},
+    /*FACTORIAL*/{1},
+    /*LOG_X*/{2},
+    /*SUM*/{0}, 
+    /*PROD*/{0}, 
+    /*SUMPRODUCT*/{0}};
+
+class FunctionNode:public Node{
     public:
-    MultiArgumentNode(MULTI_ARG_OP op):operation_(op){
-        array_type_function = ARRAY_TYPE_MULTIARG[op];
-    }
+    FunctionNode(FUNCTION_OP op):operation_(op),
+    array_type_function(ARRAY_TYPE_FUNCTION[int(op)]),
+    number_of_arguments(NUMBER_OF_ARGUMENT[int(op)])
+    {}
 
-    const std::vector<Node*>& childs() const{
-        return childs_;
-    }
+    std::shared_ptr<Node> child(size_t id) const;
 
-    Node* child(size_t id) const;
+    void add_child(const std::shared_ptr<Node>&);
 
-    void add_child(Node*);
+    void add_child(std::weak_ptr<VariableNode>&& node);
 
     virtual void refresh() override;
 
     virtual ARITHM_NODE_TYPE type() const override{
-        return ARITHM_NODE_TYPE::MULTIARG;
+        return ARITHM_NODE_TYPE::FUNCTION;
     }
 
     bool is_array_function() const{
@@ -354,10 +375,20 @@ class MultiArgumentNode:public Node{
     #endif
 
     private:
-    std::vector<Node*> childs_;
-    MULTI_ARG_OP operation_;
+    std::vector<std::variant<std::shared_ptr<Node>,std::weak_ptr<VariableNode>>> childs_;
+
+    bool __is_variable_node__(size_t index) const{
+        return std::holds_alternative<std::weak_ptr<VariableNode>>(childs_.at(index));
+    }
+
+    bool __is_simple_node__(size_t index) const{
+        return std::holds_alternative<std::shared_ptr<Node>>(childs_.at(index));
+    }
+
+    FUNCTION_OP operation_;
     std::optional<Value_t> cache_;
     bool array_type_function;
+    size_t number_of_arguments = 0;
 
     auto __register_array_input__();
 };

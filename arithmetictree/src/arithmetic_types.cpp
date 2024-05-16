@@ -29,20 +29,11 @@ Node* UnaryNode::first_undefined_child_node(){
 Value_t UnaryNode::__calculate__(Value_t&& child_exec){
     switch (operation)
         {
-        case UNARY_OP::LN:
-            return log(child_exec);
-            break;
-        case UNARY_OP::LG10:
-            return log10(child_exec);
-            break;
         case UNARY_OP::ADD:
             return child_exec;
             break;
         case UNARY_OP::SUB:
             return (-1)*(child_exec);
-            break;
-        case UNARY_OP::EXP:
-            return exp(child_exec);
             break;
         case UNARY_OP::PARENS:
             return child_exec;
@@ -222,7 +213,12 @@ Value_t VariableNode::execute(){
 Value_t VariableNode::execute(size_t index){
     if(var_){
         if(var_->is_array()){
-            return var_->get<Array_t>().at(index).get<Value_t>();
+            const Array_val& val = var_->get<Array_t>().at(index);
+            if(val.is_expression())
+                return val.get<ArithmeticTree>().execute();
+            else if(val.is_value())
+                return val.get<Value_t>();
+            else throw std::invalid_argument("Invalid type of array item");
         }
         else if(var_->is_numeric()){
             if(var_->is_value())
@@ -249,20 +245,24 @@ void VariableNode::refresh_parent_links() const{
             parents_.erase(iterator_node);
     }
 
-Node* MultiArgumentNode::child(size_t id) const{
-    if(id<childs_.size())
-        return childs_.at(id);
+std::shared_ptr<Node> FunctionNode::child(size_t id) const{
+    if(id<childs_.size()){
+        if(__is_simple_node__(id))
+            return std::get<std::shared_ptr<Node>>(childs_.at(id));
+        else return std::get<std::weak_ptr<VariableNode>>(childs_.at(id)).lock();
+    }
     else
         throw std::invalid_argument("Incorrect child's id");
 }
 
-auto MultiArgumentNode::__register_array_input__(){
+auto FunctionNode::__register_array_input__(){
     if(childs_.empty())
         throw std::invalid_argument("Invalid function parameters");
     std::vector<std::reference_wrapper<const Array_t>> params;
-    for(Node* child:childs_){
-        if(child->type()==ARITHM_NODE_TYPE::VARIABLE){
-            auto ptr = reinterpret_cast<VariableNode*>(child)->variable();
+    for(size_t i = 0;i<childs_.size();++i){
+        auto child_i = child(i);
+        if(child_i->type()==ARITHM_NODE_TYPE::VARIABLE){
+            auto ptr = reinterpret_cast<VariableNode*>(child_i.get())->variable();
             if(ptr->is_array())
                 params.push_back(ptr->get<Array_t>());
             else throw std::invalid_argument("Invalid function parameter");
@@ -271,67 +271,89 @@ auto MultiArgumentNode::__register_array_input__(){
     return params;
 }
 
-Value_t MultiArgumentNode::execute(){
-    if(!cache_.has_value()){
-        if(operation_==MULTI_ARG_OP::LOG_BASE){
-            if(childs_.size()!=2)
-                throw std::invalid_argument("Invalid function parameters");
-            std::cout<<"log_x: "<<log(childs_.at(0)->execute())<<std::endl;
-            std::cout<<"log_x base: "<<log(childs_.at(1)->execute())<<std::endl;
-            cache_.emplace(log(childs_.at(0)->execute())/log(childs_.at(1)->execute()));
-        }
-        else if(operation_==MULTI_ARG_OP::SUMPRODUCT){
-            if(childs_.empty())
-                throw std::invalid_argument("Invalid function parameters");
-            std::vector<std::reference_wrapper<const Array_t>> params;
-            for(Node* child:childs_){
-                if(child->type()==ARITHM_NODE_TYPE::VARIABLE){
-                    auto ptr = reinterpret_cast<VariableNode*>(child)->variable();
-                    if(ptr->is_array())
-                        params.push_back(ptr->get<Array_t>());
-                    else throw std::invalid_argument("Invalid function parameter");
+Value_t FunctionNode::execute(){
+    if(array_type_function?childs_.size()>0:childs_.size()==number_of_arguments){
+        if(!cache_.has_value()){
+            switch (operation_){
+                case FUNCTION_OP::LN:
+                    return log(child(0)->execute());
+                    break;
+                case FUNCTION_OP::LG10:
+                    return log10(child(0)->execute());
+                    break;
+                case FUNCTION_OP::EXP:
+                    return exp(child(0)->execute());
+                    break;
+                case FUNCTION_OP::LOG_BASE:
+                    std::cout<<"log_x: "<<log(child(0)->execute())<<std::endl;
+                    std::cout<<"log_x base: "<<log(child(1)->execute())<<std::endl;
+                    cache_.emplace(log(child(0)->execute())/log(child(1)->execute()));
+                    break;
+                case FUNCTION_OP::SUMPRODUCT:
+                {
+                    std::vector<std::reference_wrapper<const Array_t>> params;
+                    for(size_t i = 0;i<childs_.size();++i){
+                        auto child_i = child(i);
+                        if(child_i->type()==ARITHM_NODE_TYPE::VARIABLE){
+                            auto ptr = reinterpret_cast<VariableNode*>(child_i.get())->variable();
+                            if(ptr->is_array())
+                                params.push_back(ptr->get<Array_t>());
+                            else throw std::invalid_argument("Invalid function parameter");
+                        }
+                    }
+                    cache_.emplace(functions::Arithmetic::SumProduct(std::move(params)));
+                    break;
                 }
-            }
-            cache_.emplace(functions::Arithmetic::SumProduct(std::move(params)));
-        }
-        else if(operation_==MULTI_ARG_OP::SUM){
-            if(childs_.empty())
-                throw std::invalid_argument("Invalid function parameters");
-            std::vector<std::reference_wrapper<const Array_t>> params;
-            for(Node* child:childs_){
-                if(child->type()==ARITHM_NODE_TYPE::VARIABLE){
-                    auto ptr = reinterpret_cast<VariableNode*>(child)->variable();
-                    if(ptr->is_array())
-                        params.push_back(ptr->get<Array_t>());
-                    else throw std::invalid_argument("Invalid function parameter");
+                case FUNCTION_OP::SUM:
+                {
+                    std::vector<std::reference_wrapper<const Array_t>> params;
+                    for(size_t i = 0;i<childs_.size();++i){
+                        auto child_i = child(i);
+                        if(child_i->type()==ARITHM_NODE_TYPE::VARIABLE){
+                            auto ptr = reinterpret_cast<VariableNode*>(child_i.get())->variable();
+                            if(ptr->is_array())
+                                params.push_back(ptr->get<Array_t>());
+                            else throw std::invalid_argument("Invalid function parameter");
+                        }
+                    }
+                    cache_.emplace(functions::Arithmetic::Sum(std::move(params)));
+                    break;
                 }
-            }
-            cache_.emplace(functions::Arithmetic::Sum(std::move(params)));
-        }
-        else if(operation_==MULTI_ARG_OP::PROD){
-            if(childs_.empty())
-                throw std::invalid_argument("Invalid function parameters");
-            std::vector<std::reference_wrapper<const Array_t>> params;
-            for(Node* child:childs_){
-                if(child->type()==ARITHM_NODE_TYPE::VARIABLE){
-                    auto ptr = reinterpret_cast<VariableNode*>(child)->variable();
-                    if(ptr->is_array())
-                        params.push_back(ptr->get<Array_t>());
-                    else throw std::invalid_argument("Invalid function parameter");
+                case FUNCTION_OP::PROD:
+                {
+                    if(childs_.empty())
+                        throw std::invalid_argument("Invalid function parameters");
+                    std::vector<std::reference_wrapper<const Array_t>> params;
+                    for(size_t i = 0;i<childs_.size();++i){
+                        auto child_i = child(i);
+                        if(child_i->type()==ARITHM_NODE_TYPE::VARIABLE){
+                            auto ptr = reinterpret_cast<VariableNode*>(child_i.get())->variable();
+                            if(ptr->is_array())
+                                params.push_back(ptr->get<Array_t>());
+                            else throw std::invalid_argument("Invalid function parameter");
+                        }
+                    }
+                    cache_.emplace(functions::Arithmetic::Product(std::move(params)));
+                    break;
                 }
+                default: 
+                    throw std::invalid_argument("Unknown multiargument operation");
             }
-            cache_.emplace(functions::Arithmetic::Product(std::move(params)));
         }
-        else throw std::invalid_argument("Unknown multiargument operation");
     }
+    else throw std::invalid_argument("Invalid number of arguments");
     return cache_.value();
 }
 
-Value_t MultiArgumentNode::execute(size_t index){
+Value_t FunctionNode::execute(size_t index){
     return execute();
 }
 
-void MultiArgumentNode::add_child(Node* node){
+void FunctionNode::add_child(const std::shared_ptr<Node>& node){
+    childs_.push_back(node);
+}
+
+void FunctionNode::add_child(std::weak_ptr<VariableNode>&& node){
     childs_.push_back(node);
 }
 
@@ -371,7 +393,7 @@ void RangeOperationNode::refresh(){
 }
 
 //can has only one parent (unlike the variable node)
-void MultiArgumentNode::refresh(){
+void FunctionNode::refresh(){
     execute();
     if(has_parent()){
         caller_ = true;
@@ -416,8 +438,8 @@ void VariableNode::print() const{
     std::cout<<var_->name()<<'}'<<std::endl;
 }
 
-void MultiArgumentNode::print() const{
-    std::cout<<'{'<<ENUM_NAME(ARITHM_NODE_TYPE::MULTIARG);
+void FunctionNode::print() const{
+    std::cout<<'{'<<ENUM_NAME(ARITHM_NODE_TYPE::FUNCTION);
     std::cout<<ENUM_NAME(operation());
     std::cout<<'}'<<std::endl;
 }

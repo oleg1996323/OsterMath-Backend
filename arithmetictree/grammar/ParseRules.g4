@@ -101,12 +101,12 @@ function
     | ACOS '('WS* expr WS*')'
     | ASIN '('WS* expr WS*')'
     | FACTORIAL '('WS* expr WS*')'
+    | LOG_X '(' WS* expr WS* ',' WS* expr WS* ')'
     ;
 
 multiargfunction
     :
-    LOG_X '(' WS* expr WS* ',' WS* expr WS* ')'
-    | SUMPRODUCT '(' expr ',' expr (',' expr )*')'
+    SUMPRODUCT '(' expr ',' expr (',' expr )*')'
     | SUM '(' expr ',' expr (',' expr )*')'
     | PRODUCT '(' expr ',' expr (',' expr )*')'
     ;
