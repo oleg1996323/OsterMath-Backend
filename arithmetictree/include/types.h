@@ -147,6 +147,22 @@ class VariableBase: private Variable_t, public FormattingData{
 
     void print();
 
+    void set_bottom_bound_value(Value_t&& value, BOTTOM_BOUND_T type){
+        bounds_.set_bottom_bound_value(value,type);
+    }
+
+    void set_top_bound_value(Value_t&& value, TOP_BOUND_T type){
+        bounds_.set_top_bound_value(value,type);
+    }
+
+    void set_bottom_bound_value(const Value_t& value, BOTTOM_BOUND_T type){
+        bounds_.set_bottom_bound_value(value,type);
+    }
+
+    void set_top_bound_value(const Value_t& value, TOP_BOUND_T type){
+        bounds_.set_top_bound_value(value,type);
+    }
+
     protected:
     void set_data_base(BaseData* data_pool);
     BaseData* get_data_base() const;
@@ -154,7 +170,10 @@ class VariableBase: private Variable_t, public FormattingData{
     private:
     std::shared_ptr<VariableNode> node_; //shared, так как может быть передан в любое арифметическое дерево
     std::string_view name_;
+    std::string text_;
+    bool show_reinterpret_=true; //show a reinterpreted formula
     BaseData* data_base_;
+    VariableBounds bounds_;
 };
 
 std::ostream& operator<<(std::ostream& stream, const ArithmeticTree& tree);

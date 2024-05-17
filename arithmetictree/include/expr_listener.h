@@ -35,7 +35,8 @@ class BaseListener: public ParseRulesBaseListener{
         TABLEDEF,
         TABVALDEF,
         RANGEOPERATION,
-        FUNCTIONOPERATION
+        FUNCTIONOPERATION,
+        VARIABLE_COMP
     };
 
     bool is_range_operation() const;
@@ -128,4 +129,20 @@ class BaseListener: public ParseRulesBaseListener{
     virtual void enterFunction(ParseRulesParser::FunctionContext* ctx) override;
 
     virtual void exitFunction(ParseRulesParser::FunctionContext* ctx) override;
+
+    virtual void enterLess(ParseRulesParser::LessContext* ctx) override;
+
+    virtual void exitLess(ParseRulesParser::LessContext* ctx) override;
+
+    virtual void enterLess_equal(ParseRulesParser::Less_equalContext* ctx) override;
+
+    virtual void exitLess_equal(ParseRulesParser::Less_equalContext* ctx) override;
+
+    virtual void enterLarger(ParseRulesParser::LargerContext* ctx) override;
+
+    virtual void exitLarger(ParseRulesParser::LargerContext* ctx) override;
+
+    virtual void enterLarger_equal(ParseRulesParser::Larger_equalContext* ctx) override;
+
+    virtual void exitLarger_equal(ParseRulesParser::Larger_equalContext* ctx) override;
 };

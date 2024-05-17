@@ -394,3 +394,39 @@ void BaseListener::exitRangefunction(ParseRulesParser::RangefunctionContext* ctx
         __insert_to_function_operation__(ptr);
     }
 }
+
+void BaseListener::enterLess(ParseRulesParser::LessContext* ctx){
+    assert(mode_.empty());
+    mode_.push(MODE::VARIABLE_COMP);
+    if(ctx->VARIABLE())
+        current_var_ = data_base_->add_variable(ctx->VARIABLE()->getText()).get();
+    else asseet(false);
+}
+
+void BaseListener::exitLess(ParseRulesParser::LessContext* ctx){
+    current_var_->set_top_bound_value()
+}
+
+void BaseListener::enterLess_equal(ParseRulesParser::Less_equalContext* ctx){
+
+}
+
+void BaseListener::exitLess_equal(ParseRulesParser::Less_equalContext* ctx){
+
+}
+
+void BaseListener::enterLarger(ParseRulesParser::LargerContext* ctx){
+
+}
+
+void BaseListener::exitLarger(ParseRulesParser::LargerContext* ctx){
+
+}
+
+void BaseListener::enterLarger_equal(ParseRulesParser::Larger_equalContext* ctx){
+
+}
+
+void BaseListener::exitLarger_equal(ParseRulesParser::Larger_equalContext* ctx){
+
+}

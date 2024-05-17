@@ -117,3 +117,11 @@ rangefunction
     | SUM_I '(' WS* expr WS* ')'
     | PRODUCT_I '(' WS* expr WS* ')'
     ;
+
+comparision
+    :
+    VARIABLE WS* '<' WS* expr               #less
+    | VARIABLE WS* ('<=' | '=<') WS* expr   #less_equal
+    | VARIABLE WS* '>' WS* expr             #larger
+    | VARIABLE WS* ('>=' | '=>') WS* expr   #larger_equal
+    ;
