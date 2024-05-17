@@ -58,6 +58,9 @@ void ArithmeticTree::print() const{
 #endif
 
 void ArithmeticTree::insert(const std::shared_ptr<Node>& node){
+    if(node->type() == ARITHM_NODE_TYPE::VARIABLE)
+        var_dependence_.insert(reinterpret_cast<VariableNode*>(node.get())->variable()->name());
+
     if(!root_){
         std::cout<<"Add to root: ";
 

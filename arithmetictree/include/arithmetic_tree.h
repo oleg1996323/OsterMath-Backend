@@ -3,6 +3,8 @@
 #include <stdexcept>
 #include <memory>
 #include <optional>
+#include <unordered_set>
+#include <string_view>
 #include "def.h"
 
 class Node;
@@ -42,6 +44,7 @@ class ArithmeticTree{
     std::shared_ptr<Node> root_;
     mutable Node* last_incomplete_;
     mutable std::optional<Value_t> cache_;
+    std::unordered_set<std::string_view> var_dependence_;
 };
 
 namespace ranges{

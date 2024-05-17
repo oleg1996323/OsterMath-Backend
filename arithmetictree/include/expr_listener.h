@@ -8,6 +8,7 @@
 #include "def.h"
 #include "ParseRulesBaseListener.h"
 #include "exception.h"
+#include "bound.h"
 
 class BaseData;
 
@@ -36,7 +37,7 @@ class BaseListener: public ParseRulesBaseListener{
         TABVALDEF,
         RANGEOPERATION,
         FUNCTIONOPERATION,
-        VARIABLE_COMP
+        BOUND_DEFINITION
     };
 
     bool is_range_operation() const;
@@ -44,6 +45,7 @@ class BaseListener: public ParseRulesBaseListener{
     bool is_header_definition() const;
     bool is_variable_definition() const;
     bool is_table_values_definition() const;
+    bool is_bounds_definition() const;
 
     void __insert_to_variable__(const std::shared_ptr<Node>& node) const;
     void __insert_to_variable__(std::string&& node) const;
@@ -59,6 +61,9 @@ class BaseListener: public ParseRulesBaseListener{
     std::stack<MODE> mode_;
     size_t line_counter_ = 0;
     size_t col_counter_ = 0;
+
+    std::optional<std::pair<std::string_view,TOP_BOUND_T>> top_;
+    std::optional<std::pair<std::string_view,BOTTOM_BOUND_T>> bottom_;
 
     public:
     BaseListener(BaseData* data_base):

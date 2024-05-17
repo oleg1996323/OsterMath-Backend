@@ -26,6 +26,10 @@ bool BaseListener::is_range_operation() const{
     return !mode_.empty() && mode_.top()==MODE::RANGEOPERATION;
 }
 
+bool BaseListener::is_bounds_definition() const{
+    return !mode_.empty() && mode_.top()==MODE::BOUND_DEFINITION;
+}
+
 void BaseListener::__insert_to_variable__(const std::shared_ptr<Node>& node) const{
     if(current_var_->is_undef())
         current_var_->get() = ArithmeticTree();
@@ -393,40 +397,81 @@ void BaseListener::exitRangefunction(ParseRulesParser::RangefunctionContext* ctx
     else if(is_function_operation()){
         __insert_to_function_operation__(ptr);
     }
+    else if(is_bounds_definition()){
+        ArithmeticTree tree;
+        tree.insert(ptr);
+        if(bottom_.has_value())
+            current_var_->set_bottom_bound_value(bottom_.value().first,std::move(tree),bottom_.value().second);
+        else if(top_.has_value())
+            current_var_->set_top_bound_value(top_.value().first,std::move(tree),top_.value().second);
+    }
 }
 
 void BaseListener::enterLess(ParseRulesParser::LessContext* ctx){
     assert(mode_.empty());
-    mode_.push(MODE::VARIABLE_COMP);
-    if(ctx->VARIABLE())
+    if(ctx->VARIABLE()){
         current_var_ = data_base_->add_variable(ctx->VARIABLE()->getText()).get();
-    else asseet(false);
+        mode_.push(MODE::BOUND_DEFINITION);
+        top_.emplace(std::make_pair<std::string_view,TOP_BOUND_T>(current_var_->name(),TOP_BOUND_T::LESS));
+    }
+    else assert(false);
 }
 
 void BaseListener::exitLess(ParseRulesParser::LessContext* ctx){
-    current_var_->set_top_bound_value()
+    top_.reset();
+    mode_.pop();
+    assert(mode_.empty());
+    current_var_ = nullptr;
 }
 
 void BaseListener::enterLess_equal(ParseRulesParser::Less_equalContext* ctx){
-
+    assert(mode_.empty());
+    mode_.push(MODE::BOUND_DEFINITION);
+    if(ctx->VARIABLE()){
+        current_var_ = data_base_->add_variable(ctx->VARIABLE()->getText()).get();
+        mode_.push(MODE::BOUND_DEFINITION);
+        top_.emplace(std::make_pair<std::string_view,TOP_BOUND_T>(current_var_->name(),TOP_BOUND_T::LESS_OR_EQUAL));
+    }
+    else assert(false);
 }
 
 void BaseListener::exitLess_equal(ParseRulesParser::Less_equalContext* ctx){
-
+    top_.reset();
+    mode_.pop();
+    assert(mode_.empty());
+    current_var_ = nullptr;
 }
 
 void BaseListener::enterLarger(ParseRulesParser::LargerContext* ctx){
-
+    assert(mode_.empty());
+    if(ctx->VARIABLE()){
+        current_var_ = data_base_->add_variable(ctx->VARIABLE()->getText()).get();
+        mode_.push(MODE::BOUND_DEFINITION);
+        bottom_.emplace(std::make_pair<std::string_view,BOTTOM_BOUND_T>(current_var_->name(),BOTTOM_BOUND_T::LARGER));
+    }
+    else assert(false);
 }
 
 void BaseListener::exitLarger(ParseRulesParser::LargerContext* ctx){
-
+    bottom_.reset();
+    mode_.pop();
+    assert(mode_.empty());
+    current_var_ = nullptr;
 }
 
 void BaseListener::enterLarger_equal(ParseRulesParser::Larger_equalContext* ctx){
-
+    assert(mode_.empty());
+    if(ctx->VARIABLE()){
+        current_var_ = data_base_->add_variable(ctx->VARIABLE()->getText()).get();
+        mode_.push(MODE::BOUND_DEFINITION);
+        bottom_.emplace(std::make_pair<std::string_view,BOTTOM_BOUND_T>(current_var_->name(),BOTTOM_BOUND_T::LARGER_OR_EQUAL));
+    }
+    else assert(false);
 }
 
 void BaseListener::exitLarger_equal(ParseRulesParser::Larger_equalContext* ctx){
-
+    bottom_.reset();
+    mode_.pop();
+    assert(mode_.empty());
+    current_var_ = nullptr;
 }

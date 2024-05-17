@@ -118,10 +118,15 @@ rangefunction
     | PRODUCT_I '(' WS* expr WS* ')'
     ;
 
+name
+    :
+    VARIABLE
+    ;
+
 comparision
     :
-    VARIABLE WS* '<' WS* expr               #less
-    | VARIABLE WS* ('<=' | '=<') WS* expr   #less_equal
-    | VARIABLE WS* '>' WS* expr             #larger
-    | VARIABLE WS* ('>=' | '=>') WS* expr   #larger_equal
+    VARIABLE WS* ':' WS* name WS* '<' WS* expr               #less
+    | VARIABLE WS* ':' WS* name WS* ('<=' | '=<') WS* expr   #less_equal
+    | VARIABLE WS* ':' WS* name WS* '>' WS* expr             #larger
+    | VARIABLE WS* ':' WS* name WS* ('>=' | '=>') WS* expr   #larger_equal
     ;

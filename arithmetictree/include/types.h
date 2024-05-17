@@ -8,8 +8,8 @@
 #include "def.h"
 #include "exception.h"
 #include "data.h"
-#include "arithmetic_tree.h"
 #include "format.h"
+#include "bound.h"
 
 class VariableNode;
 class VariableBase;
@@ -25,6 +25,8 @@ enum class TYPE{
     STRING,
     NUMERIC
 };
+
+using Arr_value = std::variant<std::monostate,Value_t,std::string, VariableBase*, ArithmeticTree>;
 
 class Array_val:private Arr_value{
     using variant::variant;
@@ -147,20 +149,14 @@ class VariableBase: private Variable_t, public FormattingData{
 
     void print();
 
-    void set_bottom_bound_value(Value_t&& value, BOTTOM_BOUND_T type){
-        bounds_.set_bottom_bound_value(value,type);
+    template<typename T>
+    void set_bottom_bound_value(std::string_view var_name,T&& value, BOTTOM_BOUND_T type){
+        bounds_.emplace(var_name).first->second.set_bound_value(std::forward<T>(value),type);
     }
 
-    void set_top_bound_value(Value_t&& value, TOP_BOUND_T type){
-        bounds_.set_top_bound_value(value,type);
-    }
-
-    void set_bottom_bound_value(const Value_t& value, BOTTOM_BOUND_T type){
-        bounds_.set_bottom_bound_value(value,type);
-    }
-
-    void set_top_bound_value(const Value_t& value, TOP_BOUND_T type){
-        bounds_.set_top_bound_value(value,type);
+    template<typename T>
+    void set_top_bound_value(std::string_view var_name,T&& value, TOP_BOUND_T type){
+        bounds_.emplace(var_name).first->second.set_bound_value(std::forward<T>(value),type);
     }
 
     protected:
@@ -173,7 +169,7 @@ class VariableBase: private Variable_t, public FormattingData{
     std::string text_;
     bool show_reinterpret_=true; //show a reinterpreted formula
     BaseData* data_base_;
-    VariableBounds bounds_;
+    std::unordered_map<std::string_view,VariableBounds> bounds_;
 };
 
 std::ostream& operator<<(std::ostream& stream, const ArithmeticTree& tree);
