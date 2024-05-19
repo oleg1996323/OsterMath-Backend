@@ -7,14 +7,14 @@ DIV: '/' ;
 POW: '^' ;
 
 QUOTE: '\'';
-VARIABLE: '__'([a-zA-Z])+ [*'0-9]*'__';
-STRING: '"'[a-zA-Z0-9 .,:;!?]+'"';
+ASTERISK: '^' '*'+;
+
 WS: [ \t]+ -> skip;
 EOL: '\r'? '\n';
 
 fragment INT: [-+]? UINT;
-UINT: [0-9]+ (EXPONENT)?;
 EXPONENT: [eE] INT;
+UINT: [0-9]+ (EXPONENT)?;
 FLOAT: UINT '.' UINT (EXPONENT)?;
 
 number
@@ -38,23 +38,35 @@ SIN: [sS][iI][nN];
 ASIN: [aA] SIN;
 ACOS: [aA] COS;
 FACTORIAL: [fF][aA][cC][tT][oO][rR][iI][aA][lL];
+DATABASE: '$('([a-zA-Z0-9_]) [a-zA-Z0-9 _]*')';
+VARIABLE: '#'([a-zA-Z])+ ((QUOTE | ASTERISK) | [a-zA-Z0-9])*;
+STRING: '\''[a-zA-Z0-9_] [a-zA-Z0-9 _,.;!?]*;
+
+variable:
+    WS* ( DATABASE )? VARIABLE WS*
+    ;
 
 constant:
     (PI | EXP)
-    ;
-
-array
-    :
-    '['input_array (','input_array)*']'
     ;
 
 input_array:
     expr #ItemArray
     ;
 
+array
+    :
+    '['input_array (','input_array)*']'
+    ;
+    
+string
+    :
+    STRING
+    ;
+
 vardefinition
     :
-    VARIABLE WS* '=' WS* (expr | STRING | array) WS* EOL
+    variable '=' WS* (expr | string | array) WS* EOL
     ;
 
 input:
@@ -65,6 +77,7 @@ input:
 line_input:
     table_definition+
     | vardefinition+
+    | comparision+
     ;
 
 table_definition:
@@ -72,61 +85,60 @@ table_definition:
     ;
 
 hdr:
-    VARIABLE (WS+ VARIABLE)+
+    variable (WS variable)+
     ;
 
 numbers_line:
-    number (WS+ number)
+    WS* number (WS+ number) WS*
     ;
 
 expr
     : 
     '(' expr ')'                                            # Parens
-    | (function | multiargfunction | rangefunction)         # FunctionCall
-    | VARIABLE                                              # Variable
-    | (ADD | SUB) expr                                      # UnaryOp
-    | expr POW expr                                         # BinaryOp  
-    | expr (MUL | DIV) expr                                 # BinaryOp
-    | expr (ADD | SUB) expr                                 # BinaryOp           
     | (number | constant)                                   # Literal
+    | (function | multiargfunction | rangefunction)         # FunctionCall
+    | variable                                              # VariableInExpr
+    | (ADD | SUB) WS* expr                                  # UnaryOp
+    | expr POW expr                                         # BinaryOp  
+    | expr WS* (MUL | DIV) WS* expr                         # BinaryOp
+    | expr WS* (ADD | SUB) WS* expr                         # BinaryOp
     ;
 
 function
-    : LN '(' WS* expr WS* ')'
-    | LG '(' WS* expr WS* ')'
-    | EXP '(' WS* expr WS* ')'
-    | SQRT '(' WS* expr WS* ')'
-    | COS '('WS* expr WS*')'
-    | SIN '('WS* expr WS*')'
-    | ACOS '('WS* expr WS*')'
-    | ASIN '('WS* expr WS*')'
-    | FACTORIAL '('WS* expr WS*')'
-    | LOG_X '(' WS* expr WS* ',' WS* expr WS* ')'
+    : WS* LN '(' WS* expr WS* ')' WS*
+    | WS* LG '(' WS* expr WS* ')' WS*
+    | WS* EXP '(' WS* expr WS* ')' WS*
+    | WS* SQRT '(' WS* expr WS* ')' WS*
+    | WS* COS '('WS* expr WS*')' WS*
+    | WS* SIN '('WS* expr WS*')' WS*
+    | WS* ACOS '('WS* expr WS*')' WS*
+    | WS* ASIN '('WS* expr WS*')' WS*
+    | WS* FACTORIAL '('WS* expr WS*')' WS*
+    | WS* LOG_X '(' WS* expr WS* ',' WS* expr WS* ')' WS*
     ;
 
 multiargfunction
     :
-    SUMPRODUCT '(' expr ',' expr (',' expr )*')'
-    | SUM '(' expr ',' expr (',' expr )*')'
-    | PRODUCT '(' expr ',' expr (',' expr )*')'
+    WS* SUMPRODUCT '(' expr ',' expr (',' expr )*')'
+    | WS* SUM '(' expr ',' expr (',' expr )*')'
+    | WS* PRODUCT '(' expr ',' expr (',' expr )*')'
     ;
 
 rangefunction
     :
-    SUMPRODUCT_I '(' WS* expr WS* ')'
-    | SUM_I '(' WS* expr WS* ')'
-    | PRODUCT_I '(' WS* expr WS* ')'
-    ;
-
-name
-    :
-    VARIABLE
+    WS* SUMPRODUCT_I '(' WS* expr WS* ')' WS*
+    | WS* SUM_I '(' WS* expr WS* ')' WS*
+    | WS* PRODUCT_I '(' WS* expr WS* ')' WS*
     ;
 
 comparision
     :
-    VARIABLE WS* ':' WS* name WS* '<' WS* expr               #less
-    | VARIABLE WS* ':' WS* name WS* ('<=' | '=<') WS* expr   #less_equal
-    | VARIABLE WS* ':' WS* name WS* '>' WS* expr             #larger
-    | VARIABLE WS* ':' WS* name WS* ('>=' | '=>') WS* expr   #larger_equal
+    variable ':' variable '<' WS* expr WS* EOL              #less
+    | variable ':' WS* expr WS* '>' variable EOL            #less
+    | variable ':' variable ('<=' | '=<') WS* expr WS* EOL  #less_equal
+    | variable ':' WS* expr WS* ('>=' | '=>') variable EOL  #less_equal
+    | variable ':' variable '>' WS* expr WS* EOL            #larger
+    | variable ':' WS* expr WS* '<' variable EOL            #larger
+    | variable ':' variable ('>=' | '=>') WS* expr WS* EOL  #larger_equal
+    | variable ':' WS* expr WS* ('<=' | '=<') variable EOL  #larger_equal
     ;

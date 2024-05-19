@@ -53,6 +53,8 @@ class BaseListener: public ParseRulesBaseListener{
     void __insert_to_range_operation__(const std::shared_ptr<Node>& node) const;
     void __insert_to_function_operation__(const std::shared_ptr<Node>& node) const;
 
+    BaseData* __insert_new_data_base__(std::string&& name);
+
     BaseData* data_base_;
     VariableBase* current_var_;
     std::stack<std::shared_ptr<FunctionNode>> tmp_function_node_;
@@ -62,8 +64,15 @@ class BaseListener: public ParseRulesBaseListener{
     size_t line_counter_ = 0;
     size_t col_counter_ = 0;
 
-    std::optional<std::pair<std::string_view,TOP_BOUND_T>> top_;
-    std::optional<std::pair<std::string_view,BOTTOM_BOUND_T>> bottom_;
+    template<typename B_T>
+    struct Bound{
+        std::string_view db_name;
+        std::string_view var_name;
+        B_T type;
+    };
+
+    std::optional<Bound<TOP_BOUND_T>> top_;
+    std::optional<Bound<BOTTOM_BOUND_T>> bottom_;
 
     public:
     BaseListener(BaseData* data_base):
@@ -150,4 +159,8 @@ class BaseListener: public ParseRulesBaseListener{
     virtual void enterLarger_equal(ParseRulesParser::Larger_equalContext* ctx) override;
 
     virtual void exitLarger_equal(ParseRulesParser::Larger_equalContext* ctx) override;
+
+    //virtual void visitTerminal(antlr4::tree::TerminalNode * /*node*/) override;
+
+    virtual void visitErrorNode(antlr4::tree::ErrorNode * /*node*/) override;
 };

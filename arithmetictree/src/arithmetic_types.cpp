@@ -176,7 +176,13 @@ Value_t BinaryNode::execute(size_t index){
 VariableNode::VariableNode(VariableBase* variable):
     var_(variable){}
 
-VariableBase* VariableNode::variable() const{
+const VariableBase* VariableNode::variable() const{
+    if(var_)
+        return var_;
+    else throw "Variable don't exists"s;
+}
+
+VariableBase* VariableNode::variable(){
     if(var_)
         return var_;
     else throw "Variable don't exists"s;
@@ -243,7 +249,7 @@ void VariableNode::refresh_parent_links() const{
     for(auto iterator_node = parents_.begin();iterator_node!=parents_.end();++iterator_node)
         if(!(*iterator_node))
             parents_.erase(iterator_node);
-    }
+}
 
 std::shared_ptr<Node> FunctionNode::child(size_t id) const{
     if(id<childs_.size()){
@@ -350,10 +356,20 @@ Value_t FunctionNode::execute(size_t index){
 }
 
 void FunctionNode::add_child(const std::shared_ptr<Node>& node){
+    if(node->type() == ARITHM_NODE_TYPE::FUNCTION){
+        for(auto it:reinterpret_cast<FunctionNode*>(node.get())->get_dependecies())
+            var_dependence_.insert(it);
+    }
+    else if(node->type() == ARITHM_NODE_TYPE::RANGEOP){
+        for(auto it:reinterpret_cast<RangeOperationNode*>(node.get())->get_dependecies())
+            var_dependence_.insert(it);
+    }
     childs_.push_back(node);
 }
 
 void FunctionNode::add_child(std::weak_ptr<VariableNode>&& node){
+    if(!node.expired())
+        var_dependence_.insert(node.lock().get());
     childs_.push_back(node);
 }
 
@@ -382,6 +398,10 @@ ranges::ArithmeticTree& RangeOperationNode::expression(){
     return range_expression;
 }
 
+const ranges::ArithmeticTree& RangeOperationNode::expression() const{
+    return range_expression;
+}
+
 //can has only one parent (unlike the variable node)
 void RangeOperationNode::refresh(){
     execute();
@@ -402,8 +422,12 @@ void FunctionNode::refresh(){
     }
 }
 
-void RangeOperationNode::add_child(VariableNode* var){
-    this->childs_.insert(var);
+const std::unordered_set<VariableNode*>& FunctionNode::get_dependecies() const{
+    return var_dependence_;
+}
+
+const std::unordered_set<VariableNode*>& RangeOperationNode::get_dependecies() const{
+    return expression().get_dependecies();
 }
 
 #ifdef DEBUG

@@ -22,6 +22,10 @@ bool BaseData::exists(std::string_view name) const{
     return vars_.contains(name);
 }
 
+std::string_view BaseData::name() const{
+    return name_;
+}
+
 bool BaseData::defined(std::string_view name) const{
     if(exists(name)){
         if(vars_.at(name))
@@ -75,6 +79,18 @@ void BaseData::parse_entry(){
     return parser_->parse_entry();
 }
 
+void BaseData::set_pool(DataPool* pool){
+    pool_ = pool;
+}
+
+const DataPool* BaseData::get_pool() const{
+    return pool_;
+}
+
+DataPool* BaseData::get_pool(){
+    return pool_;
+}
+
 DataPool::DataPool(const std::string& name):name_(name){
     add_data("anon"s);
 }
@@ -83,12 +99,12 @@ std::string_view DataPool::name(){
     return name_;
 }
 
-void DataPool::add_data(const std::string& name){
+BaseData* DataPool::add_data(const std::string& name){
     if(!exists(name)){
         std::string_view name_sv = *(data_names_.emplace(name).first);
-        data_bases_.emplace(name_sv,name_sv);
+        data_bases_.emplace(name_sv,name_sv).first->second.set_pool(this);
     }
-    return;
+    return &data_bases_.at(name);
 }
 
 bool DataPool::exists(std::string_view name) const{
@@ -106,6 +122,12 @@ void DataPool::replace(const std::string& name) noexcept{
     if(exists(name)){
         data_bases_.at(name) = BaseData(*data_names_.find(name));
     }
+}
+
+const BaseData* DataPool::get(std::string_view name_data) const noexcept{
+    if(exists(name_data))
+        return &data_bases_.at(name_data);
+    else return nullptr;
 }
 
 BaseData* DataPool::get(std::string_view name_data) noexcept{

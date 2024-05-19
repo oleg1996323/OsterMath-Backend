@@ -33,11 +33,17 @@ struct Bound_T{
 
 class VariableBounds{
     public:
-    Value_t get_bottom_bound_value() const;
+    std::optional<Value_t> get_bottom_bound_value() const;
 
-    Value_t get_top_bound_value() const;
+    std::optional<Value_t> get_top_bound_value() const;
 
-    bool is_in_bounds(Value_t&& value) const;
+    bool is_in_bounds(Value_t&&) const;
+
+    bool is_in_bounds(const Value_t&) const;
+
+    bool is_in_bounds(const VariableBase&) const;
+
+    bool is_in_bounds(const ArithmeticTree&) const;
     
     template<typename T>
     void set_bound_value(T&& value, BOTTOM_BOUND_T type);

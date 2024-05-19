@@ -1,5 +1,6 @@
 #include "arithmetic_tree.h"
 #include "arithmetic_types.h"
+#include "types.h"
 
 ArithmeticTree::ArithmeticTree(const ArithmeticTree& other){
     if(this!=&other){
@@ -7,10 +8,13 @@ ArithmeticTree::ArithmeticTree(const ArithmeticTree& other){
     }
 }
 
+ArithmeticTree::ArithmeticTree(VariableBase* owner):owner_(owner){}
+
 ArithmeticTree::ArithmeticTree(ArithmeticTree&& other) noexcept{
     if(this!=&other){
         this->root_ = std::move(other.root_);
         this->cache_ = std::move(other.cache_);
+        this->owner_ = other.owner_;
         this->last_incomplete_ = other.last_incomplete_;
     }
 }
@@ -19,6 +23,7 @@ ArithmeticTree& ArithmeticTree::operator=(const ArithmeticTree& other){
     if(this!=&other){
         this->root_ = other.root_;
         this->cache_=other.cache_;
+        this->owner_ = other.owner_;
         last_incomplete_ = other.last_incomplete_;
     }
     return *this;
@@ -28,6 +33,7 @@ ArithmeticTree& ArithmeticTree::operator=(ArithmeticTree&& other) noexcept{
     if(this!=&other){
         this->root_ = std::move(other.root_);
         this->cache_=std::move(other.cache_);
+        this->owner_ = other.owner_;
         last_incomplete_ = other.last_incomplete_;
     }
     return *this;
@@ -39,6 +45,10 @@ const Value_t& ArithmeticTree::value() const{
     return cache_.value();
 }
 
+VariableBase* ArithmeticTree::owner() const{
+    return owner_;
+}
+
 const Value_t& ranges::ArithmeticTree::value(size_t index) const{
     if(!cache_.has_value())
         cache_.emplace(execute(index));
@@ -46,8 +56,15 @@ const Value_t& ranges::ArithmeticTree::value(size_t index) const{
 }
 
 Value_t ArithmeticTree::execute() const{
-    if(root_)
-        return root_->execute();
+    if(root_){
+        if(std::all_of(var_dependence_.begin(),var_dependence_.end(),[this](const VariableNode* node){
+            if(!node->variable()->is_undef())
+                return owner_->is_in_bounds(node->variable()->get_data_base_name(), node->variable()->name());
+            else return true;
+        }))
+            return root_->execute();
+        else return 0.;
+    }
     else return 0.;
 }
 
@@ -57,9 +74,22 @@ void ArithmeticTree::print() const{
 }
 #endif
 
+const std::unordered_set<VariableNode*>& ArithmeticTree::get_dependecies() const{
+    return var_dependence_;
+}
+
 void ArithmeticTree::insert(const std::shared_ptr<Node>& node){
-    if(node->type() == ARITHM_NODE_TYPE::VARIABLE)
-        var_dependence_.insert(reinterpret_cast<VariableNode*>(node.get())->variable()->name());
+    if(node->type() == ARITHM_NODE_TYPE::VARIABLE){
+        var_dependence_.insert(reinterpret_cast<VariableNode*>(node.get()));
+    }
+    else if(node->type() == ARITHM_NODE_TYPE::FUNCTION){
+        for(auto it:reinterpret_cast<FunctionNode*>(node.get())->get_dependecies())
+            var_dependence_.insert(it);
+    }
+    else if(node->type() == ARITHM_NODE_TYPE::RANGEOP){
+        for(auto it:reinterpret_cast<RangeOperationNode*>(node.get())->get_dependecies())
+            var_dependence_.insert(it);
+    }
 
     if(!root_){
         std::cout<<"Add to root: ";

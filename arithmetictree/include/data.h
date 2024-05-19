@@ -9,6 +9,7 @@
 
 class VariableBase;
 class Parser;
+class DataPool;
 
 class BaseData{
     public:
@@ -17,6 +18,8 @@ class BaseData{
     VariableBase* get(std::string_view name);
 
     const VariableBase* get(std::string_view name) const;
+
+    std::string_view name() const;
 
     bool exists(std::string_view name) const;
 
@@ -39,6 +42,12 @@ class BaseData{
 
     void setstream(std::istream& stream);
 
+    void set_pool(DataPool* pool);
+
+    const DataPool* get_pool() const;
+
+    DataPool* get_pool();
+
     void read_new();
 
     void parse_entry();
@@ -48,7 +57,7 @@ class BaseData{
     std::unordered_map<std::string_view,std::shared_ptr<VariableBase>> vars_;
     std::string_view name_;
     std::unique_ptr<Parser> parser_;
-
+    DataPool* pool_;
     std::string generate_hash_name();
 };
 
@@ -56,9 +65,11 @@ class DataPool{
     public:
     DataPool(const std::string& name);
 
-    void add_data(const std::string& name);
+    BaseData* add_data(const std::string& name);
 
     std::string_view name();
+
+    const BaseData* get(std::string_view name_data) const noexcept;
 
     BaseData* get(std::string_view name_data) noexcept;
 

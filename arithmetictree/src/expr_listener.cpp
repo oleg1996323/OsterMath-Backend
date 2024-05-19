@@ -32,7 +32,7 @@ bool BaseListener::is_bounds_definition() const{
 
 void BaseListener::__insert_to_variable__(const std::shared_ptr<Node>& node) const{
     if(current_var_->is_undef())
-        current_var_->get() = ArithmeticTree();
+        current_var_->get() = ArithmeticTree(current_var_);
 
     if(current_var_->is_arithmetic_tree())
         current_var_->get<ArithmeticTree>().insert(node);
@@ -59,8 +59,13 @@ void BaseListener::__insert_to_variable__(Value_t&& val) const{
     else if(current_var_->is_array())
         current_var_->get<Array_t>().define_back(val);
     else
-        throw std::runtime_error("Variable already defined");
-    
+        throw std::runtime_error("Variable already defined"); 
+}
+
+BaseData* BaseListener::__insert_new_data_base__(std::string&& name){
+    if(data_base_->get_pool()->exists(name))
+        return data_base_->get_pool()->add_data(name);
+    else throw std::invalid_argument(name+" don't exists in this pool");
 }
 
 void BaseListener::__insert_to_range_operation__(const std::shared_ptr<Node>& node) const{
@@ -73,7 +78,17 @@ void BaseListener::__insert_to_function_operation__(const std::shared_ptr<Node>&
 
 void BaseListener::enterVardefinition(ParseRulesParser::VardefinitionContext * ctx){
     mode_.push(MODE::VARDEF);
-    current_var_ = data_base_->add_variable(ctx->VARIABLE()->getText()).get();
+    //by default the database from which we define variable must exists
+
+    if(ctx->variable()){
+        //creating in active sheet
+        BaseData* c_var_db_tmp;
+        if(ctx->variable()->DATABASE())
+            c_var_db_tmp = __insert_new_data_base__(ctx->variable()->DATABASE()->getText());
+        else c_var_db_tmp = data_base_;
+        current_var_ = c_var_db_tmp->add_variable(ctx->variable()->VARIABLE()->getText()).get();
+    }
+    else assert(false);
     if(!current_var_->is_undef())
         current_var_->get()=std::monostate();
 }
@@ -86,16 +101,30 @@ void BaseListener::exitVardefinition(ParseRulesParser::VardefinitionContext * ct
 
 void BaseListener::enterVariable(ParseRulesParser::VariableContext *ctx) {
     assert(!mode_.empty());
-    VariableBase* ptr = data_base_->add_variable(ctx->VARIABLE()->getText()).get();
+            
+    BaseData* db_tmp;
+    if(ctx->DATABASE())
+        db_tmp = __insert_new_data_base__(ctx->DATABASE()->getText());
+    else db_tmp = data_base_;
+
+    VariableBase* ptr = db_tmp->add_variable(ctx->VARIABLE()->getText()).get();
     if(is_variable_definition()){
         __insert_to_variable__(ptr->node());
     }
     else if(is_range_operation()){
         __insert_to_range_operation__(ptr->node());
-        tmp_range_node_.top()->add_child(ptr->node().get());
     }
     else if(is_function_operation()){
         __insert_to_function_operation__(ptr->node());
+    }
+    else if(is_bounds_definition()){
+        if(ptr->is_arithmetic_tree() || ptr->is_value()){
+            if(bottom_.has_value())
+                current_var_->set_bottom_bound_value(bottom_.value().db_name,bottom_.value().var_name,ptr,bottom_.value().type);
+            else if(top_.has_value())
+                current_var_->set_top_bound_value(top_.value().db_name,bottom_.value().var_name,ptr,top_.value().type);
+            }
+        else throw std::invalid_argument("Invalid type of variable");
     }
     else throw std::runtime_error("Error when variable inserted");
 }
@@ -181,6 +210,20 @@ void BaseListener::enterConstant(ParseRulesParser::ConstantContext *ctx) {
             __insert_to_function_operation__(std::make_shared<ValueNode>(boost::math::constants::pi<Value_t>()));
         }
         else throw std::runtime_error("Error when constant added to range expression");
+    }
+    else if(is_bounds_definition()){
+        if(ctx->EXP()){
+            if(bottom_.has_value())
+                current_var_->set_bottom_bound_value(bottom_.value().db_name,bottom_.value().var_name,boost::math::constants::e<Value_t>(),bottom_.value().type);
+            else if(top_.has_value())
+                current_var_->set_top_bound_value(top_.value().db_name,top_.value().var_name,boost::math::constants::e<Value_t>(),top_.value().type);
+        }
+        else if(ctx->PI()){
+            if(bottom_.has_value())
+                current_var_->set_bottom_bound_value(bottom_.value().db_name,bottom_.value().var_name,boost::math::constants::pi<Value_t>(),bottom_.value().type);
+            else if(top_.has_value())
+                current_var_->set_top_bound_value(top_.value().db_name,top_.value().var_name,boost::math::constants::pi<Value_t>(),top_.value().type);
+        }
     }
     else throw std::runtime_error("Error when added constant value");
 }
@@ -300,14 +343,18 @@ void BaseListener::exitNumbers_line(ParseRulesParser::Numbers_lineContext* ctx) 
 }
 
 void BaseListener::enterNumber(ParseRulesParser::NumberContext* ctx){
-    if(is_range_operation()){
+    if(is_range_operation())
         __insert_to_range_operation__(std::make_shared<ValueNode>(ctx->getText()));
-        return;
-    }
     else if(is_variable_definition())
         __insert_to_variable__(std::move(Value_t(ctx->getText())));
     else if(is_function_operation() && !tmp_function_node_.top()->is_array_function())
         __insert_to_function_operation__(std::make_shared<ValueNode>(ctx->getText()));
+    else if(is_bounds_definition()){
+        if(bottom_.has_value())
+            current_var_->set_bottom_bound_value(bottom_.value().db_name,bottom_.value().var_name,std::move(Value_t(ctx->getText())),bottom_.value().type);
+        else if(top_.has_value())
+            current_var_->set_top_bound_value(top_.value().db_name,top_.value().var_name,std::move(Value_t(ctx->getText())),top_.value().type);
+    }
     else throw std::runtime_error("Unknown parsing type");
     return;
 }
@@ -368,6 +415,14 @@ void BaseListener::exitFunction(ParseRulesParser::FunctionContext* ctx){
         __insert_to_range_operation__(ptr);
     else if(is_function_operation())
         __insert_to_function_operation__(ptr);
+    else if(is_bounds_definition()){
+        ArithmeticTree tree;
+        tree.insert(ptr);
+        if(bottom_.has_value())
+            current_var_->set_bottom_bound_value(bottom_.value().db_name,bottom_.value().var_name,std::move(tree),bottom_.value().type);
+        else if(top_.has_value())
+            current_var_->set_top_bound_value(top_.value().db_name,top_.value().var_name,std::move(tree),top_.value().type);
+    }
 }
 
 void BaseListener::exitMultiargfunction(ParseRulesParser::MultiargfunctionContext* ctx){
@@ -380,6 +435,14 @@ void BaseListener::exitMultiargfunction(ParseRulesParser::MultiargfunctionContex
         __insert_to_range_operation__(ptr);
     else if(is_function_operation())
         __insert_to_function_operation__(ptr);
+    else if(is_bounds_definition()){
+        ArithmeticTree tree;
+        tree.insert(ptr);
+        if(bottom_.has_value())
+            current_var_->set_bottom_bound_value(bottom_.value().db_name,bottom_.value().var_name,std::move(tree),bottom_.value().type);
+        else if(top_.has_value())
+            current_var_->set_top_bound_value(top_.value().db_name,top_.value().var_name,std::move(tree),top_.value().type);
+    }
 }
 
 void BaseListener::exitRangefunction(ParseRulesParser::RangefunctionContext* ctx){
@@ -401,18 +464,35 @@ void BaseListener::exitRangefunction(ParseRulesParser::RangefunctionContext* ctx
         ArithmeticTree tree;
         tree.insert(ptr);
         if(bottom_.has_value())
-            current_var_->set_bottom_bound_value(bottom_.value().first,std::move(tree),bottom_.value().second);
+            current_var_->set_bottom_bound_value(bottom_.value().db_name,bottom_.value().var_name,std::move(tree),bottom_.value().type);
         else if(top_.has_value())
-            current_var_->set_top_bound_value(top_.value().first,std::move(tree),top_.value().second);
+            current_var_->set_top_bound_value(top_.value().db_name,top_.value().var_name,std::move(tree),top_.value().type);
     }
 }
 
 void BaseListener::enterLess(ParseRulesParser::LessContext* ctx){
     assert(mode_.empty());
-    if(ctx->VARIABLE()){
-        current_var_ = data_base_->add_variable(ctx->VARIABLE()->getText()).get();
+    if(ctx->variable().size()==2){
+        //creating in active sheet
+        BaseData* c_var_db_tmp;
+        if(ctx->variable().at(0)->DATABASE())
+            c_var_db_tmp = __insert_new_data_base__(ctx->variable().at(0)->DATABASE()->getText());
+        else c_var_db_tmp = data_base_;
+        if(ctx->variable().at(0)->VARIABLE())
+            current_var_ = c_var_db_tmp->add_variable(ctx->variable().at(0)->getText()).get();
+        else assert(false);
+        
+
+        BaseData* db_tmp;
+        if(ctx->variable().at(1)->DATABASE())
+            db_tmp = __insert_new_data_base__(ctx->variable().at(1)->DATABASE()->getText());
+        else db_tmp = data_base_;
+
+        if(ctx->variable().at(1)->VARIABLE())
+            top_.emplace(db_tmp->name(),db_tmp->add_variable(ctx->variable().at(1)->VARIABLE()->getText()).get()->name(),TOP_BOUND_T::LESS);
+        else assert(false);
+
         mode_.push(MODE::BOUND_DEFINITION);
-        top_.emplace(std::make_pair<std::string_view,TOP_BOUND_T>(current_var_->name(),TOP_BOUND_T::LESS));
     }
     else assert(false);
 }
@@ -427,10 +507,25 @@ void BaseListener::exitLess(ParseRulesParser::LessContext* ctx){
 void BaseListener::enterLess_equal(ParseRulesParser::Less_equalContext* ctx){
     assert(mode_.empty());
     mode_.push(MODE::BOUND_DEFINITION);
-    if(ctx->VARIABLE()){
-        current_var_ = data_base_->add_variable(ctx->VARIABLE()->getText()).get();
+    if(ctx->variable().size()==2){
+        //creating in active sheet
+        BaseData* c_var_db_tmp;
+        if(ctx->variable().at(0)->DATABASE())
+            c_var_db_tmp = __insert_new_data_base__(ctx->variable().at(0)->DATABASE()->getText());
+        else c_var_db_tmp = data_base_;
+        if(ctx->variable().at(0)->VARIABLE())
+            current_var_ = c_var_db_tmp->add_variable(ctx->variable().at(0)->getText()).get();
+        else assert(false);
+
+        BaseData* db_tmp;
+        if(ctx->variable().at(1)->DATABASE())
+            db_tmp = __insert_new_data_base__(ctx->variable().at(1)->DATABASE()->getText());
+        else db_tmp = data_base_;
+
+        if(ctx->variable().at(1)->VARIABLE())
+            top_.emplace(db_tmp->name(),db_tmp->add_variable(ctx->variable().at(1)->VARIABLE()->getText()).get()->name(),TOP_BOUND_T::LESS_OR_EQUAL);
+        else assert(false);
         mode_.push(MODE::BOUND_DEFINITION);
-        top_.emplace(std::make_pair<std::string_view,TOP_BOUND_T>(current_var_->name(),TOP_BOUND_T::LESS_OR_EQUAL));
     }
     else assert(false);
 }
@@ -444,10 +539,26 @@ void BaseListener::exitLess_equal(ParseRulesParser::Less_equalContext* ctx){
 
 void BaseListener::enterLarger(ParseRulesParser::LargerContext* ctx){
     assert(mode_.empty());
-    if(ctx->VARIABLE()){
-        current_var_ = data_base_->add_variable(ctx->VARIABLE()->getText()).get();
+    mode_.push(MODE::BOUND_DEFINITION);
+    if(ctx->variable().size()==2){
+        //creating in active sheet
+        BaseData* c_var_db_tmp;
+        if(ctx->variable().at(0)->DATABASE())
+            c_var_db_tmp = __insert_new_data_base__(ctx->variable().at(0)->DATABASE()->getText());
+        else c_var_db_tmp = data_base_;
+        if(ctx->variable().at(0)->VARIABLE())
+            current_var_ = c_var_db_tmp->add_variable(ctx->variable().at(0)->getText()).get();
+        else assert(false);
+
+        BaseData* db_tmp;
+        if(ctx->variable().at(1)->DATABASE())
+            db_tmp = __insert_new_data_base__(ctx->variable().at(1)->DATABASE()->getText());
+        else db_tmp = data_base_;
+        
+        if(ctx->variable().at(1)->VARIABLE())
+            bottom_.emplace(db_tmp->name(),db_tmp->add_variable(ctx->variable().at(1)->VARIABLE()->getText()).get()->name(),BOTTOM_BOUND_T::LARGER);
+        else assert(false);
         mode_.push(MODE::BOUND_DEFINITION);
-        bottom_.emplace(std::make_pair<std::string_view,BOTTOM_BOUND_T>(current_var_->name(),BOTTOM_BOUND_T::LARGER));
     }
     else assert(false);
 }
@@ -461,10 +572,26 @@ void BaseListener::exitLarger(ParseRulesParser::LargerContext* ctx){
 
 void BaseListener::enterLarger_equal(ParseRulesParser::Larger_equalContext* ctx){
     assert(mode_.empty());
-    if(ctx->VARIABLE()){
-        current_var_ = data_base_->add_variable(ctx->VARIABLE()->getText()).get();
+    mode_.push(MODE::BOUND_DEFINITION);
+    if(ctx->variable().size()==2){
+        //creating in active sheet
+        BaseData* c_var_db_tmp;
+        if(ctx->variable().at(0)->DATABASE())
+            c_var_db_tmp = __insert_new_data_base__(ctx->variable().at(0)->DATABASE()->getText());
+        else c_var_db_tmp = data_base_;
+        if(ctx->variable().at(0)->VARIABLE())
+            current_var_ = c_var_db_tmp->add_variable(ctx->variable().at(0)->VARIABLE()->getText()).get();
+        else assert(false);
+
+        BaseData* db_tmp;
+        if(ctx->variable().at(1)->DATABASE())
+            db_tmp = __insert_new_data_base__(ctx->variable().at(1)->DATABASE()->getText());
+        else db_tmp = data_base_;
+        
+        if(ctx->variable().at(1)->VARIABLE())
+            bottom_.emplace(db_tmp->name(),db_tmp->add_variable(ctx->variable().at(1)->VARIABLE()->getText()).get()->name(),BOTTOM_BOUND_T::LARGER_OR_EQUAL);
+        else assert(false);
         mode_.push(MODE::BOUND_DEFINITION);
-        bottom_.emplace(std::make_pair<std::string_view,BOTTOM_BOUND_T>(current_var_->name(),BOTTOM_BOUND_T::LARGER_OR_EQUAL));
     }
     else assert(false);
 }
@@ -474,4 +601,8 @@ void BaseListener::exitLarger_equal(ParseRulesParser::Larger_equalContext* ctx){
     mode_.pop();
     assert(mode_.empty());
     current_var_ = nullptr;
+}
+
+void BaseListener::visitErrorNode(antlr4::tree::ErrorNode* node){
+    throw ParsingError("Error when parsing: " + node->getText());
 }

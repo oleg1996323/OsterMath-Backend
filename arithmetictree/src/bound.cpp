@@ -66,23 +66,16 @@ Value_t Bound_T<BOTTOM_BOUND_T>::get() const{
     else throw std::runtime_error("Bound error");
 }
 
-Value_t VariableBounds::get_bottom_bound_value() const{
-    return bottom_bound_->get();
+std::optional<Value_t> VariableBounds::get_bottom_bound_value() const{
+    if(bottom_bound_)
+        return bottom_bound_->get();
+    else return std::nullopt;
 }
 
-Value_t VariableBounds::get_top_bound_value() const{
-    return top_bound_->get();
-}
-
-bool VariableBounds::is_in_bounds(Value_t&& value) const{
-    if(bottom_bound_->type_==BOTTOM_BOUND_T::LARGER)
-        if(top_bound_->type_==TOP_BOUND_T::LESS)
-            return bottom_bound_->get()<value && top_bound_->get()>value;
-        else return bottom_bound_->get()<value && top_bound_->get()>=value;
-    else
-        if(top_bound_->type_==TOP_BOUND_T::LESS)
-            return bottom_bound_->get()<=value && top_bound_->get()>value;
-        else return bottom_bound_->get()<=value && top_bound_->get()>=value;
+std::optional<Value_t> VariableBounds::get_top_bound_value() const{
+    if(top_bound_)
+        return top_bound_->get();
+    else return std::nullopt;
 }
 
 void VariableBounds::unset_bottom_bound(){
@@ -91,4 +84,37 @@ void VariableBounds::unset_bottom_bound(){
 
 void VariableBounds::unset_top_bound(){
     top_bound_.reset();
+}
+
+bool VariableBounds::is_in_bounds(Value_t&& value) const{
+    return is_in_bounds(value);
+}
+
+bool VariableBounds::is_in_bounds(const Value_t& value) const{
+    bool in = true;
+    if(bottom_bound_){
+        if(bottom_bound_->type_==BOTTOM_BOUND_T::LARGER)
+            in = in & (bottom_bound_->get()<value);
+        else /*LARGER_OR_EQUAL*/
+            in = in & (bottom_bound_->get()<=value);
+    }
+    if(top_bound_){
+        if(top_bound_->type_==TOP_BOUND_T::LESS)
+            in = in & (top_bound_->get()>value);
+        else /*LESS_OR_EQUAL*/
+            in = in & (top_bound_->get()>=value);
+    }
+    return in;
+}
+
+bool VariableBounds::is_in_bounds(const VariableBase& var) const{
+    if(var.is_arithmetic_tree())
+        return is_in_bounds(var.get<ArithmeticTree>());
+    else if(var.is_value())
+        return is_in_bounds(var.get<Value_t>());
+    else return true;
+}
+
+bool VariableBounds::is_in_bounds(const ArithmeticTree& tree) const{
+    return is_in_bounds(tree.value());
 }

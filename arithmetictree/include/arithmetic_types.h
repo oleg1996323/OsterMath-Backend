@@ -290,7 +290,9 @@ class VariableNode:public Node{
 
     virtual void refresh() override;
 
-    VariableBase* variable() const;
+    const VariableBase* variable() const;
+
+    VariableBase* variable();
 
     virtual Value_t execute() override;
 
@@ -341,9 +343,10 @@ constexpr size_t NUMBER_OF_ARGUMENT [int(FUNCTION_OP::SUMPRODUCT)+1] = {
 
 class FunctionNode:public Node{
     public:
-    FunctionNode(FUNCTION_OP op):operation_(op),
-    array_type_function(ARRAY_TYPE_FUNCTION[int(op)]),
-    number_of_arguments(NUMBER_OF_ARGUMENT[int(op)])
+    FunctionNode(FUNCTION_OP op):
+    number_of_arguments(NUMBER_OF_ARGUMENT[int(op)]),
+    operation_(op),
+    array_type_function(ARRAY_TYPE_FUNCTION[int(op)])
     {}
 
     std::shared_ptr<Node> child(size_t id) const;
@@ -370,12 +373,13 @@ class FunctionNode:public Node{
 
     virtual Value_t execute(size_t index) override;
 
+    const std::unordered_set<VariableNode*>& get_dependecies() const;
+
     #ifdef DEBUG
     virtual void print() const;
     #endif
 
     private:
-    std::vector<std::variant<std::shared_ptr<Node>,std::weak_ptr<VariableNode>>> childs_;
 
     bool __is_variable_node__(size_t index) const{
         return std::holds_alternative<std::weak_ptr<VariableNode>>(childs_.at(index));
@@ -385,11 +389,13 @@ class FunctionNode:public Node{
         return std::holds_alternative<std::shared_ptr<Node>>(childs_.at(index));
     }
 
+    std::vector<std::variant<std::shared_ptr<Node>,std::weak_ptr<VariableNode>>> childs_;
+    std::unordered_set<VariableNode*> var_dependence_;
+    size_t number_of_arguments = 0;
     FUNCTION_OP operation_;
     std::optional<Value_t> cache_;
     bool array_type_function;
-    size_t number_of_arguments = 0;
-
+    
     auto __register_array_input__();
 };
 
@@ -398,8 +404,6 @@ class FunctionNode:public Node{
 class RangeOperationNode:public Node{
     public:
     RangeOperationNode(RANGE_OP op):operation_(op){}
-
-    void add_child(VariableNode*);
 
     virtual ARITHM_NODE_TYPE type() const override{
         return ARITHM_NODE_TYPE::RANGEOP;
@@ -415,11 +419,15 @@ class RangeOperationNode:public Node{
 
     virtual Value_t execute(size_t index) override;
 
+    const std::unordered_set<VariableNode*>& get_dependecies() const;
+
     #ifdef DEBUG
     virtual void print() const;
     #endif
 
     ranges::ArithmeticTree& expression();
+
+    const ranges::ArithmeticTree& expression() const;
 
     size_t range_length() const{
         return range_size;
@@ -430,7 +438,7 @@ class RangeOperationNode:public Node{
     //checks the childs types and them correct vals types
     //Childs should be only numeric variable-arrays and have same length
     bool __checking_childs__() const{
-        for( auto& child:childs_){
+        for( auto& child:get_dependecies()){
             if(child->variable()){
                 if(child->variable()->is_array()){
                     if(range_size==0)
@@ -460,7 +468,6 @@ class RangeOperationNode:public Node{
         return range_size;
     }
 
-    std::unordered_set<VariableNode*> childs_;
     mutable size_t range_size = 0;
     ranges::ArithmeticTree range_expression;
     RANGE_OP operation_;

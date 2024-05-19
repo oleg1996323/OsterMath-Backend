@@ -8,11 +8,15 @@
 #include "def.h"
 
 class Node;
+class VariableNode;
+
 class ArithmeticTree{
     public:
     using type = Value_t;
 
     ArithmeticTree() = default;
+
+    ArithmeticTree(VariableBase* owner);
 
     ArithmeticTree(const ArithmeticTree& other);
 
@@ -32,19 +36,24 @@ class ArithmeticTree{
 
     const std::shared_ptr<Node>& root() const;
 
+    VariableBase* owner() const;
+
     Node* last() const{
         return last_incomplete_;
     }
+
+    const std::unordered_set<VariableNode*>& get_dependecies() const;
 
     #ifdef DEBUG
     void print() const;
     #endif
 
     protected:
+    std::unordered_set<VariableNode*> var_dependence_;
     std::shared_ptr<Node> root_;
+    VariableBase* owner_;
     mutable Node* last_incomplete_;
     mutable std::optional<Value_t> cache_;
-    std::unordered_set<std::string_view> var_dependence_;
 };
 
 namespace ranges{

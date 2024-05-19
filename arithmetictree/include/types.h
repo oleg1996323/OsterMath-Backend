@@ -105,9 +105,6 @@ class VariableBase: private Variable_t, public FormattingData{
     using variant::variant;
 
     public:
-    struct HashVar{
-        size_t operator()(const VariableBase& var);
-    };
 
     virtual ~VariableBase();
 
@@ -150,14 +147,18 @@ class VariableBase: private Variable_t, public FormattingData{
     void print();
 
     template<typename T>
-    void set_bottom_bound_value(std::string_view var_name,T&& value, BOTTOM_BOUND_T type){
-        bounds_.emplace(var_name).first->second.set_bound_value(std::forward<T>(value),type);
-    }
+    void set_bottom_bound_value(std::string_view,std::string_view,T&& value, BOTTOM_BOUND_T type);
 
     template<typename T>
-    void set_top_bound_value(std::string_view var_name,T&& value, TOP_BOUND_T type){
-        bounds_.emplace(var_name).first->second.set_bound_value(std::forward<T>(value),type);
-    }
+    void set_top_bound_value(std::string_view,std::string_view,T&& value, TOP_BOUND_T type);
+
+    bool is_in_bounds(std::string_view,std::string_view) const;
+
+    std::optional<Value_t> get_top_bound(std::string_view,std::string_view);
+
+    std::optional<Value_t> get_bottom_bound(std::string_view,std::string_view);
+
+    std::string_view get_data_base_name() const;
 
     protected:
     void set_data_base(BaseData* data_pool);
@@ -169,7 +170,7 @@ class VariableBase: private Variable_t, public FormattingData{
     std::string text_;
     bool show_reinterpret_=true; //show a reinterpreted formula
     BaseData* data_base_;
-    std::unordered_map<std::string_view,VariableBounds> bounds_;
+    std::unordered_map<std::string_view,std::unordered_map<std::string_view,VariableBounds>> bounds_;
 };
 
 std::ostream& operator<<(std::ostream& stream, const ArithmeticTree& tree);
@@ -204,4 +205,24 @@ VariableBase::VariableBase(std::string_view name, T&& value, BaseData* data_base
 {
     node_=std::make_shared<VariableNode>(this);
     get()=std::forward<T>(value);
+}
+
+template<typename T>
+void VariableBase::set_bottom_bound_value(std::string_view data_base,std::string_view var_name,T&& value, BOTTOM_BOUND_T type){
+    bounds_[data_base][var_name].set_bound_value(std::forward<T>(value),type);
+    std::cout << var_name<<' ';
+    if(type == BOTTOM_BOUND_T::LARGER)
+        std::cout<<"larger than ";
+    else std::cout<<"larger or equal than ";
+    std::cout<<value<<" in "<<name()<<std::endl;
+}
+
+template<typename T>
+void VariableBase::set_top_bound_value(std::string_view data_base,std::string_view var_name,T&& value, TOP_BOUND_T type){
+    bounds_[data_base][var_name].set_bound_value(std::forward<T>(value),type);
+    std::cout << var_name<<' ';
+    if(type == TOP_BOUND_T::LESS)
+        std::cout<<"less than ";
+    else std::cout<<"less or equal than ";
+    std::cout<<value<<" in "<<name()<<std::endl;
 }

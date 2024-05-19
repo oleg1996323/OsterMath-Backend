@@ -3,6 +3,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include "exception.h"
 #include "def.h"
 #include "data.h"
 #include "expr_listener.h"
@@ -16,6 +17,8 @@ struct ParseItems{
         input_(lexer_.GetCommonTokenStream()),
         base_parser_(input_),
         listener_(data_base){
+            lexer_.removeErrorListeners();
+            lexer_.addErrorListener(&err_listener_);
             auto error_handler = std::make_shared<antlr4::BailErrorStrategy>();
             base_parser_.setErrorHandler(error_handler);
             base_parser_.removeErrorListeners();
@@ -26,7 +29,7 @@ struct ParseItems{
     Lexer lexer_;
     antlr4::CommonTokenStream* input_;
     ParseRulesParser base_parser_;
-
+    BailErrorListener error_listener;
     BaseListener listener_;
     ErrorListener err_listener_;
     antlr4::tree::ParseTree* tree_;

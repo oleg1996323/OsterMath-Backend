@@ -71,10 +71,6 @@ void Array_t::__value_to_tree_for_last__(){
     back().get()=std::move(tree);
 }
 
-size_t VariableBase::HashVar::operator()(const VariableBase& var){
-    return std::hash<std::string_view>()(var.name_);
-}
-
 std::ostream& VariableBase::operator<<(std::ostream& stream){
     if(get_type()!=FormattingData::OUTPUT_TYPE::DEFAULT){
         stream<<std::setprecision(get_precision());
@@ -196,7 +192,7 @@ bool VariableBase::is_numeric() const{
 
 void VariableBase::value_to_tree(){
     if(is_value()){
-        ArithmeticTree tree;
+        ArithmeticTree tree(this);
         tree.insert(std::make_shared<ValueNode>(std::move(get<Value_t>())));
         this->get()=std::move(tree);
     }
@@ -207,6 +203,40 @@ void VariableBase::tree_to_value(){
         get() = get<ArithmeticTree>().value();
 }
 
-VariableBase::~VariableBase(){
+VariableBase::~VariableBase(){}
 
+bool VariableBase::is_in_bounds(std::string_view data_base,std::string_view name) const{
+    if(bounds_.at(data_base).contains(name)){
+        const VariableBase& var = *data_base_->get_pool()->get(data_base)->get(name);
+        if(var.is_arithmetic_tree())
+            return bounds_.at(data_base).at(name).is_in_bounds(var);
+        else if(var.is_value())
+            return bounds_.at(data_base).at(name).is_in_bounds(var);
+        else return true;
+    }
+    else return true;
+}
+
+std::optional<Value_t> VariableBase::get_top_bound(std::string_view data_base,std::string_view var_name){
+    if(bounds_.contains(data_base)){
+        if(bounds_.at(data_base).contains(var_name)){
+            return bounds_.at(data_base).at(var_name).get_top_bound_value();
+        }
+        else return std::nullopt;
+    }
+    else return std::nullopt;
+}
+
+std::optional<Value_t> VariableBase::get_bottom_bound(std::string_view data_base,std::string_view var_name){
+    if(bounds_.contains(data_base)){
+        if(bounds_.at(data_base).contains(var_name)){
+            return bounds_.at(data_base).at(var_name).get_bottom_bound_value();
+        }
+        else return std::nullopt;
+    }
+    else return std::nullopt;
+}
+
+std::string_view VariableBase::get_data_base_name() const{
+    return data_base_->name();
 }
