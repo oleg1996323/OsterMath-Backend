@@ -51,13 +51,13 @@
 },
 {
   "directory": "/home/oster/Electrolisys",
-  "command": "/usr/bin/g++ -DANTLR4CPP_STATIC -DDEBUG -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS -I/home/oster/Electrolisys/arithmetictree/grammar/bin/antlr4cpp_generated_src/ParseRules -I/home/oster/Electrolisys/arithmetictree/grammar/antlr4_runtime/runtime/src -I/home/oster/Electrolisys/arithmetictree/src -I/home/oster/Electrolisys/arithmetictree/include -I/home/oster/Electrolisys/include  -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -g -std=gnu++20 -o CMakeFiles/arithmetictree.dir/arithmetictree/src/expr_listener.cpp.o -c /home/oster/Electrolisys/arithmetictree/src/expr_listener.cpp",
-  "file": "/home/oster/Electrolisys/arithmetictree/src/expr_listener.cpp"
+  "command": "/usr/bin/g++ -DANTLR4CPP_STATIC -DDEBUG -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS -I/home/oster/Electrolisys/arithmetictree/grammar/bin/antlr4cpp_generated_src/ParseRules -I/home/oster/Electrolisys/arithmetictree/grammar/antlr4_runtime/runtime/src -I/home/oster/Electrolisys/arithmetictree/src -I/home/oster/Electrolisys/arithmetictree/include -I/home/oster/Electrolisys/include  -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -g -std=gnu++20 -o CMakeFiles/arithmetictree.dir/arithmetictree/src/exception.cpp.o -c /home/oster/Electrolisys/arithmetictree/src/exception.cpp",
+  "file": "/home/oster/Electrolisys/arithmetictree/src/exception.cpp"
 },
 {
   "directory": "/home/oster/Electrolisys",
-  "command": "/usr/bin/g++ -DANTLR4CPP_STATIC -DDEBUG -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS -I/home/oster/Electrolisys/arithmetictree/grammar/bin/antlr4cpp_generated_src/ParseRules -I/home/oster/Electrolisys/arithmetictree/grammar/antlr4_runtime/runtime/src -I/home/oster/Electrolisys/arithmetictree/src -I/home/oster/Electrolisys/arithmetictree/include -I/home/oster/Electrolisys/include  -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -g -std=gnu++20 -o CMakeFiles/arithmetictree.dir/arithmetictree/src/expr_parser.cpp.o -c /home/oster/Electrolisys/arithmetictree/src/expr_parser.cpp",
-  "file": "/home/oster/Electrolisys/arithmetictree/src/expr_parser.cpp"
+  "command": "/usr/bin/g++ -DANTLR4CPP_STATIC -DDEBUG -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS -I/home/oster/Electrolisys/arithmetictree/grammar/bin/antlr4cpp_generated_src/ParseRules -I/home/oster/Electrolisys/arithmetictree/grammar/antlr4_runtime/runtime/src -I/home/oster/Electrolisys/arithmetictree/src -I/home/oster/Electrolisys/arithmetictree/include -I/home/oster/Electrolisys/include  -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -g -std=gnu++20 -o CMakeFiles/arithmetictree.dir/arithmetictree/src/expr_listener.cpp.o -c /home/oster/Electrolisys/arithmetictree/src/expr_listener.cpp",
+  "file": "/home/oster/Electrolisys/arithmetictree/src/expr_listener.cpp"
 },
 {
   "directory": "/home/oster/Electrolisys",

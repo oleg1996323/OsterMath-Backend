@@ -6,16 +6,8 @@
 
 using namespace std::string_view_literals;
 
-bool BaseListener::is_header_definition() const{
-    return !mode_.empty() && mode_.top()==MODE::HDRDEF;
-}
-
 bool BaseListener::is_function_operation() const{
     return !mode_.empty() && mode_.top()==MODE::FUNCTIONOPERATION;
-}
-
-bool BaseListener::is_table_values_definition() const{
-    return !mode_.empty() && mode_.top()==MODE::TABVALDEF;
 }
 
 bool BaseListener::is_variable_definition() const{
@@ -63,9 +55,7 @@ void BaseListener::__insert_to_variable__(Value_t&& val) const{
 }
 
 BaseData* BaseListener::__insert_new_data_base__(std::string&& name){
-    if(data_base_->get_pool()->exists(name))
-        return data_base_->get_pool()->add_data(name);
-    else throw std::invalid_argument(name+" don't exists in this pool");
+    return data_base_->get_pool()->add_data(name);
 }
 
 void BaseListener::__insert_to_range_operation__(const std::shared_ptr<Node>& node) const{
@@ -136,10 +126,7 @@ void BaseListener::enterUnaryOp(ParseRulesParser::UnaryOpContext *ctx) {
             current_var_->get<ArithmeticTree>().insert(std::make_shared<UnaryNode>(ctx->ADD()?UNARY_OP::ADD:UNARY_OP::SUB));
         else throw std::runtime_error("Error when unary operator added to expression");
     }
-    else if(is_table_values_definition()){
-        assert(current_var_->is_array());
-        current_var_->get<Array_t>().define_back(ctx->ADD()?1:-1);
-    }
+    else assert(false);
 }
 
 void BaseListener::exitUnaryOp(ParseRulesParser::UnaryOpContext* ctx)  {
@@ -302,44 +289,6 @@ void BaseListener::enterArray(ParseRulesParser::ArrayContext *ctx) {
 
 void BaseListener::exitArray(ParseRulesParser::ArrayContext *ctx) {
     return;
-}
-
-void BaseListener::enterTable_definition(ParseRulesParser::Table_definitionContext* ctx) {
-    mode_.push(MODE::TABLEDEF);
-    assert(line_counter_==0);
-}
-
-void BaseListener::exitTable_definition(ParseRulesParser::Table_definitionContext* ctx) {
-    assert(mode_.top()==MODE::TABLEDEF);
-    assert(line_counter_!=0);
-    mode_.pop();
-    line_counter_=0;
-}
-
-//a typical header whitespace or tab separated. Only Variables are accepted and then defined
-//by corespondent parser rule.
-void BaseListener::enterHdr(ParseRulesParser::HdrContext *ctx) {
-    assert(mode_.top()==MODE::TABLEDEF);
-    mode_.push(MODE::HDRDEF);
-}
-
-void BaseListener::exitHdr(ParseRulesParser::HdrContext *ctx) {
-    assert(mode_.top()==MODE::HDRDEF);
-    mode_.pop();
-}
-
-void BaseListener::enterNumbers_line(ParseRulesParser::Numbers_lineContext* ctx) {
-    assert(mode_.top()==MODE::TABLEDEF || mode_.top()==MODE::TABVALDEF);
-    assert(col_counter_==0);
-    if(mode_.top()==MODE::TABLEDEF)
-        mode_.push(MODE::TABVALDEF);
-    ++line_counter_;
-}
-
-void BaseListener::exitNumbers_line(ParseRulesParser::Numbers_lineContext* ctx) {
-    assert(mode_.top()==MODE::TABVALDEF);
-    assert(col_counter_==hdr_vars_.size()-1);
-    mode_.pop();
 }
 
 void BaseListener::enterNumber(ParseRulesParser::NumberContext* ctx){

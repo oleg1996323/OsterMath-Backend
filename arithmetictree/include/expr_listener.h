@@ -32,9 +32,6 @@ class Node;
 class BaseListener: public ParseRulesBaseListener{
     enum class MODE{
         VARDEF,
-        HDRDEF,
-        TABLEDEF,
-        TABVALDEF,
         RANGEOPERATION,
         FUNCTIONOPERATION,
         BOUND_DEFINITION
@@ -42,9 +39,7 @@ class BaseListener: public ParseRulesBaseListener{
 
     bool is_range_operation() const;
     bool is_function_operation() const;
-    bool is_header_definition() const;
     bool is_variable_definition() const;
-    bool is_table_values_definition() const;
     bool is_bounds_definition() const;
 
     void __insert_to_variable__(const std::shared_ptr<Node>& node) const;
@@ -115,20 +110,6 @@ class BaseListener: public ParseRulesBaseListener{
     virtual void enterItemArray(ParseRulesParser::ItemArrayContext *ctx) override;
 
     virtual void exitItemArray(ParseRulesParser::ItemArrayContext *ctx) override;
-
-    virtual void enterTable_definition(ParseRulesParser::Table_definitionContext* ctx) override;
-
-    virtual void exitTable_definition(ParseRulesParser::Table_definitionContext* ctx) override;
-
-    //a typical header whitespace or tab separated. Only Variables are accepted and then defined
-    //by corespondent parser rule.
-    virtual void enterHdr(ParseRulesParser::HdrContext *ctx) override;
-
-    virtual void exitHdr(ParseRulesParser::HdrContext *ctx) override;
-
-    virtual void enterNumbers_line(ParseRulesParser::Numbers_lineContext* ctx) override;
-
-    virtual void exitNumbers_line(ParseRulesParser::Numbers_lineContext* ctx) override;
 
     virtual void enterRangefunction(ParseRulesParser::RangefunctionContext* ctx) override;
 

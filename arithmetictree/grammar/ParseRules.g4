@@ -1,7 +1,39 @@
 grammar ParseRules;
 
-VARIABLE: [a-zA-Z] ((QUOTE | ASTERISK) | [a-zA-Z0-9])*;
-DATABASE: [a-zA-Z0-9_] [a-zA-Z0-9 _]*;
+fragment A : [aA];
+fragment B : [bB];
+fragment C : [cC];
+fragment D : [dD];
+fragment E : [eE];
+fragment F : [fF];
+fragment G : [gG];
+fragment H : [hH];
+fragment I : [iI];
+fragment J : [jJ];
+fragment K : [kK];
+fragment L : [lL];
+fragment M : [mM];
+fragment N : [nN];
+fragment O : [oO];
+fragment P : [pP];
+fragment Q : [qQ];
+fragment R : [rR];
+fragment S : [sS];
+fragment T : [tT];
+fragment U : [uU];
+fragment V : [vV];
+fragment W : [wW];
+fragment X : [xX];
+fragment Y : [yY];
+fragment Z : [zZ];
+
+ESC_VAR: '#' -> skip;
+BEG_DB: '!(\'' -> skip;
+END_DB: '\')' -> skip;
+
+
+VARIABLE: ESC_VAR [a-zA-Z] ((QUOTE | ASTERISK) | [a-zA-Z0-9])* {setText($text.substring(1, $text.length()-1));};
+DATABASE: BEG_DB [a-zA-Z0-9_] ~[()!#]* END_DB {setText($text.substring(2, $text.length() - 5));}; 
 WS: [ \t]+ -> skip;
 EOL: '\r'? '\n';
 
@@ -13,7 +45,6 @@ input:
 line_input:
     vardefinition
     | comparision
-    | table_definition
     ;
 
 vardefinition
@@ -21,15 +52,27 @@ vardefinition
     variable '=' WS* (array | expr | string) WS* EOL
     ;
 
+comparision
+    :
+    variable ':' variable '<' WS* expr WS* EOL              #less
+    | variable ':' WS* expr WS* '>' variable EOL            #less
+    | variable ':' variable ('<=' | '=<') WS* expr WS* EOL  #less_equal
+    | variable ':' WS* expr WS* ('>=' | '=>') variable EOL  #less_equal
+    | variable ':' variable '>' WS* expr WS* EOL            #larger
+    | variable ':' WS* expr WS* '<' variable EOL            #larger
+    | variable ':' variable ('>=' | '=>') WS* expr WS* EOL  #larger_equal
+    | variable ':' WS* expr WS* ('<=' | '=<') variable EOL  #larger_equal
+    ;
+
 variable:
-    WS* ('$(' DATABASE ')')? '#' VARIABLE WS*
+    WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS*
     ;
 
 expr
     : 
     '(' expr ')'                                            # Parens
-    | (function | multiargfunction | rangefunction)         # FunctionCall
     | variable                                              # VariableInExpr
+    | (function | multiargfunction | rangefunction)         # FunctionCall
     | (number | constant)                                   # Literal
     | (ADD | SUB) WS* expr                                  # UnaryOp
     | expr POW expr                                         # BinaryOp  
@@ -44,18 +87,6 @@ array
 
 input_array:
     expr #ItemArray
-    ;
-
-table_definition:
-    hdr EOL numbers_line EOL
-    ;
-
-hdr:
-    variable (WS variable)+
-    ;
-
-numbers_line:
-    WS* number (WS+ number) WS*
     ;
 
 number
@@ -92,50 +123,13 @@ rangefunction
     | WS* PRODUCT_I '(' WS* expr WS* ')' WS*
     ;
 
-comparision
-    :
-    variable ':' variable '<' WS* expr WS* EOL              #less
-    | variable ':' WS* expr WS* '>' variable EOL            #less
-    | variable ':' variable ('<=' | '=<') WS* expr WS* EOL  #less_equal
-    | variable ':' WS* expr WS* ('>=' | '=>') variable EOL  #less_equal
-    | variable ':' variable '>' WS* expr WS* EOL            #larger
-    | variable ':' WS* expr WS* '<' variable EOL            #larger
-    | variable ':' variable ('>=' | '=>') WS* expr WS* EOL  #larger_equal
-    | variable ':' WS* expr WS* ('<=' | '=<') variable EOL  #larger_equal
-    ;
-
 ADD: '+' ;
 SUB: '-' ;
 MUL: '*' ;
 DIV: '/' ;
 POW: '^' ;
 
-fragment A : [aA];
-fragment B : [bB];
-fragment C : [cC];
-fragment D : [dD];
-fragment E : [eE];
-fragment F : [fF];
-fragment G : [gG];
-fragment H : [hH];
-fragment I : [iI];
-fragment J : [jJ];
-fragment K : [kK];
-fragment L : [lL];
-fragment M : [mM];
-fragment N : [nN];
-fragment O : [oO];
-fragment P : [pP];
-fragment Q : [qQ];
-fragment R : [rR];
-fragment S : [sS];
-fragment T : [tT];
-fragment U : [uU];
-fragment V : [vV];
-fragment W : [wW];
-fragment X : [xX];
-fragment Y : [yY];
-fragment Z : [zZ];
+
 
 SUMPRODUCT: S U M P R O D U C T;
 SUMPRODUCT_I: SUMPRODUCT '_' I;
@@ -168,4 +162,6 @@ string
     '"' STRING '"'
     ;
 
-STRING: .*?;
+STRING: '"' ~["]* '"'
+        | '\'' ~[']* '\''
+    ;
