@@ -1,73 +1,9 @@
 grammar ParseRules;
 
-ADD: '+' ;
-SUB: '-' ;
-MUL: '*' ;
-DIV: '/' ;
-POW: '^' ;
-
-QUOTE: '\'';
-ASTERISK: '^' '*'+;
-
+VARIABLE: [a-zA-Z] ((QUOTE | ASTERISK) | [a-zA-Z0-9])*;
+DATABASE: [a-zA-Z0-9_] [a-zA-Z0-9 _]*;
 WS: [ \t]+ -> skip;
 EOL: '\r'? '\n';
-
-fragment INT: [-+]? UINT;
-EXPONENT: [eE] INT;
-UINT: [0-9]+ (EXPONENT)?;
-FLOAT: UINT '.' UINT (EXPONENT)?;
-
-number
-    : (UINT | FLOAT)
-    ;
-
-SUMPRODUCT: [sS][uU][mM][pP][rR][oO][dD][uU][cC][tT];
-SUMPRODUCT_I: SUMPRODUCT '_' [iI];
-SUM: [sS][uU][mM];
-SUM_I: SUM '_' [iI];
-PRODUCT: [pP][rR][oO][dD][uU][cC][tT];
-PRODUCT_I: PRODUCT '_' [iI];
-LN: [lL][nN];       
-LG: [lL][gG];       
-LOG_X: [lL][oO][gG]'_'[xX];   
-EXP: [eE][xX][pP];     
-SQRT: [sS][qQ][rR][tT];
-PI: [pP][iI];
-COS: [cC][oO][sS];
-SIN: [sS][iI][nN];
-ASIN: [aA] SIN;
-ACOS: [aA] COS;
-FACTORIAL: [fF][aA][cC][tT][oO][rR][iI][aA][lL];
-DATABASE: '$('([a-zA-Z0-9_]) [a-zA-Z0-9 _]*')';
-VARIABLE: '#'([a-zA-Z])+ ((QUOTE | ASTERISK) | [a-zA-Z0-9])*;
-STRING: '\''[a-zA-Z0-9_] [a-zA-Z0-9 _,.;!?]*;
-
-variable:
-    WS* ( DATABASE )? VARIABLE WS*
-    ;
-
-constant:
-    (PI | EXP)
-    ;
-
-input_array:
-    expr #ItemArray
-    ;
-
-array
-    :
-    '['input_array (','input_array)*']'
-    ;
-    
-string
-    :
-    STRING
-    ;
-
-vardefinition
-    :
-    variable '=' WS* (expr | string | array) WS* EOL
-    ;
 
 input:
     line_input+
@@ -75,9 +11,39 @@ input:
     ;
 
 line_input:
-    table_definition+
-    | vardefinition+
-    | comparision+
+    vardefinition
+    | comparision
+    | table_definition
+    ;
+
+vardefinition
+    :
+    variable '=' WS* (array | expr | string) WS* EOL
+    ;
+
+variable:
+    WS* ('$(' DATABASE ')')? '#' VARIABLE WS*
+    ;
+
+expr
+    : 
+    '(' expr ')'                                            # Parens
+    | (function | multiargfunction | rangefunction)         # FunctionCall
+    | variable                                              # VariableInExpr
+    | (number | constant)                                   # Literal
+    | (ADD | SUB) WS* expr                                  # UnaryOp
+    | expr POW expr                                         # BinaryOp  
+    | expr WS* (MUL | DIV) WS* expr                         # BinaryOp
+    | expr WS* (ADD | SUB) WS* expr                         # BinaryOp
+    ;
+
+array
+    :
+    '['input_array (','input_array)*']'
+    ;
+
+input_array:
+    expr #ItemArray
     ;
 
 table_definition:
@@ -92,16 +58,12 @@ numbers_line:
     WS* number (WS+ number) WS*
     ;
 
-expr
-    : 
-    '(' expr ')'                                            # Parens
-    | (number | constant)                                   # Literal
-    | (function | multiargfunction | rangefunction)         # FunctionCall
-    | variable                                              # VariableInExpr
-    | (ADD | SUB) WS* expr                                  # UnaryOp
-    | expr POW expr                                         # BinaryOp  
-    | expr WS* (MUL | DIV) WS* expr                         # BinaryOp
-    | expr WS* (ADD | SUB) WS* expr                         # BinaryOp
+number
+    : (UINT | FLOAT)
+    ;
+
+constant:
+    (PI | EXP)
     ;
 
 function
@@ -126,8 +88,7 @@ multiargfunction
 
 rangefunction
     :
-    WS* SUMPRODUCT_I '(' WS* expr WS* ')' WS*
-    | WS* SUM_I '(' WS* expr WS* ')' WS*
+    WS* SUM_I '(' WS* expr WS* ')' WS*
     | WS* PRODUCT_I '(' WS* expr WS* ')' WS*
     ;
 
@@ -142,3 +103,69 @@ comparision
     | variable ':' variable ('>=' | '=>') WS* expr WS* EOL  #larger_equal
     | variable ':' WS* expr WS* ('<=' | '=<') variable EOL  #larger_equal
     ;
+
+ADD: '+' ;
+SUB: '-' ;
+MUL: '*' ;
+DIV: '/' ;
+POW: '^' ;
+
+fragment A : [aA];
+fragment B : [bB];
+fragment C : [cC];
+fragment D : [dD];
+fragment E : [eE];
+fragment F : [fF];
+fragment G : [gG];
+fragment H : [hH];
+fragment I : [iI];
+fragment J : [jJ];
+fragment K : [kK];
+fragment L : [lL];
+fragment M : [mM];
+fragment N : [nN];
+fragment O : [oO];
+fragment P : [pP];
+fragment Q : [qQ];
+fragment R : [rR];
+fragment S : [sS];
+fragment T : [tT];
+fragment U : [uU];
+fragment V : [vV];
+fragment W : [wW];
+fragment X : [xX];
+fragment Y : [yY];
+fragment Z : [zZ];
+
+SUMPRODUCT: S U M P R O D U C T;
+SUMPRODUCT_I: SUMPRODUCT '_' I;
+SUM: S U M;
+SUM_I: SUM '_' I;
+PRODUCT: P R O D U C T;
+PRODUCT_I: PRODUCT '_' I;
+LN: L N;       
+LG: L G;       
+LOG_X: L O G '_' X;   
+EXP: E X P;     
+SQRT: S Q R T;
+PI: P I;
+COS: C O S;
+SIN: S I N;
+ASIN: A SIN;
+ACOS: A COS;
+FACTORIAL: F A C T O R I A L;
+
+QUOTE: '\'';
+ASTERISK: '^' '*'+;
+
+fragment INT: [-+]? UINT;
+EXPONENT: [eE] INT;
+UINT: [0-9]+ (EXPONENT)?;
+FLOAT: INT '.' UINT (EXPONENT)?;
+
+string
+    :
+    '"' STRING '"'
+    ;
+
+STRING: .*?;
