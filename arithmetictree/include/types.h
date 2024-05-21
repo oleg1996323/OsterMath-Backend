@@ -92,7 +92,7 @@ class Array_t : public std::vector<Array_val>{
 
     private:
     VariableBase* parent_;
-
+    std::unordered_set<VariableNode*> var_dependence_;
     void __value_to_tree_for_last__();
 };
 

@@ -206,7 +206,7 @@ void VariableBase::tree_to_value(){
 VariableBase::~VariableBase(){}
 
 bool VariableBase::is_in_bounds(std::string_view data_base,std::string_view name) const{
-    if(bounds_.at(data_base).contains(name)){
+    if(bounds_.contains(data_base) && bounds_.at(data_base).contains(name)){
         const VariableBase& var = *data_base_->get_pool()->get(data_base)->get(name);
         if(var.is_arithmetic_tree())
             return bounds_.at(data_base).at(name).is_in_bounds(var);

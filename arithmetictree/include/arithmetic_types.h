@@ -396,7 +396,7 @@ class FunctionNode:public Node{
     std::optional<Value_t> cache_;
     bool array_type_function;
     
-    auto __register_array_input__();
+    //auto __register_array_input__();
 };
 
 //calculate some expressions by range of input values.

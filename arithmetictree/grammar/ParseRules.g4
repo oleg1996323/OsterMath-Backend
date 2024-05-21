@@ -32,8 +32,8 @@ BEG_DB: '!(\'' -> skip;
 END_DB: '\')' -> skip;
 
 
-VARIABLE: ESC_VAR [a-zA-Z] ((QUOTE | ASTERISK) | [a-zA-Z0-9])* {setText($text.substring(1, $text.length()-1));};
-DATABASE: BEG_DB [a-zA-Z0-9_] ~[()!#]* END_DB {setText($text.substring(2, $text.length() - 5));}; 
+VARIABLE: ESC_VAR [a-zA-Z] ((QUOTE | ASTERISK) | [a-zA-Z0-9])* {setText(getText().substr(1, getText().length()-1));std::cout<<getText()<<std::endl;};
+DATABASE: BEG_DB [a-zA-Z0-9_] ~[()!#]* END_DB {setText(getText().substr(3, getText().length()-5));std::cout<<getText()<<std::endl;}; 
 WS: [ \t]+ -> skip;
 EOL: '\r'? '\n';
 
@@ -49,19 +49,19 @@ line_input:
 
 vardefinition
     :
-    variable '=' WS* (array | expr | string) WS* EOL
+    WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS* '=' WS* (array | expr | string) WS* EOL
     ;
 
 comparision
     :
-    variable ':' variable '<' WS* expr WS* EOL              #less
-    | variable ':' WS* expr WS* '>' variable EOL            #less
-    | variable ':' variable ('<=' | '=<') WS* expr WS* EOL  #less_equal
-    | variable ':' WS* expr WS* ('>=' | '=>') variable EOL  #less_equal
-    | variable ':' variable '>' WS* expr WS* EOL            #larger
-    | variable ':' WS* expr WS* '<' variable EOL            #larger
-    | variable ':' variable ('>=' | '=>') WS* expr WS* EOL  #larger_equal
-    | variable ':' WS* expr WS* ('<=' | '=<') variable EOL  #larger_equal
+    WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS* ':' variable '<' WS* expr WS* EOL              #less
+    | WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS* ':' WS* expr WS* '>' variable EOL            #less
+    | WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS* ':' variable ('<=' | '=<') WS* expr WS* EOL  #less_equal
+    | WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS* ':' WS* expr WS* ('>=' | '=>') variable EOL  #less_equal
+    | WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS* ':' variable '>' WS* expr WS* EOL            #larger
+    | WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS* ':' WS* expr WS* '<' variable EOL            #larger
+    | WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS* ':' variable ('>=' | '=>') WS* expr WS* EOL  #larger_equal
+    | WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS* ':' WS* expr WS* ('<=' | '=<') variable EOL  #larger_equal
     ;
 
 variable:

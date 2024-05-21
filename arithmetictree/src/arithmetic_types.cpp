@@ -261,21 +261,21 @@ std::shared_ptr<Node> FunctionNode::child(size_t id) const{
         throw std::invalid_argument("Incorrect child's id");
 }
 
-auto FunctionNode::__register_array_input__(){
-    if(childs_.empty())
-        throw std::invalid_argument("Invalid function parameters");
-    std::vector<std::reference_wrapper<const Array_t>> params;
-    for(size_t i = 0;i<childs_.size();++i){
-        auto child_i = child(i);
-        if(child_i->type()==ARITHM_NODE_TYPE::VARIABLE){
-            auto ptr = reinterpret_cast<VariableNode*>(child_i.get())->variable();
-            if(ptr->is_array())
-                params.push_back(ptr->get<Array_t>());
-            else throw std::invalid_argument("Invalid function parameter");
-        }
-    }
-    return params;
-}
+// auto FunctionNode::__register_array_input__(){
+//     if(childs_.empty())
+//         throw std::invalid_argument("Invalid function parameters");
+//     std::vector<std::reference_wrapper<const Array_t>> params;
+//     for(size_t i = 0;i<childs_.size();++i){
+//         auto child_i = child(i);
+//         if(child_i->type()==ARITHM_NODE_TYPE::VARIABLE){
+//             auto ptr = reinterpret_cast<VariableNode*>(child_i.get())->variable();
+//             if(ptr->is_array())
+//                 params.push_back(ptr->get<Array_t>());
+//             else throw std::invalid_argument("Invalid function parameter");
+//         }
+//     }
+//     return params;
+// }
 
 Value_t FunctionNode::execute(){
     if(array_type_function?childs_.size()>0:childs_.size()==number_of_arguments){
@@ -363,6 +363,15 @@ void FunctionNode::add_child(const std::shared_ptr<Node>& node){
     else if(node->type() == ARITHM_NODE_TYPE::RANGEOP){
         for(auto it:reinterpret_cast<RangeOperationNode*>(node.get())->get_dependecies())
             var_dependence_.insert(it);
+    }
+    else if(node->type() == ARITHM_NODE_TYPE::VARIABLE){
+        VariableNode* var_node = reinterpret_cast<VariableNode*>(node.get());
+        if(var_node->variable()->is_arithmetic_tree())
+            for(auto it:var_node->variable()->get<ArithmeticTree>().get_dependecies())
+                var_dependence_.insert(it);
+        else if(var_node->variable()->is_array())
+            for(auto it:var_node->variable()->get<Array_t>().get_dependecies())
+                var_dependence_.insert(it);
     }
     childs_.push_back(node);
 }

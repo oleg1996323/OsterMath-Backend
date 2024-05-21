@@ -67,16 +67,17 @@ void BaseListener::__insert_to_function_operation__(const std::shared_ptr<Node>&
 }
 
 void BaseListener::enterVardefinition(ParseRulesParser::VardefinitionContext * ctx){
+    assert(mode_.empty());
     mode_.push(MODE::VARDEF);
     //by default the database from which we define variable must exists
 
-    if(ctx->variable()){
+    if(ctx->VARIABLE()){
         //creating in active sheet
         BaseData* c_var_db_tmp;
-        if(ctx->variable()->DATABASE())
-            c_var_db_tmp = __insert_new_data_base__(ctx->variable()->DATABASE()->getText());
+        if(ctx->DATABASE())
+            c_var_db_tmp = __insert_new_data_base__(ctx->DATABASE()->getText());
         else c_var_db_tmp = data_base_;
-        current_var_ = c_var_db_tmp->add_variable(ctx->variable()->VARIABLE()->getText()).get();
+        current_var_ = c_var_db_tmp->add_variable(ctx->VARIABLE()->getText()).get();
     }
     else assert(false);
     if(!current_var_->is_undef())
@@ -421,24 +422,21 @@ void BaseListener::exitRangefunction(ParseRulesParser::RangefunctionContext* ctx
 
 void BaseListener::enterLess(ParseRulesParser::LessContext* ctx){
     assert(mode_.empty());
-    if(ctx->variable().size()==2){
+    if(ctx->variable() && ctx->VARIABLE()){
         //creating in active sheet
         BaseData* c_var_db_tmp;
-        if(ctx->variable().at(0)->DATABASE())
-            c_var_db_tmp = __insert_new_data_base__(ctx->variable().at(0)->DATABASE()->getText());
+        if(ctx->DATABASE())
+            c_var_db_tmp = __insert_new_data_base__(ctx->DATABASE()->getText());
         else c_var_db_tmp = data_base_;
-        if(ctx->variable().at(0)->VARIABLE())
-            current_var_ = c_var_db_tmp->add_variable(ctx->variable().at(0)->getText()).get();
-        else assert(false);
-        
+        current_var_ = c_var_db_tmp->add_variable(ctx->VARIABLE()->getText()).get();
 
         BaseData* db_tmp;
-        if(ctx->variable().at(1)->DATABASE())
-            db_tmp = __insert_new_data_base__(ctx->variable().at(1)->DATABASE()->getText());
+        if(ctx->variable()->DATABASE())
+            db_tmp = __insert_new_data_base__(ctx->variable()->DATABASE()->getText());
         else db_tmp = data_base_;
 
-        if(ctx->variable().at(1)->VARIABLE())
-            top_.emplace(db_tmp->name(),db_tmp->add_variable(ctx->variable().at(1)->VARIABLE()->getText()).get()->name(),TOP_BOUND_T::LESS);
+        if(ctx->variable()->VARIABLE())
+            top_.emplace(db_tmp->name(),db_tmp->add_variable(ctx->variable()->VARIABLE()->getText()).get()->name(),TOP_BOUND_T::LESS);
         else assert(false);
 
         mode_.push(MODE::BOUND_DEFINITION);
@@ -456,23 +454,21 @@ void BaseListener::exitLess(ParseRulesParser::LessContext* ctx){
 void BaseListener::enterLess_equal(ParseRulesParser::Less_equalContext* ctx){
     assert(mode_.empty());
     mode_.push(MODE::BOUND_DEFINITION);
-    if(ctx->variable().size()==2){
+        if(ctx->variable() && ctx->VARIABLE()){
         //creating in active sheet
         BaseData* c_var_db_tmp;
-        if(ctx->variable().at(0)->DATABASE())
-            c_var_db_tmp = __insert_new_data_base__(ctx->variable().at(0)->DATABASE()->getText());
+        if(ctx->DATABASE())
+            c_var_db_tmp = __insert_new_data_base__(ctx->DATABASE()->getText());
         else c_var_db_tmp = data_base_;
-        if(ctx->variable().at(0)->VARIABLE())
-            current_var_ = c_var_db_tmp->add_variable(ctx->variable().at(0)->getText()).get();
-        else assert(false);
+        current_var_ = c_var_db_tmp->add_variable(ctx->VARIABLE()->getText()).get();
 
         BaseData* db_tmp;
-        if(ctx->variable().at(1)->DATABASE())
-            db_tmp = __insert_new_data_base__(ctx->variable().at(1)->DATABASE()->getText());
+        if(ctx->variable()->DATABASE())
+            db_tmp = __insert_new_data_base__(ctx->variable()->DATABASE()->getText());
         else db_tmp = data_base_;
 
-        if(ctx->variable().at(1)->VARIABLE())
-            top_.emplace(db_tmp->name(),db_tmp->add_variable(ctx->variable().at(1)->VARIABLE()->getText()).get()->name(),TOP_BOUND_T::LESS_OR_EQUAL);
+        if(ctx->variable()->VARIABLE())
+            top_.emplace(db_tmp->name(),db_tmp->add_variable(ctx->variable()->VARIABLE()->getText()).get()->name(),TOP_BOUND_T::LESS_OR_EQUAL);
         else assert(false);
         mode_.push(MODE::BOUND_DEFINITION);
     }
@@ -489,23 +485,21 @@ void BaseListener::exitLess_equal(ParseRulesParser::Less_equalContext* ctx){
 void BaseListener::enterLarger(ParseRulesParser::LargerContext* ctx){
     assert(mode_.empty());
     mode_.push(MODE::BOUND_DEFINITION);
-    if(ctx->variable().size()==2){
+        if(ctx->variable() && ctx->VARIABLE()){
         //creating in active sheet
         BaseData* c_var_db_tmp;
-        if(ctx->variable().at(0)->DATABASE())
-            c_var_db_tmp = __insert_new_data_base__(ctx->variable().at(0)->DATABASE()->getText());
+        if(ctx->DATABASE())
+            c_var_db_tmp = __insert_new_data_base__(ctx->DATABASE()->getText());
         else c_var_db_tmp = data_base_;
-        if(ctx->variable().at(0)->VARIABLE())
-            current_var_ = c_var_db_tmp->add_variable(ctx->variable().at(0)->getText()).get();
-        else assert(false);
+        current_var_ = c_var_db_tmp->add_variable(ctx->VARIABLE()->getText()).get();
 
         BaseData* db_tmp;
-        if(ctx->variable().at(1)->DATABASE())
-            db_tmp = __insert_new_data_base__(ctx->variable().at(1)->DATABASE()->getText());
+        if(ctx->variable()->DATABASE())
+            db_tmp = __insert_new_data_base__(ctx->variable()->DATABASE()->getText());
         else db_tmp = data_base_;
-        
-        if(ctx->variable().at(1)->VARIABLE())
-            bottom_.emplace(db_tmp->name(),db_tmp->add_variable(ctx->variable().at(1)->VARIABLE()->getText()).get()->name(),BOTTOM_BOUND_T::LARGER);
+
+        if(ctx->variable()->VARIABLE())
+            bottom_.emplace(db_tmp->name(),db_tmp->add_variable(ctx->variable()->VARIABLE()->getText()).get()->name(),BOTTOM_BOUND_T::LARGER);
         else assert(false);
         mode_.push(MODE::BOUND_DEFINITION);
     }
@@ -522,23 +516,21 @@ void BaseListener::exitLarger(ParseRulesParser::LargerContext* ctx){
 void BaseListener::enterLarger_equal(ParseRulesParser::Larger_equalContext* ctx){
     assert(mode_.empty());
     mode_.push(MODE::BOUND_DEFINITION);
-    if(ctx->variable().size()==2){
+        if(ctx->variable() && ctx->VARIABLE()){
         //creating in active sheet
         BaseData* c_var_db_tmp;
-        if(ctx->variable().at(0)->DATABASE())
-            c_var_db_tmp = __insert_new_data_base__(ctx->variable().at(0)->DATABASE()->getText());
+        if(ctx->DATABASE())
+            c_var_db_tmp = __insert_new_data_base__(ctx->DATABASE()->getText());
         else c_var_db_tmp = data_base_;
-        if(ctx->variable().at(0)->VARIABLE())
-            current_var_ = c_var_db_tmp->add_variable(ctx->variable().at(0)->VARIABLE()->getText()).get();
-        else assert(false);
+        current_var_ = c_var_db_tmp->add_variable(ctx->VARIABLE()->getText()).get();
 
         BaseData* db_tmp;
-        if(ctx->variable().at(1)->DATABASE())
-            db_tmp = __insert_new_data_base__(ctx->variable().at(1)->DATABASE()->getText());
+        if(ctx->variable()->DATABASE())
+            db_tmp = __insert_new_data_base__(ctx->variable()->DATABASE()->getText());
         else db_tmp = data_base_;
-        
-        if(ctx->variable().at(1)->VARIABLE())
-            bottom_.emplace(db_tmp->name(),db_tmp->add_variable(ctx->variable().at(1)->VARIABLE()->getText()).get()->name(),BOTTOM_BOUND_T::LARGER_OR_EQUAL);
+
+        if(ctx->variable()->VARIABLE())
+            bottom_.emplace(db_tmp->name(),db_tmp->add_variable(ctx->variable()->VARIABLE()->getText()).get()->name(),BOTTOM_BOUND_T::LARGER_OR_EQUAL);
         else assert(false);
         mode_.push(MODE::BOUND_DEFINITION);
     }
