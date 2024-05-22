@@ -8,8 +8,9 @@ void Test_Correct_Sum_Result_For_Array(){
     pool.add_data("any");
     BaseData* data = pool.get("any");
     std::string str_in = 
-R"(VAR(!('any')#I)=[VAR(#A),VAR(#B)]
-VAR(#A)=sum(VAR(#C),VAR(#D))
+R"(VAR(!('any')#I)=[VAR(!('other')#A),VAR(#B)]
+VAR(!('other')#A)=sum(VAR(#C),VAR(#D))
+VAR(!('any')#A)=2
 VAR(#B)=2
 VAR(#C)=[2,2,2]
 VAR(#D)=[2,2,2]
@@ -53,7 +54,7 @@ void Test_Correct_Product_Result_For_Array(){
     pool.add_data("any");
     BaseData* data = pool.get("any");
     std::string str_in = 
-R"(#I=[#A,#B]
+R"(VAR(#I=[#A,#B]
 #A=product(#C,#D)
 #B=2
 #C=[10,10,10]
@@ -212,11 +213,11 @@ R"(#I :  #A < 2
 void Testing(){
     Test_Correct_Sum_Result_For_Array();
     Test_Correct_SumProduct_Result_For_Array();
-    // Test_Correct_Product_Result_For_Array();
-    // Test_Simple_Arithmetic_With_Variable();
-    // Test_Range_Operation_With_Var_Arrays();
-    // Testing_compare_vars_1();
-    // Testing_compare_vars_2();
+    Test_Correct_Product_Result_For_Array();
+    Test_Simple_Arithmetic_With_Variable();
+    Test_Range_Operation_With_Var_Arrays();
+    Testing_compare_vars_1();
+    Testing_compare_vars_2();
 }
 
 #endif

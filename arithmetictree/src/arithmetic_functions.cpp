@@ -1,11 +1,12 @@
 #include "arithmetic_functions.h"
 
 bool functions::auxiliary::checking_egal_size_arrays(std::vector<std::reference_wrapper<const Array_t>>& arrays){
-    size_t fst_arr_sz;
+    size_t first_arr_sz;
     if(arrays.size()!=0 && !arrays.front().get().empty())
-        fst_arr_sz = arrays.front().get().size();
+        first_arr_sz = arrays.front().get().size();
+    else throw std::invalid_argument("Invalid input arrays");
     for(const Array_t& arr: arrays){
-        if(arr.size()!=fst_arr_sz)
+        if(arr.size()!=first_arr_sz)
             return false;
     }
     return true;

@@ -21,7 +21,12 @@ int main(){
     BaseData* data = pool.get("any");
     data->setstream(std::cin);
     //data->get("__I__")->get<ArithmeticTree>().print();
-    std::cout<<data->get("__I__")->get()<<std::endl;
+    try{
+        std::cout<<data->get("I")->get()<<std::endl;
+    }
+    catch(const std::invalid_argument& err){
+        std::cout<<err.what()<<std::endl;
+    }
     return 0;
 }
 

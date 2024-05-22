@@ -32,8 +32,8 @@ BEG_DB: '!(\'' -> skip;
 END_DB: '\')' -> skip;
 
 
-VARIABLE: ESC_VAR [a-zA-Z] ((QUOTE | ASTERISK) | [a-zA-Z0-9])* {setText(getText().substr(1, getText().length()-1));std::cout<<getText()<<std::endl;};
-DATABASE: BEG_DB [a-zA-Z0-9_] ~[()!#]* END_DB {setText(getText().substr(3, getText().length()-5));std::cout<<getText()<<std::endl;}; 
+VARIABLE: ESC_VAR [a-zA-Z] ((QUOTE | ASTERISK) | [a-zA-Z0-9])* {setText(getText().substr(1, getText().length()-1));};
+DATABASE: BEG_DB [a-zA-Z0-9_] ~[()!#]* END_DB {setText(getText().substr(3, getText().length()-5));}; 
 WS: [ \t]+ -> skip;
 EOL: '\r'? '\n';
 

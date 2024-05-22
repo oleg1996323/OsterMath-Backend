@@ -141,7 +141,5 @@ class BaseListener: public ParseRulesBaseListener{
 
     virtual void exitLarger_equal(ParseRulesParser::Larger_equalContext* ctx) override;
 
-    //virtual void visitTerminal(antlr4::tree::TerminalNode * /*node*/) override;
-
     virtual void visitErrorNode(antlr4::tree::ErrorNode * /*node*/) override;
 };

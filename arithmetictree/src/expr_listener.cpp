@@ -366,7 +366,7 @@ void BaseListener::exitFunction(ParseRulesParser::FunctionContext* ctx){
     else if(is_function_operation())
         __insert_to_function_operation__(ptr);
     else if(is_bounds_definition()){
-        ArithmeticTree tree;
+        ArithmeticTree tree(current_var_);
         tree.insert(ptr);
         if(bottom_.has_value())
             current_var_->set_bottom_bound_value(bottom_.value().db_name,bottom_.value().var_name,std::move(tree),bottom_.value().type);
@@ -386,7 +386,7 @@ void BaseListener::exitMultiargfunction(ParseRulesParser::MultiargfunctionContex
     else if(is_function_operation())
         __insert_to_function_operation__(ptr);
     else if(is_bounds_definition()){
-        ArithmeticTree tree;
+        ArithmeticTree tree(current_var_);
         tree.insert(ptr);
         if(bottom_.has_value())
             current_var_->set_bottom_bound_value(bottom_.value().db_name,bottom_.value().var_name,std::move(tree),bottom_.value().type);
@@ -411,7 +411,7 @@ void BaseListener::exitRangefunction(ParseRulesParser::RangefunctionContext* ctx
         __insert_to_function_operation__(ptr);
     }
     else if(is_bounds_definition()){
-        ArithmeticTree tree;
+        ArithmeticTree tree(current_var_);
         tree.insert(ptr);
         if(bottom_.has_value())
             current_var_->set_bottom_bound_value(bottom_.value().db_name,bottom_.value().var_name,std::move(tree),bottom_.value().type);
@@ -545,5 +545,5 @@ void BaseListener::exitLarger_equal(ParseRulesParser::Larger_equalContext* ctx){
 }
 
 void BaseListener::visitErrorNode(antlr4::tree::ErrorNode* node){
-    throw ParsingError("Error when parsing: " + node->getText());
+    throw ParsingError("Error input. Prompt: " + node->getText());
 }

@@ -8,14 +8,12 @@ ArithmeticTree::ArithmeticTree(const ArithmeticTree& other){
     }
 }
 
-ArithmeticTree::ArithmeticTree(VariableBase* owner):owner_(owner){}
+ArithmeticTree::ArithmeticTree(VariableBase* owner):owner_(owner){
+}
 
 ArithmeticTree::ArithmeticTree(ArithmeticTree&& other) noexcept{
     if(this!=&other){
-        this->root_ = std::move(other.root_);
-        this->cache_ = std::move(other.cache_);
-        this->owner_ = other.owner_;
-        this->last_incomplete_ = other.last_incomplete_;
+        *this = std::move(other);
     }
 }
 
@@ -57,13 +55,24 @@ const Value_t& ranges::ArithmeticTree::value(size_t index) const{
 
 Value_t ArithmeticTree::execute() const{
     if(root_){
-        if(std::all_of(var_dependence_.begin(),var_dependence_.end(),[this](const VariableNode* node){
-            if(!node->variable()->is_undef())
-                return owner_->is_in_bounds(node->variable()->get_data_base_name(), node->variable()->name());
+        bool exec = true;
+        for(auto var:var_dependence_){
+            if(!var->variable()->is_undef())
+                exec &= owner_->is_in_bounds(var->variable()->get_data_base_name(), var->variable()->name());
             else return true;
-        }))
-            return root_->execute();
-        else return 0.;
+
+            if(exec==false)
+                return 0.;
+        }
+        return root_->execute();
+
+        // if(std::all_of(var_dependence_.begin(),var_dependence_.end(),[this](const VariableNode* node){
+        //     if(!node->variable()->is_undef())
+        //         return owner_->is_in_bounds(node->variable()->get_data_base_name(), node->variable()->name());
+        //     else return true;
+        // }))
+        //     return root_->execute();
+        // else return 0.;
     }
     else return 0.;
 }

@@ -68,7 +68,7 @@ void Array_t::define_back(const Array_val& val){
 
 void Array_t::define_back(const std::shared_ptr<Node> & node){
     if(back().is_undef()){
-        back() = ArithmeticTree();
+        back() = ArithmeticTree(parent_);
     }
     else if(back().is_value())
         __value_to_tree_for_last__();
@@ -99,7 +99,7 @@ void Array_t::define_back(const std::shared_ptr<Node> & node){
 
 void Array_t::__value_to_tree_for_last__(){
     assert(back().is_value());
-    ArithmeticTree tree;
+    ArithmeticTree tree(parent_);
     tree.insert(std::make_shared<ValueNode>(std::move(back().get<Value_t>())));
     back().get()=std::move(tree);
 }
@@ -239,14 +239,16 @@ void VariableBase::tree_to_value(){
 VariableBase::~VariableBase(){}
 
 bool VariableBase::is_in_bounds(std::string_view data_base,std::string_view name) const{
-    if(bounds_.contains(data_base) && bounds_.at(data_base).contains(name)){
-        const VariableBase& var = *data_base_->get_pool()->get(data_base)->get(name);
-        if(var.is_arithmetic_tree())
-            return bounds_.at(data_base).at(name).is_in_bounds(var);
-        else if(var.is_value())
-            return bounds_.at(data_base).at(name).is_in_bounds(var);
+    if(bounds_.contains(data_base))
+        if(bounds_.at(data_base).contains(name)){
+            const VariableBase& var = *data_base_->get_pool()->get(data_base)->get(name);
+            if(var.is_arithmetic_tree())
+                return bounds_.at(data_base).at(name).is_in_bounds(var);
+            else if(var.is_value())
+                return bounds_.at(data_base).at(name).is_in_bounds(var);
+            else return true;
+        }
         else return true;
-    }
     else return true;
 }
 

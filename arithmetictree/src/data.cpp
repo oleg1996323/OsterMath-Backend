@@ -9,7 +9,7 @@ BaseData::BaseData(std::string_view name):name_(name){}
 
 VariableBase* BaseData::get(std::string_view name){
     if(!exists(name))
-        return nullptr;
+        throw std::invalid_argument("Variable "s + std::string(name) + " don't exists.\n");
     else
         return vars_.at(name)?vars_.at(name).get():nullptr; 
 };
