@@ -74,7 +74,7 @@ void ArithmeticTree::print() const{
 }
 #endif
 
-const std::unordered_set<VariableNode*>& ArithmeticTree::get_dependecies() const{
+const std::unordered_set<VariableNode*>& ArithmeticTree::get_dependencies() const{
     return var_dependence_;
 }
 
@@ -83,11 +83,11 @@ void ArithmeticTree::insert(const std::shared_ptr<Node>& node){
         var_dependence_.insert(reinterpret_cast<VariableNode*>(node.get()));
     }
     else if(node->type() == ARITHM_NODE_TYPE::FUNCTION){
-        for(auto it:reinterpret_cast<FunctionNode*>(node.get())->get_dependecies())
+        for(auto it:reinterpret_cast<FunctionNode*>(node.get())->get_dependencies())
             var_dependence_.insert(it);
     }
     else if(node->type() == ARITHM_NODE_TYPE::RANGEOP){
-        for(auto it:reinterpret_cast<RangeOperationNode*>(node.get())->get_dependecies())
+        for(auto it:reinterpret_cast<RangeOperationNode*>(node.get())->get_dependencies())
             var_dependence_.insert(it);
     }
 

@@ -1,5 +1,5 @@
-#include "arithmetic_types.h"
 #include "types.h"
+#include "arithmetic_types.h"
 
 #define ENUM_NAME(p) #p;
 
@@ -261,22 +261,6 @@ std::shared_ptr<Node> FunctionNode::child(size_t id) const{
         throw std::invalid_argument("Incorrect child's id");
 }
 
-// auto FunctionNode::__register_array_input__(){
-//     if(childs_.empty())
-//         throw std::invalid_argument("Invalid function parameters");
-//     std::vector<std::reference_wrapper<const Array_t>> params;
-//     for(size_t i = 0;i<childs_.size();++i){
-//         auto child_i = child(i);
-//         if(child_i->type()==ARITHM_NODE_TYPE::VARIABLE){
-//             auto ptr = reinterpret_cast<VariableNode*>(child_i.get())->variable();
-//             if(ptr->is_array())
-//                 params.push_back(ptr->get<Array_t>());
-//             else throw std::invalid_argument("Invalid function parameter");
-//         }
-//     }
-//     return params;
-// }
-
 Value_t FunctionNode::execute(){
     if(array_type_function?childs_.size()>0:childs_.size()==number_of_arguments){
         if(!cache_.has_value()){
@@ -355,22 +339,24 @@ Value_t FunctionNode::execute(size_t index){
     return execute();
 }
 
+#include "types.h"
+
 void FunctionNode::add_child(const std::shared_ptr<Node>& node){
     if(node->type() == ARITHM_NODE_TYPE::FUNCTION){
-        for(auto it:reinterpret_cast<FunctionNode*>(node.get())->get_dependecies())
+        for(auto it:reinterpret_cast<FunctionNode*>(node.get())->get_dependencies())
             var_dependence_.insert(it);
     }
     else if(node->type() == ARITHM_NODE_TYPE::RANGEOP){
-        for(auto it:reinterpret_cast<RangeOperationNode*>(node.get())->get_dependecies())
+        for(auto it:reinterpret_cast<RangeOperationNode*>(node.get())->get_dependencies())
             var_dependence_.insert(it);
     }
     else if(node->type() == ARITHM_NODE_TYPE::VARIABLE){
         VariableNode* var_node = reinterpret_cast<VariableNode*>(node.get());
         if(var_node->variable()->is_arithmetic_tree())
-            for(auto it:var_node->variable()->get<ArithmeticTree>().get_dependecies())
+            for(auto it:var_node->variable()->get<ArithmeticTree>().get_dependencies())
                 var_dependence_.insert(it);
         else if(var_node->variable()->is_array())
-            for(auto it:var_node->variable()->get<Array_t>().get_dependecies())
+            for(auto it:var_node->variable()->get<Array_t>().get_dependencies())
                 var_dependence_.insert(it);
     }
     childs_.push_back(node);
@@ -431,12 +417,20 @@ void FunctionNode::refresh(){
     }
 }
 
-const std::unordered_set<VariableNode*>& FunctionNode::get_dependecies() const{
+const std::unordered_set<VariableNode*>& FunctionNode::get_dependencies() const{
+    for(auto var_node:var_dependence_){
+        if(var_node->variable()->is_arithmetic_tree())
+            for(auto it:var_node->variable()->get<ArithmeticTree>().get_dependencies())
+                var_dependence_.insert(it);
+        else if(var_node->variable()->is_array())
+            for(auto it:var_node->variable()->get<Array_t>().get_dependencies())
+                var_dependence_.insert(it);
+    }
     return var_dependence_;
 }
 
-const std::unordered_set<VariableNode*>& RangeOperationNode::get_dependecies() const{
-    return expression().get_dependecies();
+const std::unordered_set<VariableNode*>& RangeOperationNode::get_dependencies() const{
+    return expression().get_dependencies();
 }
 
 #ifdef DEBUG

@@ -75,6 +75,8 @@ class Array_t : public std::vector<Array_val>{
         return parent_;
     }
 
+    const std::unordered_set<VariableNode*>& get_dependencies() const;
+
     TYPE type() const{
         TYPE type = TYPE::UNKNOWN;
         for(auto& val:*this)
@@ -92,7 +94,7 @@ class Array_t : public std::vector<Array_val>{
 
     private:
     VariableBase* parent_;
-    std::unordered_set<VariableNode*> var_dependence_;
+    mutable std::unordered_set<VariableNode*> var_dependence_;
     void __value_to_tree_for_last__();
 };
 

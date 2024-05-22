@@ -45,6 +45,21 @@ void Array_t::define_back(const Array_val& val){
         throw std::invalid_argument("Array item already defined");
         return;
     }
+
+    if(val.is_variable()){
+        VariableBase* var_node = val.get<VariableBase*>();
+        if(var_node->is_arithmetic_tree())
+            for(auto it:var_node->get<ArithmeticTree>().get_dependencies())
+                var_dependence_.insert(it);
+        else if(var_node->is_array())
+            for(auto it:var_node->get<Array_t>().get_dependencies())
+                var_dependence_.insert(it);
+    }
+    else if(val.is_expression()){
+        for(auto it:val.get<ArithmeticTree>().get_dependencies())
+            var_dependence_.insert(it);
+    }
+
     if(val.is_variable())
         val.get<VariableBase*>()->node()->add_parent(parent_->node().get());
 
@@ -58,9 +73,27 @@ void Array_t::define_back(const std::shared_ptr<Node> & node){
     else if(back().is_value())
         __value_to_tree_for_last__();
 
+    if(node->type() == ARITHM_NODE_TYPE::FUNCTION){
+        for(auto it:reinterpret_cast<FunctionNode*>(node.get())->get_dependencies())
+            var_dependence_.insert(it);
+    }
+    else if(node->type() == ARITHM_NODE_TYPE::RANGEOP){
+        for(auto it:reinterpret_cast<RangeOperationNode*>(node.get())->get_dependencies())
+            var_dependence_.insert(it);
+    }
+    else if(node->type() == ARITHM_NODE_TYPE::VARIABLE){
+        VariableNode* var_node = reinterpret_cast<VariableNode*>(node.get());
+        if(var_node->variable()->is_arithmetic_tree())
+            for(auto it:var_node->variable()->get<ArithmeticTree>().get_dependencies())
+                var_dependence_.insert(it);
+        else if(var_node->variable()->is_array())
+            for(auto it:var_node->variable()->get<Array_t>().get_dependencies())
+                var_dependence_.insert(it);
+    }
+        
 
     assert(back().is_expression());
-    back().get<ArithmeticTree>().insert(node);
+        back().get<ArithmeticTree>().insert(node);
     return;
 }
 
@@ -239,4 +272,8 @@ std::optional<Value_t> VariableBase::get_bottom_bound(std::string_view data_base
 
 std::string_view VariableBase::get_data_base_name() const{
     return data_base_->name();
+}
+
+const std::unordered_set<VariableNode*>& Array_t::get_dependencies() const{
+    return var_dependence_;
 }

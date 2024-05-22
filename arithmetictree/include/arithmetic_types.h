@@ -373,7 +373,7 @@ class FunctionNode:public Node{
 
     virtual Value_t execute(size_t index) override;
 
-    const std::unordered_set<VariableNode*>& get_dependecies() const;
+    const std::unordered_set<VariableNode*>& get_dependencies() const;
 
     #ifdef DEBUG
     virtual void print() const;
@@ -390,7 +390,7 @@ class FunctionNode:public Node{
     }
 
     std::vector<std::variant<std::shared_ptr<Node>,std::weak_ptr<VariableNode>>> childs_;
-    std::unordered_set<VariableNode*> var_dependence_;
+    mutable std::unordered_set<VariableNode*> var_dependence_;
     size_t number_of_arguments = 0;
     FUNCTION_OP operation_;
     std::optional<Value_t> cache_;
@@ -419,7 +419,7 @@ class RangeOperationNode:public Node{
 
     virtual Value_t execute(size_t index) override;
 
-    const std::unordered_set<VariableNode*>& get_dependecies() const;
+    const std::unordered_set<VariableNode*>& get_dependencies() const;
 
     #ifdef DEBUG
     virtual void print() const;
@@ -438,7 +438,7 @@ class RangeOperationNode:public Node{
     //checks the childs types and them correct vals types
     //Childs should be only numeric variable-arrays and have same length
     bool __checking_childs__() const{
-        for( auto& child:get_dependecies()){
+        for( auto& child:get_dependencies()){
             if(child->variable()){
                 if(child->variable()->is_array()){
                     if(range_size==0)

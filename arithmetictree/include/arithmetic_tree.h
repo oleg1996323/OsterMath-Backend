@@ -42,7 +42,7 @@ class ArithmeticTree{
         return last_incomplete_;
     }
 
-    const std::unordered_set<VariableNode*>& get_dependecies() const;
+    const std::unordered_set<VariableNode*>& get_dependencies() const;
 
     #ifdef DEBUG
     void print() const;
