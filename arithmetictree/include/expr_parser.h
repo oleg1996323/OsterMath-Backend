@@ -19,7 +19,7 @@ struct ParseItems{
         listener_(data_base){
             lexer_.removeErrorListeners();
             lexer_.addErrorListener(&err_listener_);
-            auto error_handler = std::make_shared<antlr4::DefaultErrorStrategy>();
+            auto error_handler = std::make_shared<antlr4::BailErrorStrategy>();
             base_parser_.setErrorHandler(error_handler);
             base_parser_.removeErrorListeners();
             tree_ = base_parser_.input();
@@ -40,7 +40,15 @@ public:
         data_(data_base)
 {
     set_stream(stream);
-    parse_entry();
+    try{
+        parse_entry();
+    }
+    catch(const ParsingError& err){
+        std::cout<<"Input error. Prompt: "<<err.what()<<std::endl;
+    }
+    catch(const antlr4::ParseCancellationException& err){
+        std::cout<<"Input error."<<std::endl;
+    }
 }
 
 void set_stream(std::istream& stream){

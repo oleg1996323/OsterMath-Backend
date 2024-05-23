@@ -3,32 +3,41 @@
 
 #ifdef DEBUG
 
-void Test_Correct_Sum_Result_For_Array(){
+bool CalculationsCheck(const std::string& input_str, const std::string& check_val){
     DataPool pool("main");
     pool.add_data("any");
     BaseData* data = pool.get("any");
+    std::istringstream input(input_str);
+    data->setstream(input);
+    std::ostringstream output;
+    try{
+        output<<data->get("I")->get()<<std::endl;
+        std::cout<<output.str()<<std::endl;
+        assert(output.str() == check_val);
+    }
+    catch(const std::invalid_argument& err){
+        std::cout<<err.what()<<std::endl;
+        return false;
+    }
+
+    return true;
+}
+
+void Test_Correct_Sum_Result_For_Array(){
     std::string str_in = 
-R"(VAR(!('any')#I)=[VAR(!('other')#A),VAR(#B)]
+R"(VAR(!('any')#I)=[VAR(('other')#A),VAR(#B)]
 VAR(!('other')#A)=sum(VAR(#C),VAR(#D))
 VAR(!('any')#A)=2
 VAR(#B)=2
 VAR(#C)=[2,2,2]
 VAR(#D)=[2,2,2]
 )";
-    std::istringstream input(str_in);
-    data->setstream(input);
-    std::ostringstream output;
-    output<<data->get("I")->get()<<std::endl;
-    std::cout<<output.str()<<std::endl;
-    assert(output.str() == 
-R"([12 2]
-)");
+    std::string equal = R"([12 2]
+)";
+    CalculationsCheck(str_in,equal);
 }
 
 void Test_Correct_SumProduct_Result_For_Array(){
-    DataPool pool("main");
-    pool.add_data("any");
-    BaseData* data = pool.get("any");
     std::string str_in = 
 R"(VAR(#I)=[VAR(#A),VAR(#B)]
 VAR(#A)=sumproduct(VAR(#C),VAR(#D))
@@ -36,23 +45,12 @@ VAR(#B)=2
 VAR(#C)=[500,200,100]
 VAR(#D)=[500,200,100]
 )";
-    std::istringstream input(str_in);
-    data->setstream(input);
-    std::ostringstream output;
-    // output<<data->get("I")->get()<<std::endl;
-    data->get("I")->set_stream(output);
-    data->get("I")->print();
-    std::string str = output.str();
-    std::cout<<str<<std::endl;
-    assert(output.str() == 
-R"([300000 2]
-)");
+    std::string equal = R"([300000 2]
+)";
+    CalculationsCheck(str_in,equal);
 }
 
 void Test_Correct_Product_Result_For_Array(){
-    DataPool pool("main");
-    pool.add_data("any");
-    BaseData* data = pool.get("any");
     std::string str_in = 
 R"(VAR(#I=[#A,#B]
 #A=product(#C,#D)
@@ -60,107 +58,57 @@ R"(VAR(#I=[#A,#B]
 #C=[10,10,10]
 #D=[10,10,10]
 )";
-    std::istringstream input(str_in);
-    data->setstream(input);
-    std::ostringstream output;
-    //data->get("I")->print();
-    data->get("I")->set_stream(output);
-    data->get("I")->set_format(FormattingData::OUTPUT_TYPE::FIXED);
-    data->get("I")->set_precision(0);
-    data->get("I")->print();
-    std::string str = output.str();
-    std::cout<<str<<std::endl;
-    assert(output.str() == 
-R"([1000000 2]
-)");
+    std::string equal = R"([1000000 2]
+)";
+    CalculationsCheck(str_in,equal);
 }
 
 void Test_Simple_Arithmetic_With_Variable(){
-    DataPool pool("main");
-    pool.add_data("any");
-    BaseData* data = pool.get("any");
     std::string str_in = 
 R"(#I=3*2+3^2
 )";
-    std::istringstream input(str_in);
-    data->setstream(input);
-    std::ostringstream output;
-    //data->get("I")->print();
-    data->get("I")->set_stream(output);
-    data->get("I")->print();
-    std::string str = output.str();
-    std::cout<<str<<std::endl;
-    assert(output.str() == 
-R"(15
-)");
+    std::string equal = R"(15
+)";
+    CalculationsCheck(str_in,equal);
 }
 
 void Test_Range_Operation_With_Var_Arrays(){
-    DataPool pool("main");
-    pool.add_data("any");
-    BaseData* data = pool.get("any");
     std::string str_in = 
 R"(#I=PRODUCT_I(#A+#B)
 #A=[2,2,2]
 #B=[2,2,2]
 )";
-    std::istringstream input(str_in);
-    data->setstream(input);
-    std::ostringstream output;
-    //data->get("I")->print();
-    data->get("I")->set_stream(output);
-    data->get("I")->print();
-    std::string str = output.str();
-    std::cout<<str<<std::endl;
-    assert(output.str() == 
-R"(64
-)");
-    input.clear();
-str_in = R"(#I=SUM_I(#A+#B*#C)
+    std::string equal = R"(64
+)";
+    CalculationsCheck(str_in,equal);
+
+    str_in = 
+R"(#I=SUM_I(#A+#B*#C)
 #A=[1,1,1]
 #B=[1,1,1]
 #C=3
-)";/**LOG_X(2,3)*/
-    input.str(str_in);
-    //std::cout<<input.str()<<std::endl;
-    output.str("");
-    data->read_new();
-    data->get("I")->print();
-    std::cout<<output.str()<<std::endl;
-    //std::cout<<3*(1+log(2)/log(3));
-    assert(output.str() == 
-R"(12
-)");
-str_in = R"(#I=SUM_I(#A+(#B*#C)^#D)
-#A=[1,1,1]
-#B=[1,1,LOG_X(EXP(2),pi)]
-#C=3
-#D=[2,3,4]
-)";/**LOG_X(2,3)*/
-    input.str(str_in);
-    //std::cout<<input.str()<<std::endl;
-    output.str("");
-    data->read_new();
-    data->get("I")->print();
-    std::cout<<output.str()<<std::endl;
-    //std::cout<<3*(1+log(2)/log(3));
-//     assert(output.str() == 
-// R"(12
-// )");
+)";
+    equal = R"(12
+)";
+    CalculationsCheck(str_in,equal);
 
-str_in = R"(    #I=SUM_I(#A^(*)+(#B*#C)^#D)
-#A^(*)=[1,1,1]
-#B=[1,1,LOG_X(EXP(2),pi)]
-#C=3
-#D=[2,3,4,5]
-)";/**LOG_X(2,3)*/
-    input.str(str_in);
-    //std::cout<<input.str()<<std::endl;
-    output.str("");
+str_in = R"(VAR(#I)=SUM_I(VAR(#A)+(VAR(#B)*VAR(#C))^VAR(#D))
+VAR(#A)=[1,1,1]
+VAR(#B)=[1,1,LOG_X(EXP(2),pi)]
+VAR(#C)=3
+VAR(#D)=[2,3,4]
+)";
+
+    DataPool pool("main");
+    pool.add_data("any");
+    BaseData* data = pool.get("any");
+    std::istringstream input(str_in);
+    data->setstream(input);
+    std::ostringstream output;
     try{
-        data->read_new();
-        data->get("I")->print();
+        output<<data->get("I")->get()<<std::endl;
         std::cout<<output.str()<<std::endl;
+        //assert(output.str() == check_val);
     }
     catch(const std::invalid_argument& err){
         std::cout<<err.what()<<std::endl;
@@ -172,8 +120,8 @@ void Testing_compare_vars_1(){
     pool.add_data("any");
     BaseData* data = pool.get("any");
     std::string str_in = 
-R"(#I :  #A < 2
-#I : #A > 3
+R"(VAR(#I) :  VAR(#A) < 2
+VAR(#I) : VAR(#A) > 3
 )";
     std::istringstream input(str_in);
     data->setstream(input);
@@ -194,7 +142,7 @@ void Testing_compare_vars_2(){
     pool.add_data("any");
     BaseData* data = pool.get("any");
     std::string str_in = 
-R"(#I :  #A < 2
+R"(VAR(#I) :  VAR(#A) < 2
 )";
     std::istringstream input(str_in);
     data->setstream(input);

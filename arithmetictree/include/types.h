@@ -212,19 +212,23 @@ VariableBase::VariableBase(std::string_view name, T&& value, BaseData* data_base
 template<typename T>
 void VariableBase::set_bottom_bound_value(std::string_view data_base,std::string_view var_name,T&& value, BOTTOM_BOUND_T type){
     bounds_[data_base][var_name].set_bound_value(std::forward<T>(value),type);
+    #ifdef DEBUG
     std::cout << var_name<<' ';
     if(type == BOTTOM_BOUND_T::LARGER)
         std::cout<<"larger than ";
     else std::cout<<"larger or equal than ";
     std::cout<<value<<" in "<<name()<<std::endl;
+    #endif
 }
 
 template<typename T>
 void VariableBase::set_top_bound_value(std::string_view data_base,std::string_view var_name,T&& value, TOP_BOUND_T type){
     bounds_[data_base][var_name].set_bound_value(std::forward<T>(value),type);
+    #ifdef DEBUG
     std::cout << var_name<<' ';
     if(type == TOP_BOUND_T::LESS)
         std::cout<<"less than ";
     else std::cout<<"less or equal than ";
     std::cout<<value<<" in "<<name()<<std::endl;
+    #endif
 }

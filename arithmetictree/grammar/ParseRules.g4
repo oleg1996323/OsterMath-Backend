@@ -54,17 +54,21 @@ vardefinition
 
 comparision
     :
-    WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS* ':' variable '<' WS* expr WS* EOL              #less
-    | WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS* ':' WS* expr WS* '>' variable EOL            #less
-    | WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS* ':' variable ('<=' | '=<') WS* expr WS* EOL  #less_equal
-    | WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS* ':' WS* expr WS* ('>=' | '=>') variable EOL  #less_equal
-    | WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS* ':' variable '>' WS* expr WS* EOL            #larger
-    | WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS* ':' WS* expr WS* '<' variable EOL            #larger
-    | WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS* ':' variable ('>=' | '=>') WS* expr WS* EOL  #larger_equal
-    | WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS* ':' WS* expr WS* ('<=' | '=<') variable EOL  #larger_equal
+    WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS* ':' variable_parameter '<' WS* expr WS* EOL              #less
+    | WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS* ':' WS* expr WS* '>' variable_parameter EOL            #less
+    | WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS* ':' variable_parameter ('<=' | '=<') WS* expr WS* EOL  #less_equal
+    | WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS* ':' WS* expr WS* ('>=' | '=>') variable_parameter EOL  #less_equal
+    | WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS* ':' variable_parameter '>' WS* expr WS* EOL            #larger
+    | WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS* ':' WS* expr WS* '<' variable_parameter EOL            #larger
+    | WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS* ':' variable_parameter ('>=' | '=>') WS* expr WS* EOL  #larger_equal
+    | WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS* ':' WS* expr WS* ('<=' | '=<') variable_parameter EOL  #larger_equal
     ;
 
 variable:
+    WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS*
+    ;
+
+variable_parameter:
     WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS*
     ;
 
