@@ -38,8 +38,8 @@ add_executable(physical_props ${physprop_SOURCE})
 message(STATUS ${ARITHM_TREE_INCLUDE_DIR})
 target_link_directories(physical_props PUBLIC ${ARITHM_TREE_LIBRARY_DIR})
 target_link_libraries(physical_props PUBLIC arithmetictree Boost::boost ${Boost_LIBRARIES})
-target_include_directories(physical_props PUBLIC ${ARITHM_TREE_INCLUDE_DIR} ${Boost_INCLUDE_DIRS})
-target_compile_definitions(physical_props PRIVATE $<$<CONFIG:Debug>:DEBUG>)
+target_include_directories(physical_props PUBLIC ${ARITHM_TREE_INCLUDE_DIR} ${Boost_INCLUDE_DIRS} ${ANTLR_Parserules_OUTPUT_DIR})
+target_compile_definitions(physical_props PUBLIC $<$<CONFIG:Debug>:DEBUG>)
 
 set_target_properties(physical_props
     PROPERTIES

@@ -30,18 +30,17 @@ endif()
 
 add_library(
     arithmetictree STATIC
-    EXCLUDE_FROM_ALL
     ${ANTLR_Parserules_CXX_OUTPUTS}
     ${arithmetic_tree_SOURCES}
 )
 
-target_link_libraries(arithmetictree PRIVATE antlr4_static Boost::boost)
-target_compile_definitions(arithmetictree PRIVATE $<$<CONFIG:Debug>:DEBUG>)
+target_link_libraries(arithmetictree PUBLIC antlr4_static Boost::boost)
+target_compile_definitions(arithmetictree PUBLIC $<$<CONFIG:Debug>:DEBUG>)
 if(MSVC)
-    target_compile_options(antlr4_static PRIVATE /W0)
+    target_compile_options(antlr4_static PUBLIC /W0)
 endif()
 
-target_include_directories(arithmetictree PRIVATE ${CMAKE_CURRENT_LIST_DIR}/src ${CMAKE_CURRENT_LIST_DIR}/include ${ANTLR_Parserules_OUTPUT_DIR})
+target_include_directories(arithmetictree PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src ${CMAKE_CURRENT_LIST_DIR}/include ${ANTLR_Parserules_OUTPUT_DIR})
 
 set_target_properties(arithmetictree
     PROPERTIES
@@ -52,8 +51,11 @@ set_target_properties(arithmetictree
 
 install(
     TARGETS arithmetictree
-    DESTINATION bin
     EXPORT arithmetictree
+    LIBRARY DESTINATION "${CMAKE_CURRENT_LIST_DIR}/lib"
+    ARCHIVE DESTINATION "${CMAKE_CURRENT_LIST_DIR}/lib"
+    RUNTIME DESTINATION "${CMAKE_CURRENT_LIST_DIR}/bin"
+    INCLUDES DESTINATION "${CMAKE_CURRENT_LIST_DIR}/include"
 )
 
 set_directory_properties(PROPERTIES VS_STARTUP_PROJECT arithmetictree)
