@@ -69,6 +69,10 @@ class Node{
 
     virtual void refresh();
 
+    virtual void serialize(std::ostream& stream) = 0;
+
+    virtual void deserialize(std::ostream& stream) = 0;
+
     #ifdef DEBUG
     virtual void print() const{
         std::cout<<"Undef node"<<std::endl;
@@ -115,6 +119,14 @@ class UnaryNode:public Node{
     virtual Value_t execute() override;
 
     virtual Value_t execute(size_t index) override;
+
+    virtual void serialize(std::ostream& stream) override{
+
+    }
+
+    virtual void deserialize(std::ostream& stream) override{
+
+    }
 
     #ifdef DEBUG
     virtual void print() const;
@@ -183,6 +195,14 @@ class BinaryNode:public Node{
 
     BINARY_OP operation() const{
         return operation_;
+    }
+
+    virtual void serialize(std::ostream& stream) override {
+
+    }
+
+    virtual void deserialize(std::ostream& stream) override {
+
     }
 
     #ifdef DEBUG
@@ -272,6 +292,10 @@ class ValueNode:public Node{
     virtual void print() const;
     #endif
 
+    virtual void serialize(std::ostream& stream) override;
+
+    virtual void deserialize(std::ostream& stream) override;
+
     private:
     Value_t val_;
 };
@@ -303,6 +327,10 @@ class VariableNode:public Node{
     #endif
 
     virtual void add_parent(Node* parent) override; 
+
+    virtual void serialize(std::ostream& stream) override;
+
+    virtual void deserialize(std::ostream& stream) override;
 
     private:
     mutable std::unordered_set<Node*> parents_;
@@ -389,6 +417,10 @@ class FunctionNode:public Node{
         return std::holds_alternative<std::shared_ptr<Node>>(childs_.at(index));
     }
 
+    virtual void serialize(std::ostream& stream) override;
+
+    virtual void deserialize(std::ostream& stream) override;
+
     std::vector<std::variant<std::shared_ptr<Node>,std::weak_ptr<VariableNode>>> childs_;
     mutable std::unordered_set<VariableNode*> var_dependence_;
     size_t number_of_arguments = 0;
@@ -428,6 +460,10 @@ class RangeOperationNode:public Node{
     ranges::ArithmeticTree& expression();
 
     const ranges::ArithmeticTree& expression() const;
+
+    virtual void serialize(std::ostream& stream) override;
+
+    virtual void deserialize(std::ostream& stream) override;
 
     size_t range_length() const{
         return range_size;

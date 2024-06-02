@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 project(arithmetictree)
-
+set(CMAKE_CXX_COMPILER "/usr/bin/g++")
 set(CMAKE_CXX_STANDARD 20)
 if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     set(
@@ -72,7 +72,10 @@ make_directory(${PROJECT_RUNTIME_ANTLR}/runtime/src)
 
 antlr_target(Parserules ${CMAKE_CURRENT_LIST_DIR}/ParseRules.g4 LEXER PARSER LISTENER)
 
-target_include_directories(antlr4_static PUBLIC ${PROJECT_RUNTIME_ANTLR}/runtime/src)
+
+set(ANTLR_GENERATED_FILES ${PROJECT_RUNTIME_ANTLR}/runtime/src)
+
+target_include_directories(antlr4_static INTERFACE ${ANTLR_GENERATED_FILES})
 
 set_target_properties(antlr4_static
     PROPERTIES

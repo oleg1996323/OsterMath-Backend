@@ -26,6 +26,10 @@ std::string_view BaseData::name() const{
     return name_;
 }
 
+void BaseData::set_name(const std::string& name){
+    name_ = name;
+}
+
 bool BaseData::defined(std::string_view name) const{
     if(exists(name)){
         if(vars_.at(name))
@@ -99,6 +103,10 @@ std::string_view DataPool::name(){
     return name_;
 }
 
+void DataPool::set_name(const std::string& name){
+    name_ = name;
+}
+
 BaseData* DataPool::add_data(const std::string& name){
     if(!exists(name)){
         std::string_view name_sv = *(data_names_.emplace(name).first);
@@ -122,6 +130,10 @@ void DataPool::replace(const std::string& name) noexcept{
     if(exists(name)){
         data_bases_.at(name) = BaseData(*data_names_.find(name));
     }
+}
+
+size_t DataPool::size() const{
+    return data_names_.size();
 }
 
 const BaseData* DataPool::get(std::string_view name_data) const noexcept{

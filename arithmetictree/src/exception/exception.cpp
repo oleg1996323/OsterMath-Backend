@@ -1,5 +1,24 @@
 #include <exception.h>
 #include <ParseRulesParser.h>
+#include <BaseErrorListener.h>
+#include <DefaultErrorStrategy.h>
+
+class ParsingStrategy: public antlr4::DefaultErrorStrategy{
+    public:
+    virtual void recover(antlr4::Parser *recognizer, std::exception_ptr e) override;
+
+    /// Make sure we don't attempt to recover inline; if the parser
+    ///  successfully recovers, it won't throw an exception.
+    virtual antlr4::Token* recoverInline(antlr4::Parser *recognizer) override;
+
+    /// <summary>
+    /// Make sure we don't attempt to recover from problems in subrules. </summary>
+    virtual void sync(antlr4::Parser *recognizer) override;
+
+    virtual void reportNoViableAlternative(antlr4::Parser *recognizer, const antlr4::NoViableAltException &e) override;
+};
+
+
 
 void ParsingStrategy::recover(antlr4::Parser *recognizer, std::exception_ptr e) {
     using namespace antlr4;

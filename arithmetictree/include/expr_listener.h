@@ -7,22 +7,11 @@
 #include <stack>
 #include "def.h"
 #include "ParseRulesBaseListener.h"
-#include "exception.h"
 #include "bound.h"
 
 class BaseData;
 
 using namespace std::string_view_literals;
-
-class ErrorListener: public antlr4::BaseErrorListener {
-public:
-    void syntaxError(antlr4::Recognizer* /* recognizer */, antlr4::Token* /* offendingSymbol */,
-                     size_t /* line */, size_t /* charPositionInLine */, const std::string& msg,
-                     std::exception_ptr /* e */
-                     ) override {
-        throw ParsingError("Error when lexing: " + msg);
-    }
-};
 
 class VariableBase;
 class FunctionNode;

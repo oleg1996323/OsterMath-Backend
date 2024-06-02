@@ -27,13 +27,8 @@ fragment X : [xX];
 fragment Y : [yY];
 fragment Z : [zZ];
 
-ESC_VAR: '#' -> skip;
-BEG_DB: '!(\'' -> skip;
-END_DB: '\')' -> skip;
-
-
-VARIABLE: ESC_VAR [a-zA-Z] ((QUOTE | ASTERISK) | [a-zA-Z0-9])* {setText(getText().substr(1, getText().length()-1));};
-DATABASE: BEG_DB [a-zA-Z0-9_] ~[()!#]* END_DB {setText(getText().substr(3, getText().length()-5));}; 
+VARIABLE: '#' [a-zA-Z] ((QUOTE | ASTERISK) | [a-zA-Z0-9])* {setText(getText().substr(1, getText().length()-1));};
+DATABASE: '!(\'' [a-zA-Z0-9_] (~[()!,;#' ])* '\')' {setText(getText().substr(3, getText().length()-5));}; 
 WS: [ \t]+ -> skip;
 EOL: '\r'? '\n';
 
@@ -49,27 +44,27 @@ line_input:
 
 vardefinition
     :
-    WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS* '=' WS* (array | expr | string) WS* EOL
+    WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')') | WS* VARIABLE WS*) WS* '=' WS* (array | expr | string) WS* EOL
     ;
 
 comparision
     :
-    WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS* ':' variable_parameter '<' WS* expr WS* EOL              #less
-    | WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS* ':' WS* expr WS* '>' variable_parameter EOL            #less
-    | WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS* ':' variable_parameter ('<=' | '=<') WS* expr WS* EOL  #less_equal
-    | WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS* ':' WS* expr WS* ('>=' | '=>') variable_parameter EOL  #less_equal
-    | WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS* ':' variable_parameter '>' WS* expr WS* EOL            #larger
-    | WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS* ':' WS* expr WS* '<' variable_parameter EOL            #larger
-    | WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS* ':' variable_parameter ('>=' | '=>') WS* expr WS* EOL  #larger_equal
-    | WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS* ':' WS* expr WS* ('<=' | '=<') variable_parameter EOL  #larger_equal
+    WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')') | WS* VARIABLE WS*)  WS* ':' variable_parameter '<' WS* expr WS* EOL              #less
+    | WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')') | WS* VARIABLE WS*) WS* ':' WS* expr WS* '>' variable_parameter EOL            #less
+    | WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')') | WS* VARIABLE WS*) WS* ':' variable_parameter ('<=' | '=<') WS* expr WS* EOL  #less_equal
+    | WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')') | WS* VARIABLE WS*) WS* ':' WS* expr WS* ('>=' | '=>') variable_parameter EOL  #less_equal
+    | WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')') | WS* VARIABLE WS*) WS* ':' variable_parameter '>' WS* expr WS* EOL            #larger
+    | WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')') | WS* VARIABLE WS*) WS* ':' WS* expr WS* '<' variable_parameter EOL            #larger
+    | WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')') | WS* VARIABLE WS*) WS* ':' variable_parameter ('>=' | '=>') WS* expr WS* EOL  #larger_equal
+    | WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')') | WS* VARIABLE WS*) WS* ':' WS* expr WS* ('<=' | '=<') variable_parameter EOL  #larger_equal
     ;
 
 variable:
-    WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS*
+    WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')') | WS* VARIABLE WS*) WS*
     ;
 
 variable_parameter:
-    WS* 'VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')' WS*
+    WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')') | WS* VARIABLE WS*) WS*
     ;
 
 expr
@@ -86,7 +81,7 @@ expr
 
 array
     :
-    '['input_array (','input_array)*']'
+    '[' WS* input_array WS* (',' WS* input_array)*']'
     ;
 
 input_array:

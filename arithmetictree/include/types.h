@@ -6,10 +6,10 @@
 #include <unordered_set>
 #include <variant>
 #include "def.h"
-#include "exception.h"
 #include "data.h"
 #include "format.h"
 #include "bound.h"
+#include "serialize.h"
 
 class VariableNode;
 class VariableBase;
@@ -161,18 +161,29 @@ class VariableBase: private Variable_t, public FormattingData{
     std::optional<Value_t> get_bottom_bound(std::string_view,std::string_view);
 
     std::string_view get_data_base_name() const;
+    
+    void serialize(std::ostream& stream){
+        using namespace serialization;
+        serialization::serialize(stream,data_base_->name());
+        serialization::serialize(stream,name_);
+        serialization::serialize(stream,text_);
+        serialization::serialize(stream,show_reinterpret_);
+        node_->serialize(stream);
+    }
+
+    void deserialize(std::istream& stream);
 
     protected:
     void set_data_base(BaseData* data_pool);
     BaseData* get_data_base() const;
 
     private:
+    std::unordered_map<std::string_view,std::unordered_map<std::string_view,VariableBounds>> bounds_;
+    std::string text_;
     std::shared_ptr<VariableNode> node_; //shared, так как может быть передан в любое арифметическое дерево
     std::string_view name_;
-    std::string text_;
     bool show_reinterpret_=true; //show a reinterpreted formula
     BaseData* data_base_;
-    std::unordered_map<std::string_view,std::unordered_map<std::string_view,VariableBounds>> bounds_;
 };
 
 std::ostream& operator<<(std::ostream& stream, const ArithmeticTree& tree);

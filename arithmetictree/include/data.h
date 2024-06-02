@@ -21,6 +21,8 @@ class BaseData{
 
     std::string_view name() const;
 
+    void set_name(const std::string& name);
+
     bool exists(std::string_view name) const;
 
     bool defined(std::string_view name) const;
@@ -52,6 +54,10 @@ class BaseData{
 
     void parse_entry();
 
+    void serialize(std::ostream& stream);
+
+    void deserialize(std::istream& stream);
+
     private:
     std::unordered_set<std::string> var_names_;
     std::unordered_map<std::string_view,std::shared_ptr<VariableBase>> vars_;
@@ -69,6 +75,8 @@ class DataPool{
 
     std::string_view name();
 
+    void set_name(const std::string& name);
+
     const BaseData* get(std::string_view name_data) const noexcept;
 
     BaseData* get(std::string_view name_data) noexcept;
@@ -78,6 +86,12 @@ class DataPool{
     void erase(std::string_view name);
 
     void replace(const std::string& name) noexcept;
+
+    size_t size() const;
+
+    void serialize(std::ostream& stream);
+
+    void deserialize(std::istream& stream);
 
     private:
     std::string name_;

@@ -133,9 +133,9 @@ Value_t BinaryNode::execute(){
             std::cout<<"lhs: "<<lhs_cache()<<std::endl;
             std::cout<<"rhs: "<<rhs_cache()<<std::endl;
         }
-        if(operation_==BINARY_OP::DIV && rhs_cache()!=0.)
-            return __calculate__();
-        else throw std::logic_error("Division by 0 (NULL)");
+        if(operation_==BINARY_OP::DIV && rhs_cache()==0.)
+            throw std::logic_error("Division by 0 (NULL)");
+        else return __calculate__();
     }
     else
         throw std::runtime_error("Undefined binary operation");

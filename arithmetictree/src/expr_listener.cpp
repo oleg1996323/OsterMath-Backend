@@ -3,6 +3,7 @@
 #include "arithmetic_tree.h"
 #include "arithmetic_types.h"
 #include "expr_listener.h"
+#include "exception.h"
 
 using namespace std::string_view_literals;
 

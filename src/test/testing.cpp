@@ -13,6 +13,9 @@ bool CalculationsCheck(const std::string& input_str, const std::string& check_va
     try{
         output<<data->get("I")->get()<<std::endl;
         std::cout<<output.str()<<std::endl;
+        std::cout.setf(std::ios::boolalpha);
+        std::cout<<"any exists: "<<pool.exists("any")<<std::endl;
+        std::cout<<"other exists: "<<pool.exists("other")<<std::endl;
         assert(output.str() == check_val);
     }
     catch(const std::invalid_argument& err){
@@ -25,12 +28,11 @@ bool CalculationsCheck(const std::string& input_str, const std::string& check_va
 
 void Test_Correct_Sum_Result_For_Array(){
     std::string str_in = 
-R"(VAR(!('any')#I)=[VAR(('other')#A),VAR(#B)]
-VAR(!('other')#A)=sum(VAR(#C),VAR(#D))
-VAR(!('any')#A)=2
-VAR(#B)=2
-VAR(#C)=[2,2,2]
-VAR(#D)=[2,2,2]
+R"(VAR(!('any')#I)=[VAR(!('any')#A),VAR(#B)]
+VAR(!('any')#A)=sum(VAR(!('any')#C),VAR(#D))
+VAR(!('any')#B)=2
+VAR(!('any')#C)=[2,2,2]
+VAR(!('any')#D)=[2,2,2]
 )";
     std::string equal = R"([12 2]
 )";
@@ -52,20 +54,20 @@ VAR(#D)=[500,200,100]
 
 void Test_Correct_Product_Result_For_Array(){
     std::string str_in = 
-R"(VAR(#I=[#A,#B]
-#A=product(#C,#D)
-#B=2
-#C=[10,10,10]
-#D=[10,10,10]
+R"(VAR(#I)=[VAR(#A),VAR(#B)]
+VAR(#A)=product(VAR(#C),VAR(#D))
+VAR(#B)=2
+VAR(#C)=[10,10,10]
+VAR(#D)=[10,10,10]
 )";
-    std::string equal = R"([1000000 2]
+    std::string equal = R"([1e+06 2]
 )";
     CalculationsCheck(str_in,equal);
 }
 
 void Test_Simple_Arithmetic_With_Variable(){
     std::string str_in = 
-R"(#I=3*2+3^2
+R"(VAR(!('any')#I)=3*2+3^2
 )";
     std::string equal = R"(15
 )";
@@ -74,9 +76,9 @@ R"(#I=3*2+3^2
 
 void Test_Range_Operation_With_Var_Arrays(){
     std::string str_in = 
-R"(#I=PRODUCT_I(#A+#B)
-#A=[2,2,2]
-#B=[2,2,2]
+R"(VAR(!('any')#I)=PRODUCT_I(VAR(!('other')#A)+VAR(!('any')#B))
+VAR(!('other')#A)=[2,2,2]
+VAR(#B)=[2,2,2]
 )";
     std::string equal = R"(64
 )";

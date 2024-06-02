@@ -11,7 +11,7 @@
 
 #include "config.h"
 
-#include "exception.h"
+#include "exception/exception.h"
 #include "def.h"
 #include "expr_parser.h"
 
