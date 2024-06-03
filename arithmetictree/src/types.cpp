@@ -199,24 +199,24 @@ const std::shared_ptr<VariableNode>& VariableBase::node(){
     return node_;
 }
 
-bool VariableBase::is_arithmetic_tree() const{
-    return std::holds_alternative<ArithmeticTree>(get());
+bool VariableBase::is_expression() const{
+    return node_->has_childs() && (node_->type() == NODE_TYPE::UNARY || node_->type() == NODE_TYPE::BINARY);
 }
 
 bool VariableBase::is_value() const{
-    return std::holds_alternative<Value_t>(get());
+    return node_->has_childs() && node_->type() == NODE_TYPE::VALUE;
 }
 
 bool VariableBase::is_string() const{
-    return std::holds_alternative<std::string>(get());
+    return node_->has_childs() && node_->type() == NODE_TYPE::STRING;
 }
 
 bool VariableBase::is_array() const{
-    return std::holds_alternative<Array_t>(get());
+    return node_->has_childs() && node_->type() == NODE_TYPE::ARRAY;
 }
 
 bool VariableBase::is_undef() const{
-    return std::holds_alternative<std::monostate>(get());
+    return !node_->has_childs();
 }
 
 bool VariableBase::is_numeric() const{

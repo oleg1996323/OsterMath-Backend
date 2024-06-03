@@ -6,12 +6,11 @@ set(CMAKE_CXX_COMPILER "/usr/bin/g++")
 message(STATUS ${CMAKE_CURRENT_LIST_DIR})
 include(${CMAKE_CURRENT_LIST_DIR}/grammar/CMakeLists.txt)
 
-file(GLOB arithmetic_tree_SOURCES
-    ${CMAKE_CURRENT_LIST_DIR}/src/*.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/inlude/*.h
+file(GLOB_RECURSE arithmetic_tree_SOURCES
+    ${CMAKE_CURRENT_LIST_DIR}/src/**.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/include/*.h
+    ${CMAKE_CURRENT_LIST_DIR}/include/types/*.h
 )
-
-file(GLOB arithmetic_tree_INCLUDES ${CMAKE_CURRENT_LIST_DIR}/include/*.h)
 
 set(ARITHM_TREE_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/include)
 set(ARITHM_TREE_LIBRARY_DIR ${CMAKE_CURRENT_LIST_DIR}/lib)
@@ -72,6 +71,7 @@ endif()
 target_include_directories(arithmetictree
                     PUBLIC 
                         ${CMAKE_CURRENT_LIST_DIR}/include
+                        ${CMAKE_CURRENT_LIST_DIR}/include/types
                         ${ANTLR_Parserules_OUTPUT_DIR}
 
                     PRIVATE

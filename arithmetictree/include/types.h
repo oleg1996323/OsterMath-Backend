@@ -98,13 +98,10 @@ class Array_t : public std::vector<Array_val>{
     void __value_to_tree_for_last__();
 };
 
-using Variable_t = std::variant<std::monostate,Value_t,std::string, Array_t, ArithmeticTree>;
-
 using namespace std::string_literals;
 using namespace std::string_view_literals;
 
-class VariableBase: private Variable_t, public FormattingData{
-    using variant::variant;
+class VariableBase: public FormattingData{
 
     public:
 
@@ -121,23 +118,10 @@ class VariableBase: private Variable_t, public FormattingData{
     std::string_view name() const;
     void refresh() const;
 
-    const Variable_t& get() const;
-    Variable_t& get();
-
-    void value_to_tree();
-
-    void tree_to_value();
-
-    template<typename T>
-    const T& get() const;
-
-    template<typename T>
-    T& get();
-
     const std::shared_ptr<VariableNode>& node() const;
     const std::shared_ptr<VariableNode>& node();
 
-    bool is_arithmetic_tree() const;
+    bool is_expression() const;
     bool is_value() const;
     bool is_string() const;
     bool is_array() const;
