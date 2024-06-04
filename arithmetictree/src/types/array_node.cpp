@@ -1,86 +1,66 @@
-#pragma once
 #include "def.h"
-#include "node.h"
+#include "array_node.h"
 #include "types.h"
 #include <vector>
 #include <memory>
 
-class ArrayNode:public Node{
-    public:
-    ArrayNode(size_t sz):
-        Node(sz)
-    {}
+ArrayNode::ArrayNode(size_t sz):
+    Node(sz)
+{}
 
-    virtual NODE_TYPE type() const override{
+NODE_TYPE ArrayNode::type() const{
+    return NODE_TYPE::ARRAY;
+}
 
-    }
-
-    virtual Node* first_undefined_child_node() override{
-        if(childs_.empty())
-            this;
-        else {
-            for(auto& child:childs_){
-                Node* ptr = child->first_undefined_child_node();
-                if(ptr!=nullptr)
-                    return ptr;
-                else continue;
-            }
+Node* ArrayNode::first_undefined_child_node(){
+    for(auto& child:childs_){
+            Node* ptr = child->first_undefined_child_node();
+            if(ptr!=nullptr)
+                return ptr;
+            else continue;
         }
-        return nullptr;
-    }
 
-    virtual Value_t execute() override{
-        assert(true);
-    }
+        return childs_.size()!=childs_.capacity()?nullptr:this;
+}
 
-    virtual Value_t execute(size_t index) override{
-        if(childs_.size()>index)
-            return childs_.at(index);
-        else return 0.;
-    }
+Result ArrayNode::execute(){
+    return std::shared_ptr<ArrayNode>(this);
+}
 
-    virtual void refresh() override{
-        if(has_parents()){
-            
-        }
-            
-    }
+Result ArrayNode::execute(size_t index){
+    if(childs_.size()>index)
+        return childs_.at(index)->execute(index);
+    else throw std::invalid_argument("Invalid index. Prompt: out of range index");
+}
 
-    virtual void insert(std::shared_ptr<Node> node) override{
-        // if(!childs_.empty()){
-        //     if(childs_.back()->type()==NODE_TYPE::FUNCTION )
+size_t ArrayNode::size() const{
+    return childs_.size();
+}
 
-        // }
+void ArrayNode::insert(std::shared_ptr<Node> node){
+    // if(!childs_.empty()){
+    //     if(childs_.back()->type()==NODE_TYPE::FUNCTION )
 
-        if(childs_.size()<childs_.capacity())
-            childs_.push_back(node);
-        else throw std::runtime_error("Invalid array initialization");
+    // }
 
-        if(node->type()==NODE_TYPE::VARIABLE)
-            dependencies_.insert(reinterpret_cast<VariableNode*>(node.get())->variable()->name());
-    }
+    if(childs_.size()<childs_.capacity())
+        childs_.push_back(node);
+    else throw std::runtime_error("Invalid array initialization");
 
-    virtual void serialize(std::ostream& stream) override{
+    if(node->type()==NODE_TYPE::VARIABLE)
+        var_dependence_.insert(reinterpret_cast<VariableNode*>(node.get()));
+}
 
-    }
+void ArrayNode::serialize(std::ostream& stream){
 
-    virtual void deserialize(std::ostream& stream) override{
+}
 
-    }
+void ArrayNode::deserialize(std::ostream& stream){
 
-    #ifdef DEBUG
-    virtual void print() const override{
-        
-    }
-    #endif
+}
 
-    virtual void add_parent(Node*);
-
-    bool caller() const{
-        return caller_;
-    }
-
-    protected:
-    std::unordered_set<std::string_view> dependencies_;
-    bool caller_ = false;
-};
+#ifdef DEBUG
+void ArrayNode::print() const{
+    
+}
+#endif

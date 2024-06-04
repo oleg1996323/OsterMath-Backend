@@ -128,5 +128,7 @@ class BinaryNode:public Node{
     mutable std::vector<__cache__> cache_=[](){std::vector<__cache__> res;
                                                 res.resize(1);
                                                 return res;}();
+    std::shared_ptr<Node> lhs_;
+    std::shared_ptr<Node> rhs_;
     BINARY_OP operation_;
 };

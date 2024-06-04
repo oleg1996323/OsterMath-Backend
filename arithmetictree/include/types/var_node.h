@@ -14,15 +14,12 @@ class VariableNode:public Node{
     }
 
     virtual Node* first_undefined_child_node() override{
-        if(childs_.empty())
-            return this;
-        else{
-            for(auto& child:childs_){
-                Node* ptr = child->first_undefined_child_node();
-                if(ptr)
-                    return ptr;
-                else return nullptr;
-            }
+        //in listener inserting directly in VariableNode, not in VariableBase
+        for(auto& child:childs_){
+            Node* ptr = child->first_undefined_child_node();
+            if(ptr)
+                return ptr;
+            else continue;
         }
         return nullptr;
     }
@@ -40,14 +37,6 @@ class VariableNode:public Node{
     #ifdef DEBUG
     virtual void print() const;
     #endif
-
-    virtual bool is_defined() const override{
-        for(auto& child:childs_)
-            if(child->first_undefined_child_node()==nullptr)
-                continue;
-            else return false;
-        return true;
-    }
 
     virtual void add_parent(Node* parent) override; 
 

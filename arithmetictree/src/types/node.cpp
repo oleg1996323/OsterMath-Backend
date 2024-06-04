@@ -16,3 +16,7 @@ void Node::add_parent(Node* parent){
 bool Node::has_parents() const{
     return !parents_.empty();
 }
+
+const std::vector<std::shared_ptr<Node>>& Node::childs() const{
+    return childs_;
+}

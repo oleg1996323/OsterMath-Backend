@@ -34,9 +34,9 @@ class RangeOperationNode:public Node{
     virtual void print() const;
     #endif
 
-    ranges::ArithmeticTree& expression();
+    std::shared_ptr<Node>& expression();
 
-    const ranges::ArithmeticTree& expression() const;
+    const std::shared_ptr<Node>& expression() const;
 
     virtual void serialize(std::ostream& stream) override;
 
@@ -54,7 +54,7 @@ class RangeOperationNode:public Node{
         for(auto& child:childs_){
             if(child->type()==NODE_TYPE::ARRAY){
                 ArrayNode* ptr = reinterpret_cast<ArrayNode*>(child.get());
-                if(!ptr->is_defined())
+                if(ptr->first_undefined_child_node()!=nullptr)
                     throw std::runtime_error("Incorrect initialization of array");
                 if(ptr->is_numeric()){
                     if(range_size==0){

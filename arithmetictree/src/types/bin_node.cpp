@@ -56,7 +56,7 @@ Value_t BinaryNode::__calculate__(size_t index){
     }
 }
 
-Value_t BinaryNode::execute(){
+Result BinaryNode::execute(){
     using namespace boost::multiprecision;
     if(lhs_ && rhs_){
         if(lhs_->caller()) //left branch call refreshing
@@ -64,8 +64,8 @@ Value_t BinaryNode::execute(){
         else if(rhs_->caller()) //right branch call refreshing
             rhs_->execute();
         else{
-            lhs_cache() = lhs_->execute();
-            rhs_cache() = rhs_->execute();
+            lhs_cache() = lhs_->execute().get<Value_t>();
+            rhs_cache() = rhs_->execute().get<Value_t>();
             std::cout<<"lhs: "<<lhs_cache()<<std::endl;
             std::cout<<"rhs: "<<rhs_cache()<<std::endl;
         }
@@ -78,7 +78,7 @@ Value_t BinaryNode::execute(){
     return 0.;
 }
 
-Value_t BinaryNode::execute(size_t index){
+Result BinaryNode::execute(size_t index){
     using namespace boost::multiprecision;
     if(lhs_ && rhs_){
         if(lhs_->caller()) //left branch call refreshing
@@ -86,8 +86,8 @@ Value_t BinaryNode::execute(size_t index){
         else if(rhs_->caller()) //right branch call refreshing
             rhs_->execute(index);
         else{
-            lhs_cache(index) = lhs_->execute(index);
-            rhs_cache(index) = rhs_->execute(index);
+            lhs_cache(index) = lhs_->execute(index).get<Value_t>();
+            rhs_cache(index) = rhs_->execute(index).get<Value_t>();
         }
         if(operation_==BINARY_OP::DIV && rhs_cache(index)==0.)
             throw std::logic_error("Division by 0 (NULL)");

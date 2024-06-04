@@ -1,6 +1,5 @@
 #include "types.h"
 #include "data.h"
-#include "arithmetic_tree.h"
 #include "arithmetic_types.h"
 #include "expr_listener.h"
 #include "exception.h"

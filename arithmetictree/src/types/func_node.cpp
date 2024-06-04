@@ -1,4 +1,5 @@
 #include "func_node.h"
+#include "def.h"
 
 #ifdef DEBUG
 void FunctionNode::print() const{
@@ -9,42 +10,38 @@ void FunctionNode::print() const{
 #endif
 
 std::shared_ptr<Node> FunctionNode::child(size_t id) const{
-    if(id<childs_.size()){
-        if(__is_simple_node__(id))
-            return std::get<std::shared_ptr<Node>>(childs_.at(id));
-        else return std::get<std::weak_ptr<VariableNode>>(childs_.at(id)).lock();
-    }
+    if(id<childs_.size())
+        return childs_.at(id);
     else
         throw std::invalid_argument("Incorrect child's id");
 }
 
-Value_t FunctionNode::execute(){
-    if(array_type_function?childs_.size()>0:childs_.size()==number_of_arguments){
+Result FunctionNode::execute(){
+    if(array_type_function?childs_.size()>0:childs_.size()==childs_.capacity()){
         if(!cache_.has_value()){
             switch (operation_){
                 case FUNCTION_OP::LN:
-                    return log(child(0)->execute());
+                    return log(child(0)->execute().get<Value_t>());
                     break;
                 case FUNCTION_OP::LG10:
-                    return log10(child(0)->execute());
+                    return log10(child(0)->execute().get<Value_t>());
                     break;
                 case FUNCTION_OP::EXP:
-                    return exp(child(0)->execute());
+                    return exp(child(0)->execute().get<Value_t>());
                     break;
                 case FUNCTION_OP::LOG_BASE:
-                    std::cout<<"log_x: "<<log(child(0)->execute())<<std::endl;
-                    std::cout<<"log_x base: "<<log(child(1)->execute())<<std::endl;
-                    cache_.emplace(log(child(0)->execute())/log(child(1)->execute()));
+                    std::cout<<"log_x: "<<log(child(0)->execute().get<Value_t>())<<std::endl;
+                    std::cout<<"log_x base: "<<log(child(1)->execute().get<Value_t>())<<std::endl;
+                    cache_.emplace(log(child(0)->execute().get<Value_t>())/log(child(1)->execute().get<Value_t>()));
                     break;
                 case FUNCTION_OP::SUMPRODUCT:
                 {
-                    std::vector<std::reference_wrapper<const Array_t>> params;
-                    for(size_t i = 0;i<childs_.size();++i){
-                        auto child_i = child(i);
-                        if(child_i->type()==ARITHM_NODE_TYPE::VARIABLE){
-                            auto ptr = reinterpret_cast<VariableNode*>(child_i.get())->variable();
-                            if(ptr->is_array())
-                                params.push_back(ptr->get<Array_t>());
+                    std::vector<std::shared_ptr<ArrayNode>> params;
+                    for(std::shared_ptr<Node>& child:childs_){
+                        if(child->type()==NODE_TYPE::VARIABLE){
+                            Result res = child->execute();
+                            if(res.is_array())
+                                params.push_back(res.get<std::vector<std::shared_ptr<Node>>>());
                             else throw std::invalid_argument("Invalid function parameter");
                         }
                     }

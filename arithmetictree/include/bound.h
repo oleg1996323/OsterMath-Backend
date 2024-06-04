@@ -2,10 +2,10 @@
 #include <unordered_map>
 #include <string_view>
 #include <memory>
-#include "arithmetic_tree.h"
+#include <optional>
 #include "def.h"
 
-using Bound_types = std::variant<std::monostate,Value_t, ArithmeticTree, VariableBase*>;
+using Bound_types = std::variant<std::monostate,Value_t, std::shared_ptr<ExpressionNode>, std::shared_ptr<VariableNode>>;
 
 enum class BOTTOM_BOUND_T{
     LARGER_OR_EQUAL,
@@ -41,9 +41,9 @@ class VariableBounds{
 
     bool is_in_bounds(const Value_t&) const;
 
-    bool is_in_bounds(const VariableBase&) const;
+    bool is_in_bounds(const std::shared_ptr<VariableNode>&) const;
 
-    bool is_in_bounds(const ArithmeticTree&) const;
+    bool is_in_bounds(const std::shared_ptr<ExpressionNode>&) const;
     
     template<typename T>
     void set_bound_value(T&& value, BOTTOM_BOUND_T type);

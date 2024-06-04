@@ -10,7 +10,7 @@ endif()
 include(${CMAKE_CURRENT_SOURCE_DIR}/arithmetictree/CMakeLists.txt)
 
 file(GLOB_RECURSE physprop_SOURCE
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/**.cpp
 )
 
 file(GLOB_RECURSE physprop_INCLUDE
@@ -31,7 +31,7 @@ else()
     message(FATAL_ERROR "Boost not found")
 endif()
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/include/types)
 
 add_executable(physical_props ${physprop_SOURCE})
 

@@ -1,37 +1,31 @@
 #include "def.h"
-#include "types.h"
-#include "arithmetic_tree.h"
+#include "arithmetic_types.h"
+#include <string>
 
-// bool __types_proxy__::is_arithmetic_tree() const{
-//     return std::holds_alternative<ArithmeticTree>(get());
-// }
+Result_t& Result::get(){
+    return *this;
+}
 
-// bool __types_proxy__::is_value() const{
-//     return std::holds_alternative<Value_t>(get());
-// }
+const Result_t& Result::get() const{
+    return *this;
+}
 
-// bool __types_proxy__::is_string() const{
-//     return std::holds_alternative<std::string>(get());
-// }
+bool Result::is_array() const{
+    return std::holds_alternative<std::shared_ptr<ArrayNode>>(*this);
+}
 
-// bool __types_proxy__::is_array() const{
-//     return std::holds_alternative<Array_t>(get());
-// }
+bool Result::is_value() const{
+    return std::holds_alternative<Value_t>(*this);
+}
 
-// bool __types_proxy__::is_undef() const{
-//     return std::holds_alternative<std::monostate>(get());
-// }
+bool Result::is_string() const{
+    return std::holds_alternative<std::string>(*this);
+}
 
-// __types__& __types_proxy__::get(){
-//     return *this;
-// }
+bool Result::is_variable() const{
+    return std::holds_alternative<std::shared_ptr<VariableNode>>(*this);
+}
 
-// const __types__& __types_proxy__::get() const{
-//     return *this;
-// }
-
-// std::ostream& operator<<(std::ostream& stream, const __types_proxy__& var)
-// {
-//     std::visit([&stream](const auto& x) { stream << x; }, var);
-//     return stream;
-// }
+bool Result::has_value() const{
+    return !std::holds_alternative<std::monostate>(*this);
+}

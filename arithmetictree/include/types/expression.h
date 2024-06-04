@@ -1,37 +1,14 @@
 #pragma once
-#include <memory>
-#include <optional>
-#include <vector>
-#include <unordered_set>
-#include "def.h"
+#include "node.h"
 
-class Node;
-class UnaryNode;
-class BinaryNode;
-class ValueNode;
-class VariableNode;
-class MultiArgumentNode;
-class RangeOperationNode;
-
-enum class NODE_TYPE{
-    UNARY,
-    BINARY, 
-    VALUE, 
-    VARIABLE,
-    RANGEOP,
-    FUNCTION,
-    ARRAY,
-    STRING
-};
-
-class Node{
+class ExpressionNode{
     public:
-    Node(size_t sz):
+    ExpressionNode(size_t sz):
         childs_([&sz](){std::vector<std::shared_ptr<Node>> vector;
                         vector.reserve(sz);
                         return vector;}()){}
     
-    Node() =default;
+    ExpressionNode() = default;
 
     virtual NODE_TYPE type() const = 0;
 
@@ -91,8 +68,6 @@ class Node{
     bool caller() const{
         return caller_;
     }
-
-    const std::vector<std::shared_ptr<Node>>& childs() const;
 
     protected:
     mutable std::unordered_set<Node*> parents_;

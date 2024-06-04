@@ -6,3 +6,8 @@ void ValueNode::print() const{
     std::cout<<"; "<<val_<<'}'<<std::endl;
 }
 #endif
+
+
+Value_t ValueNode::get() const{
+    return val_;
+}

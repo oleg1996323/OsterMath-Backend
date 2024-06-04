@@ -26,9 +26,7 @@ class ValueNode:public Node{
         return val_;
     }
 
-    virtual bool is_defined() const override{
-        return true;
-    }
+    const Value_t& get() const;
 
     virtual void insert(std::shared_ptr<Node> node) override;
 

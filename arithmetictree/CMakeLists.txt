@@ -8,11 +8,10 @@ include(${CMAKE_CURRENT_LIST_DIR}/grammar/CMakeLists.txt)
 
 file(GLOB_RECURSE arithmetic_tree_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/src/**.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/include/*.h
-    ${CMAKE_CURRENT_LIST_DIR}/include/types/*.h
+    ${CMAKE_CURRENT_LIST_DIR}/include/**.h
 )
 
-set(ARITHM_TREE_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/include)
+set(ARITHM_TREE_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/include ${CMAKE_CURRENT_LIST_DIR}/include/types ${CMAKE_CURRENT_LIST_DIR}/include/exception)
 set(ARITHM_TREE_LIBRARY_DIR ${CMAKE_CURRENT_LIST_DIR}/lib)
 
 set(Boost_USE_STATIC_LIBS        ON)  # only find static libs
