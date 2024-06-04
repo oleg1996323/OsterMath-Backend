@@ -21,7 +21,8 @@ enum class NODE_TYPE{
     RANGEOP,
     FUNCTION,
     ARRAY,
-    STRING
+    STRING,
+    EXPRESSION
 };
 
 class Node{
@@ -42,6 +43,10 @@ class Node{
     virtual Result execute(size_t index) = 0;
 
     const std::shared_ptr<Node>& child(size_t id) const{
+        return childs_.at(id);
+    }
+
+    std::shared_ptr<Node>& child(size_t id){
         return childs_.at(id);
     }
 

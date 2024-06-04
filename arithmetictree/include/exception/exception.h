@@ -22,6 +22,14 @@ class EmptyArray: public std::logic_error{
     using std::logic_error::logic_error;
 };
 
+class UnequalSizeArrays: public std::invalid_argument{
+    using std::invalid_argument::invalid_argument;
+};
+
+class UnknownTypeArrays: public std::invalid_argument{
+    using std::invalid_argument::invalid_argument;
+};
+
 class UndefinedFunction: public std::logic_error{
     using std::logic_error::logic_error;
 };

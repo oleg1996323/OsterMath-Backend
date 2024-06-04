@@ -84,3 +84,27 @@ void VariableNode::refresh_parent_links() const{
         if(!(*iterator_node))
             parents_.erase(iterator_node);
 }
+
+bool VariableNode::is_numeric() const{
+    if(childs_.size()==1){
+        if(childs_.at(0)->type()==NODE_TYPE::ARRAY)
+            return reinterpret_cast<const std::shared_ptr<ArrayNode>&>(childs_.at(0))->is_numeric();
+        else if(childs_.at(0)->type()==NODE_TYPE::VARIABLE)
+            return reinterpret_cast<const std::shared_ptr<VariableNode>&>(childs_.at(0))->is_numeric();
+        else 
+            return true;
+    }
+    else return false;
+}
+
+bool VariableNode::is_string() const{
+    if(childs_.size()==1){
+        if(childs_.at(0)->type()==NODE_TYPE::ARRAY)
+            return reinterpret_cast<const std::shared_ptr<ArrayNode>&>(childs_.at(0))->is_string();
+        else if(childs_.at(0)->type()==NODE_TYPE::VARIABLE)
+            return reinterpret_cast<const std::shared_ptr<VariableNode>&>(childs_.at(0))->is_string();
+        else 
+            return false;
+    }
+    else return false;
+}

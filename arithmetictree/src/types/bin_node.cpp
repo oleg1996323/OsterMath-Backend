@@ -2,13 +2,13 @@
 
 Node* BinaryNode::first_undefined_child_node(){
     Node* ptr;
-    if(!lhs_)
+    if(!child(0))
         return this;
-    else if((ptr = lhs_->first_undefined_child_node()))
+    else if((ptr = child(0)->first_undefined_child_node()))
         return ptr;
-    else if(!rhs_)
+    else if(!child(1))
         return this;
-    else if((ptr = rhs_->first_undefined_child_node()))
+    else if((ptr = child(1)->first_undefined_child_node()))
         return ptr;
     return nullptr;
 }
@@ -57,37 +57,19 @@ Value_t BinaryNode::__calculate__(size_t index){
 }
 
 Result BinaryNode::execute(){
-    using namespace boost::multiprecision;
-    if(lhs_ && rhs_){
-        if(lhs_->caller()) //left branch call refreshing
-            lhs_->execute();
-        else if(rhs_->caller()) //right branch call refreshing
-            rhs_->execute();
-        else{
-            lhs_cache() = lhs_->execute().get<Value_t>();
-            rhs_cache() = rhs_->execute().get<Value_t>();
-            std::cout<<"lhs: "<<lhs_cache()<<std::endl;
-            std::cout<<"rhs: "<<rhs_cache()<<std::endl;
-        }
-        if(operation_==BINARY_OP::DIV && rhs_cache()==0.)
-            throw std::logic_error("Division by 0 (NULL)");
-        else return __calculate__();
-    }
-    else
-        throw std::runtime_error("Undefined binary operation");
-    return 0.;
+    execute(0);
 }
 
 Result BinaryNode::execute(size_t index){
     using namespace boost::multiprecision;
-    if(lhs_ && rhs_){
-        if(lhs_->caller()) //left branch call refreshing
-            lhs_->execute(index);
-        else if(rhs_->caller()) //right branch call refreshing
-            rhs_->execute(index);
+    if(child(0) && child(1)){
+        if(child(0)->caller()) //left branch call refreshing
+            child(0)->execute(index);
+        else if(child(1)->caller()) //right branch call refreshing
+            child(1)->execute(index);
         else{
-            lhs_cache(index) = lhs_->execute(index).get<Value_t>();
-            rhs_cache(index) = rhs_->execute(index).get<Value_t>();
+            lhs_cache(index) = child(0)->execute(index).get<Value_t>();
+            rhs_cache(index) = child(1)->execute(index).get<Value_t>();
         }
         if(operation_==BINARY_OP::DIV && rhs_cache(index)==0.)
             throw std::logic_error("Division by 0 (NULL)");

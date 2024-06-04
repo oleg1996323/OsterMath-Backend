@@ -10,48 +10,19 @@ class ExpressionNode{
     
     ExpressionNode() = default;
 
-    virtual NODE_TYPE type() const = 0;
+    virtual NODE_TYPE type() const override;
 
-    virtual Node* first_undefined_child_node() = 0;
+    virtual Node* first_undefined_child_node() override;
 
-    virtual Result execute() = 0;
+    virtual Result execute() override;
 
-    virtual Result execute(size_t index) = 0;
+    virtual Result execute(size_t index) override;
 
-    const std::shared_ptr<Node>& child(size_t id) const{
-        return childs_.at(id);
-    }
+    virtual void insert(std::shared_ptr<Node> node) override;
 
-    bool has_childs() const{
-        return !childs_.empty();
-    }
+    virtual void serialize(std::ostream& stream) override;
 
-    bool has_child(size_t id) const{
-        return childs_.size()>id;
-    }
-
-    void refresh();
-
-    bool is_numeric() const{
-        for(auto& child:childs_)
-            if(child->is_numeric())
-                continue;
-            else return false;
-        return true;
-    }
-
-    virtual void insert(std::shared_ptr<Node> node) = 0;
-
-    virtual void serialize(std::ostream& stream) = 0;
-
-    virtual void deserialize(std::ostream& stream) = 0;
-
-    bool refer_to(std::string_view var_name) const{
-        for(auto& child:childs_)
-            if(child->refer_to(var_name))
-                return true;
-            else continue;
-    }
+    virtual void deserialize(std::ostream& stream) override;
 
     #ifdef DEBUG
     virtual void print() const{
@@ -68,6 +39,8 @@ class ExpressionNode{
     bool caller() const{
         return caller_;
     }
+
+    const std::vector<std::shared_ptr<Node>>& childs() const;
 
     protected:
     mutable std::unordered_set<Node*> parents_;

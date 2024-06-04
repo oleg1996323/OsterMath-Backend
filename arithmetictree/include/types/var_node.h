@@ -44,6 +44,10 @@ class VariableNode:public Node{
 
     virtual void deserialize(std::ostream& stream) override;
 
+    bool is_numeric() const;
+
+    bool is_string() const;
+
     private:
     mutable std::unordered_set<VariableNode*> var_dependence_;
     VariableBase* var_; 

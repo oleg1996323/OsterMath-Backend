@@ -29,19 +29,19 @@ class BinaryNode:public Node{
     virtual Result execute(size_t index) override;
 
     std::shared_ptr<Node>& lhs(){
-        return lhs_;
+        return child(0);
     }
 
     std::shared_ptr<Node>& rhs(){
-        return rhs_;
+        return child(1);
     }
 
     const std::shared_ptr<Node>& lhs() const {
-        return lhs_;
+        return child(0);
     }
 
     const std::shared_ptr<Node>& rhs() const {
-        return rhs_;
+        return child(1);
     }
 
     virtual void insert(std::shared_ptr<Node> node) override;
@@ -128,7 +128,5 @@ class BinaryNode:public Node{
     mutable std::vector<__cache__> cache_=[](){std::vector<__cache__> res;
                                                 res.resize(1);
                                                 return res;}();
-    std::shared_ptr<Node> lhs_;
-    std::shared_ptr<Node> rhs_;
     BINARY_OP operation_;
 };
