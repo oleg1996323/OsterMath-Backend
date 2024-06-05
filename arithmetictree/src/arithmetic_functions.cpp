@@ -53,6 +53,7 @@ Value_t SumProduct(std::vector<std::shared_ptr<ArrayNode>>&& arrays, size_t dime
     Value_t result = 0.;
     std::vector<size_t> sz_depth_measure;
     std::vector<Value_t> value_vector;
+    size_t measure_depth = 0;
     
     std::optional<std::exception> err_handler;
 
@@ -70,23 +71,49 @@ Value_t SumProduct(std::vector<std::shared_ptr<ArrayNode>>&& arrays, size_t dime
             seq_sz*=sz;
         }
         value_vector.resize(seq_sz);
+        measure_depth = sz_depth_measure.size();
     }
-    {
-        for(size_t depth = 0;depth<sz_depth_measure.size();++depth){
-            for(auto array:arrays)
-                
-        }
-        std::vector<Value_t> cache(sz_depth_measure.back(),1);
-        for(auto array:arrays)
-            for(size_t i = 0;i<array.size();++i)
-                array->child(i);
-        for(size_t i = 0;i<arrays.size();++i)
-            a
 
-        for(size_t depth = 0; depth<value_vector.size();++depth){
-            
+    // std::vector<std::shared_ptr<ArrayNode>> def;
+    // std::vector<std::shared_ptr<ArrayNode>> cache;
+    for(std::shared_ptr<ArrayNode>& array:arrays){
+        for(size_t id_zero_depth = 0;id_zero_depth<array->size();++id_zero_depth){
+            auto node = array->child(id_zero_depth);
+            for(size_t depth=1;depth<measure_depth;++depth){
+                
+            }
+                for(size_t id = 0;id<sz_depth_measure.at(iter);++id)
+                    node = array->child(id);
         }
+        
+        std::vector<std::shared_ptr<ArrayNode>> cached;
+        for(size_t iter=0;iter<measure_depth;++iter)
+            for(size_t id = 0;id<sz_depth_measure.at(iter);++id)
+                node = array->child(id);
     }
+
+    // for(size_t depth=0;depth<measure_depth;++depth){
+    //     for()
+    //     if(depth==measure_depth-1)
+    //         value_vector
+    // }
+
+    // {
+    //     for(size_t depth = 0;depth<sz_depth_measure.size();++depth){
+    //         for(auto array:arrays)
+                
+    //     }
+    //     std::vector<Value_t> cache(sz_depth_measure.back(),1);
+    //     for(auto array:arrays)
+    //         for(size_t i = 0;i<array.size();++i)
+    //             array->child(i);
+    //     for(size_t i = 0;i<arrays.size();++i)
+    //         a
+
+    //     for(size_t depth = 0; depth<value_vector.size();++depth){
+            
+    //     }
+    // }
 
     for(size_t i=0;i<arrays.front()->size();++i){
         Value_t product = 1.;

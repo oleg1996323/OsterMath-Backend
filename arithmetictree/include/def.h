@@ -56,3 +56,71 @@ template<typename T>
 const T& Result::get() const{
     return std::get<T>(*this);
 }
+
+#include <optional>
+
+class ProxySizeDepthMeasure{
+    public:
+    ProxySizeDepthMeasure(size_t new_size):
+        sz_(new_size),
+        parent_(nullptr){
+        
+    }
+
+    void operator++(){
+        if(next_level_.has_value())
+            ++next_level_;
+        else increase_iterator();
+    }
+
+    void push(size_t new_size){
+        if(next_level_.has_value())
+            next_level_->push(new_size);
+        else next_level_.emplace(new_size,this);
+    }
+
+    size_t depth(){
+        size_t depth = 1;
+        if(next_level_.has_value())
+            next_level_->depth(depth);
+        return depth; 
+    }
+
+    void reset_iterator(){
+        current_iterator = 0;
+        if(next_level_.has_value())
+            next_level_->reset_iterator();
+    }
+
+    size_t current_iterator() const{
+        return current_iterator_;
+    }
+
+    private:
+    ProxySizeDepthMeasure(size_t new_size, ProxySizeDepthMeasure* parent):
+        sz_(new_size),
+        parent_(parent){}
+
+
+    void depth(size_t& uppper_sz){
+        ++uppper_sz;
+        if(next_level.has_value())
+            depth(uppper_sz);
+        else return;
+    }
+
+    void increase_iterator(){
+        if(current_iterator_<sz_-1)
+            ++current_iterator_;
+        else {
+            current_iterator_ = 0;
+            if(parent_)
+                parent_->increase_iterator();
+        }
+    }
+
+    std::optional<ProxySizeDepthMeasure> next_level_;
+    ProxySizeDepthMeasure* parent_;
+    size_t sz_;
+    size_t current_iterator_ = 0;
+}
