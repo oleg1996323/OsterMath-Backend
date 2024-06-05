@@ -17,7 +17,7 @@ enum class TOP_BOUND_T{
 
 template<typename T>
 struct Bound_T{
-    mutable std::shared_ptr<VariableNode> value_;
+    mutable std::shared_ptr<Node> value_;
     T type_;
 
     bool is_defined() const;

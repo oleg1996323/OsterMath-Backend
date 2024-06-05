@@ -24,22 +24,26 @@ class BaseListener: public ParseRulesBaseListener{
         RANGEOPERATION,
         FUNCTIONOPERATION,
         BOUND_DEFINITION,
-        ARRAY_DEFINITION
+        ARRAY_DEFINITION,
+        ARRAY_ITEM_DEFINITION,
+        EXPRESSION
     };
 
     bool is_range_operation() const;
     bool is_function_operation() const;
     bool is_variable_definition() const;
     bool is_bounds_definition() const;
+    bool is_expression_definition() const;
+    bool is_array_definition() const;
+    bool is__array_item_definition() const;
 
-    void __insert_to_variable__(const std::shared_ptr<Node>& node) const;
-    void __insert_to_anonymous_node__(const std::shared_ptr<Node>& node) const;
+    void __insert_to_node__(const std::shared_ptr<Node>& node) const;
 
     BaseData* __insert_new_data_base__(std::string&& name);
 
     BaseData* data_base_;
     std::shared_ptr<VariableNode> current_var_;
-    std::shared_ptr<Node> anonymous_node_;
+    std::stack<std::shared_ptr<Node>> anonymous_node_;
     std::stack<MODE> mode_;
 
     template<typename B_T>
@@ -56,6 +60,10 @@ class BaseListener: public ParseRulesBaseListener{
     BaseListener(BaseData* data_base):
     data_base_(data_base)
     {}
+
+    void enterExpr(ParseRulesParser::ExprContext* ctx);
+
+    void exitExpr(ParseRulesParser::ExprContext* ctx);
 
     virtual void enterVardefinition(ParseRulesParser::VardefinitionContext * ctx) override;
     
@@ -107,6 +115,10 @@ class BaseListener: public ParseRulesBaseListener{
     virtual void enterFunction(ParseRulesParser::FunctionContext* ctx) override;
 
     virtual void exitFunction(ParseRulesParser::FunctionContext* ctx) override;
+
+    virtual void enterComparision(ParseRulesParser::ComparisionContext* ctx) override;
+
+    virtual void exitComparision(ParseRulesParser::ComparisionContext* ctx) override;
 
     virtual void enterLess(ParseRulesParser::LessContext* ctx) override;
 

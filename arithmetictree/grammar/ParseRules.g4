@@ -38,16 +38,16 @@ input:
     ;
 
 line_input:
-    vardefinition
-    | comparision
+    vardef              # Vardefinition
+    | comp              # Comparision
     ;
 
-vardefinition
+vardef
     :
     WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')') | WS* VARIABLE WS*) WS* '=' WS* (array | expr | string) WS* EOL
     ;
 
-comparision
+comp
     :
     WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')') | WS* VARIABLE WS*)  WS* ':' variable_parameter '<' WS* expr WS* EOL              #less
     | WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')') | WS* VARIABLE WS*) WS* ':' WS* expr WS* '>' variable_parameter EOL            #less

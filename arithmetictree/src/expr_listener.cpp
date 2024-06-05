@@ -6,6 +6,15 @@
 
 using namespace std::string_view_literals;
 
+void BaseListener::enterExpr(ParseRulesParser::ExprContext* ctx){
+    mode_.push(MODE::EXPRESSION);
+}
+
+void BaseListener::exitExpr(ParseRulesParser::ExprContext* ctx){
+    assert(!mode_.empty());
+    assert(is_expression_definition());
+}
+
 bool BaseListener::is_function_operation() const{
     return !mode_.empty() && mode_.top()==MODE::FUNCTIONOPERATION;
 }
@@ -22,39 +31,25 @@ bool BaseListener::is_bounds_definition() const{
     return !mode_.empty() && mode_.top()==MODE::BOUND_DEFINITION;
 }
 
-void BaseListener::__insert_to_variable__(const std::shared_ptr<Node>& node) const{
-    current_var_->insert(node);
+bool BaseListener::is_expression_definition() const{
+    return !mode_.empty() && mode_.top()==MODE::EXPRESSION;
 }
 
-void BaseListener::__insert_to_anonymous_node__(const std::shared_ptr<Node>& node) const{
-    anonymous_node_->insert(node);
+bool BaseListener::is_array_definition() const{
+    return !mode_.empty() && mode_.top()==MODE::ARRAY_DEFINITION;
+}
+
+bool BaseListener::is__array_item_definition() const{
+    return !mode_.empty() && mode_.top()==MODE::ARRAY_ITEM_DEFINITION;
+}
+
+void BaseListener::__insert_to_node__(const std::shared_ptr<Node>& node) const{
+    assert(!anonymous_node_.empty());
+    anonymous_node_.top()->insert(node);
 }
 
 BaseData* BaseListener::__insert_new_data_base__(std::string&& name){
     return data_base_->get_pool()->add_data(name);
-}
-
-void BaseListener::enterVardefinition(ParseRulesParser::VardefinitionContext * ctx){
-    assert(mode_.empty());
-    mode_.push(MODE::VARDEF);
-    //by default the database from which we define variable must exists
-
-    if(ctx->VARIABLE()){
-        //creating in active sheet
-        BaseData* c_var_db_tmp;
-        if(ctx->DATABASE())
-            c_var_db_tmp = __insert_new_data_base__(ctx->DATABASE()->getText());
-        else c_var_db_tmp = data_base_;
-        current_var_ = c_var_db_tmp->add_variable(ctx->VARIABLE()->getText())->node();
-    }
-    else assert(false);
-    current_var_->release_childs();
-}
-
-void BaseListener::exitVardefinition(ParseRulesParser::VardefinitionContext * ctx){ 
-    assert(mode_.top()==MODE::VARDEF);
-    current_var_.reset();
-    mode_.pop();
 }
 
 void BaseListener::enterVariable(ParseRulesParser::VariableContext *ctx) {
@@ -66,16 +61,7 @@ void BaseListener::enterVariable(ParseRulesParser::VariableContext *ctx) {
     else db_tmp = data_base_;
 
     VariableBase* ptr = db_tmp->add_variable(ctx->VARIABLE()->getText()).get();
-    if(is_variable_definition()){
-        __insert_to_variable__(ptr->node());
-    }
-    else if(is_bounds_definition()){
-        if(bottom_.has_value())
-            current_var_->set_bottom_bound_value(bottom_.value().db_name,bottom_.value().var_name,ptr,bottom_.value().type);
-        else if(top_.has_value())
-            current_var_->set_top_bound_value(top_.value().db_name,top_.value().var_name,ptr,top_.value().type);
-    }
-    else throw std::runtime_error("Error when variable inserted");
+    __insert_to_node__(ptr->node());
 }
 
 void BaseListener::enterUnaryOp(ParseRulesParser::UnaryOpContext *ctx) {
@@ -110,40 +96,14 @@ void BaseListener::exitParens(ParseRulesParser::ParensContext *ctx) {
 void BaseListener::enterConstant(ParseRulesParser::ConstantContext *ctx) {
     if(is_variable_definition()){
         if(ctx->EXP()){
-            current_var_->insert(std::make_shared<ValueNode>(boost::math::constants::e<Value_t>()));
+            anonymous_node_.top()->insert(std::make_shared<ValueNode>(boost::math::constants::e<Value_t>()));
         }
         else if(ctx->PI()){
-            current_var_->insert(std::make_shared<ValueNode>(boost::math::constants::pi<Value_t>()));
+            anonymous_node_.top()->insert(std::make_shared<ValueNode>(boost::math::constants::pi<Value_t>()));
         }
         else
             throw std::runtime_error("Error parsing constant");
         return;
-    }
-    else if(is_bounds_definition()){
-        if(ctx->EXP()){
-            if(bottom_.has_value())
-                current_var_->variable()->set_bottom_bound_value(bottom_.value().db_name,
-                bottom_.value().var_name,
-                std::make_shared<ValueNode>(boost::math::constants::e<Value_t>()),
-                bottom_.value().type);
-            else if(top_.has_value())
-                current_var_->variable()->set_top_bound_value(top_.value().db_name,
-                top_.value().var_name,
-                std::make_shared<ValueNode>(boost::math::constants::e<Value_t>()),
-                top_.value().type);
-        }
-        else if(ctx->PI()){
-            if(bottom_.has_value())
-                current_var_->variable()->set_bottom_bound_value(bottom_.value().db_name,
-                bottom_.value().var_name,
-                std::make_shared<ValueNode>(boost::math::constants::pi<Value_t>()),
-                bottom_.value().type);
-            else if(top_.has_value())
-                current_var_->variable()->set_top_bound_value(top_.value().db_name,
-                top_.value().var_name,
-                std::make_shared<ValueNode>(boost::math::constants::e<Value_t>()),
-                top_.value().type);
-        }
     }
     else throw std::runtime_error("Error when added constant value");
 }
@@ -155,99 +115,72 @@ void BaseListener::exitConstant(ParseRulesParser::ConstantContext *ctx) {
 //binary operator {for example: Expr + Expr or Expr / Expr}
 void BaseListener::enterBinaryOp(ParseRulesParser::BinaryOpContext *ctx) {
     //entering in the arithmetictree of range_function
-    if(is_variable_definition()){
-        if(ctx->ADD())
-            __insert_to_variable__(std::make_shared<BinaryNode>(BINARY_OP::ADD));
-        else if(ctx->SUB())
-            __insert_to_variable__(std::make_shared<BinaryNode>(BINARY_OP::SUB));
-        else if(ctx->MUL())
-            __insert_to_variable__(std::make_shared<BinaryNode>(BINARY_OP::MUL));
-        else if(ctx->DIV())
-            __insert_to_variable__(std::make_shared<BinaryNode>(BINARY_OP::DIV));
-        else
-            __insert_to_variable__(std::make_shared<BinaryNode>(BINARY_OP::POW));
-        return;
-    }
-    else throw std::runtime_error("Invalid input binary operation");
+    assert(is_expression_definition());
+    if(ctx->ADD())
+        anonymous_node_.top()->insert(std::make_shared<BinaryNode>(BINARY_OP::ADD));
+    else if(ctx->SUB())
+        anonymous_node_.top()->insert(std::make_shared<BinaryNode>(BINARY_OP::SUB));
+    else if(ctx->MUL())
+        anonymous_node_.top()->insert(std::make_shared<BinaryNode>(BINARY_OP::MUL));
+    else if(ctx->DIV())
+        anonymous_node_.top()->insert(std::make_shared<BinaryNode>(BINARY_OP::DIV));
+    else
+        anonymous_node_.top()->insert(std::make_shared<BinaryNode>(BINARY_OP::POW));
+    return;
 }
 
 void BaseListener::exitBinaryOp(ParseRulesParser::BinaryOpContext *ctx) {
     return;
 }
 
-void BaseListener::enterItemArray(ParseRulesParser::ItemArrayContext *ctx){
-    return;
-}
-
-void BaseListener::exitItemArray(ParseRulesParser::ItemArrayContext *ctx){
-    return;
-}
-
 //an array definition {for example: [1,2,3,...]}
 void BaseListener::enterArray(ParseRulesParser::ArrayContext *ctx) {
     assert(!mode_.empty() && current_var_);
-    if(is_variable_definition()){
-        __insert_to_variable__(std::make_shared<ArrayNode>(ctx->input_array().size()));
-        mode_.push(MODE::ARRAY_DEFINITION);
-    }
-    return;
+    anonymous_node_.push(std::make_shared<ArrayNode>(ctx->input_array().size()));
+    mode_.push(MODE::ARRAY_DEFINITION);
 }
 
 void BaseListener::exitArray(ParseRulesParser::ArrayContext *ctx) {
     assert(mode_.top()==MODE::ARRAY_DEFINITION);
     mode_.pop();
-    array_node_.reset();
     return;
 }
 
 void BaseListener::enterNumber(ParseRulesParser::NumberContext* ctx){
-    if(is_range_operation())
-        __insert_to_range_operation__(std::make_shared<ValueNode>(ctx->getText()));
-    else if(is_variable_definition())
-        __insert_to_variable__(std::move(Value_t(ctx->getText())));
-    else if(is_function_operation() && !tmp_function_node_.top()->is_array_function())
-        __insert_to_function_operation__(std::make_shared<ValueNode>(ctx->getText()));
-    else if(is_bounds_definition()){
-        if(bottom_.has_value())
-            current_var_->set_bottom_bound_value(bottom_.value().db_name,bottom_.value().var_name,std::move(Value_t(ctx->getText())),bottom_.value().type);
-        else if(top_.has_value())
-            current_var_->set_top_bound_value(top_.value().db_name,top_.value().var_name,std::move(Value_t(ctx->getText())),top_.value().type);
-    }
-    else throw std::runtime_error("Unknown parsing type");
-    return;
+    anonymous_node_.top()->insert(std::make_shared<ValueNode>(ctx->getText()));
 }
 
 void BaseListener::enterMultiargfunction(ParseRulesParser::MultiargfunctionContext* ctx){
     mode_.push(MODE::FUNCTIONOPERATION);
     if(ctx->PRODUCT())
-        tmp_function_node_.push(std::make_unique<FunctionNode>(FUNCTION_OP::PROD));
+        anonymous_node_.push(std::make_unique<FunctionNode>(FUNCTION_OP::PROD));
     else if(ctx->SUMPRODUCT())
-        tmp_function_node_.push(std::make_unique<FunctionNode>(FUNCTION_OP::SUMPRODUCT));
+        anonymous_node_.push(std::make_unique<FunctionNode>(FUNCTION_OP::SUMPRODUCT));
     else if(ctx->SUM())
-        tmp_function_node_.push(std::make_unique<FunctionNode>(FUNCTION_OP::SUM));
+        anonymous_node_.push(std::make_unique<FunctionNode>(FUNCTION_OP::SUM));
 }
 
 void BaseListener::enterFunction(ParseRulesParser::FunctionContext* ctx){
     mode_.push(MODE::FUNCTIONOPERATION);
     if(ctx){
         if(ctx->EXP())
-            tmp_function_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::EXP));
+            anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::EXP));
         else if(ctx->LG())
-            tmp_function_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::LG10));
+            anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::LG10));
         else if(ctx->LN())
-            tmp_function_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::LN));
+            anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::LN));
         else if(ctx->LOG_X())
-            tmp_function_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::LOG_BASE));
+            anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::LOG_BASE));
         else if(ctx->SIN())
-            tmp_function_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::SIN));
+            anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::SIN));
         else if(ctx->COS())
-            tmp_function_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::COS));
+            anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::COS));
         else if(ctx->ASIN())
-            tmp_function_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::ASIN));
+            anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::ASIN));
         else if(ctx->ACOS())
-            tmp_function_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::ACOS));
+            anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::ACOS));
         else if(ctx->FACTORIAL())
-            tmp_function_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::FACTORIAL));
+            anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::FACTORIAL));
         else throw std::invalid_argument("Unknown input of function context");
     }
 }
@@ -256,88 +189,42 @@ void BaseListener::enterRangefunction(ParseRulesParser::RangefunctionContext* ct
     assert(ctx);
     mode_.push(MODE::RANGEOPERATION);
     if(ctx->SUM_I())
-        tmp_range_node_.push(std::make_shared<RangeOperationNode>(RANGE_OP::SUM));
+        anonymous_node_.push(std::make_shared<RangeOperationNode>(RANGE_OP::SUM));
     else if(ctx->PRODUCT_I())
-        tmp_range_node_.push(std::make_shared<RangeOperationNode>(RANGE_OP::PROD));
+        anonymous_node_.push(std::make_shared<RangeOperationNode>(RANGE_OP::PROD));
     else throw std::invalid_argument("Invalid type of function");
-    assert(tmp_range_node_.top()->type()==ARITHM_NODE_TYPE::RANGEOP);
+    assert(anonymous_node_.top()->type()==NODE_TYPE::RANGEOP);
 }
 
 void BaseListener::exitFunction(ParseRulesParser::FunctionContext* ctx){
-    mode_.pop();
-    std::shared_ptr<FunctionNode> ptr = tmp_function_node_.top();
-    tmp_function_node_.pop();
-    if(is_variable_definition())
-        __insert_to_variable__(ptr);
-    else if(is_range_operation())
-        __insert_to_range_operation__(ptr);
-    else if(is_function_operation())
-        __insert_to_function_operation__(ptr);
-    else if(is_bounds_definition()){
-        ArithmeticTree tree(current_var_);
-        tree.insert(ptr);
-        if(bottom_.has_value())
-            current_var_->set_bottom_bound_value(bottom_.value().db_name,bottom_.value().var_name,std::move(tree),bottom_.value().type);
-        else if(top_.has_value())
-            current_var_->set_top_bound_value(top_.value().db_name,top_.value().var_name,std::move(tree),top_.value().type);
-    }
+    
 }
 
 void BaseListener::exitMultiargfunction(ParseRulesParser::MultiargfunctionContext* ctx){
-    mode_.pop();
-    std::shared_ptr<FunctionNode> ptr = tmp_function_node_.top();
-    tmp_function_node_.pop();
-    if(is_variable_definition())
-        __insert_to_variable__(ptr);
-    else if(is_range_operation())
-        __insert_to_range_operation__(ptr);
-    else if(is_function_operation())
-        __insert_to_function_operation__(ptr);
-    else if(is_bounds_definition()){
-        ArithmeticTree tree(current_var_);
-        tree.insert(ptr);
-        if(bottom_.has_value())
-            current_var_->set_bottom_bound_value(bottom_.value().db_name,bottom_.value().var_name,std::move(tree),bottom_.value().type);
-        else if(top_.has_value())
-            current_var_->set_top_bound_value(top_.value().db_name,top_.value().var_name,std::move(tree),top_.value().type);
-    }
+    
 }
 
 void BaseListener::exitRangefunction(ParseRulesParser::RangefunctionContext* ctx){
-    assert(!tmp_range_node_.empty());
     assert(!mode_.empty());
     mode_.pop();
-    std::shared_ptr<RangeOperationNode> ptr = tmp_range_node_.top();
-    tmp_range_node_.pop();
-    if(is_variable_definition()){
-        __insert_to_variable__(ptr);
-    }
-    else if(is_range_operation()){
-        __insert_to_range_operation__(ptr);
-    }
-    else if(is_function_operation()){
-        __insert_to_function_operation__(ptr);
-    }
-    else if(is_bounds_definition()){
-        ArithmeticTree tree(current_var_);
-        tree.insert(ptr);
-        if(bottom_.has_value())
-            current_var_->set_bottom_bound_value(bottom_.value().db_name,bottom_.value().var_name,std::move(tree),bottom_.value().type);
-        else if(top_.has_value())
-            current_var_->set_top_bound_value(top_.value().db_name,top_.value().var_name,std::move(tree),top_.value().type);
-    }
+    
 }
 
 void BaseListener::enterLess(ParseRulesParser::LessContext* ctx){
     assert(mode_.empty());
-    if(ctx->variable_parameter() && ctx->VARIABLE()){
+    if(ctx->VARIABLE()){
         //creating in active sheet
         BaseData* c_var_db_tmp;
         if(ctx->DATABASE())
+            //creating in other sheet
             c_var_db_tmp = __insert_new_data_base__(ctx->DATABASE()->getText());
         else c_var_db_tmp = data_base_;
-        current_var_ = c_var_db_tmp->add_variable(ctx->VARIABLE()->getText()).get();
+        current_var_ = c_var_db_tmp->add_variable(ctx->VARIABLE()->getText())->node();
+    }
+    else assert(false);
+    anonymous_node_.push(current_var_);
 
+    if(ctx->variable_parameter()){
         BaseData* db_tmp;
         if(ctx->variable_parameter()->DATABASE())
             db_tmp = __insert_new_data_base__(ctx->variable_parameter()->DATABASE()->getText());
@@ -346,29 +233,27 @@ void BaseListener::enterLess(ParseRulesParser::LessContext* ctx){
         if(ctx->variable_parameter()->VARIABLE())
             top_.emplace(db_tmp->name(),db_tmp->add_variable(ctx->variable_parameter()->VARIABLE()->getText()).get()->name(),TOP_BOUND_T::LESS);
         else assert(false);
-
-        mode_.push(MODE::BOUND_DEFINITION);
     }
     else assert(false);
 }
 
-void BaseListener::exitLess(ParseRulesParser::LessContext* ctx){
-    top_.reset();
-    mode_.pop();
-    assert(mode_.empty());
-    current_var_ = nullptr;
-}
+void BaseListener::exitLess(ParseRulesParser::LessContext* ctx){}
 
 void BaseListener::enterLess_equal(ParseRulesParser::Less_equalContext* ctx){
     assert(mode_.empty());
-    if(ctx->variable_parameter() && ctx->VARIABLE()){
+    if(ctx->VARIABLE()){
         //creating in active sheet
         BaseData* c_var_db_tmp;
         if(ctx->DATABASE())
+            //creating in other sheet
             c_var_db_tmp = __insert_new_data_base__(ctx->DATABASE()->getText());
         else c_var_db_tmp = data_base_;
-        current_var_ = c_var_db_tmp->add_variable(ctx->VARIABLE()->getText()).get();
-
+        current_var_ = c_var_db_tmp->add_variable(ctx->VARIABLE()->getText())->node();
+    }
+    else assert(false);
+    anonymous_node_.push(current_var_);
+    
+    if(ctx->variable_parameter()){
         BaseData* db_tmp;
         if(ctx->variable_parameter()->DATABASE())
             db_tmp = __insert_new_data_base__(ctx->variable_parameter()->DATABASE()->getText());
@@ -382,23 +267,23 @@ void BaseListener::enterLess_equal(ParseRulesParser::Less_equalContext* ctx){
     else assert(false);
 }
 
-void BaseListener::exitLess_equal(ParseRulesParser::Less_equalContext* ctx){
-    top_.reset();
-    mode_.pop();
-    assert(mode_.empty());
-    current_var_ = nullptr;
-}
+void BaseListener::exitLess_equal(ParseRulesParser::Less_equalContext* ctx){}
 
 void BaseListener::enterLarger(ParseRulesParser::LargerContext* ctx){
     assert(mode_.empty());
-    if(ctx->variable_parameter() && ctx->VARIABLE()){
+    if(ctx->VARIABLE()){
         //creating in active sheet
         BaseData* c_var_db_tmp;
         if(ctx->DATABASE())
+            //creating in other sheet
             c_var_db_tmp = __insert_new_data_base__(ctx->DATABASE()->getText());
         else c_var_db_tmp = data_base_;
         current_var_ = c_var_db_tmp->add_variable(ctx->VARIABLE()->getText())->node();
+    }
+    else assert(false);
+    anonymous_node_.push(current_var_);
 
+    if(ctx->variable_parameter()){
         BaseData* db_tmp;
         if(ctx->variable_parameter()->DATABASE())
             db_tmp = __insert_new_data_base__(ctx->variable_parameter()->DATABASE()->getText());
@@ -412,23 +297,23 @@ void BaseListener::enterLarger(ParseRulesParser::LargerContext* ctx){
     else assert(false);
 }
 
-void BaseListener::exitLarger(ParseRulesParser::LargerContext* ctx){
-    bottom_.reset();
-    mode_.pop();
-    assert(mode_.empty());
-    current_var_ = nullptr;
-}
+void BaseListener::exitLarger(ParseRulesParser::LargerContext* ctx){}
 
 void BaseListener::enterLarger_equal(ParseRulesParser::Larger_equalContext* ctx){
     assert(mode_.empty());
-    if(ctx->variable_parameter() && ctx->VARIABLE()){
+    if(ctx->VARIABLE()){
         //creating in active sheet
         BaseData* c_var_db_tmp;
         if(ctx->DATABASE())
+            //creating in other sheet
             c_var_db_tmp = __insert_new_data_base__(ctx->DATABASE()->getText());
         else c_var_db_tmp = data_base_;
-        current_var_ = c_var_db_tmp->add_variable(ctx->VARIABLE()->getText()).get();
+        current_var_ = c_var_db_tmp->add_variable(ctx->VARIABLE()->getText())->node();
+    }
+    else assert(false);
+    anonymous_node_.push(current_var_);
 
+    if(ctx->variable_parameter()){
         BaseData* db_tmp;
         if(ctx->variable_parameter()->DATABASE())
             db_tmp = __insert_new_data_base__(ctx->variable_parameter()->DATABASE()->getText());
@@ -442,13 +327,66 @@ void BaseListener::enterLarger_equal(ParseRulesParser::Larger_equalContext* ctx)
     else assert(false);
 }
 
-void BaseListener::exitLarger_equal(ParseRulesParser::Larger_equalContext* ctx){
-    bottom_.reset();
-    mode_.pop();
-    assert(mode_.empty());
-    current_var_ = nullptr;
-}
+void BaseListener::exitLarger_equal(ParseRulesParser::Larger_equalContext* ctx){}
 
 void BaseListener::visitErrorNode(antlr4::tree::ErrorNode* node){
     throw ParsingError("Error input. Prompt: " + node->getText());
+}
+
+
+void BaseListener::enterVardefinition(ParseRulesParser::VardefinitionContext * ctx){
+    assert(mode_.empty());
+    assert(anonymous_node_.empty());
+    mode_.push(MODE::VARDEF);
+    //by default the database from which we define variable must exists
+
+    if(ctx->vardef() && ctx->vardef()->VARIABLE()){
+        //creating in active sheet
+        BaseData* c_var_db_tmp;
+        if(ctx->vardef() && ctx->vardef()->DATABASE())
+            c_var_db_tmp = __insert_new_data_base__(ctx->vardef()->DATABASE()->getText());
+        else c_var_db_tmp = data_base_;
+        current_var_ = c_var_db_tmp->add_variable(ctx->vardef()->VARIABLE()->getText())->node();
+    }
+    else assert(false);
+    current_var_->release_childs();
+    anonymous_node_.push(current_var_);
+}
+
+void BaseListener::exitVardefinition(ParseRulesParser::VardefinitionContext * ctx){ 
+    assert(mode_.top()==MODE::VARDEF);
+    assert(anonymous_node_.size()==1);
+    current_var_.reset();
+    anonymous_node_.pop();
+    mode_.pop();
+}
+
+void BaseListener::enterComparision(ParseRulesParser::ComparisionContext* ctx){
+    assert(mode_.empty());
+    assert(anonymous_node_.empty());
+    mode_.push(MODE::BOUND_DEFINITION);
+}
+
+void BaseListener::enterItemArray(ParseRulesParser::ItemArrayContext *ctx){
+    if(ctx->expr()) //а надо ли оно?
+        enterExpr(ctx->expr());
+    return;
+}
+
+void BaseListener::exitItemArray(ParseRulesParser::ItemArrayContext *ctx){
+    if(ctx->expr())
+        exitExpr(ctx->expr());
+    return;
+}
+
+void BaseListener::exitComparision(ParseRulesParser::ComparisionContext* ctx){
+    assert(is_bounds_definition());
+    mode_.pop();
+    assert(mode_.empty());
+    assert(anonymous_node_.size()==1);
+    if(bottom_.has_value())
+        current_var_->variable()->set_bottom_bound_value(bottom_.value().db_name,bottom_.value().var_name,anonymous_node_.top(),bottom_.value().type);
+    else if(top_.has_value())
+        current_var_->variable()->set_top_bound_value(top_.value().db_name,top_.value().var_name,anonymous_node_.top(),top_.value().type);
+    else throw std::runtime_error("Error ");
 }
