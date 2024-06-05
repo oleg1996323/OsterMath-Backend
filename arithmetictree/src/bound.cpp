@@ -1,69 +1,51 @@
+#include <node.h>
 #include "bound.h"
 #include "types.h"
 #include "arithmetic_types.h"
 
 template<>
+bool Bound_T<TOP_BOUND_T>::is_defined() const{
+    return value_.get()!=nullptr;
+}
+
+template<>
 bool Bound_T<TOP_BOUND_T>::is_expression() const{
-    return std::holds_alternative<ArithmeticTree>(value_);
+    return is_defined() && value_->type()==NODE_TYPE::EXPRESSION;
 }
 
 template<>
 bool Bound_T<TOP_BOUND_T>::is_value() const{
-    return std::holds_alternative<Value_t>(value_);
+    return is_defined() && value_->type()==NODE_TYPE::VALUE;
 }
 
 template<>
 bool Bound_T<TOP_BOUND_T>::is_variable() const{
-    return std::holds_alternative<VariableBase*>(value_);
+    return is_defined() && value_->type()==NODE_TYPE::VARIABLE;
 }
 
 template<>
 bool Bound_T<BOTTOM_BOUND_T>::is_expression() const{
-    return std::holds_alternative<ArithmeticTree>(value_);
+    return is_defined() && value_->type()==NODE_TYPE::EXPRESSION;
 }
 
 template<>
 bool Bound_T<BOTTOM_BOUND_T>::is_value() const{
-    return std::holds_alternative<Value_t>(value_);
+    return is_defined() && value_->type()==NODE_TYPE::VALUE;
 }
 
 template<>
 bool Bound_T<BOTTOM_BOUND_T>::is_variable() const{
-    return std::holds_alternative<VariableBase*>(value_);
+    return is_defined() && value_->type()==NODE_TYPE::VARIABLE;
 }
 
 template<>
 Value_t Bound_T<TOP_BOUND_T>::get() const{
-    if(is_value())
-        return std::get<Value_t>(value_);
-    else if(is_expression())
-        return std::get<ArithmeticTree>(value_).execute();
-    else if(is_variable()){
-        if(std::get<VariableBase*>(value_))
-            return std::get<VariableBase*>(value_)->node()->execute();
-        else {
-            value_ = Value_t(0);
-            return std::get<Value_t>(value_);
-        }
-    }
-    else throw std::runtime_error("Bound error");
+    return value_->execute().get<Value_t>();
 }
 
 template<>
 Value_t Bound_T<BOTTOM_BOUND_T>::get() const{
-    if(is_value())
-        return std::get<Value_t>(value_);
-    else if(is_expression())
-        return std::get<ArithmeticTree>(value_).execute();
-    else if(is_variable()){
-        if(std::get<VariableBase*>(value_))
-            return std::get<VariableBase*>(value_)->node()->execute();
-        else {
-            value_ = Value_t(0);
-            return std::get<Value_t>(value_);
-        }
-    }
-    else throw std::runtime_error("Bound error");
+    return value_->execute().get<Value_t>();
 }
 
 std::optional<Value_t> VariableBounds::get_bottom_bound_value() const{
@@ -107,14 +89,38 @@ bool VariableBounds::is_in_bounds(const Value_t& value) const{
     return in;
 }
 
-bool VariableBounds::is_in_bounds(const VariableBase& var) const{
-    if(var.is_arithmetic_tree())
-        return is_in_bounds(var.get<ArithmeticTree>());
-    else if(var.is_value())
-        return is_in_bounds(var.get<Value_t>());
-    else return true;
+void VariableBounds::set_bound_value(std::shared_ptr<Node> value, BOTTOM_BOUND_T type){
+    if(bottom_bound_){
+        bottom_bound_->type_=type;
+        bottom_bound_->value_=value;
+    }
+    else {
+        bottom_bound_ = std::make_unique<Bound_T<BOTTOM_BOUND_T>>();
+        bottom_bound_->type_=type;
+        bottom_bound_->value_=value;
+    }
 }
 
-bool VariableBounds::is_in_bounds(const ArithmeticTree& tree) const{
-    return is_in_bounds(tree.value());
+void VariableBounds::set_bound_value(std::shared_ptr<Node> value, TOP_BOUND_T type){
+    if(top_bound_){
+        top_bound_->type_=type;
+        top_bound_->value_=value;
+    }
+    else {
+        top_bound_ = std::make_unique<Bound_T<TOP_BOUND_T>>();
+        top_bound_->type_=type;
+        top_bound_->value_=value;
+    }
 }
+
+// bool VariableBounds::is_in_bounds(const VariableBase& var) const{
+//     if(var.is_arithmetic_tree())
+//         return is_in_bounds(var.get<ArithmeticTree>());
+//     else if(var.is_value())
+//         return is_in_bounds(var.get<Value_t>());
+//     else return true;
+// }
+
+// bool VariableBounds::is_in_bounds(const ArithmeticTree& tree) const{
+//     return is_in_bounds(tree.value());
+// }

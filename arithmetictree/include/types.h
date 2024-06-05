@@ -51,11 +51,9 @@ class VariableBase: public FormattingData{
 
     void print();
 
-    template<typename T>
-    void set_bottom_bound_value(std::string_view,std::string_view,T&& value, BOTTOM_BOUND_T type);
+    void set_bottom_bound_value(std::string_view,std::string_view,std::shared_ptr<Node> value, BOTTOM_BOUND_T type);
 
-    template<typename T>
-    void set_top_bound_value(std::string_view,std::string_view,T&& value, TOP_BOUND_T type);
+    void set_top_bound_value(std::string_view,std::string_view,std::shared_ptr<Node> value, TOP_BOUND_T type);
 
     bool is_in_bounds(std::string_view,std::string_view) const;
 
@@ -89,9 +87,8 @@ class VariableBase: public FormattingData{
     BaseData* data_base_;
 };
 
-template<typename T>
-void VariableBase::set_bottom_bound_value(std::string_view data_base,std::string_view var_name,T&& value, BOTTOM_BOUND_T type){
-    bounds_[data_base][var_name].set_bound_value(std::forward<T>(value),type);
+void VariableBase::set_bottom_bound_value(std::string_view data_base,std::string_view var_name,std::shared_ptr<Node> value, BOTTOM_BOUND_T type){
+    bounds_[data_base][var_name].set_bound_value(value,type);
     #ifdef DEBUG
     std::cout << var_name<<' ';
     if(type == BOTTOM_BOUND_T::LARGER)
@@ -101,9 +98,8 @@ void VariableBase::set_bottom_bound_value(std::string_view data_base,std::string
     #endif
 }
 
-template<typename T>
-void VariableBase::set_top_bound_value(std::string_view data_base,std::string_view var_name,T&& value, TOP_BOUND_T type){
-    bounds_[data_base][var_name].set_bound_value(std::forward<T>(value),type);
+void VariableBase::set_top_bound_value(std::string_view data_base,std::string_view var_name,std::shared_ptr<Node> value, TOP_BOUND_T type){
+    bounds_[data_base][var_name].set_bound_value(value,type);
     #ifdef DEBUG
     std::cout << var_name<<' ';
     if(type == TOP_BOUND_T::LESS)

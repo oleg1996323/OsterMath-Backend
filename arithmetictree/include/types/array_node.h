@@ -31,8 +31,6 @@ class ArrayNode:public Node{
 
     bool empty() const;
 
-    std::shared_ptr<Node>& child_depth(size_t& depth, size_t& abs_id);
-
     std::vector<std::shared_ptr<Node>>::const_iterator begin() const;
 
     std::vector<std::shared_ptr<Node>>::iterator begin();

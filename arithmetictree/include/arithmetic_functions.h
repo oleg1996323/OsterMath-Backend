@@ -28,6 +28,8 @@ namespace functions{
         Value_t Sum(std::vector<std::shared_ptr<ArrayNode>>&& arrays);
         Value_t Product(std::vector<std::shared_ptr<ArrayNode>>&& arrays);
 
+        size_t pow(size_t base, size_t pow);
+
         namespace Ranges{
             Value_t SumProduct();
             Value_t Sum();

@@ -5,8 +5,6 @@
 #include <optional>
 #include "def.h"
 
-using Bound_types = std::variant<std::monostate,Value_t, std::shared_ptr<ExpressionNode>, std::shared_ptr<VariableNode>>;
-
 enum class BOTTOM_BOUND_T{
     LARGER_OR_EQUAL,
     LARGER
@@ -19,8 +17,10 @@ enum class TOP_BOUND_T{
 
 template<typename T>
 struct Bound_T{
-    mutable Bound_types value_ = 0;
+    mutable std::shared_ptr<VariableNode> value_;
     T type_;
+
+    bool is_defined() const;
 
     bool is_expression() const;
 
@@ -41,15 +41,13 @@ class VariableBounds{
 
     bool is_in_bounds(const Value_t&) const;
 
-    bool is_in_bounds(const std::shared_ptr<VariableNode>&) const;
+    bool is_in_bounds(const std::string&) const;
 
-    bool is_in_bounds(const std::shared_ptr<ExpressionNode>&) const;
+    bool is_in_bounds(std::string&&) const;
     
-    template<typename T>
-    void set_bound_value(T&& value, BOTTOM_BOUND_T type);
+    void set_bound_value(std::shared_ptr<Node> value, BOTTOM_BOUND_T type);
 
-    template<typename T>
-    void set_bound_value(T&& value, TOP_BOUND_T type);
+    void set_bound_value(std::shared_ptr<Node> value, TOP_BOUND_T type);
 
     void unset_bottom_bound();
 
@@ -59,29 +57,3 @@ class VariableBounds{
     std::unique_ptr<Bound_T<BOTTOM_BOUND_T>> bottom_bound_;
     std::unique_ptr<Bound_T<TOP_BOUND_T>> top_bound_;
 };
-
-template<typename T>
-void VariableBounds::set_bound_value(T&& value, BOTTOM_BOUND_T type){
-    if(bottom_bound_){
-        bottom_bound_->type_=type;
-        bottom_bound_->value_=std::forward<T>(value);
-    }
-    else {
-        bottom_bound_ = std::make_unique<Bound_T<BOTTOM_BOUND_T>>();
-        bottom_bound_->type_=type;
-        bottom_bound_->value_=std::forward<T>(value);
-    }
-}
-
-template<typename T>
-void VariableBounds::set_bound_value(T&& value, TOP_BOUND_T type){
-    if(top_bound_){
-        top_bound_->type_=type;
-        top_bound_->value_=std::forward<T>(value);
-    }
-    else {
-        top_bound_ = std::make_unique<Bound_T<TOP_BOUND_T>>();
-        top_bound_->type_=type;
-        top_bound_->value_=std::forward<T>(value);
-    }
-}

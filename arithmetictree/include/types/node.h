@@ -50,6 +50,11 @@ class Node{
         return childs_.at(id);
     }
 
+    void release_childs(){
+        for(auto child:childs_)
+            child.reset();
+    }
+
     bool has_childs() const{
         return !childs_.empty();
     }

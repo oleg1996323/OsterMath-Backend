@@ -13,9 +13,9 @@ class BaseData;
 
 using namespace std::string_view_literals;
 
-class VariableBase;
 class FunctionNode;
 class RangeOperationNode;
+class VariableNode;
 class Node;
 
 class BaseListener: public ParseRulesBaseListener{
@@ -23,7 +23,8 @@ class BaseListener: public ParseRulesBaseListener{
         VARDEF,
         RANGEOPERATION,
         FUNCTIONOPERATION,
-        BOUND_DEFINITION
+        BOUND_DEFINITION,
+        ARRAY_DEFINITION
     };
 
     bool is_range_operation() const;
@@ -32,21 +33,14 @@ class BaseListener: public ParseRulesBaseListener{
     bool is_bounds_definition() const;
 
     void __insert_to_variable__(const std::shared_ptr<Node>& node) const;
-    void __insert_to_variable__(std::string&& node) const;
-    void __insert_to_variable__(Value_t&& node) const;
-    void __insert_to_range_operation__(const std::shared_ptr<Node>& node) const;
-    void __insert_to_function_operation__(const std::shared_ptr<Node>& node) const;
+    void __insert_to_anonymous_node__(const std::shared_ptr<Node>& node) const;
 
     BaseData* __insert_new_data_base__(std::string&& name);
 
     BaseData* data_base_;
-    VariableBase* current_var_;
-    std::stack<std::shared_ptr<FunctionNode>> tmp_function_node_;
-    std::stack<std::shared_ptr<RangeOperationNode>> tmp_range_node_;
-    std::vector<VariableBase*> hdr_vars_; 
+    std::shared_ptr<VariableNode> current_var_;
+    std::shared_ptr<Node> anonymous_node_;
     std::stack<MODE> mode_;
-    size_t line_counter_ = 0;
-    size_t col_counter_ = 0;
 
     template<typename B_T>
     struct Bound{

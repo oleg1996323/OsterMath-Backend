@@ -57,70 +57,45 @@ const T& Result::get() const{
     return std::get<T>(*this);
 }
 
-#include <optional>
+#include <memory>
 
 class ProxySizeDepthMeasure{
     public:
-    ProxySizeDepthMeasure(size_t new_size):
-        sz_(new_size),
-        parent_(nullptr){
-        
-    }
+    ProxySizeDepthMeasure(size_t new_size);
 
-    void operator++(){
-        if(next_level_.has_value())
-            ++next_level_;
-        else increase_iterator();
-    }
+    ProxySizeDepthMeasure& operator++();
 
-    void push(size_t new_size){
-        if(next_level_.has_value())
-            next_level_->push(new_size);
-        else next_level_.emplace(new_size,this);
-    }
+    void push(size_t new_size);
 
-    size_t depth(){
-        size_t depth = 1;
-        if(next_level_.has_value())
-            next_level_->depth(depth);
-        return depth; 
-    }
+    size_t depth();
 
-    void reset_iterator(){
-        current_iterator = 0;
-        if(next_level_.has_value())
-            next_level_->reset_iterator();
-    }
+    void reset_iterator();
 
-    size_t current_iterator() const{
-        return current_iterator_;
-    }
+    size_t current_iterator(size_t depth) const;
+
+    bool is_iterable() const;
+
+    size_t size(size_t depth) const;
+
+    size_t seq_iterator(size_t depth) const;
+
+    size_t total_size_childs() const;
 
     private:
-    ProxySizeDepthMeasure(size_t new_size, ProxySizeDepthMeasure* parent):
-        sz_(new_size),
-        parent_(parent){}
+    ProxySizeDepthMeasure(size_t new_size, ProxySizeDepthMeasure* parent);
 
+    void depth(size_t& uppper_depth);
 
-    void depth(size_t& uppper_sz){
-        ++uppper_sz;
-        if(next_level.has_value())
-            depth(uppper_sz);
-        else return;
-    }
+    size_t current_iterator_ref(size_t& depth) const;
 
-    void increase_iterator(){
-        if(current_iterator_<sz_-1)
-            ++current_iterator_;
-        else {
-            current_iterator_ = 0;
-            if(parent_)
-                parent_->increase_iterator();
-        }
-    }
+    size_t size_ref(size_t& depth) const;
 
-    std::optional<ProxySizeDepthMeasure> next_level_;
+    size_t seq_iterator_ref(size_t& depth) const;
+
+    ProxySizeDepthMeasure& increase_iterator();
+
+    std::unique_ptr<ProxySizeDepthMeasure> next_level_;
     ProxySizeDepthMeasure* parent_;
     size_t sz_;
     size_t current_iterator_ = 0;
-}
+};
