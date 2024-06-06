@@ -1,7 +1,6 @@
 #include "unary_node.h"
 
-#ifdef DEBUG
-void UnaryNode::printText() const{
+std::ostream& UnaryNode::print_text(std::ostream& stream) const{
     if(operation_==UNARY_OP::ADD)
         stream<<"+"<<childs_.at(0);
     else if(operation_==UNARY_OP::SUB)
@@ -11,7 +10,11 @@ void UnaryNode::printText() const{
     else stream<<"";
     return stream;
 }
-#endif
+
+virtual std::ostream& UnaryNode::print_result(std::ostream& stream) const{
+    stream<<execute();
+    return stream;
+}
 
 Node* UnaryNode::first_undefined_child_node(){
     if(childs_.empty())
@@ -21,7 +24,7 @@ Node* UnaryNode::first_undefined_child_node(){
 }
 
 Result UnaryNode::__calculate__(){
-    switch (operation)
+    switch (operation_)
         {
         case UNARY_OP::ADD:
             return childs_.at(0)->execute();
@@ -58,6 +61,14 @@ Value_t UnaryNode::execute(size_t index){
     return 0.;
 }
 
-std::ostream& UnaryNode::operator<<(std::ostream& stream){
-    
+bool UnaryNode::is_numeric() const{
+    return childs_.at(0)->is_numeric();
+}
+
+bool UnaryNode::is_string() const{
+    return childs_.at(0)->is_string();
+}
+
+bool UnaryNode::is_array() const{
+    return childs_.at(0)->is_array();
 }

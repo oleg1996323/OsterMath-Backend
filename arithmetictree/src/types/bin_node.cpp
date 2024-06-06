@@ -57,7 +57,7 @@ Value_t BinaryNode::__calculate__(size_t index){
 }
 
 Result BinaryNode::execute(){
-    execute(0);
+    return execute(0);
 }
 
 Result BinaryNode::execute(size_t index){
@@ -80,24 +80,19 @@ Result BinaryNode::execute(size_t index){
     return 0.;
 }
 
-std::ostream& BinaryNode::printText(std::ostream& stream) const{
+std::ostream& BinaryNode::print_text(std::ostream& stream) const{
     stream<<childs_.at(0)<<(char)operation_<<childs_.at(1);
     return stream;
 }
 
-std::ostream& BinaryNode::operator<<(std::ostream& stream){
-    stream<<childs_.at(0)<<(char)operation_<<childs_.at(1);
-    return stream;
+bool BinaryNode::is_numeric() const{
+    return childs_.at(0)->is_numeric() && childs_.at(1)->is_numeric();
 }
 
-bool is_numeric() const{
-    return lhs_;
+bool BinaryNode::is_string() const{
+    return childs_.at(0)->is_string() && childs_.at(1)->is_string();
 }
 
-bool is_string() const{
-    return false;
-}
-
-bool is_array() const{
-    
+bool BinaryNode::is_array() const{
+    return childs_.at(0)->is_array() && childs_.at(1)->is_array();
 }

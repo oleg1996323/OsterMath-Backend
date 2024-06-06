@@ -1,18 +1,18 @@
 #include "val_node.h"
 
-#ifdef DEBUG
-void ValueNode::print() const{
-    std::cout<<'{'<<ENUM_NAME(ARITHM_NODE_TYPE::VALUE);
-    std::cout<<"; "<<val_<<'}'<<std::endl;
-}
-#endif
-
-
-Value_t ValueNode::get() const{
-    return val_;
-}
-
-virtual std::ostream& ValueNode::operator<<(std::ostream& stream) override{
+std::ostream& ValueNode::print_text(std::ostream& stream) const{
     stream<<val_;
     return stream;
+}
+
+bool ValueNode::is_numeric() const{
+    return true;
+}
+
+bool ValueNode::is_string() const{
+    return false;
+}
+
+bool ValueNode::is_array() const{
+    return false;
 }

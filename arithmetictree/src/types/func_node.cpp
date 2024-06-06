@@ -1,13 +1,27 @@
 #include "func_node.h"
 #include "def.h"
 
-#ifdef DEBUG
-void FunctionNode::printText() const{
+std::ostream& FunctionNode::print_text(std::ostream& stream) const{
     std::cout<<'{'<<ENUM_NAME(ARITHM_NODE_TYPE::FUNCTION);
     std::cout<<ENUM_NAME(operation());
     std::cout<<'}'<<std::endl;
 }
-#endif
+
+bool FunctionNode::is_numeric() const{
+    return std::all_of(childs_.begin(),childs_.end(),[](std::shared_ptr<Node> child){
+        return child->is_numeric();
+    });
+}
+
+bool FunctionNode::is_string() const{
+    return std::all_of(childs_.begin(),childs_.end(),[](std::shared_ptr<Node> child){
+        return child->is_string();
+    });
+}
+
+bool FunctionNode::is_array() const{
+    return false;
+}
 
 std::shared_ptr<Node> FunctionNode::child(size_t id) const{
     if(id<childs_.size())

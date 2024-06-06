@@ -74,18 +74,13 @@ class BinaryNode:public Node{
 
     }
 
-    virtual void printText() const;
-
     virtual bool is_numeric() const override;
 
     virtual bool is_string() const override;
 
     virtual bool is_array() const override;
 
-    virtual std::ostream& operator<<(std::ostream& stream) override{
-        stream<<childs_.at(0)<<(char)operation_<<childs_.at(1);
-        return stream;
-    }
+    virtual std::ostream& print_text(std::ostream& stream) const override;
 
     private:
     class __cache__{

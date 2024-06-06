@@ -25,14 +25,16 @@ class ValueNode:public Node{
     virtual Result execute(size_t index) override{
         return val_;
     }
+    
+    virtual bool is_numeric() const override;
 
-    const Value_t& get() const;
+    virtual bool is_string() const override;
+
+    virtual bool is_array() const override;
 
     virtual void insert(std::shared_ptr<Node> node) override;
 
-    virtual void printText() const;
-
-    virtual std::ostream& operator<<(std::ostream& stream) override;
+    virtual std::ostream& print_text(std::ostream& stream) const override;
 
     virtual void serialize(std::ostream& stream) override;
 

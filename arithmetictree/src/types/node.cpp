@@ -1,4 +1,3 @@
-#pragma once
 #include "node.h"
 
 void Node::refresh(){
@@ -19,4 +18,14 @@ bool Node::has_parents() const{
 
 const std::vector<std::shared_ptr<Node>>& Node::childs() const{
     return childs_;
+}
+
+std::ostream& Node::print_result(std::ostream& stream) const{
+    stream<<execute();
+    return stream;
+}
+
+std::ostream& Node::print_text(std::ostream& stream) const{
+    stream<<"#NaN"<<std::endl;
+    return stream;
 }

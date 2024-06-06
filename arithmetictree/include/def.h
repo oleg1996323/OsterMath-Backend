@@ -22,7 +22,7 @@ enum class TYPE_VAL{
     NUMERIC
 };
 
-class Result:private Result_t{
+class Result:public Result_t{
     public:
     using variant::variant;
     

@@ -2,6 +2,24 @@
 #include "arithmetic_types.h"
 #include "arithmetic_functions.h"
 #include <string>
+//using Result_t = std::variant<std::monostate,Value_t, std::string, ArrayNode*, VariableNode*>;
+// struct visitorResult{
+//     std::monostate operator()(Result&& result){
+//         return result.get<std::monostate>();
+//     }
+
+//     Value_t operator()(const Value_t& result){
+//         return result;
+//     }
+
+//     const std::string& operator()(Result&& result){
+//         return std::get<std::string>(result);
+//     }
+
+//     ArrayNode* operator()(Result&& result){
+//         return std::get<std::string>(result);
+//     }
+// };
 
 Result_t& Result::get(){
     return *this;
@@ -31,9 +49,14 @@ bool Result::has_value() const{
     return !std::holds_alternative<std::monostate>(*this);
 }
 
+std::ostream& operator<<(std::ostream& os, std::monostate null_val){
+    os<<nullptr;
+    return os;
+}
+
 std::ostream& Result::operator<<(std::ostream& os)
 {
-    std::visit([&os](auto&& arg) {
+    std::visit([this,&os](auto&& arg) {
         os << arg;
     }, *this);
     return os;

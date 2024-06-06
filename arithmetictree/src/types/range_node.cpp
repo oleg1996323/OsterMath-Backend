@@ -54,7 +54,7 @@ const std::unordered_set<VariableNode*>& RangeOperationNode::get_dependencies() 
     return expression().get_dependencies();
 }
 
-std::ostream& RangeOperationNode::operator<<(std::ostream& stream){
+std::ostream& RangeOperationNode::print_text(std::ostream& stream) const{
     if(operation_==RANGE_OP::PROD)
         stream<<"prod_i(";
     else if(operation_==RANGE_OP::SUM)
@@ -66,4 +66,25 @@ std::ostream& RangeOperationNode::operator<<(std::ostream& stream){
     stream<<")";
     return stream;
     }
+}
+
+std::ostream& RangeOperationNode::print_result(std::ostream& stream) const{
+    stream<<execute();
+    return stream;
+}
+
+bool RangeNode::is_numeric() const{
+    return std::all_of(childs_.begin(),childs_.end(),[](std::shared_ptr<Node> child){
+        return child->is_numeric();
+    });
+}
+
+bool RangeNode::is_string() const{
+    return std::all_of(childs_.begin(),childs_.end(),[](std::shared_ptr<Node> child){
+        return child->is_string();
+    });
+}
+
+bool RangeNode::is_array() const{
+    return false;
 }

@@ -30,7 +30,7 @@ class RangeOperationNode:public Node{
 
     const std::unordered_set<VariableNode*>& get_dependencies() const;
 
-    virtual void printText() const;
+    virtual std::ostream& print_text(std::ostream& stream) const override;
 
     std::shared_ptr<Node>& expression();
 
@@ -40,11 +40,15 @@ class RangeOperationNode:public Node{
 
     virtual void deserialize(std::ostream& stream) override;
 
+    virtual bool is_numeric() const override;
+
+    virtual bool is_string() const override;
+
+    virtual bool is_array() const override;
+
     size_t range_length() const{
         return range_size;
     }
-
-    virtual std::ostream& operator<<(std::ostream& stream) override;
 
     private:
 

@@ -86,10 +86,6 @@ void ArrayNode::deserialize(std::ostream& stream){
 
 }
 
-void ArrayNode::printText() const{
-
-}
-
 bool ArrayNode::is_numeric() const{
     return std::all_of(childs_.begin(),childs_.end(),[](std::shared_ptr<Node> child){
         return child->is_numeric();
@@ -104,4 +100,13 @@ bool ArrayNode::is_string() const{
 
 bool ArrayNode::is_array() const{
     return true;
+}
+
+std::ostream& ArrayNode::print_text(std::ostream& stream) const{
+    stream<<'[';
+    for(auto child:childs_){
+        stream<<child;
+    }
+    stream<<']';
+    return stream;
 }

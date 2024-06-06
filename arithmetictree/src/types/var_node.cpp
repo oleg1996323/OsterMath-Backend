@@ -1,11 +1,10 @@
 #include "var_node.h"
+#include "types.h"
 
-#ifdef DEBUG
-void VariableNode::print() const{
-    std::cout<<'{'<<ENUM_NAME(ARITHM_NODE_TYPE::VARIABLE);
-    std::cout<<var_->name()<<'}'<<std::endl;
+std::ostream& VariableNode::print_text(std::ostream& stream) const{
+    stream<<"VAR(!('"<<var_->get_data_base_name()<<"\')#"<<var_->name()<<"\'="<<!childs_.empty()?child(0)->print_text():"NaN";
+    return stream;
 }
-#endif
 
 VariableNode::VariableNode(VariableBase* variable):
     var_(variable){}
@@ -73,12 +72,6 @@ Value_t VariableNode::execute(size_t index){
 
 }
 
-void VariableNode::add_parent(Node* parent){
-    if(parents_.contains(parent))
-        parents_.erase(parent);
-    parents_.insert(parent);
-}
-
 void VariableNode::refresh_parent_links() const{
     for(auto iterator_node = parents_.begin();iterator_node!=parents_.end();++iterator_node)
         if(!(*iterator_node))
@@ -87,31 +80,21 @@ void VariableNode::refresh_parent_links() const{
 
 bool VariableNode::is_numeric() const{
     if(childs_.size()==1){
-        if(childs_.at(0)->type()==NODE_TYPE::ARRAY)
-            return reinterpret_cast<const std::shared_ptr<ArrayNode>&>(childs_.at(0))->is_numeric();
-        else if(childs_.at(0)->type()==NODE_TYPE::VARIABLE)
-            return reinterpret_cast<const std::shared_ptr<VariableNode>&>(childs_.at(0))->is_numeric();
-        else
-            return true;
+        childs_.at(0)->is_numeric();
     }
     else return false;
 }
 
 bool VariableNode::is_string() const{
     if(childs_.size()==1){
-        if(childs_.at(0)->type()==NODE_TYPE::ARRAY)
-            return reinterpret_cast<const std::shared_ptr<ArrayNode>&>(childs_.at(0))->is_string();
-        else if(childs_.at(0)->type()==NODE_TYPE::VARIABLE)
-            return reinterpret_cast<const std::shared_ptr<VariableNode>&>(childs_.at(0))->is_string();
-        else
-            return false;
+        childs_.at(0)->is_string();
     }
     else return false;
 }
 
-std::ostream& VariableNode::operator<<(std::ostream& stream){
-    if(!childs_.empty())
-        stream<<childs_.at(0);
-    else stream<<"NULL";
-    return stream;
+bool VariableNode::is_array() const{
+    if(childs_.size()==1){
+        childs_.at(0)->is_array();
+    }
+    else return false;
 }

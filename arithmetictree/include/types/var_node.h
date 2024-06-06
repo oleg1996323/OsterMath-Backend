@@ -34,19 +34,17 @@ class VariableNode:public Node{
 
     virtual Result execute(size_t index) override;
 
-    virtual void printText() const;
-
-    virtual std::ostream& operator<<(std::ostream& stream) override;
-
-    virtual void add_parent(Node* parent) override;
+    virtual std::ostream& print_text(std::ostream& stream) const override;
 
     virtual void serialize(std::ostream& stream) override;
 
     virtual void deserialize(std::ostream& stream) override;
 
-    bool is_numeric() const;
+    virtual bool is_numeric() const override;
 
-    bool is_string() const;
+    virtual bool is_string() const override;
+
+    virtual bool is_array() const override;
 
     private:
     mutable std::unordered_set<VariableNode*> var_dependence_;

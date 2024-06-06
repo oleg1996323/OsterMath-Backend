@@ -41,18 +41,7 @@ class ArrayNode:public Node{
 
     virtual bool is_array() const override;
 
-    virtual void printText() const override;
-
-    virtual std::ostream& operator<<(std::ostream& stream) override{
-        stream<<'[';
-        if(!childs_.empty()){
-            for(auto child:childs_){
-                stream<<child;
-            }
-        }
-        stream<<']';
-        return stream;
-    }
+    virtual std::ostream& print_text(std::ostream& stream) const override;
 
     virtual void add_parent(Node*);
 

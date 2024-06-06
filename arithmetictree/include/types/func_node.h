@@ -79,7 +79,13 @@ class FunctionNode:public Node{
 
     virtual Result execute(size_t index) override;
 
-    virtual void printText() const;
+    virtual std::ostream& print_text(std::ostream& stream) const override;
+
+    virtual bool is_numeric() const override;
+
+    virtual bool is_string() const override;
+
+    virtual bool is_array() const override;
 
     private:
 
@@ -94,8 +100,6 @@ class FunctionNode:public Node{
     virtual void serialize(std::ostream& stream) override;
 
     virtual void deserialize(std::ostream& stream) override;
-
-    virtual std::ostream& operator<<(std::ostream& stream) override;
 
     FUNCTION_OP operation_;
     mutable std::unordered_set<VariableNode*> var_dependence_;

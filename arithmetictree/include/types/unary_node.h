@@ -41,6 +41,12 @@ class UnaryNode:public Node{
 
     virtual Result execute(size_t index) override;
 
+    virtual bool is_numeric() const override;
+
+    virtual bool is_string() const override;
+
+    virtual bool is_array() const override;
+
     virtual void serialize(std::ostream& stream) override{
 
     }
@@ -49,18 +55,7 @@ class UnaryNode:public Node{
 
     }
 
-    virtual void printText() const;
-
-    virtual std::ostream& operator<<(std::ostream& stream) override{
-        if(operation_==UNARY_OP::ADD)
-            stream<<"+"<<childs_.at(0);
-        else if(operation_==UNARY_OP::SUB)
-            stream<<"-"<<childs_.at(0);
-        else if(operation_==UNARY_OP::PARENS)
-            stream<<"("<<childs_.at(0)<<")";
-        else stream<<"";
-        return stream;
-    }
+    virtual std::ostream& print_text(std::ostream& stream) const override;
 
     private:
     Result __calculate__();

@@ -71,14 +71,6 @@ class Node{
 
     void refresh();
 
-    bool is_numeric() const{
-        for(auto& child:childs_)
-            if(child->is_numeric())
-                continue;
-            else return false;
-        return true;
-    }
-
     virtual void insert(std::shared_ptr<Node> node) = 0;
 
     virtual void serialize(std::ostream& stream) = 0;
@@ -92,17 +84,13 @@ class Node{
             else continue;
     }
 
-    virtual std::ostream& print_text(std::ostream& stream) const{
-        std::cout<<"Undef node"<<std::endl;
-    }
+    virtual std::ostream& print_text(std::ostream& stream) const;
 
-    virtual std::ostream& print_result(std::ostream& stream){
-        stream<<execute();
-    }
+    std::ostream& print_result(std::ostream& stream) const;
 
     virtual ~Node(){}
 
-    virtual void add_parent(Node*);
+    void add_parent(Node*);
 
     bool has_parents() const;
 
