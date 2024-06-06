@@ -2,7 +2,7 @@
 #include "def.h"
 
 #ifdef DEBUG
-void FunctionNode::print() const{
+void FunctionNode::printText() const{
     std::cout<<'{'<<ENUM_NAME(ARITHM_NODE_TYPE::FUNCTION);
     std::cout<<ENUM_NAME(operation());
     std::cout<<'}'<<std::endl;
@@ -80,7 +80,7 @@ Result FunctionNode::execute(){
                     cache_.emplace(functions::Arithmetic::Product(std::move(params)));
                     break;
                 }
-                default: 
+                default:
                     throw std::invalid_argument("Unknown multiargument operation");
             }
         }
@@ -142,4 +142,38 @@ const std::unordered_set<VariableNode*>& FunctionNode::get_dependencies() const{
                 var_dependence_.insert(it);
     }
     return var_dependence_;
+}
+
+std::ostream& FunctionNode::operator<<(std::ostream& stream){
+    if(operation_==FUNCTION_OP::ACOS)
+        stream<<"acos(";
+    else if(operation_==FUNCTION_OP::COS)
+        stream<<"cos(";
+    else if(operation_==FUNCTION_OP::ASIN)
+        stream<<"asin(";
+    else if(operation_==FUNCTION_OP::SIN)
+        stream<<"sin(";
+    else if(operation_==FUNCTION_OP::EXP)
+        stream<<"exp(";
+    else if(operation_==FUNCTION_OP::FACTORIAL)
+        stream<<"factorial(";
+    else if(operation_==FUNCTION_OP::LG10)
+        stream<<"lg10(";
+    else if(operation_==FUNCTION_OP::LN)
+        stream<<"ln(";
+    else if(operation_==FUNCTION_OP::LOG_BASE)
+        stream<<"log_x(";
+    else if(operation_==FUNCTION_OP::PROD)
+        stream<<"prod(";
+    else if(operation_==FUNCTION_OP::SUM)
+        stream<<"sum(";
+    else if(operation_==FUNCTION_OP::SUMPRODUCT)
+        stream<<"sumproduct(";
+    else stream<<"";
+
+    for(auto child:childs_){
+        stream<<child;
+    stream<<")";
+    return stream;
+    }
 }

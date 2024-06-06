@@ -80,20 +80,24 @@ Result BinaryNode::execute(size_t index){
     return 0.;
 }
 
-
-#ifdef DEBUG
-void BinaryNode::print() const{
-    std::cout<<'{'<<ENUM_NAME(NODE_TYPE::BINARY);
-    std::cout<<"; ";
-    if(operation_==BINARY_OP::ADD){
-        std::cout<<ENUM_NAME(BINARY_OP::ADD);}
-    else if(operation_==BINARY_OP::SUB){
-        std::cout<<ENUM_NAME(BINARY_OP::SUB);}
-    else if(operation_==BINARY_OP::MUL){
-        std::cout<<ENUM_NAME(BINARY_OP::MUL);}
-    else if(operation_==BINARY_OP::DIV){
-        std::cout<<ENUM_NAME(BINARY_OP::DIV);}
-    else std::cout<<ENUM_NAME(BINARY_OP::POW);
-    std::cout<<'}'<<std::endl;
+std::ostream& BinaryNode::printText(std::ostream& stream) const{
+    stream<<childs_.at(0)<<(char)operation_<<childs_.at(1);
+    return stream;
 }
-#endif
+
+std::ostream& BinaryNode::operator<<(std::ostream& stream){
+    stream<<childs_.at(0)<<(char)operation_<<childs_.at(1);
+    return stream;
+}
+
+bool is_numeric() const{
+    return lhs_;
+}
+
+bool is_string() const{
+    return false;
+}
+
+bool is_array() const{
+    
+}

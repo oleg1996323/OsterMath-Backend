@@ -70,7 +70,7 @@ Value_t VariableNode::execute(size_t index){
         throw std::invalid_argument("Invalid type of variable: not array or numeric");
     }
     else throw std::runtime_error("Uninitialized variable");
-    
+
 }
 
 void VariableNode::add_parent(Node* parent){
@@ -91,7 +91,7 @@ bool VariableNode::is_numeric() const{
             return reinterpret_cast<const std::shared_ptr<ArrayNode>&>(childs_.at(0))->is_numeric();
         else if(childs_.at(0)->type()==NODE_TYPE::VARIABLE)
             return reinterpret_cast<const std::shared_ptr<VariableNode>&>(childs_.at(0))->is_numeric();
-        else 
+        else
             return true;
     }
     else return false;
@@ -103,8 +103,15 @@ bool VariableNode::is_string() const{
             return reinterpret_cast<const std::shared_ptr<ArrayNode>&>(childs_.at(0))->is_string();
         else if(childs_.at(0)->type()==NODE_TYPE::VARIABLE)
             return reinterpret_cast<const std::shared_ptr<VariableNode>&>(childs_.at(0))->is_string();
-        else 
+        else
             return false;
     }
     else return false;
+}
+
+std::ostream& VariableNode::operator<<(std::ostream& stream){
+    if(!childs_.empty())
+        stream<<childs_.at(0);
+    else stream<<"NULL";
+    return stream;
 }

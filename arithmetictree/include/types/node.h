@@ -15,8 +15,8 @@ class RangeOperationNode;
 
 enum class NODE_TYPE{
     UNARY,
-    BINARY, 
-    VALUE, 
+    BINARY,
+    VALUE,
     VARIABLE,
     RANGEOP,
     FUNCTION,
@@ -31,7 +31,7 @@ class Node{
         childs_([&sz](){std::vector<std::shared_ptr<Node>> vector;
                         vector.reserve(sz);
                         return vector;}()){}
-    
+
     Node() =default;
 
     virtual NODE_TYPE type() const = 0;
@@ -63,6 +63,12 @@ class Node{
         return childs_.size()>id;
     }
 
+    virtual bool is_numeric() const = 0;
+
+    virtual bool is_string() const = 0;
+
+    virtual bool is_array() const = 0;
+
     void refresh();
 
     bool is_numeric() const{
@@ -86,11 +92,13 @@ class Node{
             else continue;
     }
 
-    #ifdef DEBUG
-    virtual void print() const{
+    virtual std::ostream& print_text(std::ostream& stream) const{
         std::cout<<"Undef node"<<std::endl;
     }
-    #endif
+
+    virtual std::ostream& print_result(std::ostream& stream){
+        stream<<execute();
+    }
 
     virtual ~Node(){}
 

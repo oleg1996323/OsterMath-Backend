@@ -8,7 +8,7 @@ class VariableBase;
 class VariableNode:public Node{
     public:
     VariableNode(VariableBase* variable);
-    
+
     virtual NODE_TYPE type() const override{
         return NODE_TYPE::VARIABLE;
     }
@@ -34,11 +34,11 @@ class VariableNode:public Node{
 
     virtual Result execute(size_t index) override;
 
-    #ifdef DEBUG
-    virtual void print() const;
-    #endif
+    virtual void printText() const;
 
-    virtual void add_parent(Node* parent) override; 
+    virtual std::ostream& operator<<(std::ostream& stream) override;
+
+    virtual void add_parent(Node* parent) override;
 
     virtual void serialize(std::ostream& stream) override;
 
@@ -50,7 +50,7 @@ class VariableNode:public Node{
 
     private:
     mutable std::unordered_set<VariableNode*> var_dependence_;
-    VariableBase* var_; 
+    VariableBase* var_;
 
     void refresh_parent_links() const;
 };

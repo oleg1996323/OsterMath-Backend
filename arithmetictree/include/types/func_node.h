@@ -19,8 +19,8 @@ enum class FUNCTION_OP{
     SUMPRODUCT
 };
 
-constexpr bool ARRAY_TYPE_FUNCTION [int(FUNCTION_OP::SUMPRODUCT)+1] = 
-{   
+constexpr bool ARRAY_TYPE_FUNCTION [int(FUNCTION_OP::SUMPRODUCT)+1] =
+{
     /*LN*/{false},
     /*LG10*/{false},
     /*EXP*/{false},
@@ -30,8 +30,8 @@ constexpr bool ARRAY_TYPE_FUNCTION [int(FUNCTION_OP::SUMPRODUCT)+1] =
     /*ASIN*/{false},
     /*FACTORIAL*/{false},
     /*LOG_X*/{false},
-    /*SUM*/{true}, 
-    /*PROD*/{true}, 
+    /*SUM*/{true},
+    /*PROD*/{true},
     /*SUMPRODUCT*/{true}};
 
 //0 - if 1 or more
@@ -45,8 +45,8 @@ constexpr size_t NUMBER_OF_ARGUMENT [int(FUNCTION_OP::SUMPRODUCT)+1] = {
     /*ASIN*/{1},
     /*FACTORIAL*/{1},
     /*LOG_X*/{2},
-    /*SUM*/{0}, 
-    /*PROD*/{0}, 
+    /*SUM*/{0},
+    /*PROD*/{0},
     /*SUMPRODUCT*/{0}};
 
 class FunctionNode:public Node{
@@ -79,9 +79,7 @@ class FunctionNode:public Node{
 
     virtual Result execute(size_t index) override;
 
-    #ifdef DEBUG
-    virtual void print() const;
-    #endif
+    virtual void printText() const;
 
     private:
 
@@ -97,11 +95,12 @@ class FunctionNode:public Node{
 
     virtual void deserialize(std::ostream& stream) override;
 
-    
+    virtual std::ostream& operator<<(std::ostream& stream) override;
+
     FUNCTION_OP operation_;
     mutable std::unordered_set<VariableNode*> var_dependence_;
     std::optional<Value_t> cache_;
     bool array_type_function;
-    
+
     //auto __register_array_input__();
 };

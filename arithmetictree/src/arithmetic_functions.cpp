@@ -102,7 +102,7 @@ Value_t functions::Arithmetic::SumProduct(std::vector<std::shared_ptr<ArrayNode>
         }
     }
 
-    result = std::accumulate(value_vector.begin(),value_vector.end(),0);
+    result = std::accumulate(value_vector.begin(),value_vector.end(),Value_t(0));
     return result;
     // for(size_t i=0;i<arrays.front()->size();++i){
     //     Value_t product = 1.;

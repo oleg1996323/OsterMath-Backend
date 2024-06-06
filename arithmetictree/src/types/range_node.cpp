@@ -53,3 +53,17 @@ void RangeOperationNode::refresh(){
 const std::unordered_set<VariableNode*>& RangeOperationNode::get_dependencies() const{
     return expression().get_dependencies();
 }
+
+std::ostream& RangeOperationNode::operator<<(std::ostream& stream){
+    if(operation_==RANGE_OP::PROD)
+        stream<<"prod_i(";
+    else if(operation_==RANGE_OP::SUM)
+        stream<<"sum_i(";
+    else stream<<"";
+
+    for(auto child:childs_){
+        stream<<child;
+    stream<<")";
+    return stream;
+    }
+}

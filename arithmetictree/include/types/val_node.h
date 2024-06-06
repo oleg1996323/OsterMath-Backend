@@ -3,7 +3,7 @@
 #include "node.h"
 
 class ValueNode:public Node{
-    public:   
+    public:
     ValueNode(Value_t&& value):val_(std::move(value)){}
 
     ValueNode(const Value_t& value):val_(value){}
@@ -30,9 +30,9 @@ class ValueNode:public Node{
 
     virtual void insert(std::shared_ptr<Node> node) override;
 
-    #ifdef DEBUG
-    virtual void print() const;
-    #endif
+    virtual void printText() const;
+
+    virtual std::ostream& operator<<(std::ostream& stream) override;
 
     virtual void serialize(std::ostream& stream) override;
 

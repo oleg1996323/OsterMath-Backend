@@ -30,9 +30,7 @@ class RangeOperationNode:public Node{
 
     const std::unordered_set<VariableNode*>& get_dependencies() const;
 
-    #ifdef DEBUG
-    virtual void print() const;
-    #endif
+    virtual void printText() const;
 
     std::shared_ptr<Node>& expression();
 
@@ -45,6 +43,8 @@ class RangeOperationNode:public Node{
     size_t range_length() const{
         return range_size;
     }
+
+    virtual std::ostream& operator<<(std::ostream& stream) override;
 
     private:
 

@@ -31,6 +31,14 @@ bool Result::has_value() const{
     return !std::holds_alternative<std::monostate>(*this);
 }
 
+std::ostream& Result::operator<<(std::ostream& os)
+{
+    std::visit([&os](auto&& arg) {
+        os << arg;
+    }, *this);
+    return os;
+}
+
 ProxySizeDepthMeasure::ProxySizeDepthMeasure(size_t new_size):
     parent_(nullptr),
     sz_(new_size>0?new_size:throw std::invalid_argument("Argument cannot be 0"))

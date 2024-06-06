@@ -25,24 +25,6 @@ std::ostream& operator<<(std::ostream& stream, const Arr_value& val){
     return stream;
 }
 
-std::ostream& operator<<(std::ostream& stream, const Array_t& arr){
-    stream<<'[';
-    if(!arr.empty()){
-        if(arr.front().is_variable() && arr.front().get<VariableBase*>()!=nullptr)
-            stream<<arr.front().get<VariableBase*>()->get();
-        else
-            stream<<arr.front().get();
-        for(size_t i=1;i<arr.size();++i){
-            if(arr.at(i).is_variable() && arr.at(i).get<VariableBase*>()!=nullptr)
-                stream<<' '<<arr.at(i).get<VariableBase*>()->get();
-            else
-            stream<<' '<<arr.at(i).get();
-        }
-    }
-    stream<<']';
-    return stream;
-}
-
 std::ostream& operator<<(std::ostream& stream, std::monostate empty){
     return stream;
 }

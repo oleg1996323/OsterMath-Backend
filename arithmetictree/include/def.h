@@ -33,6 +33,8 @@ class Result:private Result_t{
     template<typename T>
     T& get();
 
+    std::ostream& operator<<(std::ostream& os);
+
     template<typename T>
     const T& get() const;
 
@@ -44,7 +46,12 @@ class Result:private Result_t{
 
     bool is_variable() const;
 
-    bool has_value() const;    
+    bool has_value() const;
+
+    private:
+    struct ResultVisitor{
+        
+    };
 };
 
 template<typename T>
@@ -62,6 +69,8 @@ const T& Result::get() const{
 class ProxySizeDepthMeasure{
     public:
     ProxySizeDepthMeasure(size_t new_size);
+
+    ProxySizeDepthMeasure(size_t new_size, ProxySizeDepthMeasure* parent);
 
     ProxySizeDepthMeasure& operator++();
 
@@ -82,8 +91,6 @@ class ProxySizeDepthMeasure{
     size_t total_size_childs() const;
 
     private:
-    ProxySizeDepthMeasure(size_t new_size, ProxySizeDepthMeasure* parent);
-
     void depth(size_t& uppper_depth);
 
     size_t current_iterator_ref(size_t& depth) const;

@@ -1,9 +1,15 @@
 #include "unary_node.h"
 
 #ifdef DEBUG
-void UnaryNode::print() const{
-    std::cout<<'{'<<ENUM_NAME(ARITHM_NODE_TYPE::UNARY);
-    std::cout<<'}'<<std::endl;
+void UnaryNode::printText() const{
+    if(operation_==UNARY_OP::ADD)
+        stream<<"+"<<childs_.at(0);
+    else if(operation_==UNARY_OP::SUB)
+        stream<<"-"<<childs_.at(0);
+    else if(operation_==UNARY_OP::PARENS)
+        stream<<"("<<childs_.at(0)<<")";
+    else stream<<"";
+    return stream;
 }
 #endif
 
@@ -50,4 +56,8 @@ Value_t UnaryNode::execute(size_t index){
     else
         throw std::runtime_error("Undefined unary operation");
     return 0.;
+}
+
+std::ostream& UnaryNode::operator<<(std::ostream& stream){
+    
 }

@@ -23,10 +23,6 @@ class ArrayNode:public Node{
 
     virtual void deserialize(std::ostream& stream) override;
 
-    bool is_numeric() const;
-
-    bool is_string() const;
-
     size_t size() const;
 
     bool empty() const;
@@ -39,9 +35,24 @@ class ArrayNode:public Node{
 
     std::vector<std::shared_ptr<Node>>::iterator end();
 
-    #ifdef DEBUG
-    virtual void print() const override;
-    #endif
+    virtual bool is_numeric() const override;
+
+    virtual bool is_string() const override;
+
+    virtual bool is_array() const override;
+
+    virtual void printText() const override;
+
+    virtual std::ostream& operator<<(std::ostream& stream) override{
+        stream<<'[';
+        if(!childs_.empty()){
+            for(auto child:childs_){
+                stream<<child;
+            }
+        }
+        stream<<']';
+        return stream;
+    }
 
     virtual void add_parent(Node*);
 

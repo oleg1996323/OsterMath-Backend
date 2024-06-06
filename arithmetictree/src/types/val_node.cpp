@@ -11,3 +11,8 @@ void ValueNode::print() const{
 Value_t ValueNode::get() const{
     return val_;
 }
+
+virtual std::ostream& ValueNode::operator<<(std::ostream& stream) override{
+    stream<<val_;
+    return stream;
+}

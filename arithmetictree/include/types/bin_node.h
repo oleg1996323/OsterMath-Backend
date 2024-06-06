@@ -3,11 +3,11 @@
 #include "node.h"
 
 enum class BINARY_OP{
-    ADD,
-    SUB,
-    MUL,
-    DIV,
-    POW
+    ADD='+',
+    SUB='-',
+    MUL='*',
+    DIV='/',
+    POW='^'
 };
 
 class BinaryNode:public Node{
@@ -74,9 +74,18 @@ class BinaryNode:public Node{
 
     }
 
-    #ifdef DEBUG
-    virtual void print() const;
-    #endif
+    virtual void printText() const;
+
+    virtual bool is_numeric() const override;
+
+    virtual bool is_string() const override;
+
+    virtual bool is_array() const override;
+
+    virtual std::ostream& operator<<(std::ostream& stream) override{
+        stream<<childs_.at(0)<<(char)operation_<<childs_.at(1);
+        return stream;
+    }
 
     private:
     class __cache__{

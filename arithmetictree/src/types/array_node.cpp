@@ -37,10 +37,6 @@ size_t ArrayNode::size() const{
     return childs_.size();
 }
 
-std::shared_ptr<Node>& ArrayNode::child_depth(size_t& depth, size_t abs_id) const{
-    return childs_;
-}
-
 bool ArrayNode::empty() const{
     return childs_.empty();
 }
@@ -90,30 +86,22 @@ void ArrayNode::deserialize(std::ostream& stream){
 
 }
 
-#ifdef DEBUG
-void ArrayNode::print() const{
-    
+void ArrayNode::printText() const{
+
 }
-#endif
 
 bool ArrayNode::is_numeric() const{
-    return std::all_of(childs_.begin(),childs_.end(),[](const std::shared_ptr<Node>& node){
-        if(node->type()==NODE_TYPE::ARRAY)
-            return reinterpret_cast<const std::shared_ptr<ArrayNode>&>(node)->is_numeric();
-        else if(node->type()==NODE_TYPE::VARIABLE)
-            return reinterpret_cast<const std::shared_ptr<VariableNode>&>(node)->is_numeric();
-        else 
-            return true;
+    return std::all_of(childs_.begin(),childs_.end(),[](std::shared_ptr<Node> child){
+        return child->is_numeric();
     });
 }
 
 bool ArrayNode::is_string() const{
-    return std::all_of(childs_.begin(),childs_.end(),[](const std::shared_ptr<Node>& node){
-        if(node->type()==NODE_TYPE::ARRAY)
-            return reinterpret_cast<const std::shared_ptr<ArrayNode>&>(node)->is_string();
-        else if(node->type()==NODE_TYPE::VARIABLE)
-            return reinterpret_cast<const std::shared_ptr<VariableNode>&>(node)->is_string();
-        else 
-            return true;
+    return std::all_of(childs_.begin(),childs_.end(),[](std::shared_ptr<Node> child){
+        return child->is_string();
     });
+}
+
+bool ArrayNode::is_array() const{
+    return true;
 }

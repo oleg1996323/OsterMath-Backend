@@ -8,13 +8,18 @@ enum class UNARY_OP{
     PARENS
 };
 
+class MultiArgumentNode;
+class BinaryNode;
+class ValueNode;
+class VariableNode;
+
 class UnaryNode:public Node{
     friend MultiArgumentNode;
     friend BinaryNode;
     friend ValueNode;
     friend VariableNode;
     public:
-    UnaryNode(UNARY_OP op):operation(op){}
+    UnaryNode(UNARY_OP op):operation_(op){}
 
     virtual Node* first_undefined_child_node() override;
 
@@ -44,11 +49,20 @@ class UnaryNode:public Node{
 
     }
 
-    #ifdef DEBUG
-    virtual void print() const;
-    #endif
+    virtual void printText() const;
+
+    virtual std::ostream& operator<<(std::ostream& stream) override{
+        if(operation_==UNARY_OP::ADD)
+            stream<<"+"<<childs_.at(0);
+        else if(operation_==UNARY_OP::SUB)
+            stream<<"-"<<childs_.at(0);
+        else if(operation_==UNARY_OP::PARENS)
+            stream<<"("<<childs_.at(0)<<")";
+        else stream<<"";
+        return stream;
+    }
 
     private:
     Result __calculate__();
-    UNARY_OP operation;
+    UNARY_OP operation_;
 };
