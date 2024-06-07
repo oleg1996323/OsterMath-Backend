@@ -37,9 +37,9 @@ class UnaryNode:public Node{
 
     virtual void insert(std::shared_ptr<Node> node) override;
 
-    virtual Result execute() override;
+    virtual const Result& execute() override;
 
-    virtual Result execute(size_t index) override;
+    virtual const Result& execute(size_t index) override;
 
     virtual bool is_numeric() const override;
 

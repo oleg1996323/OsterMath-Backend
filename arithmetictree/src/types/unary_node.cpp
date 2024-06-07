@@ -1,4 +1,5 @@
 #include "unary_node.h"
+#include "def.h"
 
 std::ostream& UnaryNode::print_text(std::ostream& stream) const{
     if(operation_==UNARY_OP::ADD)
@@ -8,11 +9,6 @@ std::ostream& UnaryNode::print_text(std::ostream& stream) const{
     else if(operation_==UNARY_OP::PARENS)
         stream<<"("<<childs_.at(0)<<")";
     else stream<<"";
-    return stream;
-}
-
-virtual std::ostream& UnaryNode::print_result(std::ostream& stream) const{
-    stream<<execute();
     return stream;
 }
 
@@ -30,7 +26,7 @@ Result UnaryNode::__calculate__(){
             return childs_.at(0)->execute();
             break;
         case UNARY_OP::SUB:
-            return (-1)*(childs_.at(0)->execute());
+            return (-1)*(childs_.at(0)->execute().get<Value_t>());
             break;
         case UNARY_OP::PARENS:
             return childs_.at(0)->execute();

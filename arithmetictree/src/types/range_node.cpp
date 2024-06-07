@@ -1,17 +1,7 @@
 #include "range_node.h"
+#include "def.h"
 
-#ifdef DEBUG
-void RangeOperationNode::print() const{
-    std::cout<<'{'<<ENUM_NAME(ARITHM_NODE_TYPE::RANGEOP);
-    if(operation_==RANGE_OP::PROD)
-        std::cout<<ENUM_NAME(RANGE_OP::PROD);
-    if(operation_==RANGE_OP::SUM)
-        std::cout<<ENUM_NAME(RANGE_OP::SUM);
-    std::cout<<'}'<<std::endl;
-}
-#endif
-
-Value_t RangeOperationNode::execute(){
+Result RangeOperationNode::execute(){
     Value_t result;
     if(!__checking_childs__())
         throw std::invalid_argument("Invalid input of variables");
@@ -28,30 +18,8 @@ Value_t RangeOperationNode::execute(){
     return result;
 }
 
-Value_t RangeOperationNode::execute(size_t index){
+Result RangeOperationNode::execute(size_t index){
     return range_expression.execute(index);
-}
-
-ranges::ArithmeticTree& RangeOperationNode::expression(){
-    return range_expression;
-}
-
-const ranges::ArithmeticTree& RangeOperationNode::expression() const{
-    return range_expression;
-}
-
-//can has only one parent (unlike the variable node)
-void RangeOperationNode::refresh(){
-    execute();
-    if(has_parent()){
-        caller_ = true;
-        parent_->refresh();
-        caller_ = false;
-    }
-}
-
-const std::unordered_set<VariableNode*>& RangeOperationNode::get_dependencies() const{
-    return expression().get_dependencies();
 }
 
 std::ostream& RangeOperationNode::print_text(std::ostream& stream) const{
@@ -68,23 +36,49 @@ std::ostream& RangeOperationNode::print_text(std::ostream& stream) const{
     }
 }
 
-std::ostream& RangeOperationNode::print_result(std::ostream& stream) const{
-    stream<<execute();
-    return stream;
-}
-
-bool RangeNode::is_numeric() const{
+bool RangeOperationNode::is_numeric() const{
     return std::all_of(childs_.begin(),childs_.end(),[](std::shared_ptr<Node> child){
         return child->is_numeric();
     });
 }
 
-bool RangeNode::is_string() const{
+bool RangeOperationNode::is_string() const{
     return std::all_of(childs_.begin(),childs_.end(),[](std::shared_ptr<Node> child){
         return child->is_string();
     });
 }
 
-bool RangeNode::is_array() const{
+bool RangeOperationNode::is_array() const{
     return false;
+}
+
+//checks the childs types and them correct vals types
+//Childs should be only numeric variable-arrays and have same length
+bool RangeOperationNode::__checking_childs__() const{
+    for(auto& child:childs_){
+        if(child->type()==NODE_TYPE::ARRAY){
+            ArrayNode* ptr = reinterpret_cast<ArrayNode*>(child.get());
+            if(ptr->first_undefined_child_node()!=nullptr)
+                throw std::runtime_error("Incorrect initialization of array");
+            if(ptr->is_numeric()){
+                if(range_size==0){
+                    if((range_size=ptr->size())==0)
+                        throw std::invalid_argument("Null size array input in range function");
+                    else continue;
+                }
+                else {
+                    if(range_size!=ptr->size())
+                        throw std::invalid_argument("Unequal size array input in range function");
+                    else continue;
+                }
+            }
+            else {
+                throw std::invalid_argument("Not numeric array data");
+                return false;
+            }
+
+        }
+        else return false;
+    }
+    return range_size;
 }

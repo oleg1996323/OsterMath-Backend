@@ -62,6 +62,10 @@ class VariableBase: public FormattingData{
     std::optional<Value_t> get_bottom_bound(std::string_view,std::string_view);
 
     std::string_view get_data_base_name() const;
+
+    Result& result();
+
+    const Result& result() const;
     
     void serialize(std::ostream& stream){
         using namespace serialization;

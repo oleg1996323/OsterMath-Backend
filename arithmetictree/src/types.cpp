@@ -20,24 +20,11 @@ void VariableBase::print(){
     get_stream()<<*this<<std::endl;
 }
 
-std::ostream& operator<<(std::ostream& stream, const Arr_value& val){
-    std::visit([&stream](const auto& x) { stream << x; }, val);
+std::ostream& operator<<(std::ostream& stream, const Result& val){
+    std::visit([&stream](const auto& x) { stream << x;}, val);
     return stream;
 }
 
-std::ostream& operator<<(std::ostream& stream, std::monostate empty){
-    return stream;
-}
-
-std::ostream& operator<<(std::ostream& stream, const Variable_t& var){
-    std::visit([&stream](const auto& x) { stream << std::defaultfloat<<x; }, var);
-    return stream;
-}
-
-std::ostream& operator<<(std::ostream& stream, const ArithmeticTree& tree){
-    stream<<std::defaultfloat<<tree.value();
-    return stream;
-}
 
 VariableBase::VariableBase(std::string_view name, BaseData* data_base):
     name_(name),
@@ -64,12 +51,16 @@ BaseData* VariableBase::get_data_base() const{
     return data_base_;
 }
 
-Variable_t& VariableBase::get(){
-    return *this;
+const Result& VariableBase::result() const{
+    return node_->execute();
 }
 
-const Variable_t& VariableBase::get() const{
-    return *this;
+void print_result() const{
+
+}
+
+void print_text() const{
+
 }
 
 const std::shared_ptr<VariableNode>& VariableBase::node() const{
@@ -155,8 +146,4 @@ std::optional<Value_t> VariableBase::get_bottom_bound(std::string_view data_base
 
 std::string_view VariableBase::get_data_base_name() const{
     return data_base_->name();
-}
-
-const std::unordered_set<VariableNode*>& Array_t::get_dependencies() const{
-    return var_dependence_;
 }

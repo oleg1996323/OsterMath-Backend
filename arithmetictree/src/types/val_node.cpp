@@ -16,3 +16,7 @@ bool ValueNode::is_string() const{
 bool ValueNode::is_array() const{
     return false;
 }
+
+bool ValueNode::refer_to(std::string_view var_name) const {
+    return false;
+}

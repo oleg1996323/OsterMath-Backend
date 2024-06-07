@@ -38,9 +38,9 @@ class Node{
 
     virtual Node* first_undefined_child_node() = 0;
 
-    virtual Result execute() = 0;
+    virtual const Result& execute() = 0;
 
-    virtual Result execute(size_t index) = 0;
+    virtual const Result& execute(size_t index) = 0;
 
     const std::shared_ptr<Node>& child(size_t id) const{
         return childs_.at(id);
@@ -77,13 +77,6 @@ class Node{
 
     virtual void deserialize(std::ostream& stream) = 0;
 
-    bool refer_to(std::string_view var_name) const{
-        for(auto& child:childs_)
-            if(child->refer_to(var_name))
-                return true;
-            else continue;
-    }
-
     virtual std::ostream& print_text(std::ostream& stream) const;
 
     std::ostream& print_result(std::ostream& stream) const;
@@ -93,6 +86,8 @@ class Node{
     void add_parent(Node*);
 
     bool has_parents() const;
+
+    bool refer_to(std::string_view var_name) const;
 
     bool caller() const{
         return caller_;

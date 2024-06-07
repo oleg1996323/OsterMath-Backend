@@ -1,4 +1,7 @@
 #include "node.h"
+#include "def.h"
+#include "var_node.h"
+#include "types.h"
 
 void Node::refresh(){
     execute();
@@ -28,4 +31,18 @@ std::ostream& Node::print_result(std::ostream& stream) const{
 std::ostream& Node::print_text(std::ostream& stream) const{
     stream<<"#NaN"<<std::endl;
     return stream;
+}
+
+bool VariableNode::refer_to(std::string_view var_name) const{
+    if(childs_.empty()){
+        return false;
+    }
+    else {
+        for(auto& child:childs_){
+            if(child->type()==NODE_TYPE::VARIABLE && 
+            reinterpret_cast<const std::shared_ptr<VariableNode>&>(child)->variable()->name()==var_name)
+                return true;
+            else return child->refer_to(var_name);
+        }
+    }
 }

@@ -24,9 +24,9 @@ class BinaryNode:public Node{
 
     virtual Node* first_undefined_child_node() override;
 
-    virtual Result execute() override;
+    virtual const Result& execute() override;
 
-    virtual Result execute(size_t index) override;
+    virtual const Result& execute(size_t index) override;
 
     std::shared_ptr<Node>& lhs(){
         return child(0);

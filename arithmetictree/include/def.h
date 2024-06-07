@@ -12,7 +12,7 @@ class VariableNode;
 
 using Value_t = boost::multiprecision::cpp_dec_float_50;
 using Bound_types = std::variant<std::monostate,Value_t, std::shared_ptr<ExpressionNode>, std::shared_ptr<VariableNode>>;
-using Result_t = std::variant<std::monostate,Value_t, std::string, std::shared_ptr<ArrayNode>, std::shared_ptr<VariableNode>>;
+using Result_t = std::variant<std::monostate,Value_t,std::string, std::shared_ptr<ArrayNode>, std::shared_ptr<VariableNode>>;
 
 #define ENUM_NAME(p) #p;
 

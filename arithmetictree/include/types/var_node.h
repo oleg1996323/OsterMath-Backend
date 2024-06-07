@@ -24,15 +24,15 @@ class VariableNode:public Node{
         return nullptr;
     }
 
-    const VariableBase* variable() const;
+    const VariableBase* variable() const noexcept;
 
     VariableBase* variable();
 
     virtual void insert(std::shared_ptr<Node> node) override;
 
-    virtual Result execute() override;
+    virtual const Result& execute() override;
 
-    virtual Result execute(size_t index) override;
+    virtual const Result& execute(size_t index) override;
 
     virtual std::ostream& print_text(std::ostream& stream) const override;
 
@@ -47,7 +47,6 @@ class VariableNode:public Node{
     virtual bool is_array() const override;
 
     private:
-    mutable std::unordered_set<VariableNode*> var_dependence_;
     VariableBase* var_;
 
     void refresh_parent_links() const;

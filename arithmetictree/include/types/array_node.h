@@ -13,9 +13,9 @@ class ArrayNode:public Node{
 
     virtual Node* first_undefined_child_node() override;
 
-    virtual Result execute() override;
+    virtual const Result& execute() override;
 
-    virtual Result execute(size_t index) override;
+    virtual const Result& execute(size_t index) override;
 
     virtual void insert(std::shared_ptr<Node> node) override;
 
@@ -46,5 +46,4 @@ class ArrayNode:public Node{
     virtual void add_parent(Node*);
 
     protected:
-    mutable std::unordered_set<VariableNode*> var_dependence_;
 };

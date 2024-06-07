@@ -75,9 +75,9 @@ class FunctionNode:public Node{
 
     virtual void insert(std::shared_ptr<Node> node) override;
 
-    virtual Result execute() override;
+    virtual const Result& execute() override;
 
-    virtual Result execute(size_t index) override;
+    virtual const Result& execute(size_t index) override;
 
     virtual std::ostream& print_text(std::ostream& stream) const override;
 
@@ -89,21 +89,12 @@ class FunctionNode:public Node{
 
     private:
 
-    bool __is_variable_node__(size_t index) const{
-        return childs_.at(index)->type()==NODE_TYPE::VARIABLE;
-    }
-
-    bool __is_simple_node__(size_t index) const{
-        return !(childs_.at(index)->type()==NODE_TYPE::VARIABLE);
-    }
-
     virtual void serialize(std::ostream& stream) override;
 
     virtual void deserialize(std::ostream& stream) override;
 
     FUNCTION_OP operation_;
-    mutable std::unordered_set<VariableNode*> var_dependence_;
-    std::optional<Value_t> cache_;
+    Result cache_;
     bool array_type_function;
 
     //auto __register_array_input__();

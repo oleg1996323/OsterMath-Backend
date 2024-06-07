@@ -18,11 +18,11 @@ class ValueNode:public Node{
         return nullptr;
     }
 
-    virtual Result execute() override{
+    virtual const Result& execute() override{
         return val_;
     }
 
-    virtual Result execute(size_t index) override{
+    virtual const Result& execute(size_t index) override{
         return val_;
     }
     

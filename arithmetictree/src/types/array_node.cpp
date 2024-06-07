@@ -59,23 +59,13 @@ std::vector<std::shared_ptr<Node>>::iterator ArrayNode::end(){
 
 void ArrayNode::insert(std::shared_ptr<Node> node){
     if(!childs_.empty()){
-        for(std::shared_ptr<Node> child:childs_){
-            Node* undef = child->first_undefined_child_node();
-            if(undef){
-                undef->insert(node);
-                if(node->type()==NODE_TYPE::VARIABLE)
-                    var_dependence_.insert(reinterpret_cast<VariableNode*>(node.get()));
-                return;
-            }
-        }
+        for(std::shared_ptr<Node> child:childs_)
+            child->first_undefined_child_node()->insert(node);
     }
 
     if(childs_.size()<childs_.capacity())
         childs_.push_back(node);
     else throw std::runtime_error("Invalid array initialization");
-
-    if(node->type()==NODE_TYPE::VARIABLE)
-        var_dependence_.insert(reinterpret_cast<VariableNode*>(node.get()));
 }
 
 void ArrayNode::serialize(std::ostream& stream){
