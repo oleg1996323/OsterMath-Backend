@@ -2,7 +2,6 @@
 #include <boost/multiprecision/cpp_dec_float.hpp>
 
 class VariableNode;
-class ExpressionNode;
 class Node;
 class ArrayNode;
 class VariableNode;
@@ -11,8 +10,8 @@ class VariableNode;
 
 
 using Value_t = boost::multiprecision::cpp_dec_float_50;
-using Bound_types = std::variant<std::monostate,Value_t, std::shared_ptr<ExpressionNode>, std::shared_ptr<VariableNode>>;
-using Result_t = std::variant<std::monostate,Value_t,std::string, std::shared_ptr<ArrayNode>, std::shared_ptr<VariableNode>>;
+using Bound_types = std::variant<std::monostate,Node*>;
+using Result_t = std::variant<std::monostate,Value_t,std::string, Node*>;
 
 #define ENUM_NAME(p) #p;
 
@@ -33,26 +32,25 @@ class Result:public Result_t{
     template<typename T>
     T& get();
 
-    std::ostream& operator<<(std::ostream& os);
-
     template<typename T>
     const T& get() const;
 
-    bool is_array() const;
+    std::ostream& operator<<(std::ostream& os);
 
     bool is_value() const;
 
     bool is_string() const;
 
-    bool is_variable() const;
+    bool is_node() const;
+
+    bool is_array() const;
 
     bool has_value() const;
 
     private:
-    struct ResultVisitor{
-        
-    };
 };
+
+std::ostream& operator<<(std::ostream& os, const Result&);
 
 template<typename T>
 T& Result::get(){
@@ -72,7 +70,7 @@ class ProxySizeDepthMeasure{
 
     ProxySizeDepthMeasure(size_t new_size, ProxySizeDepthMeasure* parent);
 
-    ProxySizeDepthMeasure& operator++();
+    bool operator++();
 
     void push(size_t new_size);
 
@@ -80,26 +78,26 @@ class ProxySizeDepthMeasure{
 
     void reset_iterator();
 
-    size_t current_iterator(size_t depth) const;
+    size_t current_iterator(int32_t depth) const;
 
     bool is_iterable() const;
 
     size_t size(size_t depth) const;
 
-    size_t seq_iterator(size_t depth) const;
+    size_t seq_iterator(int32_t depth) const;
 
     size_t total_size_childs() const;
 
     private:
     void depth(size_t& uppper_depth);
 
-    size_t current_iterator_ref(size_t& depth) const;
+    size_t current_iterator_ref(int32_t& depth) const;
 
     size_t size_ref(size_t& depth) const;
 
-    size_t seq_iterator_ref(size_t& depth) const;
+    size_t seq_iterator_ref(int32_t& depth) const;
 
-    ProxySizeDepthMeasure& increase_iterator();
+    bool increase_iterator();
 
     std::unique_ptr<ProxySizeDepthMeasure> next_level_;
     ProxySizeDepthMeasure* parent_;

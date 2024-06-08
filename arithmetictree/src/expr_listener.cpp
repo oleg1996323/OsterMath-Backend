@@ -43,7 +43,12 @@ bool BaseListener::is__array_item_definition() const{
     return !mode_.empty() && mode_.top()==MODE::ARRAY_ITEM_DEFINITION;
 }
 
-void BaseListener::__insert_to_node__(const std::shared_ptr<Node>& node) const{
+void BaseListener::__insert_to_prec_node__(MODE mode_assert_check){
+    assert(mode_.top()==mode_assert_check);
+    mode_.pop();
+    assert(!anonymous_node_.empty());
+    auto node = anonymous_node_.top();
+    anonymous_node_.pop();
     assert(!anonymous_node_.empty());
     anonymous_node_.top()->insert(node);
 }
@@ -52,28 +57,48 @@ BaseData* BaseListener::__insert_new_data_base__(std::string&& name){
     return data_base_->get_pool()->add_data(name);
 }
 
+void BaseListener::enterParens(ParseRulesParser::ParensContext* ctx){
+    assert(!mode_.empty());
+    mode_.push(MODE::EXPRESSION);
+    if(ctx)
+        anonymous_node_.push(std::make_shared<UnaryNode>(UNARY_OP::PARENS));
+    else assert(false);
+}
+
+void BaseListener::exitParens(ParseRulesParser::ParensContext* ctx){
+    __insert_to_prec_node__(MODE::EXPRESSION);
+}
+
 void BaseListener::enterVariable(ParseRulesParser::VariableContext *ctx) {
     assert(!mode_.empty());
-            
+    mode_.push(MODE::VALUE);
     BaseData* db_tmp;
     if(ctx->DATABASE())
         db_tmp = __insert_new_data_base__(ctx->DATABASE()->getText());
     else db_tmp = data_base_;
 
     VariableBase* ptr = db_tmp->add_variable(ctx->VARIABLE()->getText()).get();
-    __insert_to_node__(ptr->node());
+    anonymous_node_.push(ptr->node());
+
+    //unknown how to add node
+}
+
+void BaseListener::exitVariable(ParseRulesParser::VariableContext *ctx) {
+    __insert_to_prec_node__(MODE::VALUE);
 }
 
 void BaseListener::enterUnaryOp(ParseRulesParser::UnaryOpContext *ctx) {
     assert(!mode_.empty());
-    if(is_variable_definition()){
-        current_var_->insert(std::make_shared<UnaryNode>(ctx->ADD()?UNARY_OP::ADD:UNARY_OP::SUB));
-    }
+    mode_.push(MODE::EXPRESSION);
+    if(ctx->ADD())
+        anonymous_node_.push(std::make_shared<UnaryNode>(UNARY_OP::ADD));
+    else if(ctx->SUB())
+        anonymous_node_.push(std::make_shared<UnaryNode>(UNARY_OP::SUB));
     else assert(false);
 }
 
 void BaseListener::exitUnaryOp(ParseRulesParser::UnaryOpContext* ctx)  {
-    return;
+    __insert_to_prec_node__(MODE::EXPRESSION);
 }
 
 void BaseListener::enterLiteral(ParseRulesParser::LiteralContext *ctx) {
@@ -84,53 +109,44 @@ void BaseListener::exitLiteral(ParseRulesParser::LiteralContext *ctx) {
     return;
 }
 
-void BaseListener::enterParens(ParseRulesParser::ParensContext *ctx) {
-    return;
-}
-
-void BaseListener::exitParens(ParseRulesParser::ParensContext *ctx) {
-    return;
-}
-
 //a connstant definition {for example: Lg(Expr)}
 void BaseListener::enterConstant(ParseRulesParser::ConstantContext *ctx) {
-    if(is_variable_definition()){
-        if(ctx->EXP()){
-            anonymous_node_.top()->insert(std::make_shared<ValueNode>(boost::math::constants::e<Value_t>()));
-        }
-        else if(ctx->PI()){
-            anonymous_node_.top()->insert(std::make_shared<ValueNode>(boost::math::constants::pi<Value_t>()));
-        }
-        else
-            throw std::runtime_error("Error parsing constant");
-        return;
+    assert(!mode_.empty());
+    mode_.push(MODE::VALUE);
+    if(ctx->EXP()){
+        anonymous_node_.push(std::make_shared<ValueNode>(boost::math::constants::e<Value_t>()));
     }
-    else throw std::runtime_error("Error when added constant value");
+    else if(ctx->PI()){
+        anonymous_node_.push(std::make_shared<ValueNode>(boost::math::constants::pi<Value_t>()));
+    }
+    else
+        throw std::runtime_error("Error parsing constant");
+    return;
 }
 
 void BaseListener::exitConstant(ParseRulesParser::ConstantContext *ctx) {
-    return;
+    __insert_to_prec_node__(MODE::VALUE);
 }
 
 //binary operator {for example: Expr + Expr or Expr / Expr}
 void BaseListener::enterBinaryOp(ParseRulesParser::BinaryOpContext *ctx) {
-    //entering in the arithmetictree of range_function
-    assert(is_expression_definition());
+    assert(!mode_.empty());
+    mode_.push(MODE::EXPRESSION);
     if(ctx->ADD())
-        anonymous_node_.top()->insert(std::make_shared<BinaryNode>(BINARY_OP::ADD));
+        anonymous_node_.push(std::make_shared<BinaryNode>(BINARY_OP::ADD));
     else if(ctx->SUB())
-        anonymous_node_.top()->insert(std::make_shared<BinaryNode>(BINARY_OP::SUB));
+        anonymous_node_.push(std::make_shared<BinaryNode>(BINARY_OP::SUB));
     else if(ctx->MUL())
-        anonymous_node_.top()->insert(std::make_shared<BinaryNode>(BINARY_OP::MUL));
+        anonymous_node_.push(std::make_shared<BinaryNode>(BINARY_OP::MUL));
     else if(ctx->DIV())
-        anonymous_node_.top()->insert(std::make_shared<BinaryNode>(BINARY_OP::DIV));
+        anonymous_node_.push(std::make_shared<BinaryNode>(BINARY_OP::DIV));
     else
-        anonymous_node_.top()->insert(std::make_shared<BinaryNode>(BINARY_OP::POW));
+        anonymous_node_.push(std::make_shared<BinaryNode>(BINARY_OP::POW));
     return;
 }
 
 void BaseListener::exitBinaryOp(ParseRulesParser::BinaryOpContext *ctx) {
-    return;
+    __insert_to_prec_node__(MODE::EXPRESSION);
 }
 
 //an array definition {for example: [1,2,3,...]}
@@ -141,26 +157,32 @@ void BaseListener::enterArray(ParseRulesParser::ArrayContext *ctx) {
 }
 
 void BaseListener::exitArray(ParseRulesParser::ArrayContext *ctx) {
-    assert(mode_.top()==MODE::ARRAY_DEFINITION);
-    mode_.pop();
-    return;
+    __insert_to_prec_node__(MODE::ARRAY_DEFINITION);
 }
 
 void BaseListener::enterNumber(ParseRulesParser::NumberContext* ctx){
-    anonymous_node_.top()->insert(std::make_shared<ValueNode>(ctx->getText()));
+    assert(!mode_.empty());
+    mode_.push(MODE::VALUE);
+    anonymous_node_.push(std::make_shared<ValueNode>(ctx->getText()));
+}
+
+void BaseListener::exitNumber(ParseRulesParser::NumberContext* ctx){
+    __insert_to_prec_node__(MODE::VALUE);
 }
 
 void BaseListener::enterMultiargfunction(ParseRulesParser::MultiargfunctionContext* ctx){
-    mode_.push(MODE::FUNCTIONOPERATION);
+    assert(!mode_.empty());
+    mode_.push(MODE::MULTIARGFUNCTION);
     if(ctx->PRODUCT())
-        anonymous_node_.push(std::make_unique<FunctionNode>(FUNCTION_OP::PROD));
+        anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::PROD,ctx->expr().size()));
     else if(ctx->SUMPRODUCT())
-        anonymous_node_.push(std::make_unique<FunctionNode>(FUNCTION_OP::SUMPRODUCT));
+        anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::SUMPRODUCT,ctx->expr().size()));
     else if(ctx->SUM())
-        anonymous_node_.push(std::make_unique<FunctionNode>(FUNCTION_OP::SUM));
+        anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::SUM,ctx->expr().size()));
 }
 
 void BaseListener::enterFunction(ParseRulesParser::FunctionContext* ctx){
+    assert(!mode_.empty());
     mode_.push(MODE::FUNCTIONOPERATION);
     if(ctx){
         if(ctx->EXP())
@@ -186,28 +208,25 @@ void BaseListener::enterFunction(ParseRulesParser::FunctionContext* ctx){
 }
 
 void BaseListener::enterRangefunction(ParseRulesParser::RangefunctionContext* ctx){
-    assert(ctx);
+    assert(!mode_.empty());
     mode_.push(MODE::RANGEOPERATION);
     if(ctx->SUM_I())
         anonymous_node_.push(std::make_shared<RangeOperationNode>(RANGE_OP::SUM));
     else if(ctx->PRODUCT_I())
         anonymous_node_.push(std::make_shared<RangeOperationNode>(RANGE_OP::PROD));
     else throw std::invalid_argument("Invalid type of function");
-    assert(anonymous_node_.top()->type()==NODE_TYPE::RANGEOP);
 }
 
 void BaseListener::exitFunction(ParseRulesParser::FunctionContext* ctx){
-    
+    __insert_to_prec_node__(MODE::FUNCTIONOPERATION);
 }
 
 void BaseListener::exitMultiargfunction(ParseRulesParser::MultiargfunctionContext* ctx){
-    
+    __insert_to_prec_node__(MODE::MULTIARGFUNCTION);
 }
 
 void BaseListener::exitRangefunction(ParseRulesParser::RangefunctionContext* ctx){
-    assert(!mode_.empty());
-    mode_.pop();
-    
+    __insert_to_prec_node__(MODE::RANGEOPERATION);
 }
 
 void BaseListener::enterLess(ParseRulesParser::LessContext* ctx){
@@ -233,11 +252,14 @@ void BaseListener::enterLess(ParseRulesParser::LessContext* ctx){
         if(ctx->variable_parameter()->VARIABLE())
             top_.emplace(db_tmp->name(),db_tmp->add_variable(ctx->variable_parameter()->VARIABLE()->getText()).get()->name(),TOP_BOUND_T::LESS);
         else assert(false);
+        mode_.push(MODE::BOUND_DEFINITION);
     }
     else assert(false);
 }
 
-void BaseListener::exitLess(ParseRulesParser::LessContext* ctx){}
+void BaseListener::exitLess(ParseRulesParser::LessContext* ctx){
+    __insert_to_prec_node__(MODE::BOUND_DEFINITION);
+}
 
 void BaseListener::enterLess_equal(ParseRulesParser::Less_equalContext* ctx){
     assert(mode_.empty());
@@ -267,7 +289,9 @@ void BaseListener::enterLess_equal(ParseRulesParser::Less_equalContext* ctx){
     else assert(false);
 }
 
-void BaseListener::exitLess_equal(ParseRulesParser::Less_equalContext* ctx){}
+void BaseListener::exitLess_equal(ParseRulesParser::Less_equalContext* ctx){
+    __insert_to_prec_node__(MODE::BOUND_DEFINITION);
+}
 
 void BaseListener::enterLarger(ParseRulesParser::LargerContext* ctx){
     assert(mode_.empty());
@@ -297,7 +321,9 @@ void BaseListener::enterLarger(ParseRulesParser::LargerContext* ctx){
     else assert(false);
 }
 
-void BaseListener::exitLarger(ParseRulesParser::LargerContext* ctx){}
+void BaseListener::exitLarger(ParseRulesParser::LargerContext* ctx){
+    __insert_to_prec_node__(MODE::BOUND_DEFINITION);
+}
 
 void BaseListener::enterLarger_equal(ParseRulesParser::Larger_equalContext* ctx){
     assert(mode_.empty());
@@ -327,7 +353,9 @@ void BaseListener::enterLarger_equal(ParseRulesParser::Larger_equalContext* ctx)
     else assert(false);
 }
 
-void BaseListener::exitLarger_equal(ParseRulesParser::Larger_equalContext* ctx){}
+void BaseListener::exitLarger_equal(ParseRulesParser::Larger_equalContext* ctx){
+    __insert_to_prec_node__(MODE::BOUND_DEFINITION);
+}
 
 void BaseListener::visitErrorNode(antlr4::tree::ErrorNode* node){
     throw ParsingError("Error input. Prompt: " + node->getText());
@@ -361,22 +389,22 @@ void BaseListener::exitVardefinition(ParseRulesParser::VardefinitionContext * ct
     mode_.pop();
 }
 
+void BaseListener::enterItemArray(ParseRulesParser::ItemArrayContext *ctx){
+    assert(!mode_.empty());
+    assert(mode_.top()==MODE::ARRAY_DEFINITION);
+    mode_.push(MODE::ARRAY_ITEM_DEFINITION);
+}
+
+void BaseListener::exitItemArray(ParseRulesParser::ItemArrayContext *ctx){
+    assert(!mode_.empty());
+    assert(mode_.top()==MODE::ARRAY_ITEM_DEFINITION);
+    mode_.pop();
+}
+
 void BaseListener::enterComparision(ParseRulesParser::ComparisionContext* ctx){
     assert(mode_.empty());
     assert(anonymous_node_.empty());
     mode_.push(MODE::BOUND_DEFINITION);
-}
-
-void BaseListener::enterItemArray(ParseRulesParser::ItemArrayContext *ctx){
-    if(ctx->expr()) //а надо ли оно?
-        enterExpr(ctx->expr());
-    return;
-}
-
-void BaseListener::exitItemArray(ParseRulesParser::ItemArrayContext *ctx){
-    if(ctx->expr())
-        exitExpr(ctx->expr());
-    return;
 }
 
 void BaseListener::exitComparision(ParseRulesParser::ComparisionContext* ctx){

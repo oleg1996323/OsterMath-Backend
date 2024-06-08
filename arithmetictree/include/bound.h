@@ -40,10 +40,6 @@ class VariableBounds{
     bool is_in_bounds(Value_t&&) const;
 
     bool is_in_bounds(const Value_t&) const;
-
-    bool is_in_bounds(const std::string&) const;
-
-    bool is_in_bounds(std::string&&) const;
     
     void set_bound_value(std::shared_ptr<Node> value, BOTTOM_BOUND_T type);
 

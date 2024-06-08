@@ -3,82 +3,86 @@
 
 Result RangeOperationNode::execute(){
     Value_t result;
-    if(!__checking_childs__())
-        throw std::invalid_argument("Invalid input of variables");
+    childs_.clear();
+    range_expression->get_array_childs(childs_);
+    define_range_length();
     if(operation_==RANGE_OP::SUM)
         result = 0.;
     else if(operation_==RANGE_OP::PROD)
         result = 1.;
     for(size_t i=0;i<range_size;++i){
         if(operation_==RANGE_OP::SUM)
-            result+=execute(i);
+            result+=execute(i).get<Value_t>();
         else if(operation_==RANGE_OP::PROD)
-            result*=execute(i);
+            result*=execute(i).get<Value_t>();
     }
     return result;
 }
 
 Result RangeOperationNode::execute(size_t index){
-    return range_expression.execute(index);
+    if(range_expression)
+        return range_expression->execute(index);
+    else return 0.;
 }
 
-std::ostream& RangeOperationNode::print_text(std::ostream& stream) const{
+void RangeOperationNode::print_text(std::ostream& stream) const{
     if(operation_==RANGE_OP::PROD)
-        stream<<"prod_i(";
+        stream<<"product_i(";
     else if(operation_==RANGE_OP::SUM)
         stream<<"sum_i(";
     else stream<<"";
 
     for(auto child:childs_){
-        stream<<child;
-    stream<<")";
-    return stream;
+        range_expression->print_text(stream);
     }
+    stream<<")";
+}
+
+void RangeOperationNode::print_result(std::ostream& stream) const{
+    stream<<const_cast<RangeOperationNode*>(this)->execute();
 }
 
 bool RangeOperationNode::is_numeric() const{
-    return std::all_of(childs_.begin(),childs_.end(),[](std::shared_ptr<Node> child){
-        return child->is_numeric();
-    });
+    if(range_expression)
+        return range_expression->is_numeric();
+    else return false;
 }
 
 bool RangeOperationNode::is_string() const{
-    return std::all_of(childs_.begin(),childs_.end(),[](std::shared_ptr<Node> child){
-        return child->is_string();
-    });
+    if(range_expression)
+        return range_expression->is_string();
+    else return false;
 }
 
 bool RangeOperationNode::is_array() const{
     return false;
 }
 
-//checks the childs types and them correct vals types
-//Childs should be only numeric variable-arrays and have same length
-bool RangeOperationNode::__checking_childs__() const{
-    for(auto& child:childs_){
-        if(child->type()==NODE_TYPE::ARRAY){
-            ArrayNode* ptr = reinterpret_cast<ArrayNode*>(child.get());
-            if(ptr->first_undefined_child_node()!=nullptr)
-                throw std::runtime_error("Incorrect initialization of array");
-            if(ptr->is_numeric()){
-                if(range_size==0){
-                    if((range_size=ptr->size())==0)
-                        throw std::invalid_argument("Null size array input in range function");
-                    else continue;
-                }
-                else {
-                    if(range_size!=ptr->size())
-                        throw std::invalid_argument("Unequal size array input in range function");
-                    else continue;
-                }
-            }
-            else {
-                throw std::invalid_argument("Not numeric array data");
-                return false;
-            }
+void RangeOperationNode::insert(std::shared_ptr<Node> node){
+    range_expression = node;
+    node->add_parent(this);
+}
 
+void RangeOperationNode::serialize(std::ostream& stream){
+    
+}
+
+void RangeOperationNode::deserialize(std::ostream& stream){
+
+}
+
+void RangeOperationNode::define_range_length(){
+    size_t sz = 0;
+    for (auto child:childs_){
+        if(sz==0){
+            sz = reinterpret_cast<std::shared_ptr<ArrayNode>&>(child)->size();
+            if(sz==0)
+                throw std::invalid_argument("Empty array argument to range-operation-function");
         }
-        else return false;
+        else{
+            if(reinterpret_cast<std::shared_ptr<ArrayNode>&>(child)->size()!=sz)
+                throw std::invalid_argument("Innegal sizes of range-operation-function arguments");
+        }
     }
-    return range_size;
+    range_size = sz;
 }

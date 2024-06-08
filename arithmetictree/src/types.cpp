@@ -3,28 +3,13 @@
 #include "arithmetic_types.h"
 #include "data.h"
 
-std::ostream& VariableBase::operator<<(std::ostream& stream){
-    if(get_type()!=FormattingData::OUTPUT_TYPE::DEFAULT){
-        stream<<std::setprecision(get_precision());
-        if(get_type()==FormattingData::OUTPUT_TYPE::SCIENTIFIC)
-            stream<<std::scientific;
-        else if(get_type()==FormattingData::OUTPUT_TYPE::FIXED)
-            stream<<std::fixed;
-        else throw std::runtime_error("Unknown format");
-    }
-    stream<<*this;
-    return stream;
+void VariableBase::print_result(){
+    get_stream()<<result()<<std::endl;
 }
 
-void VariableBase::print(){
-    get_stream()<<*this<<std::endl;
+void VariableBase::print_text(){
+    get_stream()<<text()<<std::endl;
 }
-
-std::ostream& operator<<(std::ostream& stream, const Result& val){
-    std::visit([&stream](const auto& x) { stream << x;}, val);
-    return stream;
-}
-
 
 VariableBase::VariableBase(std::string_view name, BaseData* data_base):
     name_(name),
@@ -51,16 +36,29 @@ BaseData* VariableBase::get_data_base() const{
     return data_base_;
 }
 
-const Result& VariableBase::result() const{
+Result VariableBase::result(){
     return node_->execute();
 }
 
-void print_result() const{
-
+Result VariableBase::result() const{
+    return node_->execute();
 }
 
-void print_text() const{
+std::string VariableBase::text(){
+    std::ostringstream stream;
+    node_->print_text(stream);
+    stream<<" = ";
+    if(node_->has_childs()){
+        node_->child(0)->print_text(stream);
+    }
+    else stream<<"#NAN";
+    return stream.str();
+}
 
+std::string VariableBase::text() const{
+    std::ostringstream stream;
+    node_->print_text(stream);
+    return stream.str();
 }
 
 const std::shared_ptr<VariableNode>& VariableBase::node() const{
@@ -76,15 +74,15 @@ bool VariableBase::is_expression() const{
 }
 
 bool VariableBase::is_value() const{
-    return node_->has_childs() && node_->type() == NODE_TYPE::VALUE;
+    return node_->has_childs() && node_->is_numeric();
 }
 
 bool VariableBase::is_string() const{
-    return node_->has_childs() && node_->type() == NODE_TYPE::STRING;
+    return node_->has_childs() && node_->is_string();
 }
 
 bool VariableBase::is_array() const{
-    return node_->has_childs() && node_->type() == NODE_TYPE::ARRAY;
+    return node_->has_childs() && node_->is_array();
 }
 
 bool VariableBase::is_undef() const{
@@ -92,20 +90,7 @@ bool VariableBase::is_undef() const{
 }
 
 bool VariableBase::is_numeric() const{
-    return !is_undef() && !is_string() && !(is_array() && this->get<Array_t>().type()!=TYPE::STRING);
-}
-
-void VariableBase::value_to_tree(){
-    if(is_value()){
-        ArithmeticTree tree(this);
-        tree.insert(std::make_shared<ValueNode>(std::move(get<Value_t>())));
-        this->get()=std::move(tree);
-    }
-}
-
-void VariableBase::tree_to_value(){
-    if(is_arithmetic_tree())
-        get() = get<ArithmeticTree>().value();
+    return node_->is_numeric();
 }
 
 VariableBase::~VariableBase(){}
@@ -113,11 +98,9 @@ VariableBase::~VariableBase(){}
 bool VariableBase::is_in_bounds(std::string_view data_base,std::string_view name) const{
     if(bounds_.contains(data_base))
         if(bounds_.at(data_base).contains(name)){
-            const VariableBase& var = *data_base_->get_pool()->get(data_base)->get(name);
-            if(var.is_arithmetic_tree())
-                return bounds_.at(data_base).at(name).is_in_bounds(var);
-            else if(var.is_value())
-                return bounds_.at(data_base).at(name).is_in_bounds(var);
+            VariableBase* var = data_base_->get_pool()->get(data_base)->get(name);
+            if(var->is_numeric() && !var->is_array())
+                return bounds_.at(data_base).at(name).is_in_bounds(var->result().get<Value_t>());
             else return true;
         }
         else return true;
@@ -146,4 +129,26 @@ std::optional<Value_t> VariableBase::get_bottom_bound(std::string_view data_base
 
 std::string_view VariableBase::get_data_base_name() const{
     return data_base_->name();
+}
+
+void VariableBase::set_bottom_bound_value(std::string_view data_base,std::string_view var_name,std::shared_ptr<Node> value, BOTTOM_BOUND_T type){
+    bounds_[data_base][var_name].set_bound_value(value,type);
+    #ifdef DEBUG
+    std::cout << var_name<<' ';
+    if(type == BOTTOM_BOUND_T::LARGER)
+        std::cout<<"larger than ";
+    else std::cout<<"larger or equal than ";
+    std::cout<<value<<" in "<<name()<<std::endl;
+    #endif
+}
+
+void VariableBase::set_top_bound_value(std::string_view data_base,std::string_view var_name,std::shared_ptr<Node> value, TOP_BOUND_T type){
+    bounds_[data_base][var_name].set_bound_value(value,type);
+    #ifdef DEBUG
+    std::cout << var_name<<' ';
+    if(type == TOP_BOUND_T::LESS)
+        std::cout<<"less than ";
+    else std::cout<<"less or equal than ";
+    std::cout<<value<<" in "<<name()<<std::endl;
+    #endif
 }

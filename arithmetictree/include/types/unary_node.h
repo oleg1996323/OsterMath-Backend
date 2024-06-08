@@ -21,8 +21,6 @@ class UnaryNode:public Node{
     public:
     UnaryNode(UNARY_OP op):operation_(op){}
 
-    virtual Node* first_undefined_child_node() override;
-
     virtual NODE_TYPE type() const override{
         return NODE_TYPE::UNARY;
     }
@@ -37,9 +35,9 @@ class UnaryNode:public Node{
 
     virtual void insert(std::shared_ptr<Node> node) override;
 
-    virtual const Result& execute() override;
+    virtual Result execute() override;
 
-    virtual const Result& execute(size_t index) override;
+    virtual Result execute(size_t index) override;
 
     virtual bool is_numeric() const override;
 
@@ -55,7 +53,9 @@ class UnaryNode:public Node{
 
     }
 
-    virtual std::ostream& print_text(std::ostream& stream) const override;
+    virtual void print_text(std::ostream& stream) const override;
+
+    virtual void print_result(std::ostream& stream) const override;
 
     private:
     Result __calculate__();

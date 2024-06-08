@@ -18,17 +18,15 @@ class RangeOperationNode:public Node{
         return NODE_TYPE::RANGEOP;
     }
 
-    virtual Node* first_undefined_child_node() override{
-        return nullptr;
-    }
+    virtual Result execute() override;
 
-    virtual const Result& execute() override;
-
-    virtual const Result& execute(size_t index) override;
+    virtual Result execute(size_t index) override;
 
     virtual void insert(std::shared_ptr<Node> node) override;
 
-    virtual std::ostream& print_text(std::ostream& stream) const override;
+    virtual void print_text(std::ostream& stream) const override;
+
+    virtual void print_result(std::ostream& stream) const override;
 
     virtual void serialize(std::ostream& stream) override;
 
@@ -46,9 +44,7 @@ class RangeOperationNode:public Node{
 
     private:
 
-    //checks the childs types and them correct vals types
-    //Childs should be only numeric variable-arrays and have same length
-    bool __checking_childs__() const;
+    void define_range_length();
 
     mutable size_t range_size = 0;
     std::shared_ptr<Node> range_expression;

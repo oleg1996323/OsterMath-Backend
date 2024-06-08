@@ -23,26 +23,37 @@ const std::vector<std::shared_ptr<Node>>& Node::childs() const{
     return childs_;
 }
 
-std::ostream& Node::print_result(std::ostream& stream) const{
-    stream<<execute();
-    return stream;
+Result Node::execute() const{
+    return const_cast<Node*>(this)->execute();
 }
 
-std::ostream& Node::print_text(std::ostream& stream) const{
+Result Node::execute(size_t index) const{
+    return const_cast<Node*>(this)->execute(index);
+}
+
+void Node::print_text(std::ostream& stream) const{
     stream<<"#NaN"<<std::endl;
-    return stream;
 }
 
-bool VariableNode::refer_to(std::string_view var_name) const{
+bool Node::refer_to(std::string_view var_name) const{
     if(childs_.empty()){
         return false;
     }
     else {
         for(auto& child:childs_){
             if(child->type()==NODE_TYPE::VARIABLE && 
-            reinterpret_cast<const std::shared_ptr<VariableNode>&>(child)->variable()->name()==var_name)
+                reinterpret_cast<const std::shared_ptr<VariableNode>&>(child)->variable()->name()==var_name)
                 return true;
             else return child->refer_to(var_name);
         }
+        return false;
+    }
+}
+
+void Node::get_array_childs(std::vector<std::shared_ptr<Node>>& childs) const{
+    for(auto child:childs_){
+        if(child->type()==NODE_TYPE::ARRAY)
+            childs.push_back(child);
+        else child->get_array_childs(childs);
     }
 }

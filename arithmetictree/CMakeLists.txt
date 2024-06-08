@@ -11,6 +11,8 @@ file(GLOB_RECURSE arithmetic_tree_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/include/**.h
 )
 
+#message(STATUS ${arithmetic_tree_SOURCES})
+
 set(ARITHM_TREE_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/include ${CMAKE_CURRENT_LIST_DIR}/include/types ${CMAKE_CURRENT_LIST_DIR}/include/exception)
 set(ARITHM_TREE_LIBRARY_DIR ${CMAKE_CURRENT_LIST_DIR}/lib)
 
@@ -38,7 +40,6 @@ add_library(
     exceptions STATIC
     ${ANTLR_Parserules_CXX_OUTPUTS}
     ${CMAKE_CURRENT_LIST_DIR}/src/exception/exception.cpp
-    "${ANTLR_GENERATED_SOURCES}"
 )
 
 target_include_directories(exceptions
@@ -57,8 +58,9 @@ set_target_properties(exceptions
 
 add_library(
     arithmetictree STATIC
-    ${ANTLR_Parserules_CXX_OUTPUTS}
     ${arithmetic_tree_SOURCES}
+    ${ANTLR_Parserules_CXX_OUTPUTS}
+    ${ANTLR_GENERATED_FILES}
 )
 
 target_link_libraries(arithmetictree PUBLIC Boost::boost PRIVATE exceptions antlr4_static)
@@ -88,13 +90,13 @@ get_target_property(ANY arithmetictree RUNTIME_OUTPUT_DIRECTORY)
 
 message(STATUS "Runtime dir: " ${ANY})
 
-# install(
-#     TARGETS arithmetictree
-#     LIBRARY DESTINATION ${CMAKE_CURRENT_LIST_DIR}/lib
-#     ARCHIVE DESTINATION ${CMAKE_CURRENT_LIST_DIR}/lib
-#     RUNTIME DESTINATION ${CMAKE_CURRENT_LIST_DIR}/bin
-#     INCLUDES DESTINATION ${CMAKE_CURRENT_LIST_DIR}/include
-#     EXPORT arithmetictree
-# )
+install(
+    TARGETS arithmetictree
+    LIBRARY DESTINATION ${CMAKE_CURRENT_LIST_DIR}/lib
+    ARCHIVE DESTINATION ${CMAKE_CURRENT_LIST_DIR}/lib
+    RUNTIME DESTINATION ${CMAKE_CURRENT_LIST_DIR}/bin
+    INCLUDES DESTINATION ${CMAKE_CURRENT_LIST_DIR}/include
+    EXPORT arithmetictree
+)
 
 set_directory_properties(PROPERTIES VS_STARTUP_PROJECT arithmetictree)

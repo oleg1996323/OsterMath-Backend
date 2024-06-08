@@ -11,11 +11,9 @@ class ArrayNode:public Node{
 
     virtual NODE_TYPE type() const override;
 
-    virtual Node* first_undefined_child_node() override;
+    virtual Result execute() override;
 
-    virtual const Result& execute() override;
-
-    virtual const Result& execute(size_t index) override;
+    virtual Result execute(size_t index) override;
 
     virtual void insert(std::shared_ptr<Node> node) override;
 
@@ -41,9 +39,10 @@ class ArrayNode:public Node{
 
     virtual bool is_array() const override;
 
-    virtual std::ostream& print_text(std::ostream& stream) const override;
+    virtual void print_text(std::ostream& stream) const override;
 
-    virtual void add_parent(Node*);
+    virtual void print_result(std::ostream& stream) const override;
 
-    protected:
+    ~ArrayNode(){
+    }
 };

@@ -14,15 +14,11 @@ class ValueNode:public Node{
         return NODE_TYPE::VALUE;
     }
 
-    virtual Node* first_undefined_child_node() override{
-        return nullptr;
-    }
-
-    virtual const Result& execute() override{
+    virtual Result execute() override{
         return val_;
     }
 
-    virtual const Result& execute(size_t index) override{
+    virtual Result execute(size_t index) override{
         return val_;
     }
     
@@ -34,7 +30,9 @@ class ValueNode:public Node{
 
     virtual void insert(std::shared_ptr<Node> node) override;
 
-    virtual std::ostream& print_text(std::ostream& stream) const override;
+    virtual void print_text(std::ostream& stream) const override;
+
+    virtual void print_result(std::ostream& stream) const override;
 
     virtual void serialize(std::ostream& stream) override;
 

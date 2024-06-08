@@ -1,25 +1,8 @@
 #include "def.h"
-#include "arithmetic_types.h"
+#include "node.h"
 #include "arithmetic_functions.h"
+#include "arithmetic_types.h"
 #include <string>
-//using Result_t = std::variant<std::monostate,Value_t, std::string, ArrayNode*, VariableNode*>;
-// struct visitorResult{
-//     std::monostate operator()(Result&& result){
-//         return result.get<std::monostate>();
-//     }
-
-//     Value_t operator()(const Value_t& result){
-//         return result;
-//     }
-
-//     const std::string& operator()(Result&& result){
-//         return std::get<std::string>(result);
-//     }
-
-//     ArrayNode* operator()(Result&& result){
-//         return std::get<std::string>(result);
-//     }
-// };
 
 Result_t& Result::get(){
     return *this;
@@ -27,10 +10,6 @@ Result_t& Result::get(){
 
 const Result_t& Result::get() const{
     return *this;
-}
-
-bool Result::is_array() const{
-    return std::holds_alternative<std::shared_ptr<ArrayNode>>(*this);
 }
 
 bool Result::is_value() const{
@@ -41,24 +20,34 @@ bool Result::is_string() const{
     return std::holds_alternative<std::string>(*this);
 }
 
-bool Result::is_variable() const{
-    return std::holds_alternative<std::shared_ptr<VariableNode>>(*this);
+bool Result::is_node() const{
+    return std::holds_alternative<Node*>(*this);
+}
+
+bool Result::is_array() const{
+    return is_node() && get<Node*>()->is_array();
 }
 
 bool Result::has_value() const{
     return !std::holds_alternative<std::monostate>(*this);
 }
 
-std::ostream& operator<<(std::ostream& os, std::monostate null_val){
-    os<<nullptr;
-    return os;
-}
-
 std::ostream& Result::operator<<(std::ostream& os)
 {
     std::visit([this,&os](auto&& arg) {
+        if(this->is_node())
+            this->get<Node*>()->print_result(os);
         os << arg;
     }, *this);
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const Result& res){
+    if(res.is_node())
+        res.get<Node*>()->print_result(os);
+    else std::visit([&os](auto&& arg) {
+        os << arg;
+    },res);
     return os;
 }
 
@@ -72,7 +61,7 @@ ProxySizeDepthMeasure::ProxySizeDepthMeasure(size_t new_size, ProxySizeDepthMeas
     sz_(new_size>0?new_size:throw std::invalid_argument("Argument cannot be 0"))
     {}
 
-ProxySizeDepthMeasure& ProxySizeDepthMeasure::operator++(){
+bool ProxySizeDepthMeasure::operator++(){
     if(next_level_)
         return ++(*next_level_.get());
     else return increase_iterator();
@@ -106,25 +95,41 @@ void ProxySizeDepthMeasure::reset_iterator(){
         next_level_->reset_iterator();
 }
 
-size_t ProxySizeDepthMeasure::current_iterator(size_t depth) const{
-    if(depth>0){
-        --depth;
-        if(next_level_ && depth!=0)
-            return next_level_->current_iterator_ref(depth);
-        if(depth!=0)
+size_t ProxySizeDepthMeasure::current_iterator(int32_t depth) const{
+    if(depth>=0){
+        if(depth>0){
+            if(next_level_){
+                return next_level_->current_iterator_ref(depth);
+            }
+            else 
+                throw std::invalid_argument("Unavailable depth");
+        }
+        else if(depth==0)
+            return current_iterator_;
+        else
             throw std::invalid_argument("Unavailable depth");
         return current_iterator_;
     }
-    else throw std::invalid_argument("Argument cannot be 0");
+    else throw std::invalid_argument("Argument cannot be less than 0");
 }
 
-size_t ProxySizeDepthMeasure::current_iterator_ref(size_t& depth) const{
-    --depth;
-    if(next_level_ && depth!=0)
-        return next_level_->current_iterator_ref(depth);
-    if(depth!=0)
-        throw std::invalid_argument("Unavailable depth");
-    return current_iterator_;
+size_t ProxySizeDepthMeasure::current_iterator_ref(int32_t& depth) const{
+    if(depth>=0){
+        if(depth>0){
+            if(next_level_){
+                --depth;
+                return next_level_->current_iterator_ref(depth);
+            }
+            else 
+                throw std::invalid_argument("Unavailable depth");
+        }
+        else if(depth==0)
+            return current_iterator_;
+        else
+            throw std::invalid_argument("Unavailable depth");
+        return current_iterator_;
+    }
+    else throw std::invalid_argument("Argument cannot be less than 0");
 }
 
 void ProxySizeDepthMeasure::depth(size_t& uppper_depth){
@@ -155,39 +160,53 @@ size_t ProxySizeDepthMeasure::size_ref(size_t& depth) const{
     return sz_;
 }
 
-size_t ProxySizeDepthMeasure::seq_iterator(size_t depth) const{
-    if(depth>0){
-        --depth;
-        if(next_level_ && depth!=0){
-            return total_size_childs()*current_iterator_+next_level_->seq_iterator_ref(depth);
+size_t ProxySizeDepthMeasure::seq_iterator(int32_t depth) const{
+    if(depth>=0){
+        if(depth>0){
+            if(next_level_){
+                return total_size_childs()*current_iterator_+next_level_->seq_iterator_ref(depth);;
+            }
+            else 
+                throw std::invalid_argument("Unavailable depth");
         }
-        if(depth!=0)
+        else if(depth==0)
+            return current_iterator_;
+        else
             throw std::invalid_argument("Unavailable depth");
-        return sz_;
+        return current_iterator_;
     }
-    else throw std::invalid_argument("Argument cannot be 0");
+    else throw std::invalid_argument("Argument cannot be less than 0");
 }
 
-size_t ProxySizeDepthMeasure::seq_iterator_ref(size_t& depth) const{
-    --depth;
-    if(next_level_ && depth!=0){
-        return total_size_childs()*current_iterator_+next_level_->seq_iterator_ref(depth);
+size_t ProxySizeDepthMeasure::seq_iterator_ref(int32_t& depth) const{
+    if(depth>=0){
+        if(depth>0){
+            if(next_level_){
+                --depth;
+                return total_size_childs()*current_iterator_+next_level_->seq_iterator_ref(depth);
+            }
+            else 
+                throw std::invalid_argument("Unavailable depth");
+        }
+        else if(depth==0)
+            return current_iterator_;
+        else
+            throw std::invalid_argument("Unavailable depth");
+        return current_iterator_;
     }
-    if(depth!=0)
-        throw std::invalid_argument("Unavailable depth");
-    return sz_;
+    else throw std::invalid_argument("Argument cannot be less than 0");
 }
 
-ProxySizeDepthMeasure& ProxySizeDepthMeasure::increase_iterator(){
-    if(current_iterator_<sz_-1){
-        ++current_iterator_;
-        return *this;
+bool ProxySizeDepthMeasure::increase_iterator(){
+    if(++current_iterator_<sz_){
+        return true;
     }
     else {
-        current_iterator_ = 0;
-        if(parent_)
-            parent_->increase_iterator();
-        return *this;
+        if(parent_ && parent_->is_iterable()){
+            current_iterator_ = 0;
+            return parent_->increase_iterator();
+        }
+        else return false;
     }
 }
 

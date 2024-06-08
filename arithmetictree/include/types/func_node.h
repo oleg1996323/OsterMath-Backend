@@ -52,14 +52,26 @@ constexpr size_t NUMBER_OF_ARGUMENT [int(FUNCTION_OP::SUMPRODUCT)+1] = {
 class FunctionNode:public Node{
     public:
     FunctionNode(FUNCTION_OP op):
-    Node(int(op)),
+    Node((int)NUMBER_OF_ARGUMENT[(int)op]),
     operation_(op),
     array_type_function(ARRAY_TYPE_FUNCTION[int(op)])
-    {}
+    {
+        if(array_type_function)
+            throw std::runtime_error("Incorrect constructor. Prompt: function is array-type.");
+        std::cout<<(int)NUMBER_OF_ARGUMENT[(int)op]<<std::endl;
+    }
+
+    FunctionNode(FUNCTION_OP op, size_t arr_sz):
+    Node(arr_sz),
+    operation_(op),
+    array_type_function(ARRAY_TYPE_FUNCTION[int(op)])
+    {
+        if(!array_type_function)
+            throw std::runtime_error("Incorrect constructor. Prompt: function is not array-type.");
+        std::cout<<(int)NUMBER_OF_ARGUMENT[(int)op]<<std::endl;
+    }
 
     std::shared_ptr<Node> child(size_t id) const;
-
-    void add_child(const std::shared_ptr<Node>&);
 
     virtual NODE_TYPE type() const override{
         return NODE_TYPE::FUNCTION;
@@ -69,17 +81,15 @@ class FunctionNode:public Node{
         return array_type_function;
     }
 
-    virtual Node* first_undefined_child_node() override{
-        return nullptr;
-    }
-
     virtual void insert(std::shared_ptr<Node> node) override;
 
-    virtual const Result& execute() override;
+    virtual Result execute() override;
 
-    virtual const Result& execute(size_t index) override;
+    virtual Result execute(size_t index) override;
 
-    virtual std::ostream& print_text(std::ostream& stream) const override;
+    virtual void print_text(std::ostream& stream) const override;
+
+    virtual void print_result(std::ostream& stream) const override;
 
     virtual bool is_numeric() const override;
 
@@ -87,15 +97,13 @@ class FunctionNode:public Node{
 
     virtual bool is_array() const override;
 
-    private:
-
     virtual void serialize(std::ostream& stream) override;
 
     virtual void deserialize(std::ostream& stream) override;
 
+    private:
+    
     FUNCTION_OP operation_;
     Result cache_;
     bool array_type_function;
-
-    //auto __register_array_input__();
 };

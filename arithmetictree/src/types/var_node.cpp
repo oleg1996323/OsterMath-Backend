@@ -1,19 +1,11 @@
-#include "var_node.h"
 #include "types.h"
-#include "def.h"
+#include "var_node.h"
 
-std::ostream& VariableNode::print_text(std::ostream& stream) const{
-    stream<<"VAR(!('"<<var_->get_data_base_name()<<"\')#"<<var_->name()<<"\'="<<!childs_.empty()?child(0)->print_text(stream):"NaN";
-    return stream;
-}
-
-VariableNode::VariableNode(VariableBase* variable):
+VariableNode::VariableNode(VariableBase* variable):Node(),
     var_(variable){}
 
-const VariableBase* VariableNode::variable() const{
-    if(var_)
-        return var_;
-    else throw "Variable don't exists"s;
+const VariableBase* VariableNode::variable() const noexcept{
+    return var_;
 }
 
 VariableBase* VariableNode::variable() noexcept{
@@ -25,7 +17,7 @@ Result VariableNode::execute(){
 }
 
 Result VariableNode::execute(size_t index){
-    return childs_.at(0)->execute();
+    return childs_.at(0)->execute(index);
 }
 
 void VariableNode::refresh_parent_links() const{
@@ -55,14 +47,30 @@ bool VariableNode::is_array() const{
     else return false;
 }
 
-bool VariableNode::refer_to(std::string_view var_name) const{
-    if(childs_.empty()){
-        return false;
+void VariableNode::print_text(std::ostream& stream) const{
+    stream<<"VAR(!('"<<var_->get_data_base_name()<<"\')#"<<var_->name()<<")";
+}
+
+void VariableNode::print_result(std::ostream& stream) const{
+    if(childs_.size()==1)
+        childs_.at(0)->print_result(stream);
+}
+
+void VariableNode::insert(std::shared_ptr<Node> node){
+    if(childs_.size()<1){
+        childs_.push_back(node);
+        node->add_parent(this);
     }
     else {
-        for(auto& child:childs_){
-            if(child->refer_to(var_name))
-                return true;
-        }
+        childs_.at(0)=node;
+        node->add_parent(this);
     }
+}
+
+void VariableNode::serialize(std::ostream& stream){
+
+}
+
+void VariableNode::deserialize(std::ostream& stream){
+
 }

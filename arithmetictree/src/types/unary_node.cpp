@@ -1,7 +1,7 @@
 #include "unary_node.h"
 #include "def.h"
 
-std::ostream& UnaryNode::print_text(std::ostream& stream) const{
+void UnaryNode::print_text(std::ostream& stream) const{
     if(operation_==UNARY_OP::ADD)
         stream<<"+"<<childs_.at(0);
     else if(operation_==UNARY_OP::SUB)
@@ -9,14 +9,15 @@ std::ostream& UnaryNode::print_text(std::ostream& stream) const{
     else if(operation_==UNARY_OP::PARENS)
         stream<<"("<<childs_.at(0)<<")";
     else stream<<"";
-    return stream;
 }
 
-Node* UnaryNode::first_undefined_child_node(){
-    if(childs_.empty())
-        return this;
-    else
-        return childs_.at(0)->first_undefined_child_node();
+void UnaryNode::print_result(std::ostream& stream) const{
+    stream<<const_cast<UnaryNode*>(this)->execute();
+}
+
+void UnaryNode::insert(std::shared_ptr<Node> node){
+    assert(childs_.size()==0);
+    childs_.push_back(node);
 }
 
 Result UnaryNode::__calculate__(){
@@ -37,20 +38,20 @@ Result UnaryNode::__calculate__(){
         }
 }
 
-Value_t UnaryNode::execute(){
+Result UnaryNode::execute(){
     using namespace boost::multiprecision;
     if(!childs_.empty()){
-        return __calculate__(std::move(child_->execute()));
+        return __calculate__();
     }
     else
         throw std::runtime_error("Undefined unary operation");
     return 0.;
 }
 
-Value_t UnaryNode::execute(size_t index){
+Result UnaryNode::execute(size_t index){
     using namespace boost::multiprecision;
     if(!childs_.empty()){
-        return __calculate__(std::move(child_->execute(index)));
+        return __calculate__();
     }
     else
         throw std::runtime_error("Undefined unary operation");

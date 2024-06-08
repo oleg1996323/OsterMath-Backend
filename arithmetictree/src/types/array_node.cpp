@@ -12,19 +12,8 @@ NODE_TYPE ArrayNode::type() const{
     return NODE_TYPE::ARRAY;
 }
 
-Node* ArrayNode::first_undefined_child_node(){
-    for(auto& child:childs_){
-            Node* ptr = child->first_undefined_child_node();
-            if(ptr!=nullptr)
-                return ptr;
-            else continue;
-        }
-
-        return childs_.size()!=childs_.capacity()?nullptr:this;
-}
-
 Result ArrayNode::execute(){
-    return std::shared_ptr<ArrayNode>(this);
+    return this;
 }
 
 Result ArrayNode::execute(size_t index){
@@ -58,14 +47,11 @@ std::vector<std::shared_ptr<Node>>::iterator ArrayNode::end(){
 }
 
 void ArrayNode::insert(std::shared_ptr<Node> node){
-    if(!childs_.empty()){
-        for(std::shared_ptr<Node> child:childs_)
-            child->first_undefined_child_node()->insert(node);
-    }
-
-    if(childs_.size()<childs_.capacity())
+    if(childs_.size()<childs_.capacity()){
         childs_.push_back(node);
-    else throw std::runtime_error("Invalid array initialization");
+        node->add_parent(this);
+    }
+    else throw std::logic_error("Invalid inserting. Prompt: Unvalailable to insert node to full defined array");
 }
 
 void ArrayNode::serialize(std::ostream& stream){
@@ -92,11 +78,31 @@ bool ArrayNode::is_array() const{
     return true;
 }
 
-std::ostream& ArrayNode::print_text(std::ostream& stream) const{
+void ArrayNode::print_text(std::ostream& stream) const{
     stream<<'[';
-    for(auto child:childs_){
-        stream<<child;
+    if(!childs_.empty()){
+        for(auto child:childs_){
+                child->print_text(stream);
+                stream<<"; ";
+        }
+        stream.seekp(-2,std::ios_base::end);
     }
     stream<<']';
+}
+
+void ArrayNode::print_result(std::ostream& stream) const{
+    stream<<'[';
+    if(!childs_.empty()){
+        for(auto child:childs_){
+                child->print_result(stream);
+                stream<<"; ";
+        }
+        stream.seekp(-2,std::ios_base::end);
+    }
+    stream<<']';
+}
+
+std::ostream& operator<<(std::ostream& stream, std::shared_ptr<ArrayNode>& node){
+    node->print_text(stream);
     return stream;
 }

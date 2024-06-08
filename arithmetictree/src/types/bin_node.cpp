@@ -1,16 +1,10 @@
 #include "bin_node.h"
+#include "def.h"
 
-Node* BinaryNode::first_undefined_child_node(){
-    Node* ptr;
-    if(!child(0))
-        return this;
-    else if((ptr = child(0)->first_undefined_child_node()))
-        return ptr;
-    else if(!child(1))
-        return this;
-    else if((ptr = child(1)->first_undefined_child_node()))
-        return ptr;
-    return nullptr;
+void BinaryNode::insert(std::shared_ptr<Node> node){
+    if(childs_.size()<2)
+        childs_.push_back(node);
+    else std::logic_error("Invalid inserting. Prompt: Unvalailable to insert vjre than 2 nodes to binary node");
 }
 
 Value_t BinaryNode::__calculate__(){
@@ -80,9 +74,14 @@ Result BinaryNode::execute(size_t index){
     return 0.;
 }
 
-std::ostream& BinaryNode::print_text(std::ostream& stream) const{
-    stream<<childs_.at(0)<<(char)operation_<<childs_.at(1);
-    return stream;
+void BinaryNode::print_text(std::ostream& stream) const{
+    childs_.at(0)->print_text(stream);
+    stream<<(char)operation_;
+    childs_.at(1)->print_text(stream);
+}
+
+void BinaryNode::print_result(std::ostream& stream) const{
+    stream<<const_cast<BinaryNode*>(this)->execute();
 }
 
 bool BinaryNode::is_numeric() const{

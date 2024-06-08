@@ -47,9 +47,13 @@ class VariableBase: public FormattingData{
     bool is_undef() const;
     bool is_numeric() const;
 
-    std::ostream& operator<<(std::ostream& stream);
+    void print_result();
 
-    void print();
+    void print_text();
+
+    std::string text();
+
+    std::string text() const;
 
     void set_bottom_bound_value(std::string_view,std::string_view,std::shared_ptr<Node> value, BOTTOM_BOUND_T type);
 
@@ -63,15 +67,15 @@ class VariableBase: public FormattingData{
 
     std::string_view get_data_base_name() const;
 
-    Result& result();
+    Result result();
 
-    const Result& result() const;
+    Result result() const;
     
     void serialize(std::ostream& stream){
         using namespace serialization;
         serialization::serialize(stream,data_base_->name());
         serialization::serialize(stream,name_);
-        serialization::serialize(stream,text_);
+        //serialization::serialize(stream,text_);
         serialization::serialize(stream,show_reinterpret_);
         //node_->serialize(stream);
     }
@@ -84,31 +88,8 @@ class VariableBase: public FormattingData{
 
     private:
     std::unordered_map<std::string_view,std::unordered_map<std::string_view,VariableBounds>> bounds_;
-    std::string text_;
     std::shared_ptr<VariableNode> node_; //shared, так как может быть передан в любое арифметическое дерево
     std::string_view name_;
     bool show_reinterpret_=true; //show a reinterpreted formula
     BaseData* data_base_;
 };
-
-void VariableBase::set_bottom_bound_value(std::string_view data_base,std::string_view var_name,std::shared_ptr<Node> value, BOTTOM_BOUND_T type){
-    bounds_[data_base][var_name].set_bound_value(value,type);
-    #ifdef DEBUG
-    std::cout << var_name<<' ';
-    if(type == BOTTOM_BOUND_T::LARGER)
-        std::cout<<"larger than ";
-    else std::cout<<"larger or equal than ";
-    std::cout<<value<<" in "<<name()<<std::endl;
-    #endif
-}
-
-void VariableBase::set_top_bound_value(std::string_view data_base,std::string_view var_name,std::shared_ptr<Node> value, TOP_BOUND_T type){
-    bounds_[data_base][var_name].set_bound_value(value,type);
-    #ifdef DEBUG
-    std::cout << var_name<<' ';
-    if(type == TOP_BOUND_T::LESS)
-        std::cout<<"less than ";
-    else std::cout<<"less or equal than ";
-    std::cout<<value<<" in "<<name()<<std::endl;
-    #endif
-}

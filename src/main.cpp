@@ -22,7 +22,9 @@ int main(){
     data->setstream(std::cin);
     //data->get("__I__")->get<ArithmeticTree>().print();
     try{
-        std::cout<<data->get("I")->get()<<std::endl;
+        data->get("I")->set_stream(std::cout);
+        data->get("I")->print_result();
+        std::cout<<std::endl;
     }
     catch(const std::invalid_argument& err){
         std::cout<<err.what()<<std::endl;

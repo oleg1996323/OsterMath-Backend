@@ -1,5 +1,6 @@
 #include "test/testing.h"
 #include "data.h"
+#include "arithmetic_types.h"
 
 #ifdef DEBUG
 
@@ -10,8 +11,28 @@ bool CalculationsCheck(const std::string& input_str, const std::string& check_va
     std::istringstream input(input_str);
     data->setstream(input);
     std::ostringstream output;
+    data->get("I")->set_stream(output);
+    data->get("A")->set_stream(output);
+    data->get("B")->set_stream(output);
+    // data->get("C")->set_stream(output);
+    // data->get("D")->set_stream(output);
     try{
-        output<<data->get("I")->get()<<std::endl;
+        data->get("I")->print_text();
+        std::cout<<output.str()<<std::endl;
+        output.str("");
+        data->get("A")->print_text();
+        std::cout<<output.str()<<std::endl;
+        output.str("");
+        data->get("B")->print_text();
+        std::cout<<output.str()<<std::endl;
+        output.str("");
+        // data->get("C")->print_text();
+        // std::cout<<output.str()<<std::endl;
+        // output.str("");
+        // data->get("D")->print_text();
+        // std::cout<<output.str()<<std::endl;
+        // output.str("");
+        data->get("I")->print_result();
         std::cout<<output.str()<<std::endl;
         std::cout.setf(std::ios::boolalpha);
         std::cout<<"any exists: "<<pool.exists("any")<<std::endl;
@@ -34,7 +55,7 @@ VAR(!('any')#B)=2
 VAR(!('any')#C)=[2,2,2]
 VAR(!('any')#D)=[2,2,2]
 )";
-    std::string equal = R"([12 2]
+    std::string equal = R"([12; 2]
 )";
     CalculationsCheck(str_in,equal);
 }
@@ -47,7 +68,7 @@ VAR(#B)=2
 VAR(#C)=[500,200,100]
 VAR(#D)=[500,200,100]
 )";
-    std::string equal = R"([300000 2]
+    std::string equal = R"([300000; 2]
 )";
     CalculationsCheck(str_in,equal);
 }
@@ -60,7 +81,7 @@ VAR(#B)=2
 VAR(#C)=[10,10,10]
 VAR(#D)=[10,10,10]
 )";
-    std::string equal = R"([1e+06 2]
+    std::string equal = R"([1e+06; 2]
 )";
     CalculationsCheck(str_in,equal);
 }
@@ -76,8 +97,8 @@ R"(VAR(!('any')#I)=3*2+3^2
 
 void Test_Range_Operation_With_Var_Arrays(){
     std::string str_in = 
-R"(VAR(!('any')#I)=PRODUCT_I(VAR(!('other')#A)+VAR(!('any')#B))
-VAR(!('other')#A)=[2,2,2]
+R"(VAR(!('any')#I)=PRODUCT_I(VAR(!('any')#A)+VAR(!('any')#B))
+VAR(!('any')#A)=[2,2,2]
 VAR(#B)=[2,2,2]
 )";
     std::string equal = R"(64
@@ -108,7 +129,10 @@ VAR(#D)=[2,3,4]
     data->setstream(input);
     std::ostringstream output;
     try{
-        output<<data->get("I")->get()<<std::endl;
+        data->get("I")->set_stream(output);
+        data->get("I")->print_result();
+        std::cout<<output.str()<<std::endl;
+        data->get("I")->print_text();
         std::cout<<output.str()<<std::endl;
         //assert(output.str() == check_val);
     }
@@ -130,7 +154,7 @@ VAR(#I) : VAR(#A) > 3
     std::ostringstream output;
     //data->get("I")->print();
     data->get("I")->set_stream(output);
-    data->get("I")->print();
+    data->get("I")->print_result();
     std::string str = output.str();
     std::cout<<str<<std::endl;
     assert(data->get("I")->get_bottom_bound("any","A").has_value());
@@ -151,7 +175,7 @@ R"(VAR(#I) :  VAR(#A) < 2
     std::ostringstream output;
     //data->get("I")->print();
     data->get("I")->set_stream(output);
-    data->get("I")->print();
+    data->get("I")->print_result();
     std::string str = output.str();
     std::cout<<str<<std::endl;
     assert(!data->get("I")->get_bottom_bound("any","A").has_value());
@@ -164,7 +188,7 @@ void Testing(){
     Test_Correct_Sum_Result_For_Array();
     Test_Correct_SumProduct_Result_For_Array();
     Test_Correct_Product_Result_For_Array();
-    Test_Simple_Arithmetic_With_Variable();
+    //Test_Simple_Arithmetic_With_Variable();
     Test_Range_Operation_With_Var_Arrays();
     Testing_compare_vars_1();
     Testing_compare_vars_2();

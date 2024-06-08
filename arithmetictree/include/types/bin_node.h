@@ -22,25 +22,23 @@ class BinaryNode:public Node{
         return NODE_TYPE::BINARY;
     }
 
-    virtual Node* first_undefined_child_node() override;
+    virtual Result execute() override;
 
-    virtual const Result& execute() override;
+    virtual Result execute(size_t index) override;
 
-    virtual const Result& execute(size_t index) override;
-
-    std::shared_ptr<Node>& lhs(){
+    std::shared_ptr<Node> lhs(){
         return child(0);
     }
 
-    std::shared_ptr<Node>& rhs(){
+    std::shared_ptr<Node> rhs(){
         return child(1);
     }
 
-    const std::shared_ptr<Node>& lhs() const {
+    const std::shared_ptr<Node> lhs() const {
         return child(0);
     }
 
-    const std::shared_ptr<Node>& rhs() const {
+    const std::shared_ptr<Node> rhs() const {
         return child(1);
     }
 
@@ -80,7 +78,9 @@ class BinaryNode:public Node{
 
     virtual bool is_array() const override;
 
-    virtual std::ostream& print_text(std::ostream& stream) const override;
+    virtual void print_text(std::ostream& stream) const override;
+
+    virtual void print_result(std::ostream& stream) const override;
 
     private:
     class __cache__{

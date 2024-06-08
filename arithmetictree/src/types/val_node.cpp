@@ -1,8 +1,11 @@
 #include "val_node.h"
 
-std::ostream& ValueNode::print_text(std::ostream& stream) const{
+void ValueNode::print_text(std::ostream& stream) const{
     stream<<val_;
-    return stream;
+}
+
+void ValueNode::print_result(std::ostream& stream) const{
+    stream<<val_;
 }
 
 bool ValueNode::is_numeric() const{
@@ -17,6 +20,14 @@ bool ValueNode::is_array() const{
     return false;
 }
 
-bool ValueNode::refer_to(std::string_view var_name) const {
-    return false;
+void ValueNode::insert(std::shared_ptr<Node> node){
+    throw std::logic_error("Invalid inserting. Prompt: Unvalailable to insert node to finite node Value");
+}
+
+void ValueNode::serialize(std::ostream& stream){
+
+}
+
+void ValueNode::deserialize(std::ostream& stream){
+
 }

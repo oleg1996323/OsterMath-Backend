@@ -1,7 +1,8 @@
+#include "def.h"
+#include "node.h"
 #include "func_node.h"
 #include "var_node.h"
-#include "node.h"
-#include "def.h"
+#include "array_node.h"
 #include "arithmetic_functions.h"
 
 bool FunctionNode::is_numeric() const{
@@ -47,38 +48,53 @@ Result FunctionNode::execute(){
                     break;
                 case FUNCTION_OP::SUMPRODUCT:
                 {
-                    std::vector<std::shared_ptr<ArrayNode>> params;
+                    std::vector<ArrayNode*> arrays;
                     for(std::shared_ptr<Node>& child:childs_){
-                        if(child->type()==NODE_TYPE::VARIABLE){
-                            Result res = child->execute();
-                            if(res.is_array())
-                                params.push_back(res.get<std::shared_ptr<ArrayNode>>());
-                            else throw std::invalid_argument("Invalid function parameter");
+                        if(child->is_array()){
+                            ArrayNode* push_node;
+                            if(child->type()==NODE_TYPE::VARIABLE && child->childs().size()==1)
+                               push_node = reinterpret_cast<ArrayNode*>(child->child(0).get());
+                            else 
+                                push_node = reinterpret_cast<ArrayNode*>(child.get());
+                            arrays.push_back(push_node);
                         }
+                        else throw std::invalid_argument("Invalid function parameter");
                     }
-                    cache_ = functions::Arithmetic::SumProduct(std::move(params));
+                    cache_ = functions::Arithmetic::SumProduct(arrays);
                     break;
                 }
                 case FUNCTION_OP::SUM:
                 {
-                    std::vector<std::shared_ptr<ArrayNode>> arrays;
-                    for(auto& child:childs_){
-                        if(child->is_array())
-                            arrays.push_back(reinterpret_cast<std::shared_ptr<ArrayNode>&>(child));
+                    std::vector<ArrayNode*> arrays;
+                    for(std::shared_ptr<Node>& child:childs_){
+                        if(child->is_array()){
+                            ArrayNode* push_node;
+                            if(child->type()==NODE_TYPE::VARIABLE && child->childs().size()==1)
+                               push_node = reinterpret_cast<ArrayNode*>(child->child(0).get());
+                            else 
+                                push_node = reinterpret_cast<ArrayNode*>(child.get());
+                            arrays.push_back(push_node);
+                        }
                         else throw std::invalid_argument("Invalid function parameter");
                     }
-                    cache_ = functions::Arithmetic::Sum(std::move(arrays));
+                    cache_ = functions::Arithmetic::Sum(arrays);
                     break;
                 }
                 case FUNCTION_OP::PROD:
                 {
-                    std::vector<std::shared_ptr<ArrayNode>> arrays;
-                    for(auto& child:childs_){
-                        if(child->is_array())
-                            arrays.push_back(reinterpret_cast<std::shared_ptr<ArrayNode>&>(child));
+                    std::vector<ArrayNode*> arrays;
+                    for(std::shared_ptr<Node>& child:childs_){
+                        if(child->is_array()){
+                            ArrayNode* push_node;
+                            if(child->type()==NODE_TYPE::VARIABLE && child->childs().size()==1)
+                               push_node = reinterpret_cast<ArrayNode*>(child->child(0).get());
+                            else 
+                                push_node = reinterpret_cast<ArrayNode*>(child.get());
+                            arrays.push_back(push_node);
+                        }
                         else throw std::invalid_argument("Invalid function parameter");
                     }
-                    cache_ = functions::Arithmetic::Product(std::move(arrays));
+                    cache_ = functions::Arithmetic::Product(arrays);
                     break;
                 }
                 default:
@@ -97,11 +113,7 @@ Result FunctionNode::execute(size_t index){
 
 #include "types.h"
 
-void FunctionNode::add_child(const std::shared_ptr<Node>& node){
-    childs_.push_back(node);
-}
-
-std::ostream& FunctionNode::print_text(std::ostream& stream) const{
+void FunctionNode::print_text(std::ostream& stream) const{
     if(operation_==FUNCTION_OP::ACOS)
         stream<<"acos(";
     else if(operation_==FUNCTION_OP::COS)
@@ -129,8 +141,27 @@ std::ostream& FunctionNode::print_text(std::ostream& stream) const{
     else stream<<"";
 
     for(auto child:childs_){
-        stream<<child->print_text(stream);
-    stream<<")";
-    return stream;
+        child->print_text(stream);
     }
+    stream<<")";
+}
+
+void FunctionNode::print_result(std::ostream& stream) const{
+    stream<<const_cast<FunctionNode*>(this)->execute();
+}
+
+void FunctionNode::insert(std::shared_ptr<Node> node){
+    if(childs_.size()<childs_.capacity()){
+        childs_.push_back(node);
+        node->add_parent(this);
+    }
+    else throw std::logic_error("Invalid inserting. Prompt: Unvalailable to insert node to full defined function node");
+}
+
+void FunctionNode::serialize(std::ostream& stream){
+
+}
+
+void FunctionNode::deserialize(std::ostream& stream){
+
 }
