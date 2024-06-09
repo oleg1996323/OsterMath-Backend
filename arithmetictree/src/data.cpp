@@ -2,6 +2,7 @@
 #include "def.h"
 #include "types.h"
 #include "expr_parser.h"
+#include "arithmetic_types.h"
 
 using namespace std::string_literals;
 
@@ -146,4 +147,49 @@ BaseData* DataPool::get(std::string_view name_data) noexcept{
     if(exists(name_data))
         return &data_bases_.at(name_data);
     else return nullptr;
+}
+
+#include "serialize.h"
+
+void BaseData::serialize(serialization::SerialData& serial_data){
+    serial_data.data_stream_.write("#SHEETNAME_", 11);
+    serial_data.data_stream_.write(name_.begin(), name_.size());
+    serial_data.data_stream_.write("\n",1);
+    serial_data.data_stream_.write("#DATAPOOL_", 10);
+    serial_data.data_stream_.write(pool_->name().begin(),pool_->name().size());
+    serial_data.data_stream_.write("#VARIABLES", 10);
+    for(auto var_data:vars_){
+        stream.write(var_data.first.begin(), var_data.first.size()); //name
+        stream<<std::endl; //control symbol
+        var_data.second->serialize(stream);
+    }
+}
+
+void BaseData::serialize_header(serialization::SerialData& serial_data) const{
+    //access every nodes of BaseData variables (including the comparing structures)
+    for(auto& [name,var_base]:vars_){
+        serial_data.insert_node(reinterpret_cast<const std::shared_ptr<Node>&>(var_base->node()));
+        var_base->node()->deserialize_header(serial_data,var_base->node());
+    }
+
+    for(const std::shared_ptr<Node>& node:serial_data.)
+}
+
+void BaseData::deserialize(serialization::SerialData& serial_data){
+    
+}
+
+void DataPool::serialize(serialization::SerialData& serial_data){
+    serial_data.data_stream_.write("#BOOKMATHNAME_", 14);
+    serial_data.data_stream_.write(name_.c_str(), name_.size());
+    serial_data.data_stream_.write("\n",1);
+    for(auto& data:data_bases_)
+        data.second.serialize_header(serial_data);
+
+    for(auto& data:data_bases_)
+        data.second.serialize(serial_data);
+}
+
+void DataPool::deserialize(serialization::SerialData& serial_data){
+
 }

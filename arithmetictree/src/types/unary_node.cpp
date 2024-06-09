@@ -21,16 +21,20 @@ void UnaryNode::insert(std::shared_ptr<Node> node){
 }
 
 Result UnaryNode::__calculate__(){
+    return __calculate__(0);
+}
+
+Result UnaryNode::__calculate__(size_t index){
     switch (operation_)
         {
         case UNARY_OP::ADD:
-            return childs_.at(0)->execute();
+            return childs_.at(0)->execute(index);
             break;
         case UNARY_OP::SUB:
-            return (-1)*(childs_.at(0)->execute().get<Value_t>());
+            return (-1)*(childs_.at(0)->execute(index).get<Value_t>());
             break;
         case UNARY_OP::PARENS:
-            return childs_.at(0)->execute();
+            return childs_.at(0)->execute(index);
             break;
         default:
             throw std::invalid_argument("Unknown type of unary expression");
@@ -39,19 +43,13 @@ Result UnaryNode::__calculate__(){
 }
 
 Result UnaryNode::execute(){
-    using namespace boost::multiprecision;
-    if(!childs_.empty()){
-        return __calculate__();
-    }
-    else
-        throw std::runtime_error("Undefined unary operation");
-    return 0.;
+    return execute(0);
 }
 
 Result UnaryNode::execute(size_t index){
     using namespace boost::multiprecision;
     if(!childs_.empty()){
-        return __calculate__();
+        return __calculate__(index);
     }
     else
         throw std::runtime_error("Undefined unary operation");

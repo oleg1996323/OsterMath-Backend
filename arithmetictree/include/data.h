@@ -7,9 +7,14 @@
 #include "def.h"
 #include "expr_parser.h"
 
+
 class VariableBase;
 class Parser;
 class DataPool;
+
+namespace serialization{
+    class SerialData;
+}
 
 class BaseData{
     public:
@@ -54,9 +59,13 @@ class BaseData{
 
     void parse_entry();
 
-    void serialize(std::ostream& stream);
+    void serialize(serialization::SerialData& serial_data);
 
-    void deserialize(std::istream& stream);
+    void deserialize(serialization::SerialData& serial_data);
+
+    void serialize_header(serialization::SerialData& serial_data) const;
+
+    void deserialize_header(serialization::SerialData& serial_data);
 
     private:
     std::unordered_set<std::string> var_names_;
@@ -89,9 +98,9 @@ class DataPool{
 
     size_t size() const;
 
-    void serialize(std::ostream& stream);
+    void serialize(serialization::SerialData& serial_data);
 
-    void deserialize(std::istream& stream);
+    void deserialize(serialization::SerialData& serial_data);
 
     private:
     std::string name_;

@@ -33,10 +33,12 @@ Result FunctionNode::execute(){
         if(!cache_.has_value()){
             switch (operation_){
                 case FUNCTION_OP::LN:
-                    return log(child(0)->execute().get<Value_t>());
+                    cache_ =  log(child(0)->execute().get<Value_t>());
+                    return cache_;
                     break;
                 case FUNCTION_OP::LG10:
-                    return log10(child(0)->execute().get<Value_t>());
+                    cache_ =  log10(child(0)->execute().get<Value_t>());
+                    return cache_;
                     break;
                 case FUNCTION_OP::EXP:
                     cache_ = exp(child(0)->execute().get<Value_t>());

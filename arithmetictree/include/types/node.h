@@ -25,6 +25,10 @@ enum class NODE_TYPE{
     EXPRESSION
 };
 
+namespace serialization{
+    class SerialData;
+}
+
 class Node{
     public:
     Node(size_t sz):
@@ -80,6 +84,10 @@ class Node{
     virtual void serialize(std::ostream& stream) = 0;
 
     virtual void deserialize(std::ostream& stream) = 0;
+
+    void serialize_header(serialization::SerialData& serial_data, const std::shared_ptr<Node>& from);
+
+    void deserialize_header(serialization::SerialData& serial_data, const std::shared_ptr<Node>& from);
 
     virtual void print_text(std::ostream& stream) const;
 

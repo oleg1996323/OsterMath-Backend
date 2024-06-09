@@ -65,7 +65,7 @@ class BinaryNode:public Node{
     }
 
     virtual void serialize(std::ostream& stream) override {
-
+        
     }
 
     virtual void deserialize(std::ostream& stream) override {

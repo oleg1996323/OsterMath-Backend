@@ -138,7 +138,7 @@ void VariableBase::set_bottom_bound_value(std::string_view data_base,std::string
     if(type == BOTTOM_BOUND_T::LARGER)
         std::cout<<"larger than ";
     else std::cout<<"larger or equal than ";
-    std::cout<<value<<" in "<<name()<<std::endl;
+    std::cout<<value->execute()<<" in "<<name()<<std::endl;
     #endif
 }
 
@@ -149,6 +149,6 @@ void VariableBase::set_top_bound_value(std::string_view data_base,std::string_vi
     if(type == TOP_BOUND_T::LESS)
         std::cout<<"less than ";
     else std::cout<<"less or equal than ";
-    std::cout<<value<<" in "<<name()<<std::endl;
+    std::cout<<value->execute()<<" in "<<name()<<std::endl;
     #endif
 }

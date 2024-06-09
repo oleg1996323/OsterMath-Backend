@@ -61,9 +61,9 @@ class VariableBase: public FormattingData{
 
     bool is_in_bounds(std::string_view,std::string_view) const;
 
-    std::optional<Value_t> get_top_bound(std::string_view,std::string_view);
+    std::optional<Value_t> get_top_bound(std::string_view data_base,std::string_view var_name);
 
-    std::optional<Value_t> get_bottom_bound(std::string_view,std::string_view);
+    std::optional<Value_t> get_bottom_bound(std::string_view data_base,std::string_view var_name);
 
     std::string_view get_data_base_name() const;
 
@@ -72,12 +72,15 @@ class VariableBase: public FormattingData{
     Result result() const;
     
     void serialize(std::ostream& stream){
-        using namespace serialization;
-        serialization::serialize(stream,data_base_->name());
-        serialization::serialize(stream,name_);
-        //serialization::serialize(stream,text_);
-        serialization::serialize(stream,show_reinterpret_);
-        //node_->serialize(stream);
+        stream<<"#TEXT";
+        {
+            std::ostream& prec_stream = get_stream();
+            set_stream(stream);
+            print_text();
+            set_stream(prec_stream);
+        }
+        serialization::serialize_structure(stream,show_reinterpret_);
+        stream<<std::endl;
     }
 
     void deserialize(std::istream& stream);
@@ -90,6 +93,7 @@ class VariableBase: public FormattingData{
     std::unordered_map<std::string_view,std::unordered_map<std::string_view,VariableBounds>> bounds_;
     std::shared_ptr<VariableNode> node_; //shared, так как может быть передан в любое арифметическое дерево
     std::string_view name_;
+    std::string text_;
     bool show_reinterpret_=true; //show a reinterpreted formula
     BaseData* data_base_;
 };

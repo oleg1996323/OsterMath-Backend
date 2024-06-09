@@ -63,14 +63,66 @@ VAR(!('any')#D)=[2,2,2]
 void Test_Correct_SumProduct_Result_For_Array(){
     std::string str_in = 
 R"(VAR(#I)=[VAR(#A),VAR(#B)]
-VAR(#A)=sumproduct(VAR(#C),VAR(#D))
+VAR(#A)=sumproduct(VAR(!('other')#C),VAR(#D))
 VAR(#B)=2
-VAR(#C)=[500,200,100]
+VAR(!('other')#C)=[500,200,100]
 VAR(#D)=[500,200,100]
 )";
     std::string equal = R"([300000; 2]
 )";
     CalculationsCheck(str_in,equal);
+}
+
+void Test_Serialization(){
+    std::string str_in = 
+R"(VAR(#I)=[VAR(#A),VAR(#B)]
+VAR(#A)=sumproduct(VAR(!('other')#C),VAR(#D))
+VAR(#B)=2
+VAR(!('other')#C)=[500,200,100]
+VAR(#D)=[500,200,100]
+)";
+    std::string equal = R"([300000; 2]
+)";
+
+    DataPool pool("main");
+    pool.add_data("any");
+    BaseData* data = pool.get("any");
+    std::istringstream input(str_in);
+    data->setstream(input);
+    std::ostringstream output;
+    data->get("I")->set_stream(output);
+    data->get("A")->set_stream(output);
+    data->get("B")->set_stream(output);
+    // data->get("C")->set_stream(output);
+    // data->get("D")->set_stream(output);
+    try{
+        data->get("I")->print_text();
+        std::cout<<output.str()<<std::endl;
+        output.str("");
+        data->get("A")->print_text();
+        std::cout<<output.str()<<std::endl;
+        output.str("");
+        data->get("B")->print_text();
+        std::cout<<output.str()<<std::endl;
+        output.str("");
+        // data->get("C")->print_text();
+        // std::cout<<output.str()<<std::endl;
+        // output.str("");
+        // data->get("D")->print_text();
+        // std::cout<<output.str()<<std::endl;
+        // output.str("");
+        data->get("I")->print_result();
+        std::cout<<output.str()<<std::endl;
+        std::cout.setf(std::ios::boolalpha);
+        std::cout<<"any exists: "<<pool.exists("any")<<std::endl;
+        std::cout<<"other exists: "<<pool.exists("other")<<std::endl;
+        assert(output.str() == equal);
+    }
+    catch(const std::invalid_argument& err){
+        std::cout<<err.what()<<std::endl;
+    }
+
+    serialization::serialize_to("./TestSerialization.omb",&pool);
 }
 
 void Test_Correct_Product_Result_For_Array(){
@@ -115,7 +167,7 @@ R"(#I=SUM_I(#A+#B*#C)
 )";
     CalculationsCheck(str_in,equal);
 
-str_in = R"(VAR(#I)=SUM_I(VAR(#A)+(VAR(#B)*VAR(#C))^VAR(#D))
+str_in = R"(VAR(#I)=SUM_I(#A+(#B*#C)^#D)
 VAR(#A)=[1,1,1]
 VAR(#B)=[1,1,LOG_X(EXP(2),pi)]
 VAR(#C)=3
@@ -154,9 +206,9 @@ VAR(#I) : VAR(#A) > 3
     std::ostringstream output;
     //data->get("I")->print();
     data->get("I")->set_stream(output);
-    data->get("I")->print_result();
-    std::string str = output.str();
-    std::cout<<str<<std::endl;
+    //data->get("I")->print_result();
+    //std::string str = output.str();
+    //std::cout<<str<<std::endl;
     assert(data->get("I")->get_bottom_bound("any","A").has_value());
     assert(data->get("I")->get_top_bound("any","A").has_value());
     assert(data->get("I")->get_top_bound("any","A").value()==2);
@@ -175,9 +227,9 @@ R"(VAR(#I) :  VAR(#A) < 2
     std::ostringstream output;
     //data->get("I")->print();
     data->get("I")->set_stream(output);
-    data->get("I")->print_result();
-    std::string str = output.str();
-    std::cout<<str<<std::endl;
+    //data->get("I")->print_result();
+    //std::string str = output.str();
+    //std::cout<<str<<std::endl;
     assert(!data->get("I")->get_bottom_bound("any","A").has_value());
     assert(data->get("I")->get_top_bound("any","A").has_value());
     assert(data->get("I")->get_top_bound("any","A").value()==2);
@@ -192,6 +244,7 @@ void Testing(){
     Test_Range_Operation_With_Var_Arrays();
     Testing_compare_vars_1();
     Testing_compare_vars_2();
+    Test_Serialization();
 }
 
 #endif

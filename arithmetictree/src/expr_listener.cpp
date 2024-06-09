@@ -230,7 +230,7 @@ void BaseListener::exitRangefunction(ParseRulesParser::RangefunctionContext* ctx
 }
 
 void BaseListener::enterLess(ParseRulesParser::LessContext* ctx){
-    assert(mode_.empty());
+    assert(!mode_.empty());
     if(ctx->VARIABLE()){
         //creating in active sheet
         BaseData* c_var_db_tmp;
@@ -241,7 +241,6 @@ void BaseListener::enterLess(ParseRulesParser::LessContext* ctx){
         current_var_ = c_var_db_tmp->add_variable(ctx->VARIABLE()->getText())->node();
     }
     else assert(false);
-    anonymous_node_.push(current_var_);
 
     if(ctx->variable_parameter()){
         BaseData* db_tmp;
@@ -252,17 +251,18 @@ void BaseListener::enterLess(ParseRulesParser::LessContext* ctx){
         if(ctx->variable_parameter()->VARIABLE())
             top_.emplace(db_tmp->name(),db_tmp->add_variable(ctx->variable_parameter()->VARIABLE()->getText()).get()->name(),TOP_BOUND_T::LESS);
         else assert(false);
-        mode_.push(MODE::BOUND_DEFINITION);
     }
     else assert(false);
 }
 
 void BaseListener::exitLess(ParseRulesParser::LessContext* ctx){
-    __insert_to_prec_node__(MODE::BOUND_DEFINITION);
+    assert(!mode_.empty());
+    assert(mode_.top()==MODE::BOUND_DEFINITION);
+    assert(anonymous_node_.size()==1);
 }
 
 void BaseListener::enterLess_equal(ParseRulesParser::Less_equalContext* ctx){
-    assert(mode_.empty());
+    assert(!mode_.empty());
     if(ctx->VARIABLE()){
         //creating in active sheet
         BaseData* c_var_db_tmp;
@@ -273,7 +273,6 @@ void BaseListener::enterLess_equal(ParseRulesParser::Less_equalContext* ctx){
         current_var_ = c_var_db_tmp->add_variable(ctx->VARIABLE()->getText())->node();
     }
     else assert(false);
-    anonymous_node_.push(current_var_);
     
     if(ctx->variable_parameter()){
         BaseData* db_tmp;
@@ -284,17 +283,18 @@ void BaseListener::enterLess_equal(ParseRulesParser::Less_equalContext* ctx){
         if(ctx->variable_parameter()->VARIABLE())
             top_.emplace(db_tmp->name(),db_tmp->add_variable(ctx->variable_parameter()->VARIABLE()->getText()).get()->name(),TOP_BOUND_T::LESS_OR_EQUAL);
         else assert(false);
-        mode_.push(MODE::BOUND_DEFINITION);
     }
     else assert(false);
 }
 
 void BaseListener::exitLess_equal(ParseRulesParser::Less_equalContext* ctx){
-    __insert_to_prec_node__(MODE::BOUND_DEFINITION);
+    assert(!mode_.empty());
+    assert(mode_.top()==MODE::BOUND_DEFINITION);
+    assert(anonymous_node_.size()==1);
 }
 
 void BaseListener::enterLarger(ParseRulesParser::LargerContext* ctx){
-    assert(mode_.empty());
+    assert(!mode_.empty());
     if(ctx->VARIABLE()){
         //creating in active sheet
         BaseData* c_var_db_tmp;
@@ -305,7 +305,6 @@ void BaseListener::enterLarger(ParseRulesParser::LargerContext* ctx){
         current_var_ = c_var_db_tmp->add_variable(ctx->VARIABLE()->getText())->node();
     }
     else assert(false);
-    anonymous_node_.push(current_var_);
 
     if(ctx->variable_parameter()){
         BaseData* db_tmp;
@@ -316,17 +315,18 @@ void BaseListener::enterLarger(ParseRulesParser::LargerContext* ctx){
         if(ctx->variable_parameter()->VARIABLE())
             bottom_.emplace(db_tmp->name(),db_tmp->add_variable(ctx->variable_parameter()->VARIABLE()->getText()).get()->name(),BOTTOM_BOUND_T::LARGER);
         else assert(false);
-        mode_.push(MODE::BOUND_DEFINITION);
     }
     else assert(false);
 }
 
 void BaseListener::exitLarger(ParseRulesParser::LargerContext* ctx){
-    __insert_to_prec_node__(MODE::BOUND_DEFINITION);
+    assert(!mode_.empty());
+    assert(mode_.top()==MODE::BOUND_DEFINITION);
+    assert(anonymous_node_.size()==1);
 }
 
 void BaseListener::enterLarger_equal(ParseRulesParser::Larger_equalContext* ctx){
-    assert(mode_.empty());
+    assert(!mode_.empty());
     if(ctx->VARIABLE()){
         //creating in active sheet
         BaseData* c_var_db_tmp;
@@ -337,7 +337,6 @@ void BaseListener::enterLarger_equal(ParseRulesParser::Larger_equalContext* ctx)
         current_var_ = c_var_db_tmp->add_variable(ctx->VARIABLE()->getText())->node();
     }
     else assert(false);
-    anonymous_node_.push(current_var_);
 
     if(ctx->variable_parameter()){
         BaseData* db_tmp;
@@ -348,13 +347,14 @@ void BaseListener::enterLarger_equal(ParseRulesParser::Larger_equalContext* ctx)
         if(ctx->variable_parameter()->VARIABLE())
             bottom_.emplace(db_tmp->name(),db_tmp->add_variable(ctx->variable_parameter()->VARIABLE()->getText()).get()->name(),BOTTOM_BOUND_T::LARGER_OR_EQUAL);
         else assert(false);
-        mode_.push(MODE::BOUND_DEFINITION);
     }
     else assert(false);
 }
 
 void BaseListener::exitLarger_equal(ParseRulesParser::Larger_equalContext* ctx){
-    __insert_to_prec_node__(MODE::BOUND_DEFINITION);
+    assert(!mode_.empty());
+    assert(mode_.top()==MODE::BOUND_DEFINITION);
+    assert(anonymous_node_.size()==1);
 }
 
 void BaseListener::visitErrorNode(antlr4::tree::ErrorNode* node){
@@ -405,6 +405,7 @@ void BaseListener::enterComparision(ParseRulesParser::ComparisionContext* ctx){
     assert(mode_.empty());
     assert(anonymous_node_.empty());
     mode_.push(MODE::BOUND_DEFINITION);
+    anonymous_node_.push(std::make_shared<UnaryNode>(UNARY_OP::PARENS));
 }
 
 void BaseListener::exitComparision(ParseRulesParser::ComparisionContext* ctx){
@@ -417,4 +418,5 @@ void BaseListener::exitComparision(ParseRulesParser::ComparisionContext* ctx){
     else if(top_.has_value())
         current_var_->variable()->set_top_bound_value(top_.value().db_name,top_.value().var_name,anonymous_node_.top(),top_.value().type);
     else throw std::runtime_error("Error ");
+    anonymous_node_.pop();
 }

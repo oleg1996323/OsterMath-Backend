@@ -1,0 +1,5 @@
+VAR(!('other')#C) = [500; 200; 100] 
+VAR(!('any')#B) = 2
+VAR(!('any')#D) = [500; 200; 100] 
+VAR(!('any')#A) = sumproduct(VAR(!('other')#C)VAR(!('any')#D))
+VAR(!('any')#I) = [VAR(!('any')#A); VAR(!('any')#B)] 

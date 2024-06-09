@@ -2,6 +2,7 @@
 #include "def.h"
 #include "var_node.h"
 #include "types.h"
+#include "serialize.h"
 
 void Node::refresh(){
     execute();
@@ -56,4 +57,17 @@ void Node::get_array_childs(std::vector<std::shared_ptr<Node>>& childs) const{
             childs.push_back(child);
         else child->get_array_childs(childs);
     }
+}
+
+void Node::serialize_header(serialization::SerialData& serial_data, const std::shared_ptr<Node>& from){
+    for(auto& child:childs_){
+        if(!serial_data.contains_node(child) && child!=from){
+            serial_data.insert_node(child);
+            child->serialize_header(serial_data,from);
+        }
+    }
+}
+
+void Node::deserialize_header(serialization::SerialData& serial_data, const std::shared_ptr<Node>& from){
+
 }

@@ -59,5 +59,6 @@ class UnaryNode:public Node{
 
     private:
     Result __calculate__();
+    Result __calculate__(size_t index);
     UNARY_OP operation_;
 };
