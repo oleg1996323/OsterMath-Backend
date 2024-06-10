@@ -4,6 +4,20 @@
 #include "types.h"
 #include "serialize.h"
 
+size_t Node::counter = 0;
+
+Node::Node(size_t sz):
+    childs_([&sz](){std::vector<std::shared_ptr<Node>> vector;
+                    vector.reserve(sz);
+                    return vector;}()),
+                    node_count(counter++){
+                        std::cout<<node_count<<std::endl;
+                    }
+
+Node::Node():node_count(counter++){
+    std::cout<<node_count<<std::endl;
+}
+
 void Node::refresh(){
     execute();
     caller_ = true;
@@ -57,6 +71,14 @@ void Node::get_array_childs(std::vector<std::shared_ptr<Node>>& childs) const{
             childs.push_back(child);
         else child->get_array_childs(childs);
     }
+}
+
+const std::unordered_set<Node*>& Node::parents() const{
+    return parents_;
+}
+
+size_t Node::id() const{
+    return node_count;
 }
 
 void Node::serialize_header(serialization::SerialData& serial_data, const std::shared_ptr<Node>& from){

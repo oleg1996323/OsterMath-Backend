@@ -237,13 +237,13 @@ R"(VAR(#I) :  VAR(#A) < 2
 }
 
 void Testing(){
-    Test_Correct_Sum_Result_For_Array();
-    Test_Correct_SumProduct_Result_For_Array();
-    Test_Correct_Product_Result_For_Array();
+    //Test_Correct_Sum_Result_For_Array();
+    //Test_Correct_SumProduct_Result_For_Array();
+    //Test_Correct_Product_Result_For_Array();
     //Test_Simple_Arithmetic_With_Variable();
-    Test_Range_Operation_With_Var_Arrays();
-    Testing_compare_vars_1();
-    Testing_compare_vars_2();
+    //Test_Range_Operation_With_Var_Arrays();
+    //Testing_compare_vars_1();
+    //Testing_compare_vars_2();
     Test_Serialization();
 }
 

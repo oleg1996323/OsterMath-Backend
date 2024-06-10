@@ -79,7 +79,7 @@ class VariableBase: public FormattingData{
             print_text();
             set_stream(prec_stream);
         }
-        serialization::serialize_structure(stream,show_reinterpret_);
+        //serialization::serialize_structure(stream,show_reinterpret_);
         stream<<std::endl;
     }
 

@@ -67,6 +67,10 @@ class BaseData{
 
     void deserialize_header(serialization::SerialData& serial_data);
 
+    const std::unordered_map<std::string_view,std::shared_ptr<VariableBase>> variables() const;
+
+    uint16_t id() const;
+
     private:
     std::unordered_set<std::string> var_names_;
     std::unordered_map<std::string_view,std::shared_ptr<VariableBase>> vars_;
@@ -74,6 +78,8 @@ class BaseData{
     std::unique_ptr<Parser> parser_;
     DataPool* pool_;
     std::string generate_hash_name();
+    static uint16_t counter;
+    uint16_t data_count;
 };
 
 class DataPool{
@@ -101,6 +107,8 @@ class DataPool{
     void serialize(serialization::SerialData& serial_data);
 
     void deserialize(serialization::SerialData& serial_data);
+
+    const std::unordered_map<std::string_view,BaseData>& data_bases() const;
 
     private:
     std::string name_;

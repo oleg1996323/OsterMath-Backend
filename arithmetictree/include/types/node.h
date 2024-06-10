@@ -31,12 +31,9 @@ namespace serialization{
 
 class Node{
     public:
-    Node(size_t sz):
-        childs_([&sz](){std::vector<std::shared_ptr<Node>> vector;
-                        vector.reserve(sz);
-                        return vector;}()){}
+    Node(size_t sz);
 
-    Node() =default;
+    Node();
 
     virtual NODE_TYPE type() const = 0;
 
@@ -99,16 +96,23 @@ class Node{
 
     bool has_parents() const;
 
+    const std::unordered_set<Node*>& parents() const;
+
     bool refer_to(std::string_view var_name) const;
 
     bool caller() const{
         return caller_;
     }
 
-    const std::vector<std::shared_ptr<Node>>& childs() const;
+    size_t id() const;
 
+    const std::vector<std::shared_ptr<Node>>& childs() const;
+    
     protected:
     mutable std::unordered_set<Node*> parents_;
     std::vector<std::shared_ptr<Node>> childs_;
     bool caller_ = false;
+    private:
+    static size_t counter;
+    size_t node_count;
 };

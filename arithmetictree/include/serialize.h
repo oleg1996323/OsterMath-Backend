@@ -13,7 +13,7 @@ class SerialData{
     std::fstream data_stream_;
 
     void open_to_write(const std::filesystem::path& path){
-        data_stream_.open(path, std::ios::out | std::ios_base::binary);
+        data_stream_.open(path, std::ios::out );
         if(data_stream_.is_open())
             path_=std::move(path);
         else throw std::runtime_error(std::string("Impossible to open the file ")+path.string());
@@ -42,20 +42,17 @@ class SerialData{
         open_to_read(path);
     }
 
-    void serialize_header(){
-        for(std::shared_ptr<Node>& node:dict_){
-            data_stream_.write((char*)node.get(), sizeof(uint32_t));
-            //data_stream_. //add type, operation type and maybe size if array, function or rangeoperation
-            //may be necessary to use virtual serialize_header and serialize (for body)
-        }
-        data_stream_.write("\n/h",3); //header and body separator
+    void serialize_header(DataPool* pool);
+
+    void serialize_body(DataPool* pool){
+        // for(const std::shared_ptr<Node>& node:dict_){
+            
+        // }
     }
 
-    void serialize_body(){
-        for(std::shared_ptr<Node>& node:dict_){
-            data_stream_.write()
-        }
-    }
+    DataPool deserialize_header();
+
+    DataPool deserialize_body();
     
     private:
     std::filesystem::path path_;

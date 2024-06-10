@@ -6,7 +6,9 @@
 
 using namespace std::string_literals;
 
-BaseData::BaseData(std::string_view name):name_(name){}
+uint16_t BaseData::counter = 0;
+
+BaseData::BaseData(std::string_view name):name_(name), data_count(counter++){}
 
 VariableBase* BaseData::get(std::string_view name){
     if(!exists(name))
@@ -96,6 +98,10 @@ DataPool* BaseData::get_pool(){
     return pool_;
 }
 
+const std::unordered_map<std::string_view,std::shared_ptr<VariableBase>> BaseData::variables() const{
+    return vars_;
+}
+
 DataPool::DataPool(const std::string& name):name_(name){
     add_data("anon"s);
 }
@@ -149,6 +155,10 @@ BaseData* DataPool::get(std::string_view name_data) noexcept{
     else return nullptr;
 }
 
+const std::unordered_map<std::string_view,BaseData>& DataPool::data_bases() const{
+    return data_bases_;
+}
+
 #include "serialize.h"
 
 void BaseData::serialize(serialization::SerialData& serial_data){
@@ -159,9 +169,9 @@ void BaseData::serialize(serialization::SerialData& serial_data){
     serial_data.data_stream_.write(pool_->name().begin(),pool_->name().size());
     serial_data.data_stream_.write("#VARIABLES", 10);
     for(auto var_data:vars_){
-        stream.write(var_data.first.begin(), var_data.first.size()); //name
-        stream<<std::endl; //control symbol
-        var_data.second->serialize(stream);
+        //stream.write(var_data.first.begin(), var_data.first.size()); //name
+        //stream<<std::endl; //control symbol
+        //var_data.second->serialize(stream);
     }
 }
 
@@ -172,22 +182,31 @@ void BaseData::serialize_header(serialization::SerialData& serial_data) const{
         var_base->node()->deserialize_header(serial_data,var_base->node());
     }
 
-    for(const std::shared_ptr<Node>& node:serial_data.)
+    //for(const std::shared_ptr<Node>& node:serial_data.)
 }
 
 void BaseData::deserialize(serialization::SerialData& serial_data){
     
 }
 
-void DataPool::serialize(serialization::SerialData& serial_data){
-    serial_data.data_stream_.write("#BOOKMATHNAME_", 14);
-    serial_data.data_stream_.write(name_.c_str(), name_.size());
-    serial_data.data_stream_.write("\n",1);
-    for(auto& data:data_bases_)
-        data.second.serialize_header(serial_data);
+uint16_t BaseData::id() const{
+    return data_count;
+}
 
-    for(auto& data:data_bases_)
-        data.second.serialize(serial_data);
+void DataPool::serialize(serialization::SerialData& serial_data){
+    uint32_t sz=0;
+    serial_data.data_stream_.write("/OMB\n",5);
+    //pool name size and pool name
+    sz = pool->name().size();
+    serial_data.data_stream_.write(reinterpret_cast<const char*>(&sz),sizeof(sz));
+    serial_data.data_stream_.write(pool->name().data(),pool->name().size());
+    //pool hash
+    uint32_t pool_ptr = (uint32_t)this;
+    serial_data.data_stream_.write(reinterpret_cast<const char*>(&this),sizeof(uint32_t));
+
+    //number of data_bases
+    sz = pool->data_bases().size();
+    serial_data.data_stream_.write(reinterpret_cast<const char*>(&sz),sizeof(sz));
 }
 
 void DataPool::deserialize(serialization::SerialData& serial_data){
