@@ -2,9 +2,11 @@
 #include <string>
 #include <fstream>
 #include <filesystem>
+#include <unordered_map>
 #include "node.h"
 
 class DataPool;
+class BaseData;
 
 namespace serialization{
 
@@ -57,7 +59,9 @@ class SerialData{
     private:
     std::filesystem::path path_;
     //add std::unordered_map for search and inserting at deserialization
-    std::unordered_set<std::shared_ptr<Node>> dict_;
+    std::unordered_map<uint64_t,DataPool*> pools_;
+    std::unordered_map<uint64_t,BaseData*> data_bases_;
+    std::unordered_map<uint64_t,std::shared_ptr<Node>> nodes_;
     
 };
 
@@ -68,4 +72,5 @@ class SerialData{
 
 void serialize_to(const std::filesystem::path& path,DataPool* pool);
 void serialize_to(std::filesystem::path&& path,DataPool* pool);
+DataPool deserialize_from(const std::filesystem::path& path);
 }

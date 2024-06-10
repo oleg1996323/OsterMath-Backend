@@ -93,8 +93,6 @@ VAR(#D)=[500,200,100]
     data->get("I")->set_stream(output);
     data->get("A")->set_stream(output);
     data->get("B")->set_stream(output);
-    // data->get("C")->set_stream(output);
-    // data->get("D")->set_stream(output);
     try{
         data->get("I")->print_text();
         std::cout<<output.str()<<std::endl;
@@ -105,12 +103,6 @@ VAR(#D)=[500,200,100]
         data->get("B")->print_text();
         std::cout<<output.str()<<std::endl;
         output.str("");
-        // data->get("C")->print_text();
-        // std::cout<<output.str()<<std::endl;
-        // output.str("");
-        // data->get("D")->print_text();
-        // std::cout<<output.str()<<std::endl;
-        // output.str("");
         data->get("I")->print_result();
         std::cout<<output.str()<<std::endl;
         std::cout.setf(std::ios::boolalpha);
@@ -123,6 +115,14 @@ VAR(#D)=[500,200,100]
     }
 
     serialization::serialize_to("./TestSerialization.omb",&pool);
+    DataPool other = serialization::deserialize_from("./TestSerialization.omb");
+    assert(other.exists("any"));
+    assert(other.exists("other"));
+    assert(other.exists("anon"));
+    assert(other.get("any")->exists("I"));
+    assert(other.get("any")->exists("A"));
+    assert(other.get("other")->exists("C"));
+    return;
 }
 
 void Test_Correct_Product_Result_For_Array(){

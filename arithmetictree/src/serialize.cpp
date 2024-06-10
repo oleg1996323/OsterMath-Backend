@@ -13,6 +13,14 @@ void serialize_to(const std::filesystem::path& path,DataPool* pool){
     serial_data.data_stream_.close();
 }
 
+DataPool deserialize_from(const std::filesystem::path& path){
+    SerialData serial_data;
+    serial_data.open_to_read(path);
+    DataPool pool = serial_data.deserialize_header();
+    serial_data.data_stream_.close();
+    return pool;
+}
+
 void SerialData::serialize_header(DataPool* pool){
     uint32_t sz=0;
     data_stream_.write("/OMB\n",5);
@@ -21,8 +29,9 @@ void SerialData::serialize_header(DataPool* pool){
     data_stream_.write(reinterpret_cast<const char*>(&sz),sizeof(sz));
     data_stream_.write(pool->name().data(),pool->name().size());
     //pool hash
-    uint32_t pool_ptr = (uint32_t)pool;
-    data_stream_.write(reinterpret_cast<const char*>(&pool_ptr),sizeof(uint32_t));
+    uint64_t pool_ptr = (uint64_t)pool;
+    std::cout<<"Pool pointer: "<<pool_ptr<<std::endl;
+    data_stream_.write(reinterpret_cast<const char*>(&pool_ptr),sizeof(uint64_t));
 
     //number of data_bases
     sz = pool->data_bases().size();
@@ -36,9 +45,9 @@ void SerialData::serialize_header(DataPool* pool){
         data_stream_.write(reinterpret_cast<const char*>(&sz),sizeof(sz));
         data_stream_.write(db_name.data(), db_name.size());
         //database hash
-        uint16_t db_id = data_base.id();
-        std::cout<<"DataBase id:"<<db_id<<std::endl;
-        data_stream_.write(reinterpret_cast<const char*>(&db_id),sizeof(uint16_t));
+        uint64_t db_ptr = (uint64_t)&data_base;
+        std::cout<<"DataBase id:"<<db_ptr<<std::endl;
+        data_stream_.write(reinterpret_cast<const char*>(&db_ptr),sizeof(uint64_t));
 
         //number of variables
         sz = data_base.variables().size();
@@ -51,9 +60,9 @@ void SerialData::serialize_header(DataPool* pool){
                 data_stream_.write(reinterpret_cast<const char*>(&sz),sizeof(sz));
                 data_stream_.write(var_name.data(),var_name.size());
                 //variable hash
-                uint32_t var_id = var->node()->id();
-                std::cout<<"Variable id:"<<var_id<<std::endl;
-                data_stream_.write(reinterpret_cast<const char*>(&var_id),sizeof(uint32_t));
+                uint64_t var_ptr = (uint64_t)var.get();
+                std::cout<<"Variable id:"<<var_ptr<<std::endl;
+                data_stream_.write(reinterpret_cast<const char*>(&var_ptr),sizeof(uint64_t));
                 data_stream_.write("\r\n", 2);
                 insert_node(reinterpret_cast<const std::shared_ptr<Node> &>(var->node()));
             }
@@ -68,8 +77,13 @@ void SerialData::serialize_header(DataPool* pool){
 
 DataPool SerialData::deserialize_header(){
     uint32_t sz=0;
-    char* fmt_ctrl;
-    data_stream_.read(fmt_ctrl,5);
+    {
+        std::string fmt_ctrl(5,0);
+        data_stream_.read(fmt_ctrl.data(),5);
+        if(fmt_ctrl!="/OMB\n")
+            throw std::runtime_error("Incorrect format");
+    }
+
     //pool name size and pool name
     data_stream_.read(reinterpret_cast<char*>(&sz),sizeof(sz));
 
@@ -78,49 +92,66 @@ DataPool SerialData::deserialize_header(){
 
     DataPool pool(pool_name);
     //pool hash
-    uint32_t pool_ptr;
-    data_stream_.read(reinterpret_cast<char*>(&pool_ptr),sizeof(uint32_t));
+    uint64_t pool_ptr;
+    data_stream_.read(reinterpret_cast<char*>(&pool_ptr),sizeof(uint64_t));
     
 
     //number of data_bases
-    data_stream_.read(reinterpret_cast<char*>(&sz),sizeof(sz));
+    uint32_t sz_db=0;
+    data_stream_.read(reinterpret_cast<char*>(&sz_db),sizeof(sz_db));
     
-    for(decltype(sz) iter = 0; iter<sz;++iter){
-        uint32_t t_pool_id;
-        
-        data_stream_.read(reinterpret_cast<char*>(&t_pool_id),sizeof(t_pool_id));
-        
-        data_stream_.read(reinterpret_cast<char*>(&sz),sizeof(sz));
+    for(decltype(sz_db) iter = 0; iter<sz_db;++iter){
+        uint64_t t_pool_ptr;
+
+        data_stream_.read(reinterpret_cast<char*>(&t_pool_ptr),sizeof(uint64_t));
+        data_stream_.read(reinterpret_cast<char*>(&sz),sizeof(uint32_t));
+
         std::string db_name(sz,0);
-        data_stream_.read(db_name_ch.data(), sz);
+
+        data_stream_.read(db_name.data(), sz);
 
         BaseData* db = pool.add_data(db_name);
 
         //database hash
-        uint16_t db_id;
+        uint64_t db_ptr;
         
-        data_stream_.read(reinterpret_cast<char*>(&db_id),sizeof(uint16_t));
-        std::cout<<"DataBase id:"<<db_id<<std::endl;
+        data_stream_.read(reinterpret_cast<char*>(&db_ptr),sizeof(uint64_t));
+        std::cout<<"DataBase id:"<<db_ptr<<std::endl;
         //insert in serial data base
 
         //number of variables
-        data_stream_.read(reinterpret_cast<char*>(&sz),sizeof(sz));
+        uint32_t sz_var;
+        data_stream_.read(reinterpret_cast<char*>(&sz_var),sizeof(uint32_t));
         if(sz!=0){
-            for(auto& [var_name,var]:data_base.variables()){
+            for(decltype(sz_var) iter_2=0;iter_2<sz_var;++iter_2){
                 //variable name size and variable name
                 data_stream_.read(reinterpret_cast<char*>(&sz),sizeof(sz));
                 std::string var_name(sz,0);
                 data_stream_.read(var_name.data(),sz);
                 db->add_variable(std::move(var_name));
                 //variable hash
-                uint32_t var_id ;
-                data_stream_.read(reinterpret_cast<char*>(&var_id),sizeof(uint32_t));
-                std::cout<<"Variable id:"<<var_id<<std::endl;
-                data_stream_.read(void*, 2);
+                uint64_t var_ptr;
+                data_stream_.read(reinterpret_cast<char*>(&var_ptr),sizeof(var_ptr));
+                char cr;
+                char lf;
+                data_stream_.get(cr);
+                data_stream_.get(lf);
+                if(cr!='\r' || lf!='\n')
+                    throw std::runtime_error(std::string("OMB file ")+path_.string()+" corrupted");
+
+                std::cout<<"Variable id:"<<var_ptr<<std::endl;
+                
                 //insert_node(reinterpret_cast<const std::shared_ptr<Node> &>(var->node()));
             }
         }
-        else data_stream_.read("\r\n", 2);
+        else {
+            char cr;
+            char lf;
+            data_stream_.get(cr);
+            data_stream_.get(lf);
+            if(cr!='\r' || lf!='\n')
+                throw std::runtime_error(std::string("OMB file ")+path_.string()+" corrupted");
+        }
     }
 
     return pool;

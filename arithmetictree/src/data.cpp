@@ -194,19 +194,19 @@ uint16_t BaseData::id() const{
 }
 
 void DataPool::serialize(serialization::SerialData& serial_data){
-    uint32_t sz=0;
-    serial_data.data_stream_.write("/OMB\n",5);
-    //pool name size and pool name
-    sz = pool->name().size();
-    serial_data.data_stream_.write(reinterpret_cast<const char*>(&sz),sizeof(sz));
-    serial_data.data_stream_.write(pool->name().data(),pool->name().size());
-    //pool hash
-    uint32_t pool_ptr = (uint32_t)this;
-    serial_data.data_stream_.write(reinterpret_cast<const char*>(&this),sizeof(uint32_t));
+    // uint32_t sz=0;
+    // serial_data.data_stream_.write("/OMB\n",5);
+    // //pool name size and pool name
+    // sz = name().size();
+    // serial_data.data_stream_.write(reinterpret_cast<const char*>(&sz),sizeof(sz));
+    // serial_data.data_stream_.write(name().data(),pool->name().size());
+    // //pool hash
+    // uint32_t pool_ptr = (uint32_t)this;
+    // serial_data.data_stream_.write(reinterpret_cast<const char*>(pool_ptr),sizeof(uint32_t));
 
-    //number of data_bases
-    sz = pool->data_bases().size();
-    serial_data.data_stream_.write(reinterpret_cast<const char*>(&sz),sizeof(sz));
+    // //number of data_bases
+    // sz = pool->data_bases().size();
+    // serial_data.data_stream_.write(reinterpret_cast<const char*>(&sz),sizeof(sz));
 }
 
 void DataPool::deserialize(serialization::SerialData& serial_data){
