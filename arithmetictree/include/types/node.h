@@ -3,6 +3,7 @@
 #include <optional>
 #include <vector>
 #include <unordered_set>
+#include <functional>
 #include "def.h"
 
 class Node;
@@ -106,6 +107,9 @@ class Node{
 
     size_t id() const;
 
+    template<typename T, typename... U, typename... ARGS>
+    void recursive_function_applied_to_all_childs(std::function<T(U&&...)> func, ARGS&&... args);
+
     const std::vector<std::shared_ptr<Node>>& childs() const;
     
     protected:
@@ -116,3 +120,9 @@ class Node{
     static size_t counter;
     size_t node_count;
 };
+
+template<typename T, typename... U, typename... ARGS>
+void Node::recursive_function_applied_to_all_childs(std::function<T(U&&...)> func, ARGS&&... args){
+    for(auto& child:childs_)
+        child->recursive_function_applied_to_all_childs(func(child),std::forward<ARGS>(args)...);
+}

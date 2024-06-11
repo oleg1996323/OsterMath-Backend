@@ -23,39 +23,62 @@ DataPool deserialize_from(const std::filesystem::path& path){
 
 void SerialData::serialize_header(DataPool* pool){
     uint32_t sz=0;
+    uint64_t pool_id = 0;
+    uint64_t db_id = 0;
+    uint64_t node_id = 0;
     data_stream_.write("/OMB\n",5);
     //pool name size and pool name
     sz = pool->name().size();
     data_stream_.write(reinterpret_cast<const char*>(&sz),sizeof(sz));
     data_stream_.write(pool->name().data(),pool->name().size());
     //pool hash
-    uint64_t pool_ptr = (uint64_t)pool;
-    std::cout<<"Pool pointer: "<<pool_ptr<<std::endl;
-    data_stream_.write(reinterpret_cast<const char*>(&pool_ptr),sizeof(uint64_t));
+    std::cout<<"Pool pointer: "<<pool_id<<std::endl;
+    data_stream_.write(reinterpret_cast<const char*>(&pool_id),sizeof(pool_id));
+    ++pool_id;
 
     //number of data_bases
     sz = pool->data_bases().size();
     data_stream_.write(reinterpret_cast<const char*>(&sz),sizeof(sz));
     
     for(auto& [db_name,data_base]:pool->data_bases()){
-        data_stream_.write((char*)pool,sizeof(pool_ptr));
+        data_stream_.write((char*)pool,sizeof(pool_id));
 
         //database name size and database name
         sz = db_name.size();
         data_stream_.write(reinterpret_cast<const char*>(&sz),sizeof(sz));
         data_stream_.write(db_name.data(), db_name.size());
         //database hash
-        uint64_t db_ptr = (uint64_t)&data_base;
-        std::cout<<"DataBase id:"<<db_ptr<<std::endl;
-        data_stream_.write(reinterpret_cast<const char*>(&db_ptr),sizeof(uint64_t));
+        std::cout<<"DataBase id:"<<db_id<<std::endl;
+        data_stream_.write(reinterpret_cast<const char*>(&db_id),sizeof(db_id));
+        ++db_id;
 
         //number of variables
         sz = data_base.variables().size();
         data_stream_.write(reinterpret_cast<const char*>(&sz),sizeof(sz));
         if(!data_base.variables().empty()){
+            
+            //function for node writing
+            //{NODEHASH}{NODETYPE}{NODEOPERATION(optional)}{CHILDS_SIZE(optional)}
+            std::function<void(const std::shared_ptr<Node>&)> nodes_to_header;
+            nodes_to_header=[](const std::shared_ptr<Node>& node)->void{
+                
+                return;
+            };
 
             for(auto& [var_name,var]:data_base.variables()){
                 //variable name size and variable name
+                sz = var_name.size();
+                data_stream_.write(reinterpret_cast<const char*>(&sz),sizeof(sz));
+                data_stream_.write(var_name.data(),var_name.size());
+                //variable hash
+                data_stream_.write(reinterpret_cast<const char*>(&node_id),sizeof(node_id));
+                ++node_id;
+                data_stream_.write("\r\n", 2);
+                insert_node(reinterpret_cast<const std::shared_ptr<Node> &>(var->node()));
+            }
+            for(auto& [var_name,var]:data_base.variables()){
+                //variable name size and variable name
+                
                 sz = var_name.size();
                 data_stream_.write(reinterpret_cast<const char*>(&sz),sizeof(sz));
                 data_stream_.write(var_name.data(),var_name.size());
@@ -73,6 +96,61 @@ void SerialData::serialize_header(DataPool* pool){
 
     //add type, operation type and maybe size if array, function or rangeoperation
     //may be necessary to use virtual serialize_header and serialize (for body)
+}
+
+void SerialData::serialize_body(DataPool* pool){
+    // uint64_t pool_ptr = (uint64_t)pool;
+    // for(auto& [db_name,data_base]:pool->data_bases()){
+        
+    //     uint64_t db_ptr = (uint64_t)&data_base;
+
+    //     //variable structure {POOLHASH}{DATABASEHASH}{NODEHASH}{NODETYPE}{NODEOPERATION(optional)}{PARENTS}{CHILDS}
+    //     data_stream_.write((char*)pool,sizeof(pool_ptr));
+    //     data_stream_.write(reinterpret_cast<const char*>(&db_ptr),sizeof(uint64_t));
+
+    //     //database name size and database name
+    //     sz = db_name.size();
+    //     data_stream_.write(reinterpret_cast<const char*>(&sz),sizeof(sz));
+    //     data_stream_.write(db_name.data(), db_name.size());
+    //     //database hash
+        
+    //     std::cout<<"DataBase id:"<<db_ptr<<std::endl;
+        
+
+    //     //number of variables
+    //     sz = data_base.variables().size();
+    //     data_stream_.write(reinterpret_cast<const char*>(&sz),sizeof(sz));
+    //     if(!data_base.variables().empty()){
+
+    //         for(auto& [var_name,var]:data_base.variables()){
+    //             //variable name size and variable name
+    //             sz = var_name.size();
+    //             data_stream_.write(reinterpret_cast<const char*>(&sz),sizeof(sz));
+    //             data_stream_.write(var_name.data(),var_name.size());
+    //             //variable hash
+    //             uint64_t var_ptr = (uint64_t)var.get();
+    //             std::cout<<"Variable id:"<<var_ptr<<std::endl;
+    //             data_stream_.write(reinterpret_cast<const char*>(&var_ptr),sizeof(uint64_t));
+    //             data_stream_.write("\r\n", 2);
+    //             insert_node(reinterpret_cast<const std::shared_ptr<Node> &>(var->node()));
+    //         }
+    //         for(auto& [var_name,var]:data_base.variables()){
+    //             //variable name size and variable name
+    //             var->serialize();
+    //             sz = var_name.size();
+    //             data_stream_.write(reinterpret_cast<const char*>(&sz),sizeof(sz));
+    //             data_stream_.write(var_name.data(),var_name.size());
+    //             //variable hash
+    //             uint64_t var_ptr = (uint64_t)var.get();
+    //             std::cout<<"Variable id:"<<var_ptr<<std::endl;
+    //             data_stream_.write(reinterpret_cast<const char*>(&var_ptr),sizeof(uint64_t));
+    //             data_stream_.write("\r\n", 2);
+    //             insert_node(reinterpret_cast<const std::shared_ptr<Node> &>(var->node()));
+    //         }
+    //         data_stream_.seekp(-2,std::ostream::end);
+    //     }
+    //     data_stream_.write("\r\n", 2);
+    // }
 }
 
 DataPool SerialData::deserialize_header(){
