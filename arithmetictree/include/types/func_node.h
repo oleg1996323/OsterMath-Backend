@@ -101,6 +101,8 @@ class FunctionNode:public Node{
 
     virtual void deserialize(std::ostream& stream) override;
 
+    FUNCTION_OP operation() const;
+
     private:
     
     FUNCTION_OP operation_;

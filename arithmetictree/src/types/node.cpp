@@ -82,12 +82,12 @@ size_t Node::id() const{
 }
 
 void Node::serialize_header(serialization::SerialData& serial_data, const std::shared_ptr<Node>& from){
-    for(auto& child:childs_){
-        if(!serial_data.contains_node(child) && child!=from){
-            serial_data.insert_node(child);
-            child->serialize_header(serial_data,from);
-        }
-    }
+    // for(auto& child:childs_){
+    //     if(!serial_data.contains_node(child) && child!=from){
+    //         serial_data.insert_node(child);
+    //         child->serialize_header(serial_data,from);
+    //     }
+    // }
 }
 
 void Node::deserialize_header(serialization::SerialData& serial_data, const std::shared_ptr<Node>& from){

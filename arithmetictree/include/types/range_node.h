@@ -38,6 +38,8 @@ class RangeOperationNode:public Node{
 
     virtual bool is_array() const override;
 
+    RANGE_OP operation() const;
+
     size_t range_length() const{
         return range_size;
     }

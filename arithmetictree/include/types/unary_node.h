@@ -53,6 +53,8 @@ class UnaryNode:public Node{
 
     }
 
+    UNARY_OP operation() const;
+
     virtual void print_text(std::ostream& stream) const override;
 
     virtual void print_result(std::ostream& stream) const override;

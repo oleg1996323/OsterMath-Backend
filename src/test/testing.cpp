@@ -125,6 +125,38 @@ VAR(#D)=[500,200,100]
     return;
 }
 
+void Test_Deserialization(){
+    std::string equal = R"([300000; 2]
+)";
+
+    DataPool pool=serialization::deserialize_from("./TestSerialization.omb");
+    BaseData* data = pool.get("any");
+    std::ostringstream output;
+    data->get("I")->set_stream(output);
+    data->get("A")->set_stream(output);
+    data->get("B")->set_stream(output);
+    try{
+        data->get("I")->print_text();
+        std::cout<<output.str()<<std::endl;
+        output.str("");
+        data->get("A")->print_text();
+        std::cout<<output.str()<<std::endl;
+        output.str("");
+        data->get("B")->print_text();
+        std::cout<<output.str()<<std::endl;
+        output.str("");
+        data->get("I")->print_result();
+        std::cout<<output.str()<<std::endl;
+        std::cout.setf(std::ios::boolalpha);
+        std::cout<<"any exists: "<<pool.exists("any")<<std::endl;
+        std::cout<<"other exists: "<<pool.exists("other")<<std::endl;
+        assert(output.str() == equal);
+    }
+    catch(const std::invalid_argument& err){
+        std::cout<<err.what()<<std::endl;
+    }
+}
+
 void Test_Correct_Product_Result_For_Array(){
     std::string str_in = 
 R"(VAR(#I)=[VAR(#A),VAR(#B)]
@@ -245,6 +277,7 @@ void Testing(){
     //Testing_compare_vars_1();
     //Testing_compare_vars_2();
     Test_Serialization();
+    Test_Deserialization();
 }
 
 #endif

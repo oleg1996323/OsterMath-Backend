@@ -38,6 +38,10 @@ void RangeOperationNode::print_text(std::ostream& stream) const{
     stream<<")";
 }
 
+RANGE_OP RangeOperationNode::operation() const{
+    return operation_;
+}
+
 void RangeOperationNode::print_result(std::ostream& stream) const{
     stream<<const_cast<RangeOperationNode*>(this)->execute();
 }

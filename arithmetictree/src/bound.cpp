@@ -9,11 +9,6 @@ bool Bound_T<TOP_BOUND_T>::is_defined() const{
 }
 
 template<>
-bool Bound_T<TOP_BOUND_T>::is_expression() const{
-    return is_defined() && value_->type()==NODE_TYPE::EXPRESSION;
-}
-
-template<>
 bool Bound_T<TOP_BOUND_T>::is_value() const{
     return is_defined() && value_->type()==NODE_TYPE::VALUE;
 }
@@ -26,11 +21,6 @@ bool Bound_T<TOP_BOUND_T>::is_variable() const{
 template<>
 bool Bound_T<BOTTOM_BOUND_T>::is_defined() const{
     return value_.get()!=nullptr;
-}
-
-template<>
-bool Bound_T<BOTTOM_BOUND_T>::is_expression() const{
-    return is_defined() && value_->type()==NODE_TYPE::EXPRESSION;
 }
 
 template<>

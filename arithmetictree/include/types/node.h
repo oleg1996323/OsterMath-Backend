@@ -22,8 +22,7 @@ enum class NODE_TYPE{
     RANGEOP,
     FUNCTION,
     ARRAY,
-    STRING,
-    EXPRESSION
+    STRING
 };
 
 namespace serialization{
@@ -107,8 +106,8 @@ class Node{
 
     size_t id() const;
 
-    template<typename T, typename... U, typename... ARGS>
-    void recursive_function_applied_to_all_childs(std::function<T(U&&...)> func, ARGS&&... args);
+    template<typename T, typename... U>
+    void recursive_function_applied_to_all_childs(std::function<T(const std::shared_ptr<Node>&,U...)> func);
 
     const std::vector<std::shared_ptr<Node>>& childs() const;
     
@@ -119,10 +118,28 @@ class Node{
     private:
     static size_t counter;
     size_t node_count;
+
+    private:
+
+    template<typename T, typename... U>
+    void recursive_function_applied_to_all_childs(std::function<T(const std::shared_ptr<Node>&,U...)> func, Node* root);
 };
 
-template<typename T, typename... U, typename... ARGS>
-void Node::recursive_function_applied_to_all_childs(std::function<T(U&&...)> func, ARGS&&... args){
+template<typename T, typename... U>
+void Node::recursive_function_applied_to_all_childs(std::function<T(const std::shared_ptr<Node>&,U...)> func){
+    for(auto& child:childs_){
+        if(child->type()!=NODE_TYPE::VARIABLE){
+            func(child);
+            child->recursive_function_applied_to_all_childs(func,this);
+        }
+    }
+}
+
+template<typename T, typename... U>
+void Node::recursive_function_applied_to_all_childs(std::function<T(const std::shared_ptr<Node>&,U...)> func, Node* root){
     for(auto& child:childs_)
-        child->recursive_function_applied_to_all_childs(func(child),std::forward<ARGS>(args)...);
+        if(child.get()!=root && child->type()!=NODE_TYPE::VARIABLE){
+            func(child);
+            child->recursive_function_applied_to_all_childs(func,this);
+        }
 }

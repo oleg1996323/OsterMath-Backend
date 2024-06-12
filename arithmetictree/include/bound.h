@@ -22,8 +22,6 @@ struct Bound_T{
 
     bool is_defined() const;
 
-    bool is_expression() const;
-
     bool is_value() const;
 
     bool is_variable() const;

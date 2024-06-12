@@ -177,10 +177,10 @@ void BaseData::serialize(serialization::SerialData& serial_data){
 
 void BaseData::serialize_header(serialization::SerialData& serial_data) const{
     //access every nodes of BaseData variables (including the comparing structures)
-    for(auto& [name,var_base]:vars_){
-        serial_data.insert_node(reinterpret_cast<const std::shared_ptr<Node>&>(var_base->node()));
-        var_base->node()->deserialize_header(serial_data,var_base->node());
-    }
+    // for(auto& [name,var_base]:vars_){
+    //     serial_data.insert_node(reinterpret_cast<const std::shared_ptr<Node>&>(var_base->node()));
+    //     var_base->node()->deserialize_header(serial_data,var_base->node());
+    // }
 
     //for(const std::shared_ptr<Node>& node:serial_data.)
 }

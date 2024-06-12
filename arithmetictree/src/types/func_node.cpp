@@ -28,6 +28,10 @@ std::shared_ptr<Node> FunctionNode::child(size_t id) const{
         throw std::invalid_argument("Incorrect child's id");
 }
 
+FUNCTION_OP FunctionNode::operation() const{
+    return operation_;
+}
+
 Result FunctionNode::execute(){
     if(array_type_function?childs_.size()>0:childs_.size()==childs_.capacity()){
         if(!cache_.has_value()){

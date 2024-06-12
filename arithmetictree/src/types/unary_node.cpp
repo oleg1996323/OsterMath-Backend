@@ -18,6 +18,7 @@ void UnaryNode::print_result(std::ostream& stream) const{
 void UnaryNode::insert(std::shared_ptr<Node> node){
     assert(childs_.size()==0);
     childs_.push_back(node);
+    node->add_parent(this);
 }
 
 Result UnaryNode::__calculate__(){
@@ -66,4 +67,8 @@ bool UnaryNode::is_string() const{
 
 bool UnaryNode::is_array() const{
     return childs_.at(0)->is_array();
+}
+
+UNARY_OP UnaryNode::operation() const{
+    return operation_;
 }
