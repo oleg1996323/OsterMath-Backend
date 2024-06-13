@@ -10,7 +10,7 @@
             "compilerPath": "/usr/bin/g++",
             "compilerArgs": [],
             "defines": [
-                "CMAKE_BUILD_TYPE=Release"
+                "CMAKE_BUILD_TYPE=Debug"
             ]
         }
     ],

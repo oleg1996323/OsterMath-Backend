@@ -131,6 +131,12 @@ void Test_Deserialization(){
 
     DataPool pool=serialization::deserialize_from("./TestSerialization.omb");
     BaseData* data = pool.get("any");
+    assert(pool.exists("any"));
+    assert(pool.exists("other"));
+    assert(pool.exists("anon"));
+    assert(pool.get("any")->exists("I"));
+    assert(pool.get("any")->exists("A"));
+    assert(pool.get("other")->exists("C"));
     std::ostringstream output;
     data->get("I")->set_stream(output);
     data->get("A")->set_stream(output);

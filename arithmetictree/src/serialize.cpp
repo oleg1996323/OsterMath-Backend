@@ -26,8 +26,10 @@ void SerialData::insert_var(uint64_t var_id, const std::shared_ptr<VariableNode>
     if(node)
         nodes_[var_id]=reinterpret_cast<const std::shared_ptr<Node>&>(node);
 
-    for(auto parent:node->parents())
+    for(auto parent:node->parents()){
         add_dependency((uint64_t)parent,var_id);
+        std::cout<<var_id<<" depends of: "<<(uint64_t)parent<<std::endl;
+    }
     if(node->childs().size()>0)
         nodes_dependencies_[var_id].reserve(node->childs().size());
 }
@@ -53,8 +55,6 @@ void SerialData::serialize_header(DataPool* pool){
     data_stream_.write(reinterpret_cast<const char*>(&sz),sizeof(sz));
     //data_stream_.write("\n", 1);
     for(auto& [db_name,data_base]:pool->data_bases()){
-        data_stream_.write(reinterpret_cast<const char*>(&pool_id),sizeof(pool_id));
-
         //database name size and database name
         name_sz = db_name.size();
         data_stream_.write(reinterpret_cast<const char*>(&name_sz),sizeof(name_sz));
@@ -79,9 +79,9 @@ void SerialData::serialize_header(DataPool* pool){
                 if(node){
                     NodeProperties props;
                     props.id = (uint64_t)node.get();
-                    for(auto parent:node->parents()){
-                        add_dependency((uint64_t)parent,props.id);
-                        std::cout<<props.id<<" depends of: "<<(uint64_t)parent<<std::endl;
+                    for(auto child:node->childs()){
+                        add_dependency(props.id,(uint64_t)child.get());
+                        std::cout<<(uint64_t)child.get()<<" depends of: "<<props.id<<std::endl;
                     }
                     props.type = (uint8_t)node->type();
                     props.sz = node->childs().size();
@@ -137,7 +137,13 @@ void SerialData::serialize_header(DataPool* pool){
                 
                 std::cout<<"Var name: "<<var_name<<". Var ptr: "<<props.id<<std::endl;
                 //data_stream_.write("\n", 1);
-                insert_var(props.id,var->node());
+                insert_node(props.id,reinterpret_cast<const std::shared_ptr<Node>&>(var->node()));
+                if(!var->node()->childs().empty())
+                    nodes_dependencies_[props.id].reserve(var->node()->childs().size());
+
+                for(const auto& child:var->node()->childs()){
+                    nodes_dependencies_[(uint64_t)var->node().get()].push_back((uint64_t)child.get());
+                }
             }
 
             //get number of non-variable nodes
@@ -163,6 +169,8 @@ void SerialData::serialize_body(DataPool* pool){
     data_stream_.write(reinterpret_cast<const char*>(&sz_dependencies),sizeof(sz_dependencies));
     for(auto& [parent_id, childs]:nodes_dependencies_){
         data_stream_.write(reinterpret_cast<const char*>(&parent_id),sizeof(parent_id));
+        size_t sz = childs.size();
+        data_stream_.write(reinterpret_cast<const char*>(&sz),sizeof(sz));
         data_stream_.write(reinterpret_cast<const char*>(childs.data()),childs.size()*sizeof(childs.data()));
     }
 }
@@ -195,15 +203,13 @@ DataPool SerialData::deserialize_header(){
     uint32_t sz_db=0;
     data_stream_.read(reinterpret_cast<char*>(&sz_db),sizeof(sz_db));
     
-    for(decltype(sz_db) iter = 0; iter<sz_db;++iter){
-        data_stream_.read(reinterpret_cast<char*>(&pool_id),sizeof(pool_id));
-        
+    for(decltype(sz_db) iter = 0; iter<sz_db;++iter){     
         data_stream_.read(reinterpret_cast<char*>(&name_sz),sizeof(name_sz));
         std::string db_name(name_sz,0);
 
         data_stream_.read(db_name.data(), name_sz);
 
-        BaseData* db;
+        BaseData* db=nullptr;
         
         data_stream_.read(reinterpret_cast<char*>(&db_id),sizeof(db_id));
         
@@ -212,7 +218,7 @@ DataPool SerialData::deserialize_header(){
             db = pool.add_data(db_name);
             insert_data(db_id,db);
         }
-        else assert(false);
+        else std::runtime_error("Incorrect reading OMB file. Prompt: failure when reading database " +std::to_string(db_id));
         //insert in serial data base
 
         //number of variables
@@ -229,7 +235,7 @@ DataPool SerialData::deserialize_header(){
                 std::string var_name(props.sz_name,0);
                 data_stream_.read(var_name.data(),props.sz_name);
 
-                if(!contains_node(props.id))
+                if(!contains_node(props.id) && db)
                     insert_var(props.id,db->add_variable(std::move(var_name))->node());
                 else assert(false);
 
@@ -283,17 +289,19 @@ void SerialData::deserialize_body(){
 
         //header must already init all nodes
         if(!contains_node(parent_id))
-            throw std::runtime_error("Incorrect reading header. Prompt: not found node " +std::to_string(parent_id));
+            throw std::runtime_error("Incorrect reading OMB file. Prompt: not found node " +std::to_string(parent_id));
 
-        size_t sz_dep = nodes_.at(parent_id)->childs().capacity();
+        size_t sz_dep;
+        data_stream_.read(reinterpret_cast<char*>(&sz_dep),sizeof(sz_dep));
         std::cout<<nodes_.at(parent_id)->type()<<std::endl;
 
-        nodes_dependencies_[parent_id].resize(sz_dep,0);
+        if(sz_dep>0)
+            nodes_dependencies_[parent_id].resize(sz_dep,0);
         for(decltype(sz_dep) iter_dep = 0; iter_dep<sz_dep;++iter_dep){
             uint64_t node_id = 0;
             data_stream_.read(reinterpret_cast<char*>(&node_id),sizeof(node_id));
             nodes_dependencies_.at(parent_id)[iter_dep]=node_id;
-            nodes_.at(parent_id)->insert(nodes_.at(iter_dep));
+            nodes_.at(parent_id)->insert(nodes_.at(node_id));
         }
     }
 }

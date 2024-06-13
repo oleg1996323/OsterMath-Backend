@@ -37,21 +37,21 @@ class SerialData{
             data_bases_[id]=db;
     }
 
-    void insert_pool(uint16_t id, DataPool* pool){
+    void insert_pool(uint64_t id, DataPool* pool){
         if(pool!=nullptr)
             pools_[id]=pool;
     }
 
-    bool contains_pool(uint16_t pool_id){
-        return nodes_.contains(pool_id);
+    bool contains_pool(uint64_t pool_id){
+        return pools_.contains(pool_id);
     }
 
-    bool contains_node(uint64_t db_id){
-        return nodes_.contains(db_id);
+    bool contains_node(uint64_t node_id){
+        return nodes_.contains(node_id);
     }
 
-    bool contains_data(uint64_t node_id){
-        return data_bases_.contains(node_id);
+    bool contains_data(uint64_t db_id){
+        return data_bases_.contains(db_id);
     }
 
     std::shared_ptr<Node> get_node(uint64_t hash){
