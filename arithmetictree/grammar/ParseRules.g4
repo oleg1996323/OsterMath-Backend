@@ -31,6 +31,12 @@ VARIABLE: '#' [a-zA-Z] ((QUOTE | ASTERISK) | [a-zA-Z0-9])* {setText(getText().su
 DATABASE: '!(\'' [a-zA-Z0-9_] (~[()!,;#' ])* '\')' {setText(getText().substr(3, getText().length()-5));}; 
 WS: [ \t]+ -> skip;
 EOL: '\r'? '\n';
+LARGER: '>';
+LARGER_EQUAL: ('>=' | '=>');
+EQUAL: '=';
+LESS: ('<=' | '=<');
+LESS_EQUAL: '<';
+comparator: LARGER | LARGER_EQUAL | EQUAL | LESS | LESS_EQUAL;
 
 input:
     line_input+
@@ -38,33 +44,33 @@ input:
     ;
 
 line_input:
-    vardef              # Vardefinition
-    | comp              # Comparision
-    ;
-
-vardef
-    :
-    WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')') | WS* VARIABLE WS*) WS* '=' WS* (array | expr | string) WS* EOL
-    ;
-
-comp
-    :
-    WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')') | WS* VARIABLE WS*)  WS* ':' variable_parameter '<' WS* expr WS* EOL              #less
-    | WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')') | WS* VARIABLE WS*) WS* ':' WS* expr WS* '>' variable_parameter EOL            #less
-    | WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')') | WS* VARIABLE WS*) WS* ':' variable_parameter ('<=' | '=<') WS* expr WS* EOL  #less_equal
-    | WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')') | WS* VARIABLE WS*) WS* ':' WS* expr WS* ('>=' | '=>') variable_parameter EOL  #less_equal
-    | WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')') | WS* VARIABLE WS*) WS* ':' variable_parameter '>' WS* expr WS* EOL            #larger
-    | WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')') | WS* VARIABLE WS*) WS* ':' WS* expr WS* '<' variable_parameter EOL            #larger
-    | WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')') | WS* VARIABLE WS*) WS* ':' variable_parameter ('>=' | '=>') WS* expr WS* EOL  #larger_equal
-    | WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')') | WS* VARIABLE WS*) WS* ':' WS* expr WS* ('<=' | '=<') variable_parameter EOL  #larger_equal
+    vardefinition
+    | comparision
     ;
 
 variable:
     WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')') | WS* VARIABLE WS*) WS*
     ;
 
-variable_parameter:
-    WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')') | WS* VARIABLE WS*) WS*
+vardefinition:
+    WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')') | WS* VARIABLE WS*) WS* '=' WS* (array | expr | string) WS* EOL
+    ;
+
+comparision:
+    WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')') | WS* VARIABLE WS*)  WS* ':' WS* lhs_comp WS* comparator
+     WS* rhs_comp WS* (':' WS* expr_comp WS*)? EOL
+    ;
+
+lhs_comp:
+    expr
+    ;
+
+rhs_comp:
+    expr
+    ;
+
+expr_comp:
+    expr
     ;
 
 expr

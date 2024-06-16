@@ -12,11 +12,11 @@ void VariableBase::print_text(){
 }
 
 VariableBase::VariableBase(std::string_view name, BaseData* data_base):
+    node_(std::make_shared<VariableNode>(this)),
+    domains_(node_),
     name_(name),
     data_base_(data_base)
-{
-    node_=std::make_shared<VariableNode>(this);
-}
+{}
 
 std::string_view VariableBase::name() const{
     return name_;
@@ -37,11 +37,11 @@ BaseData* VariableBase::get_data_base() const{
 }
 
 Result VariableBase::result(){
-    return node_->execute();
+    return domains_.execute();
 }
 
 Result VariableBase::result() const{
-    return node_->execute();
+    return domains_.execute();
 }
 
 std::string VariableBase::text(){
@@ -95,60 +95,18 @@ bool VariableBase::is_numeric() const{
 
 VariableBase::~VariableBase(){}
 
-bool VariableBase::is_in_bounds(std::string_view data_base,std::string_view name) const{
-    if(bounds_.contains(data_base))
-        if(bounds_.at(data_base).contains(name)){
-            VariableBase* var = data_base_->get_pool()->get(data_base)->get(name);
-            if(var->is_numeric() && !var->is_array())
-                return bounds_.at(data_base).at(name).is_in_bounds(var->result().get<Value_t>());
-            else return true;
-        }
-        else return true;
-    else return true;
+void VariableBase::add_domain(Domain&& domain){
+    domains_.add_domain(std::move(domain));
 }
 
-std::optional<Value_t> VariableBase::get_top_bound(std::string_view data_base,std::string_view var_name){
-    if(bounds_.contains(data_base)){
-        if(bounds_.at(data_base).contains(var_name)){
-            return bounds_.at(data_base).at(var_name).get_top_bound_value();
-        }
-        else return std::nullopt;
-    }
-    else return std::nullopt;
+VariableDomain& VariableBase::get_domains(){
+    return domains_;
 }
 
-std::optional<Value_t> VariableBase::get_bottom_bound(std::string_view data_base,std::string_view var_name){
-    if(bounds_.contains(data_base)){
-        if(bounds_.at(data_base).contains(var_name)){
-            return bounds_.at(data_base).at(var_name).get_bottom_bound_value();
-        }
-        else return std::nullopt;
-    }
-    else return std::nullopt;
+const VariableDomain& VariableBase::get_domains() const{
+    return domains_;
 }
 
 std::string_view VariableBase::get_data_base_name() const{
     return data_base_->name();
-}
-
-void VariableBase::set_bottom_bound_value(std::string_view data_base,std::string_view var_name,std::shared_ptr<Node> value, BOTTOM_BOUND_T type){
-    bounds_[data_base][var_name].set_bound_value(value,type);
-    #ifdef DEBUG
-    std::cout << var_name<<' ';
-    if(type == BOTTOM_BOUND_T::LARGER)
-        std::cout<<"larger than ";
-    else std::cout<<"larger or equal than ";
-    std::cout<<value->execute()<<" in "<<name()<<std::endl;
-    #endif
-}
-
-void VariableBase::set_top_bound_value(std::string_view data_base,std::string_view var_name,std::shared_ptr<Node> value, TOP_BOUND_T type){
-    bounds_[data_base][var_name].set_bound_value(value,type);
-    #ifdef DEBUG
-    std::cout << var_name<<' ';
-    if(type == TOP_BOUND_T::LESS)
-        std::cout<<"less than ";
-    else std::cout<<"less or equal than ";
-    std::cout<<value->execute()<<" in "<<name()<<std::endl;
-    #endif
 }

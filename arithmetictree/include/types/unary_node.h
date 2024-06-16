@@ -3,6 +3,7 @@
 #include "node.h"
 
 enum class UNARY_OP{
+    NOTHING,
     ADD,
     SUB,
     PARENS

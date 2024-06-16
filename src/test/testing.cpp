@@ -12,20 +12,20 @@ bool CalculationsCheck(const std::string& input_str, const std::string& check_va
     data->setstream(input);
     std::ostringstream output;
     data->get("I")->set_stream(output);
-    data->get("A")->set_stream(output);
-    data->get("B")->set_stream(output);
+    // data->get("A")->set_stream(output);
+    // data->get("B")->set_stream(output);
     // data->get("C")->set_stream(output);
     // data->get("D")->set_stream(output);
     try{
         data->get("I")->print_text();
         std::cout<<output.str()<<std::endl;
         output.str("");
-        data->get("A")->print_text();
-        std::cout<<output.str()<<std::endl;
-        output.str("");
-        data->get("B")->print_text();
-        std::cout<<output.str()<<std::endl;
-        output.str("");
+        // data->get("A")->print_text();
+        // std::cout<<output.str()<<std::endl;
+        // output.str("");
+        // data->get("B")->print_text();
+        // std::cout<<output.str()<<std::endl;
+        // output.str("");
         // data->get("C")->print_text();
         // std::cout<<output.str()<<std::endl;
         // output.str("");
@@ -76,13 +76,15 @@ VAR(#D)=[500,200,100]
 void Test_Serialization(){
     std::string str_in = 
 R"(VAR(#I)=[VAR(#A),VAR(#B)]
+VAR(#I) :  VAR(#A) > 299999 : 2
 VAR(#A)=sumproduct(VAR(!('other')#C),VAR(#D))
 VAR(#B)=2
 VAR(!('other')#C)=[500,200,100]
 VAR(#D)=[500,200,100]
 )";
-    std::string equal = R"([300000; 2]
+    std::string equal = R"(2
 )";
+
 
     DataPool pool("main");
     pool.add_data("any");
@@ -116,6 +118,8 @@ VAR(#D)=[500,200,100]
 
     serialization::serialize_to("./TestSerialization.omb",&pool);
     DataPool other = serialization::deserialize_from("./TestSerialization.omb");
+    for(auto& [name,data]:other.data_bases())
+        std::cout<<name<<std::endl;
     assert(other.exists("any"));
     assert(other.exists("other"));
     assert(other.exists("anon"));
@@ -232,58 +236,39 @@ VAR(#D)=[2,3,4]
 }
 
 void Testing_compare_vars_1(){
-    DataPool pool("main");
-    pool.add_data("any");
-    BaseData* data = pool.get("any");
     std::string str_in = 
-R"(VAR(#I) :  VAR(#A) < 2
-VAR(#I) : VAR(#A) > 3
+R"(VAR(#I) :  VAR(#A) < 2 : 2
+VAR(#I) : VAR(#A) > 3 : 1
+VAR(#I) = 5
+VAR(#A) = 2.5
 )";
-    std::istringstream input(str_in);
-    data->setstream(input);
-    std::ostringstream output;
-    //data->get("I")->print();
-    data->get("I")->set_stream(output);
-    //data->get("I")->print_result();
-    //std::string str = output.str();
-    //std::cout<<str<<std::endl;
-    assert(data->get("I")->get_bottom_bound("any","A").has_value());
-    assert(data->get("I")->get_top_bound("any","A").has_value());
-    assert(data->get("I")->get_top_bound("any","A").value()==2);
-    assert(data->get("I")->get_bottom_bound("any","A").value()==3);
+    std::string equal = R"(5
+)";
+    CalculationsCheck(str_in,equal);
 }
 
 void Testing_compare_vars_2(){
-    DataPool pool("main");
-    pool.add_data("any");
-    BaseData* data = pool.get("any");
-    std::string str_in = 
-R"(VAR(#I) :  VAR(#A) < 2
+        std::string str_in = 
+R"(VAR(#I) :  VAR(#A) < 2 : 2
+VAR(#I) : VAR(#A) > 3 : 1.1
+VAR(#A) = 4
+VAR(#I) = 5
 )";
-    std::istringstream input(str_in);
-    data->setstream(input);
-    std::ostringstream output;
-    //data->get("I")->print();
-    data->get("I")->set_stream(output);
-    //data->get("I")->print_result();
-    //std::string str = output.str();
-    //std::cout<<str<<std::endl;
-    assert(!data->get("I")->get_bottom_bound("any","A").has_value());
-    assert(data->get("I")->get_top_bound("any","A").has_value());
-    assert(data->get("I")->get_top_bound("any","A").value()==2);
-    assert(data->get("I")->get_bottom_bound("any","A")==std::nullopt);
+    std::string equal = R"(1.1
+)";
+    CalculationsCheck(str_in,equal);
 }
 
 void Testing(){
-    //Test_Correct_Sum_Result_For_Array();
-    //Test_Correct_SumProduct_Result_For_Array();
-    //Test_Correct_Product_Result_For_Array();
-    //Test_Simple_Arithmetic_With_Variable();
-    //Test_Range_Operation_With_Var_Arrays();
-    //Testing_compare_vars_1();
-    //Testing_compare_vars_2();
+    // Test_Correct_Sum_Result_For_Array();
+    // Test_Correct_SumProduct_Result_For_Array();
+    Test_Correct_Product_Result_For_Array();
+    Test_Simple_Arithmetic_With_Variable();
+    Test_Range_Operation_With_Var_Arrays();
     Test_Serialization();
     Test_Deserialization();
+    Testing_compare_vars_1();
+    Testing_compare_vars_2();
 }
 
 #endif

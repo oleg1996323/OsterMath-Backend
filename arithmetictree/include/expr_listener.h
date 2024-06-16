@@ -7,7 +7,7 @@
 #include <stack>
 #include "def.h"
 #include "ParseRulesBaseListener.h"
-#include "bound.h"
+#include "domain.h"
 
 class BaseData;
 
@@ -24,17 +24,20 @@ class BaseListener: public ParseRulesBaseListener{
         RANGEOPERATION,
         MULTIARGFUNCTION,
         FUNCTIONOPERATION,
-        BOUND_DEFINITION,
+        DOMAIN_DEFINITION,
+        LHS_DOMAIN,
+        RHS_DOMAIN,
+        EXPR_DOMAIN,
         ARRAY_DEFINITION,
         ARRAY_ITEM_DEFINITION,
         EXPRESSION,
-        VALUE,
+        VALUE
     };
 
     bool is_range_operation() const;
     bool is_function_operation() const;
     bool is_variable_definition() const;
-    bool is_bounds_definition() const;
+    bool is_domain_definition() const;
     bool is_expression_definition() const;
     bool is_array_definition() const;
     bool is__array_item_definition() const;
@@ -48,24 +51,12 @@ class BaseListener: public ParseRulesBaseListener{
     std::stack<std::shared_ptr<Node>> anonymous_node_;
     std::stack<MODE> mode_;
 
-    template<typename B_T>
-    struct Bound{
-        std::string_view db_name;
-        std::string_view var_name;
-        B_T type;
-    };
-
-    std::optional<Bound<TOP_BOUND_T>> top_;
-    std::optional<Bound<BOTTOM_BOUND_T>> bottom_;
+    std::optional<Domain> domain_;
 
     public:
     BaseListener(BaseData* data_base):
     data_base_(data_base)
     {}
-
-    void enterExpr(ParseRulesParser::ExprContext* ctx);
-
-    void exitExpr(ParseRulesParser::ExprContext* ctx);
 
     virtual void enterParens(ParseRulesParser::ParensContext* ctx) override;
 
@@ -126,21 +117,22 @@ class BaseListener: public ParseRulesBaseListener{
 
     virtual void exitComparision(ParseRulesParser::ComparisionContext* ctx) override;
 
-    virtual void enterLess(ParseRulesParser::LessContext* ctx) override;
+    virtual void enterLhs_comp(ParseRulesParser::Lhs_compContext* ctx) override;
 
-    virtual void exitLess(ParseRulesParser::LessContext* ctx) override;
+    virtual void exitLhs_comp(ParseRulesParser::Lhs_compContext* ctx) override;
 
-    virtual void enterLess_equal(ParseRulesParser::Less_equalContext* ctx) override;
+    virtual void enterRhs_comp(ParseRulesParser::Rhs_compContext* ctx) override;
 
-    virtual void exitLess_equal(ParseRulesParser::Less_equalContext* ctx) override;
+    virtual void exitRhs_comp(ParseRulesParser::Rhs_compContext* ctx) override;
 
-    virtual void enterLarger(ParseRulesParser::LargerContext* ctx) override;
+    virtual void enterExpr_comp(ParseRulesParser::Expr_compContext* ctx) override;
 
-    virtual void exitLarger(ParseRulesParser::LargerContext* ctx) override;
+    virtual void exitExpr_comp(ParseRulesParser::Expr_compContext* ctx) override;
 
-    virtual void enterLarger_equal(ParseRulesParser::Larger_equalContext* ctx) override;
+    virtual void enterString(ParseRulesParser::StringContext * ctx) override;
 
-    virtual void exitLarger_equal(ParseRulesParser::Larger_equalContext* ctx) override;
+    virtual void exitString(ParseRulesParser::StringContext * ctx) override;
 
     virtual void visitErrorNode(antlr4::tree::ErrorNode * /*node*/) override;
+
 };

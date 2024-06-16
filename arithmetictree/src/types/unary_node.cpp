@@ -2,12 +2,22 @@
 #include "def.h"
 
 void UnaryNode::print_text(std::ostream& stream) const{
-    if(operation_==UNARY_OP::ADD)
-        stream<<"+"<<childs_.at(0);
-    else if(operation_==UNARY_OP::SUB)
-        stream<<"-"<<childs_.at(0);
-    else if(operation_==UNARY_OP::PARENS)
-        stream<<"("<<childs_.at(0)<<")";
+    if(operation_==UNARY_OP::ADD){
+        stream<<"+";
+        childs_.at(0)->print_text(stream);
+    }
+    else if(operation_==UNARY_OP::SUB){
+        stream<<"-";
+        childs_.at(0)->print_text(stream);
+    }
+    else if(operation_==UNARY_OP::PARENS){
+        stream<<"(";
+        childs_.at(0)->print_text(stream);
+        stream<<")";
+    }
+    else if(operation_==UNARY_OP::NOTHING){
+        childs_.at(0)->print_text(stream);
+    }
     else stream<<"";
 }
 
@@ -37,6 +47,8 @@ Result UnaryNode::__calculate__(size_t index){
         case UNARY_OP::PARENS:
             return childs_.at(0)->execute(index);
             break;
+        case UNARY_OP::NOTHING:
+            return childs_.at(0)->execute(index);
         default:
             throw std::invalid_argument("Unknown type of unary expression");
             break;

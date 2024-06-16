@@ -8,7 +8,7 @@
 #include "def.h"
 #include "data.h"
 #include "format.h"
-#include "bound.h"
+#include "domain.h"
 #include "serialize.h"
 
 class VariableNode;
@@ -55,43 +55,26 @@ class VariableBase: public FormattingData{
 
     std::string text() const;
 
-    void set_bottom_bound_value(std::string_view,std::string_view,std::shared_ptr<Node> value, BOTTOM_BOUND_T type);
+    void add_domain(Domain&&);
 
-    void set_top_bound_value(std::string_view,std::string_view,std::shared_ptr<Node> value, TOP_BOUND_T type);
+    VariableDomain& get_domains();
 
-    bool is_in_bounds(std::string_view,std::string_view) const;
-
-    std::optional<Value_t> get_top_bound(std::string_view data_base,std::string_view var_name);
-
-    std::optional<Value_t> get_bottom_bound(std::string_view data_base,std::string_view var_name);
+    const VariableDomain& get_domains() const;
 
     std::string_view get_data_base_name() const;
 
     Result result();
 
     Result result() const;
-    
-    void serialize(std::ostream& stream){
-        stream<<"#TEXT";
-        {
-            std::ostream& prec_stream = get_stream();
-            set_stream(stream);
-            print_text();
-            set_stream(prec_stream);
-        }
-        //serialization::serialize_structure(stream,show_reinterpret_);
-        stream<<std::endl;
-    }
-
-    void deserialize(std::istream& stream);
 
     protected:
     void set_data_base(BaseData* data_pool);
     BaseData* get_data_base() const;
 
     private:
-    std::unordered_map<std::string_view,std::unordered_map<std::string_view,VariableBounds>> bounds_;
+    
     std::shared_ptr<VariableNode> node_; //shared, так как может быть передан в любое арифметическое дерево
+    VariableDomain domains_;
     std::string_view name_;
     std::string text_;
     bool show_reinterpret_=true; //show a reinterpreted formula

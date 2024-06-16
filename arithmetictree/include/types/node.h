@@ -22,7 +22,9 @@ enum class NODE_TYPE{
     RANGEOP,
     FUNCTION,
     ARRAY,
-    STRING
+    STRING,
+    UNDEF,
+    CUSTOM
 };
 
 namespace serialization{
@@ -35,7 +37,7 @@ class Node{
 
     Node();
 
-    virtual NODE_TYPE type() const = 0;
+    virtual NODE_TYPE type() const;
 
     virtual Result execute() = 0;
 

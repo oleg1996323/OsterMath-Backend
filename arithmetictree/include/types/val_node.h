@@ -4,6 +4,8 @@
 
 class ValueNode:public Node{
     public:
+    ValueNode()=default;
+    
     ValueNode(Value_t&& value):val_(std::move(value)){}
 
     ValueNode(const Value_t& value):val_(value){}
@@ -15,11 +17,15 @@ class ValueNode:public Node{
     }
 
     virtual Result execute() override{
-        return val_;
+        if(val_.has_value())
+            return val_.value();
+        else return std::monostate();
     }
 
     virtual Result execute(size_t index) override{
-        return val_;
+        if(val_.has_value())
+            return val_.value();
+        else return std::monostate();
     }
     
     virtual bool is_numeric() const override;
@@ -39,5 +45,5 @@ class ValueNode:public Node{
     virtual void deserialize(std::ostream& stream) override;
 
     private:
-    Value_t val_;
+    std::optional<Value_t> val_;
 };

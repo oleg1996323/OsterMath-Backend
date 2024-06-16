@@ -1,6 +1,7 @@
 #include "serialize.h"
 #include "data.h"
 #include "arithmetic_types.h"
+#include "domain.h"
 #include <iostream>
 
 namespace serialization{
@@ -137,26 +138,44 @@ void SerialData::serialize_header(DataPool* pool){
                 
                 std::cout<<"Var name: "<<var_name<<". Var ptr: "<<props.id<<std::endl;
                 //data_stream_.write("\n", 1);
-                insert_node(props.id,reinterpret_cast<const std::shared_ptr<Node>&>(var->node()));
                 if(!var->node()->childs().empty())
                     nodes_dependencies_[props.id].reserve(var->node()->childs().size());
 
                 for(const auto& child:var->node()->childs()){
                     nodes_dependencies_[(uint64_t)var->node().get()].push_back((uint64_t)child.get());
                 }
+
+                uint32_t sz_domains = var->get_domains().get_domains().size();
+                data_stream_.write(reinterpret_cast<const char*>(&sz_domains),sizeof(sz_domains));
+                for(auto& domain:var->get_domains().get_domains()){
+                    nodes_to_header(domain.lhs_);
+                    nodes_to_header(domain.rhs_);
+                    nodes_to_header(domain.value_if_true_);
+                    data_stream_.write(reinterpret_cast<const char*>(&domain.type_),sizeof(uint8_t));
+                }
             }
 
             //get number of non-variable nodes
             for(auto& [var_name,var]:data_base.variables()){
                 var->node()->recursive_function_applied_to_all_childs(nodes_size);
+                for(auto& domain:var->get_domains().get_domains()){
+                    domain.lhs_->recursive_function_applied_to_all_childs(nodes_size);
+                    domain.rhs_->recursive_function_applied_to_all_childs(nodes_size);
+                    domain.value_if_true_->recursive_function_applied_to_all_childs(nodes_size);
+                }
             }
-
+            
             //writing number of non-variable nodes
             data_stream_.write(reinterpret_cast<const char*>(&sz),sizeof(sz));
 
             //writing non-variable nodes info
             for(auto& [var_name,var]:data_base.variables()){
                 var->node()->recursive_function_applied_to_all_childs(nodes_to_header);
+                for(auto& domain:var->get_domains().get_domains()){
+                    domain.lhs_->recursive_function_applied_to_all_childs(nodes_to_header);
+                    domain.rhs_->recursive_function_applied_to_all_childs(nodes_to_header);
+                    domain.value_if_true_->recursive_function_applied_to_all_childs(nodes_to_header);
+                }
             }
             //data_stream_.seekp(-1,std::ostream::end);                
         }
@@ -226,6 +245,47 @@ DataPool SerialData::deserialize_header(){
         data_stream_.read(reinterpret_cast<char*>(&sz_var),sizeof(sz_var));
         if(sz_var!=0){
 
+            std::function<std::shared_ptr<Node>()> nodes_from_header;
+            nodes_from_header = [this]()->std::shared_ptr<Node> {
+                NodeProperties props;
+                data_stream_.read(reinterpret_cast<char*>(&props),sizeof(props));
+                switch ((NODE_TYPE)props.type){
+                    case NODE_TYPE::ARRAY:
+                        insert_node(props.id,std::make_shared<ArrayNode>(props.sz));
+                        return nodes_.at(props.id);
+                        break;
+                    case NODE_TYPE::BINARY:
+                        insert_node(props.id,std::make_shared<BinaryNode>((BINARY_OP)props.operation));
+                        return nodes_.at(props.id);
+                        break;
+                    case NODE_TYPE::FUNCTION:
+                        insert_node(props.id,std::make_shared<FunctionNode>((FUNCTION_OP)props.operation, props.sz));
+                        return nodes_.at(props.id);
+                        break;
+                    case NODE_TYPE::RANGEOP:
+                        insert_node(props.id,std::make_shared<RangeOperationNode>((RANGE_OP)props.operation));
+                        return nodes_.at(props.id);
+                        break;
+                    case NODE_TYPE::STRING:
+                        return nodes_.at(props.id);
+                        break;
+                    case NODE_TYPE::UNARY:
+                        insert_node(props.id,std::make_shared<UnaryNode>((UNARY_OP)props.operation));
+                        return nodes_.at(props.id);
+                        break;
+                    case NODE_TYPE::VALUE:
+                        insert_node(props.id,std::make_shared<ValueNode>(props.cache.get<Value_t>()));
+                        return nodes_.at(props.id);
+                        break;
+                    case NODE_TYPE::VARIABLE:
+                        return nodes_.at(props.id);
+                        break;
+                    default:
+                        throw std::runtime_error("Unknown data of node");
+                        return nodes_.at(props.id);
+                }
+            };
+
             //definition of variables
             for(decltype(sz_var) var_iter=0;var_iter<sz_var;++var_iter){
                 VarProperties props;
@@ -240,40 +300,24 @@ DataPool SerialData::deserialize_header(){
                 else assert(false);
 
                 std::cout<<"Node id:"<<node_id<<std::endl;
+
+                uint32_t sz_domains;
+                data_stream_.read(reinterpret_cast<char*>(&sz_domains),sizeof(sz_domains));
+                for(decltype(sz_domains) domain_iter=0;domain_iter<sz_domains;++domain_iter){
+                    Domain domain;
+                    domain.lhs_ = nodes_from_header();
+                    domain.rhs_ = nodes_from_header();
+                    domain.value_if_true_ = nodes_from_header();
+                    data_stream_.read(reinterpret_cast<char*>(&domain.type_),sizeof(uint8_t));
+                    reinterpret_cast<std::shared_ptr<VariableNode>&>(nodes_.at(props.id))->variable()->add_domain(std::move(domain));
+                }
             }
             uint32_t sz_nodes;
 
             //definition of nodes
             data_stream_.read(reinterpret_cast<char*>(&sz_nodes),sizeof(sz_nodes));
             for(decltype(sz_nodes) nodes_iter=0;nodes_iter<sz_nodes;++nodes_iter){
-                NodeProperties props;
-                data_stream_.read(reinterpret_cast<char*>(&props),sizeof(props));
-                switch ((NODE_TYPE)props.type){
-                    case NODE_TYPE::ARRAY:
-                        insert_node(props.id,std::make_shared<ArrayNode>(props.sz));
-                        break;
-                    case NODE_TYPE::BINARY:
-                        insert_node(props.id,std::make_shared<BinaryNode>((BINARY_OP)props.operation));
-                        break;
-                    case NODE_TYPE::FUNCTION:
-                        insert_node(props.id,std::make_shared<FunctionNode>((FUNCTION_OP)props.operation, props.sz));
-                        break;
-                    case NODE_TYPE::RANGEOP:
-                        insert_node(props.id,std::make_shared<RangeOperationNode>((RANGE_OP)props.operation));
-                        break;
-                    case NODE_TYPE::STRING:
-                        break;
-                    case NODE_TYPE::UNARY:
-                        insert_node(props.id,std::make_shared<UnaryNode>((UNARY_OP)props.operation));
-                        break;
-                    case NODE_TYPE::VALUE:
-                        insert_node(props.id,std::make_shared<ValueNode>(props.cache.get<Value_t>()));
-                        break;
-                    case NODE_TYPE::VARIABLE:
-                        break;
-                    default:
-                        throw std::runtime_error("Unknown data of node");
-                }
+                nodes_from_header();
             }
         }
     }

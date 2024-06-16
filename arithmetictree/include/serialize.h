@@ -108,6 +108,7 @@ class SerialData{
     struct VarProperties{
         uint64_t id;
         uint8_t sz_name;
+        uint32_t sz_domains;
     };
 
     struct NodeProperties{

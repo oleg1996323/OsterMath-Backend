@@ -6,6 +6,10 @@
 
 size_t Node::counter = 0;
 
+NODE_TYPE Node::type() const{
+    return NODE_TYPE::UNDEF;
+}
+
 Node::Node(size_t sz):
     childs_([&sz](){std::vector<std::shared_ptr<Node>> vector;
                     vector.reserve(sz);

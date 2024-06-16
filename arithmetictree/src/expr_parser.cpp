@@ -13,7 +13,7 @@ Parser::ParseItems::ParseItems(std::istream& stream, BaseData* data_base):
     err_listener_(new ErrorListener()){
         lexer_->removeErrorListeners();
         lexer_->addErrorListener(err_listener_);
-        auto error_handler = std::make_shared<antlr4::BailErrorStrategy>();
+        auto error_handler = std::make_shared<antlr4::DefaultErrorStrategy>();
         base_parser_->setErrorHandler(error_handler);
         base_parser_->removeErrorListeners();
         tree_ = base_parser_->input();

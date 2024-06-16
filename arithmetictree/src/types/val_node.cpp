@@ -1,11 +1,15 @@
 #include "val_node.h"
 
 void ValueNode::print_text(std::ostream& stream) const{
-    stream<<val_;
+    if(val_.has_value())
+        stream<<val_.value();
+    else stream<<"#NAN";
 }
 
 void ValueNode::print_result(std::ostream& stream) const{
-    stream<<val_;
+    if(val_.has_value())
+        stream<<val_.value();
+    else stream<<"#NAN";
 }
 
 bool ValueNode::is_numeric() const{

@@ -6,15 +6,6 @@
 
 using namespace std::string_view_literals;
 
-void BaseListener::enterExpr(ParseRulesParser::ExprContext* ctx){
-    mode_.push(MODE::EXPRESSION);
-}
-
-void BaseListener::exitExpr(ParseRulesParser::ExprContext* ctx){
-    assert(!mode_.empty());
-    assert(is_expression_definition());
-}
-
 bool BaseListener::is_function_operation() const{
     return !mode_.empty() && mode_.top()==MODE::FUNCTIONOPERATION;
 }
@@ -27,8 +18,8 @@ bool BaseListener::is_range_operation() const{
     return !mode_.empty() && mode_.top()==MODE::RANGEOPERATION;
 }
 
-bool BaseListener::is_bounds_definition() const{
-    return !mode_.empty() && mode_.top()==MODE::BOUND_DEFINITION;
+bool BaseListener::is_domain_definition() const{
+    return !mode_.empty() && mode_.top()==MODE::DOMAIN_DEFINITION;
 }
 
 bool BaseListener::is_expression_definition() const{
@@ -229,138 +220,66 @@ void BaseListener::exitRangefunction(ParseRulesParser::RangefunctionContext* ctx
     __insert_to_prec_node__(MODE::RANGEOPERATION);
 }
 
-void BaseListener::enterLess(ParseRulesParser::LessContext* ctx){
-    assert(!mode_.empty());
-    if(ctx->VARIABLE()){
-        //creating in active sheet
-        BaseData* c_var_db_tmp;
-        if(ctx->DATABASE())
-            //creating in other sheet
-            c_var_db_tmp = __insert_new_data_base__(ctx->DATABASE()->getText());
-        else c_var_db_tmp = data_base_;
-        current_var_ = c_var_db_tmp->add_variable(ctx->VARIABLE()->getText())->node();
-    }
-    else assert(false);
-
-    if(ctx->variable_parameter()){
-        BaseData* db_tmp;
-        if(ctx->variable_parameter()->DATABASE())
-            db_tmp = __insert_new_data_base__(ctx->variable_parameter()->DATABASE()->getText());
-        else db_tmp = data_base_;
-
-        if(ctx->variable_parameter()->VARIABLE())
-            top_.emplace(db_tmp->name(),db_tmp->add_variable(ctx->variable_parameter()->VARIABLE()->getText()).get()->name(),TOP_BOUND_T::LESS);
-        else assert(false);
-    }
-    else assert(false);
-}
-
-void BaseListener::exitLess(ParseRulesParser::LessContext* ctx){
-    assert(!mode_.empty());
-    assert(mode_.top()==MODE::BOUND_DEFINITION);
-    assert(anonymous_node_.size()==1);
-}
-
-void BaseListener::enterLess_equal(ParseRulesParser::Less_equalContext* ctx){
-    assert(!mode_.empty());
-    if(ctx->VARIABLE()){
-        //creating in active sheet
-        BaseData* c_var_db_tmp;
-        if(ctx->DATABASE())
-            //creating in other sheet
-            c_var_db_tmp = __insert_new_data_base__(ctx->DATABASE()->getText());
-        else c_var_db_tmp = data_base_;
-        current_var_ = c_var_db_tmp->add_variable(ctx->VARIABLE()->getText())->node();
-    }
-    else assert(false);
-    
-    if(ctx->variable_parameter()){
-        BaseData* db_tmp;
-        if(ctx->variable_parameter()->DATABASE())
-            db_tmp = __insert_new_data_base__(ctx->variable_parameter()->DATABASE()->getText());
-        else db_tmp = data_base_;
-
-        if(ctx->variable_parameter()->VARIABLE())
-            top_.emplace(db_tmp->name(),db_tmp->add_variable(ctx->variable_parameter()->VARIABLE()->getText()).get()->name(),TOP_BOUND_T::LESS_OR_EQUAL);
-        else assert(false);
-    }
-    else assert(false);
-}
-
-void BaseListener::exitLess_equal(ParseRulesParser::Less_equalContext* ctx){
-    assert(!mode_.empty());
-    assert(mode_.top()==MODE::BOUND_DEFINITION);
-    assert(anonymous_node_.size()==1);
-}
-
-void BaseListener::enterLarger(ParseRulesParser::LargerContext* ctx){
-    assert(!mode_.empty());
-    if(ctx->VARIABLE()){
-        //creating in active sheet
-        BaseData* c_var_db_tmp;
-        if(ctx->DATABASE())
-            //creating in other sheet
-            c_var_db_tmp = __insert_new_data_base__(ctx->DATABASE()->getText());
-        else c_var_db_tmp = data_base_;
-        current_var_ = c_var_db_tmp->add_variable(ctx->VARIABLE()->getText())->node();
-    }
-    else assert(false);
-
-    if(ctx->variable_parameter()){
-        BaseData* db_tmp;
-        if(ctx->variable_parameter()->DATABASE())
-            db_tmp = __insert_new_data_base__(ctx->variable_parameter()->DATABASE()->getText());
-        else db_tmp = data_base_;
-
-        if(ctx->variable_parameter()->VARIABLE())
-            bottom_.emplace(db_tmp->name(),db_tmp->add_variable(ctx->variable_parameter()->VARIABLE()->getText()).get()->name(),BOTTOM_BOUND_T::LARGER);
-        else assert(false);
-    }
-    else assert(false);
-}
-
-void BaseListener::exitLarger(ParseRulesParser::LargerContext* ctx){
-    assert(!mode_.empty());
-    assert(mode_.top()==MODE::BOUND_DEFINITION);
-    assert(anonymous_node_.size()==1);
-}
-
-void BaseListener::enterLarger_equal(ParseRulesParser::Larger_equalContext* ctx){
-    assert(!mode_.empty());
-    if(ctx->VARIABLE()){
-        //creating in active sheet
-        BaseData* c_var_db_tmp;
-        if(ctx->DATABASE())
-            //creating in other sheet
-            c_var_db_tmp = __insert_new_data_base__(ctx->DATABASE()->getText());
-        else c_var_db_tmp = data_base_;
-        current_var_ = c_var_db_tmp->add_variable(ctx->VARIABLE()->getText())->node();
-    }
-    else assert(false);
-
-    if(ctx->variable_parameter()){
-        BaseData* db_tmp;
-        if(ctx->variable_parameter()->DATABASE())
-            db_tmp = __insert_new_data_base__(ctx->variable_parameter()->DATABASE()->getText());
-        else db_tmp = data_base_;
-
-        if(ctx->variable_parameter()->VARIABLE())
-            bottom_.emplace(db_tmp->name(),db_tmp->add_variable(ctx->variable_parameter()->VARIABLE()->getText()).get()->name(),BOTTOM_BOUND_T::LARGER_OR_EQUAL);
-        else assert(false);
-    }
-    else assert(false);
-}
-
-void BaseListener::exitLarger_equal(ParseRulesParser::Larger_equalContext* ctx){
-    assert(!mode_.empty());
-    assert(mode_.top()==MODE::BOUND_DEFINITION);
-    assert(anonymous_node_.size()==1);
-}
-
 void BaseListener::visitErrorNode(antlr4::tree::ErrorNode* node){
     throw ParsingError("Error input. Prompt: " + node->getText());
 }
 
+void BaseListener::enterLhs_comp(ParseRulesParser::Lhs_compContext* ctx){
+    assert(!mode_.empty());
+    assert(anonymous_node_.empty());
+    mode_.push(MODE::LHS_DOMAIN);
+    //by default the database from which we define variable must exists
+    anonymous_node_.push(std::make_shared<UnaryNode>(UNARY_OP::NOTHING));
+}
+
+void BaseListener::exitLhs_comp(ParseRulesParser::Lhs_compContext* ctx){
+    if(ctx){
+        assert(!mode_.empty());
+        assert(mode_.top()==MODE::LHS_DOMAIN);
+        mode_.pop();
+        assert(anonymous_node_.size()==1);
+        domain_->lhs_ = anonymous_node_.top();
+        anonymous_node_.pop();
+    }
+}
+
+void BaseListener::enterRhs_comp(ParseRulesParser::Rhs_compContext* ctx){
+    assert(!mode_.empty());
+    assert(anonymous_node_.empty());
+    mode_.push(MODE::RHS_DOMAIN);
+    //by default the database from which we define variable must exists
+    anonymous_node_.push(std::make_shared<UnaryNode>(UNARY_OP::NOTHING));
+}
+
+void BaseListener::exitRhs_comp(ParseRulesParser::Rhs_compContext* ctx){
+    if(ctx){
+        assert(!mode_.empty());
+        assert(mode_.top()==MODE::RHS_DOMAIN);
+        mode_.pop();
+        assert(anonymous_node_.size()==1);
+        domain_->rhs_ = anonymous_node_.top();
+        anonymous_node_.pop();
+    }
+}
+
+void BaseListener::enterExpr_comp(ParseRulesParser::Expr_compContext* ctx){
+    assert(!mode_.empty());
+    assert(anonymous_node_.empty());
+    mode_.push(MODE::EXPR_DOMAIN);
+    //by default the database from which we define variable must exists
+    anonymous_node_.push(std::make_shared<UnaryNode>(UNARY_OP::NOTHING));
+}
+
+void BaseListener::exitExpr_comp(ParseRulesParser::Expr_compContext* ctx){
+    if(ctx){
+        assert(!mode_.empty());
+        assert(mode_.top()==MODE::EXPR_DOMAIN);
+        mode_.pop();
+        assert(anonymous_node_.size()==1);
+        domain_->value_if_true_ = anonymous_node_.top();
+        anonymous_node_.pop();
+    }
+}
 
 void BaseListener::enterVardefinition(ParseRulesParser::VardefinitionContext * ctx){
     assert(mode_.empty());
@@ -368,13 +287,13 @@ void BaseListener::enterVardefinition(ParseRulesParser::VardefinitionContext * c
     mode_.push(MODE::VARDEF);
     //by default the database from which we define variable must exists
 
-    if(ctx->vardef() && ctx->vardef()->VARIABLE()){
+    if(ctx->VARIABLE()){
         //creating in active sheet
         BaseData* c_var_db_tmp;
-        if(ctx->vardef() && ctx->vardef()->DATABASE())
-            c_var_db_tmp = __insert_new_data_base__(ctx->vardef()->DATABASE()->getText());
+        if(ctx->DATABASE())
+            c_var_db_tmp = __insert_new_data_base__(ctx->DATABASE()->getText());
         else c_var_db_tmp = data_base_;
-        current_var_ = c_var_db_tmp->add_variable(ctx->vardef()->VARIABLE()->getText())->node();
+        current_var_ = c_var_db_tmp->add_variable(ctx->VARIABLE()->getText())->node();
     }
     else assert(false);
     current_var_->release_childs();
@@ -404,19 +323,48 @@ void BaseListener::exitItemArray(ParseRulesParser::ItemArrayContext *ctx){
 void BaseListener::enterComparision(ParseRulesParser::ComparisionContext* ctx){
     assert(mode_.empty());
     assert(anonymous_node_.empty());
-    mode_.push(MODE::BOUND_DEFINITION);
-    anonymous_node_.push(std::make_shared<UnaryNode>(UNARY_OP::PARENS));
+    domain_.emplace(Domain());
+    if(ctx->comparator()){
+        if(ctx->comparator()->LESS())
+            domain_->type_ = COMP_T::LESS;
+        else if(ctx->comparator()->LESS_EQUAL())
+            domain_->type_ = COMP_T::LESS_OR_EQUAL;
+        else if(ctx->comparator()->EQUAL())
+            domain_->type_ = COMP_T::EQUAL;
+        else if(ctx->comparator()->LARGER_EQUAL())
+            domain_->type_ = COMP_T::LARGER_OR_EQUAL;
+        else if(ctx->comparator()->LARGER())
+            domain_->type_ = COMP_T::LARGER;
+        else throw std::runtime_error("Undefined node");
+    }
+    else throw std::runtime_error("Undefined node");
+
+    mode_.push(MODE::DOMAIN_DEFINITION);
+    if(ctx->VARIABLE()){
+        //creating in active sheet
+        BaseData* c_var_db_tmp;
+        if(ctx->DATABASE())
+            c_var_db_tmp = __insert_new_data_base__(ctx->DATABASE()->getText());
+        else c_var_db_tmp = data_base_;
+        current_var_ = c_var_db_tmp->add_variable(ctx->VARIABLE()->getText())->node();
+    }
+    else assert(false);
 }
 
 void BaseListener::exitComparision(ParseRulesParser::ComparisionContext* ctx){
-    assert(is_bounds_definition());
+    assert(is_domain_definition());
     mode_.pop();
-    assert(mode_.empty());
-    assert(anonymous_node_.size()==1);
-    if(bottom_.has_value())
-        current_var_->variable()->set_bottom_bound_value(bottom_.value().db_name,bottom_.value().var_name,anonymous_node_.top(),bottom_.value().type);
-    else if(top_.has_value())
-        current_var_->variable()->set_top_bound_value(top_.value().db_name,top_.value().var_name,anonymous_node_.top(),top_.value().type);
-    else throw std::runtime_error("Error ");
-    anonymous_node_.pop();
+    assert(anonymous_node_.empty());
+    assert(current_var_);
+    assert(domain_.has_value());
+    current_var_->variable()->add_domain(std::move(domain_.value()));
+    current_var_.reset();
+}
+
+void BaseListener::enterString(ParseRulesParser::StringContext* ctx){
+
+}
+
+void BaseListener::exitString(ParseRulesParser::StringContext* ctx){
+    
 }
