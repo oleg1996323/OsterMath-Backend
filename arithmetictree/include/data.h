@@ -26,7 +26,7 @@ class BaseData{
 
     std::string_view name() const;
 
-    void set_name(const std::string& name);
+    void set_name(std::string_view name);
 
     bool exists(std::string_view name) const;
 
@@ -56,6 +56,8 @@ class BaseData{
     DataPool* get_pool();
 
     void read_new();
+
+    void rename_var(const std::string& current_name,const std::string& new_name);
 
     void parse_entry();
 
@@ -90,6 +92,8 @@ class DataPool{
 
     std::string_view name();
 
+    void rename_database(const std::string&, const std::string&);
+
     void set_name(const std::string& name);
 
     const BaseData* get(std::string_view name_data) const noexcept;
@@ -99,8 +103,6 @@ class DataPool{
     bool exists(std::string_view name) const;
 
     void erase(std::string_view name);
-
-    void replace(const std::string& name) noexcept;
 
     size_t size() const;
 

@@ -22,6 +22,10 @@ std::string_view VariableBase::name() const{
     return name_;
 }
 
+void VariableBase::set_name(std::string_view name){
+    name_=name;
+}
+
 #include "arithmetic_types.h"
 
 void VariableBase::refresh() const{

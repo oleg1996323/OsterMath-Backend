@@ -35,6 +35,7 @@ class VariableBase: public FormattingData{
     void define(T&& value);
 
     std::string_view name() const;
+    void set_name(std::string_view name);
     void refresh() const;
 
     const std::shared_ptr<VariableNode>& node() const;

@@ -2,14 +2,22 @@
 #include <iostream>
 #include <string>
 #include <string_view>
-#include "def.h"
 #include "data.h"
 #include "test/testing.h"
 
 #ifdef DEBUG
 
 int main(){   
-    Testing();
+    //Testing();
+
+    std::string str = "String number 1.";
+    std::string_view str_v = str;
+
+    std::cout<<"String: "<<str_v<<". Lenght: "<<str_v.size()<<std::endl;
+
+    str = "Another string number 1.";
+    std::cout<<"String: "<<str_v<<". Lenght: "<<str_v.size()<<std::endl;
+
     return 0;
 }
 

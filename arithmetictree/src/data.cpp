@@ -29,7 +29,7 @@ std::string_view BaseData::name() const{
     return name_;
 }
 
-void BaseData::set_name(const std::string& name){
+void BaseData::set_name(std::string_view name){
     name_ = name;
 }
 
@@ -40,6 +40,16 @@ bool BaseData::defined(std::string_view name) const{
         else return false;
     }
     else return false;
+}
+
+void BaseData::rename_var(const std::string& current_name,const std::string& new_name){
+    if(exists(current_name)){
+        auto var = vars_.at(current_name);
+        vars_.erase(current_name);
+        var_names_.erase(current_name);
+        var_names_.insert(new_name);
+        var->set_name(vars_.emplace(new_name, var).first->first);
+    }
 }
 
 std::shared_ptr<VariableBase>& BaseData::add_variable(std::string&& name){
@@ -110,6 +120,16 @@ std::string_view DataPool::name(){
     return name_;
 }
 
+void DataPool::rename_database(const std::string& current_name, const std::string& new_name){
+    if(exists(current_name)){
+        BaseData& data = data_bases_.at(current_name);
+        data_bases_.erase(current_name);
+        data_names_.erase(current_name);
+        data_names_.insert(new_name);
+        data.set_name(data_bases_.emplace(new_name, std::move(data)).first->first);
+    }
+}
+
 void DataPool::set_name(const std::string& name){
     name_ = name;
 }
@@ -133,12 +153,6 @@ void DataPool::erase(std::string_view name){
     }
 }
 
-void DataPool::replace(const std::string& name) noexcept{
-    if(exists(name)){
-        data_bases_.at(name) = BaseData(*data_names_.find(name));
-    }
-}
-
 size_t DataPool::size() const{
     return data_names_.size();
 }
@@ -159,56 +173,6 @@ const std::unordered_map<std::string_view,BaseData>& DataPool::data_bases() cons
     return data_bases_;
 }
 
-#include "serialize.h"
-
-void BaseData::serialize(serialization::SerialData& serial_data){
-    serial_data.data_stream_.write("#SHEETNAME_", 11);
-    serial_data.data_stream_.write(name_.begin(), name_.size());
-    serial_data.data_stream_.write("\n",1);
-    serial_data.data_stream_.write("#DATAPOOL_", 10);
-    serial_data.data_stream_.write(pool_->name().begin(),pool_->name().size());
-    serial_data.data_stream_.write("#VARIABLES", 10);
-    for(auto var_data:vars_){
-        //stream.write(var_data.first.begin(), var_data.first.size()); //name
-        //stream<<std::endl; //control symbol
-        //var_data.second->serialize(stream);
-    }
-}
-
-void BaseData::serialize_header(serialization::SerialData& serial_data) const{
-    //access every nodes of BaseData variables (including the comparing structures)
-    // for(auto& [name,var_base]:vars_){
-    //     serial_data.insert_node(reinterpret_cast<const std::shared_ptr<Node>&>(var_base->node()));
-    //     var_base->node()->deserialize_header(serial_data,var_base->node());
-    // }
-
-    //for(const std::shared_ptr<Node>& node:serial_data.)
-}
-
-void BaseData::deserialize(serialization::SerialData& serial_data){
-    
-}
-
 uint16_t BaseData::id() const{
     return data_count;
-}
-
-void DataPool::serialize(serialization::SerialData& serial_data){
-    // uint32_t sz=0;
-    // serial_data.data_stream_.write("/OMB\n",5);
-    // //pool name size and pool name
-    // sz = name().size();
-    // serial_data.data_stream_.write(reinterpret_cast<const char*>(&sz),sizeof(sz));
-    // serial_data.data_stream_.write(name().data(),pool->name().size());
-    // //pool hash
-    // uint32_t pool_ptr = (uint32_t)this;
-    // serial_data.data_stream_.write(reinterpret_cast<const char*>(pool_ptr),sizeof(uint32_t));
-
-    // //number of data_bases
-    // sz = pool->data_bases().size();
-    // serial_data.data_stream_.write(reinterpret_cast<const char*>(&sz),sizeof(sz));
-}
-
-void DataPool::deserialize(serialization::SerialData& serial_data){
-
 }
