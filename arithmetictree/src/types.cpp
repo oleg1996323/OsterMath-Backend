@@ -97,6 +97,28 @@ bool VariableBase::is_numeric() const{
     return node_->is_numeric();
 }
 
+TYPE_VAL VariableBase::type() const{
+    if(node_->has_childs()){
+        if(node_->is_numeric()){
+            if(node_->is_array())
+                return TYPE_VAL::NUMERIC_ARRAY;
+            else return TYPE_VAL::VALUE;
+        }
+        else if(node_->is_string()){
+            if(node_->is_array())
+                return TYPE_VAL::STRING_ARRAY;
+            else return TYPE_VAL::STRING;
+        }
+        else{
+            if(node_->is_array())
+                return TYPE_VAL::ARRAY;
+            else return TYPE_VAL::UNKNOWN;
+        }
+    }
+    else
+        return TYPE_VAL::UNKNOWN;
+}
+
 VariableBase::~VariableBase(){}
 
 void VariableBase::add_domain(Domain&& domain){

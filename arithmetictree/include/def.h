@@ -17,8 +17,11 @@ using Result_t = std::variant<std::monostate,Value_t,std::string, Node*>;
 
 enum class TYPE_VAL{
     UNKNOWN,
+    STRING_ARRAY,
+    NUMERIC_ARRAY,
+    VALUE,
     STRING,
-    NUMERIC
+    ARRAY
 };
 
 class Result:public Result_t{

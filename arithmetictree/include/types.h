@@ -48,6 +48,8 @@ class VariableBase: public FormattingData{
     bool is_undef() const;
     bool is_numeric() const;
 
+    TYPE_VAL type() const;
+
     void print_result();
 
     void print_text();

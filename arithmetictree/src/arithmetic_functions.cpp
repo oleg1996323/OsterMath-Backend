@@ -57,9 +57,9 @@ std::optional<std::invalid_argument> functions::auxiliary::arrays_string(const s
 
 TYPE_VAL functions::auxiliary::getting_arrays_type(const std::vector<ArrayNode*>& arrays){
     if(arrays_numeric(arrays))
-        return TYPE_VAL::NUMERIC;
+        return TYPE_VAL::NUMERIC_ARRAY;
     else if(arrays_string(arrays))
-        return TYPE_VAL::STRING;
+        return TYPE_VAL::STRING_ARRAY;
     else throw std::invalid_argument("Unknown type of array");
 }
 
