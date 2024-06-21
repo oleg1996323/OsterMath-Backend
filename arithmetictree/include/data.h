@@ -4,6 +4,7 @@
 #include <unordered_set>
 #include <string>
 #include <memory>
+#include <list>
 #include "def.h"
 #include "expr_parser.h"
 
@@ -110,12 +111,12 @@ class DataPool{
 
     void deserialize(serialization::SerialData& serial_data);
 
-    const std::unordered_map<std::string_view,BaseData>& data_bases() const;
+    const std::list<std::shared_ptr<BaseData>>& data_bases() const;
 
     private:
     std::string name_;
     std::unordered_set<std::string> data_names_;
-    std::unordered_map<std::string_view,BaseData> data_bases_;
+    std::list<std::shared_ptr<BaseData>> data_bases_;
 };
 
 using namespace std::string_view_literals;

@@ -55,20 +55,20 @@ void SerialData::serialize_header(DataPool* pool){
     sz = pool->data_bases().size();
     data_stream_.write(reinterpret_cast<const char*>(&sz),sizeof(sz));
     //data_stream_.write("\n", 1);
-    for(auto& [db_name,data_base]:pool->data_bases()){
+    for(auto& data_base:pool->data_bases()){
         //database name size and database name
-        name_sz = db_name.size();
+        name_sz = data_base->name().size();
         data_stream_.write(reinterpret_cast<const char*>(&name_sz),sizeof(name_sz));
-        data_stream_.write(db_name.data(), db_name.size());
+        data_stream_.write(data_base->name().data(), data_base->name().size());
         //database hash
-        db_id = (uint64_t)&data_base;
+        db_id = (uint64_t)data_base.get();
         std::cout<<"DataBase id:"<<db_id<<std::endl;
         data_stream_.write(reinterpret_cast<const char*>(&db_id),sizeof(db_id));
 
         //number of variables
-        sz = data_base.variables().size();
+        sz = data_base->variables().size();
         data_stream_.write(reinterpret_cast<const char*>(&sz),sizeof(sz));
-        if(!data_base.variables().empty()){
+        if(!data_base->variables().empty()){
             std::function<void(const std::shared_ptr<Node>&)> nodes_size;
             sz=0;
             nodes_size=[&sz](const std::shared_ptr<Node>& node)->void{
@@ -126,7 +126,7 @@ void SerialData::serialize_header(DataPool* pool){
                 return;
             };
 
-            for(auto& [var_name,var]:data_base.variables()){
+            for(auto& [var_name,var]:data_base->variables()){
                 VarProperties props;
 
                 //variable name size and variable name
@@ -156,7 +156,7 @@ void SerialData::serialize_header(DataPool* pool){
             }
 
             //get number of non-variable nodes
-            for(auto& [var_name,var]:data_base.variables()){
+            for(auto& [var_name,var]:data_base->variables()){
                 var->node()->recursive_function_applied_to_all_childs(nodes_size);
                 for(auto& domain:var->get_domains().get_domains()){
                     domain.lhs_->recursive_function_applied_to_all_childs(nodes_size);
@@ -169,7 +169,7 @@ void SerialData::serialize_header(DataPool* pool){
             data_stream_.write(reinterpret_cast<const char*>(&sz),sizeof(sz));
 
             //writing non-variable nodes info
-            for(auto& [var_name,var]:data_base.variables()){
+            for(auto& [var_name,var]:data_base->variables()){
                 var->node()->recursive_function_applied_to_all_childs(nodes_to_header);
                 for(auto& domain:var->get_domains().get_domains()){
                     domain.lhs_->recursive_function_applied_to_all_childs(nodes_to_header);

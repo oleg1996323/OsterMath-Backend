@@ -118,8 +118,8 @@ VAR(#D)=[500,200,100]
 
     serialization::serialize_to("./TestSerialization.omb",&pool);
     DataPool other = serialization::deserialize_from("./TestSerialization.omb");
-    for(auto& [name,data]:other.data_bases())
-        std::cout<<name<<std::endl;
+    for(auto& data:other.data_bases())
+        std::cout<<data->name()<<std::endl;
     assert(other.exists("any"));
     assert(other.exists("other"));
     assert(other.exists("anon"));

@@ -122,11 +122,10 @@ std::string_view DataPool::name(){
 
 void DataPool::rename_database(const std::string& current_name, const std::string& new_name){
     if(exists(current_name)){
-        BaseData& data = data_bases_.at(current_name);
-        data_bases_.erase(current_name);
+        BaseData* data = get(current_name);
+        data->set_name(new_name);
         data_names_.erase(current_name);
         data_names_.insert(new_name);
-        data.set_name(data_bases_.emplace(new_name, std::move(data)).first->first);
     }
 }
 
@@ -137,20 +136,27 @@ void DataPool::set_name(const std::string& name){
 BaseData* DataPool::add_data(const std::string& name){
     if(!exists(name)){
         std::string_view name_sv = *(data_names_.emplace(name).first);
-        data_bases_.emplace(name_sv,name_sv).first->second.set_pool(this);
+        data_bases_.emplace_back(std::make_shared<BaseData>(name_sv))->set_pool(this);
     }
-    return &data_bases_.at(name);
+    return get(name);
 }
 
 bool DataPool::exists(std::string_view name) const{
-    return data_bases_.contains(name);
+    auto result = std::find_if(data_bases_.begin(),data_bases_.end(),[name](const std::shared_ptr<BaseData>& data){
+        return data->name()==name;
+    });
+    if(result!=data_bases_.end())
+        return true;
+    else return false;
 }
 
 void DataPool::erase(std::string_view name){
-    if(exists(name)){
-        data_bases_.erase(name);
-        data_names_.erase(std::string(name));
-    }
+    auto result = std::find_if(data_bases_.begin(),data_bases_.end(),[name](const std::shared_ptr<BaseData>& data){
+        return data->name()==name;
+    });
+    if(result!=data_bases_.end())
+        data_bases_.erase(result);
+    data_names_.erase(std::string(name));
 }
 
 size_t DataPool::size() const{
@@ -158,18 +164,17 @@ size_t DataPool::size() const{
 }
 
 const BaseData* DataPool::get(std::string_view name_data) const noexcept{
-    if(exists(name_data))
-        return &data_bases_.at(name_data);
-    else return nullptr;
+    return get(name_data);
 }
 
 BaseData* DataPool::get(std::string_view name_data) noexcept{
-    if(exists(name_data))
-        return &data_bases_.at(name_data);
-    else return nullptr;
+    auto result = std::find_if(data_bases_.begin(),data_bases_.end(),[name_data](const std::shared_ptr<BaseData>& data){
+        return data->name()==name_data;
+    });
+    return result!=data_bases_.end() && *result?result->get():nullptr;
 }
 
-const std::unordered_map<std::string_view,BaseData>& DataPool::data_bases() const{
+const std::list<std::shared_ptr<BaseData>>& DataPool::data_bases() const{
     return data_bases_;
 }
 
