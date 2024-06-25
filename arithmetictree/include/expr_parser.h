@@ -6,7 +6,9 @@
 #include "def.h"
 
 class Lexer;
+namespace bailerror{
 class ErrorListener;
+}
 class BaseListener;
 class BailErrorListener;
 class BaseData;
@@ -41,7 +43,7 @@ public:
         ParseRulesParser* base_parser_;
         BailErrorListener* error_listener;
         BaseListener* listener_;
-        ErrorListener* err_listener_;
+        bailerror::ErrorListener* err_listener_;
         antlr4::tree::ParseTree* tree_;
     };
     std::unique_ptr<ParseItems> items_;

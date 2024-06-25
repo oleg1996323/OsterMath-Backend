@@ -17,12 +17,11 @@ size_t pow(size_t base, size_t pow){
     else return 1;    
 }
 
-std::optional<std::invalid_argument> functions::auxiliary::check_sizes_arrays(std::vector<size_t>& sz_depth_measure,const std::vector<ArrayNode*>& arrays){
+bool functions::auxiliary::check_sizes_arrays(std::vector<size_t>& sz_depth_measure,const std::vector<ArrayNode*>& arrays){
     if(arrays.size()!=0 && !arrays.front()->empty())
         sz_depth_measure.push_back(arrays.front()->size());
-    else return std::nullopt;
 
-    if(!std::all_of(arrays.begin(),arrays.end(),[&sz_depth_measure](ArrayNode* array){
+    return !std::all_of(arrays.begin(),arrays.end(),[&sz_depth_measure](ArrayNode* array){
 
         if(std::all_of(array->begin(),array->end(),[](std::shared_ptr<Node>& node){return node->type()==NODE_TYPE::ARRAY;}))
         {
@@ -34,25 +33,19 @@ std::optional<std::invalid_argument> functions::auxiliary::check_sizes_arrays(st
             return array->size()==sz_depth_measure.back() && check_sizes_arrays(sz_depth_measure,in_arrays);
         }
         return array->size()==sz_depth_measure.back();
-    }))
-        return UnequalSizeArrays("The sizes of arrays are not equal");
-    else return std::nullopt;
+    });
 }
 
-std::optional<std::invalid_argument> functions::auxiliary::arrays_numeric(const std::vector<ArrayNode*>& arrays){
-    if(!std::all_of(arrays.begin(),arrays.end(),[](ArrayNode* node){
+bool functions::auxiliary::arrays_numeric(const std::vector<ArrayNode*>& arrays){
+    return(!std::all_of(arrays.begin(),arrays.end(),[](ArrayNode* node){
         return node->is_numeric();
-    }))
-        return UnknownTypeArrays("The array must be numeric");
-    else return std::nullopt;
+    }));
 }
 
-std::optional<std::invalid_argument> functions::auxiliary::arrays_string(const std::vector<ArrayNode*>& arrays){
-    if(!std::all_of(arrays.begin(),arrays.end(),[](ArrayNode* node){
+bool functions::auxiliary::arrays_string(const std::vector<ArrayNode*>& arrays){
+    return !std::all_of(arrays.begin(),arrays.end(),[](ArrayNode* node){
         return node->is_string();
-    }))
-        return UnknownTypeArrays("The array must be literal (string)");
-    else return std::nullopt;
+    });
 }
 
 TYPE_VAL functions::auxiliary::getting_arrays_type(const std::vector<ArrayNode*>& arrays){
@@ -60,7 +53,7 @@ TYPE_VAL functions::auxiliary::getting_arrays_type(const std::vector<ArrayNode*>
         return TYPE_VAL::NUMERIC_ARRAY;
     else if(arrays_string(arrays))
         return TYPE_VAL::STRING_ARRAY;
-    else throw std::invalid_argument("Unknown type of array");
+    else return TYPE_VAL::UNKNOWN;
 }
 
 Value_t functions::Arithmetic::SumProduct(const std::vector<ArrayNode*>& arrays){
@@ -71,15 +64,11 @@ Value_t functions::Arithmetic::SumProduct(const std::vector<ArrayNode*>& arrays)
     {
         std::vector<size_t> sz_depth_measure;
         {
-            std::optional<std::exception> err_handler;
+            if(!functions::auxiliary::arrays_numeric(arrays))
+                throw exceptions::IncorrectTypeArrays("numeric");
 
-            err_handler = functions::auxiliary::arrays_numeric(arrays);
-            if(err_handler.has_value())
-                throw err_handler.value();
-
-            err_handler = functions::auxiliary::check_sizes_arrays(sz_depth_measure,arrays);
-            if(err_handler.has_value())
-                throw err_handler.value();
+            if(!functions::auxiliary::check_sizes_arrays(sz_depth_measure,arrays))
+                throw exceptions::UnequalSizeArrays("Sumproduct");
         }
 
         for(auto sz:sz_depth_measure){
@@ -106,15 +95,6 @@ Value_t functions::Arithmetic::SumProduct(const std::vector<ArrayNode*>& arrays)
 
     result = std::accumulate(value_vector.begin(),value_vector.end(),Value_t(0));
     return result;
-    // for(size_t i=0;i<arrays.front()->size();++i){
-    //     Value_t product = 1.;
-    //     //добавить std::inner_product и std::accumulate
-    //     for(std::shared_ptr<ArrayNode>& arr: arrays){
-    //         product *= arr->child(i)->execute();
-    //     }
-    //     result+=product;
-    // }
-    // return result;
 }
 
 Value_t functions::Arithmetic::Sum(const std::vector<ArrayNode*>& arrays){
@@ -124,15 +104,11 @@ Value_t functions::Arithmetic::Sum(const std::vector<ArrayNode*>& arrays){
     {
         std::vector<size_t> sz_depth_measure;
         {
-            std::optional<std::exception> err_handler;
+            if(!functions::auxiliary::arrays_numeric(arrays))
+                throw exceptions::IncorrectTypeArrays("numeric");
 
-            err_handler = functions::auxiliary::arrays_numeric(arrays);
-            if(err_handler.has_value())
-                throw err_handler.value();
-
-            err_handler = functions::auxiliary::check_sizes_arrays(sz_depth_measure,arrays);
-            if(err_handler.has_value())
-                throw err_handler.value();
+            if(!functions::auxiliary::check_sizes_arrays(sz_depth_measure,arrays))
+                throw exceptions::UnequalSizeArrays("Sum");
         }
 
         for(auto sz:sz_depth_measure){
@@ -167,15 +143,11 @@ Value_t functions::Arithmetic::Product(const std::vector<ArrayNode*>& arrays){
     {
         std::vector<size_t> sz_depth_measure;
         {
-            std::optional<std::exception> err_handler;
+            if(!functions::auxiliary::arrays_numeric(arrays))
+                throw exceptions::IncorrectTypeArrays("numeric");
 
-            err_handler = functions::auxiliary::arrays_numeric(arrays);
-            if(err_handler.has_value())
-                throw err_handler.value();
-
-            err_handler = functions::auxiliary::check_sizes_arrays(sz_depth_measure,arrays);
-            if(err_handler.has_value())
-                throw err_handler.value();
+            if(!functions::auxiliary::check_sizes_arrays(sz_depth_measure,arrays))
+                throw exceptions::UnequalSizeArrays("Product");
         }
 
         for(auto sz:sz_depth_measure){

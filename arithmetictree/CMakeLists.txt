@@ -36,11 +36,28 @@ file(GLOB_RECURSE ANTLR_GENERATED_SOURCES
 
 #message(STATUS "${ANTLR_GENERATED_SOURCES}")
 
+set(USER_INTERFACE ON)
+
+add_library(
+    bailerror STATIC
+    ${ANTLR_Parserules_CXX_OUTPUTS}
+    ${CMAKE_CURRENT_LIST_DIR}/src/exception/bailerror.cpp
+)
+
+target_include_directories(bailerror
+                    PUBLIC
+                        ${CMAKE_CURRENT_LIST_DIR}/include
+                        ${CMAKE_CURRENT_LIST_DIR}/include/exception
+                        ${ANTLR_Parserules_OUTPUT_DIR}
+                        ${ANTLR_GENERATED_FILES})
+
 add_library(
     exceptions STATIC
     ${ANTLR_Parserules_CXX_OUTPUTS}
     ${CMAKE_CURRENT_LIST_DIR}/src/exception/exception.cpp
 )
+
+set_target_properties(exceptions PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 target_include_directories(exceptions
                     PUBLIC
@@ -49,13 +66,6 @@ target_include_directories(exceptions
                         ${ANTLR_Parserules_OUTPUT_DIR}
                         ${ANTLR_GENERATED_FILES})
 
-set_target_properties(exceptions
-    PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/lib"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/lib"
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/bin"
-)
-
 add_library(
     arithmetictree STATIC
     ${arithmetic_tree_SOURCES}
@@ -63,7 +73,10 @@ add_library(
     ${ANTLR_GENERATED_FILES}
 )
 
-target_link_libraries(arithmetictree PUBLIC Boost::boost PRIVATE exceptions antlr4_static)
+
+set_target_properties(arithmetictree PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+target_link_libraries(arithmetictree PUBLIC Boost::boost exceptions PRIVATE bailerror antlr4_static)
 target_compile_definitions(arithmetictree PUBLIC $<$<CONFIG:Debug>:DEBUG>)
 if(MSVC)
     target_compile_options(antlr4_static PUBLIC /W0)
@@ -79,16 +92,30 @@ target_include_directories(arithmetictree
                         ${CMAKE_CURRENT_LIST_DIR}/include/exception
                         ${ANTLR_GENERATED_FILES})
 
-set_target_properties(arithmetictree
-    PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/lib"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/lib"
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/bin"
-)
+message(STATUS ${USER_INTERFACE})
 
-get_target_property(ANY arithmetictree RUNTIME_OUTPUT_DIRECTORY)
-
-message(STATUS "Runtime dir: " ${ANY})
+if(NOT USER_INTERFACE)
+    set_target_properties(arithmetictree exceptions
+        PROPERTIES
+        ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_LIST_DIR}/lib/uiless/Debug"
+        LIBRARY_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_LIST_DIR}/lib/uiless/Debug"
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_LIST_DIR}/bin/uiless/Debug"
+        ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_LIST_DIR}/lib/uiless/Release"
+        LIBRARY_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_LIST_DIR}/lib/uiless/Release"
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_LIST_DIR}/bin/uiless/Release"
+    )
+else()
+    set_target_properties(arithmetictree
+        PROPERTIES
+        ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_LIST_DIR}/lib/ui/Debug"
+        LIBRARY_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_LIST_DIR}/lib/ui/Debug"
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_LIST_DIR}/bin/ui/Debug"
+        ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_LIST_DIR}/lib/ui/Release"
+        LIBRARY_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_LIST_DIR}/lib/ui/Release"
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_LIST_DIR}/bin/ui/Release"
+    )
+    target_compile_definitions(arithmetictree PUBLIC USER_INTERFACE)
+endif()
 
 install(
     TARGETS arithmetictree

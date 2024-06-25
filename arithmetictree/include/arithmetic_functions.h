@@ -4,16 +4,17 @@
 #include <types.h>
 #include <def.h>
 #include <optional>
+#include "exception/exception.h"
 
 class ArrayNode;
 
 namespace functions{
     namespace auxiliary{
-        std::optional<std::invalid_argument> check_sizes_arrays(std::vector<size_t>& sz_depth_measure,const std::vector<ArrayNode*>& arrays);
+        bool check_sizes_arrays(std::vector<size_t>& sz_depth_measure,const std::vector<ArrayNode*>& arrays);
         TYPE_VAL getting_arrays_type(const std::vector<ArrayNode*>& arrays);
 
-        std::optional<std::invalid_argument> arrays_numeric(const std::vector<ArrayNode*>& arrays);
-        std::optional<std::invalid_argument> arrays_string(const std::vector<ArrayNode*>& arrays);
+        bool arrays_numeric(const std::vector<ArrayNode*>& arrays);
+        bool arrays_string(const std::vector<ArrayNode*>& arrays);
     }
 
     namespace Arithmetic{

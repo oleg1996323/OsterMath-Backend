@@ -1,6 +1,4 @@
 #pragma once
-#include <BaseErrorListener.h>
-#include <DefaultErrorStrategy.h>
 #include <stdexcept>
     /// <summary>
     /// Instead of recovering from exception {@code e}, re-throw it wrapped
@@ -8,52 +6,86 @@
     ///  rule function catches.  Use <seealso cref="Exception#getCause()"/> to get the
     ///  original <seealso cref="RecognitionException"/>.
     /// </summary>
-class ParsingStrategy;
 
-class ParsingError : public std::runtime_error {
+namespace exceptions{
+
+enum EXCEPTION_TYPE{
+    NOEXCEPT,
+    PARSING,
+    CYCLIC,
+    UNQEQUAL_ARRAYS,
+    UNKNOWN_TYPE_ARRAY,
+    INCORRECT_TYPE_ARRAYS,
+    DIVISION_ZERO
+};
+
+class Exception: public std::runtime_error{
+    public:
     using std::runtime_error::runtime_error;
+    //error abbreviation
+    static const char* error_abbr();
+    virtual const char* get_error() const = 0;
+    virtual EXCEPTION_TYPE type() const = 0;
+    virtual const char* get_prompt() const;
 };
 
-class EmptyVal: public std::logic_error{
-    using std::logic_error::logic_error;
+class ParsingError : public Exception {
+    public:
+    using Exception::Exception;
+    ParsingError(const std::string& error);
+    static const char* error_abbr();
+    virtual const char* get_error() const;
+    virtual EXCEPTION_TYPE type() const;
+    virtual const char* get_prompt() const;
 };
 
-class EmptyArray: public std::logic_error{
-    using std::logic_error::logic_error;
+class UnequalSizeArrays: public Exception{
+    public:
+    UnequalSizeArrays(const std::string& function_name);
+    static const char* error_abbr();
+    virtual const char* get_error() const;
+    virtual EXCEPTION_TYPE type() const;
+    virtual const char* get_prompt() const;
 };
 
-class UnequalSizeArrays: public std::invalid_argument{
-    using std::invalid_argument::invalid_argument;
+class UnknownTypeArray: public Exception{
+    public:
+    UnknownTypeArray();
+    static const char* error_abbr();
+    virtual const char* get_error() const;
+    virtual EXCEPTION_TYPE type() const;
+    virtual const char* get_prompt() const;
 };
 
-class UnknownTypeArrays: public std::invalid_argument{
-    using std::invalid_argument::invalid_argument;
+class IncorrectTypeArrays: public Exception{
+    public:
+    using Exception::Exception;
+    IncorrectTypeArrays(const std::string& type_expected);
+    static const char* error_abbr();
+    virtual const char* get_error() const;
+    virtual EXCEPTION_TYPE type() const;
+    virtual const char* get_prompt() const;
 };
 
-class UndefinedFunction: public std::logic_error{
-    using std::logic_error::logic_error;
+class CyclicReference: public Exception{
+    public:
+    using Exception::Exception;
+    CyclicReference(const std::string& var_name);
+    static const char* error_abbr();
+    virtual const char* get_error() const;
+    virtual EXCEPTION_TYPE type() const;
+    virtual const char* get_prompt() const;
 };
 
-class VariableAlreadyExists: public std::logic_error{
-    using std::logic_error::logic_error;
+class DivisionZero: public Exception{
+    public:
+    using Exception::Exception;
+    DivisionZero();
+    static const char* error_abbr();
+    virtual const char* get_error() const;
+    virtual EXCEPTION_TYPE type() const;
+    virtual const char* get_prompt() const;
 };
 
-class BailErrorListener : public antlr4::BaseErrorListener {
-public:
-    void syntaxError(antlr4::Recognizer* /* recognizer */, antlr4::Token* /* offendingSymbol */,
-                     size_t /* line */, size_t /* charPositionInLine */, const std::string& msg,
-                     std::exception_ptr /* e */
-                     ) override {
-        throw ParsingError("Error when lexing: " + msg);
-    }
-};
-
-class ErrorListener: public antlr4::BaseErrorListener {
-public:
-    void syntaxError(antlr4::Recognizer* /* recognizer */, antlr4::Token* /* offendingSymbol */,
-                     size_t /* line */, size_t /* charPositionInLine */, const std::string& msg,
-                     std::exception_ptr /* e */
-                     ) override {
-        throw ParsingError("Error when lexing: " + msg);
-    }
-};
+const char* get_except_abbr(EXCEPTION_TYPE);
+}

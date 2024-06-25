@@ -13,7 +13,9 @@ VariableBase* VariableNode::variable() noexcept{
 }
 
 Result VariableNode::execute(){
-    return childs_.at(0)->execute();
+    if(has_childs())
+        return childs_.at(0)->execute();
+    else return 0;
 }
 
 Result VariableNode::execute(size_t index){

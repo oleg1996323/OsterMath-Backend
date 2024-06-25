@@ -221,7 +221,7 @@ void BaseListener::exitRangefunction(ParseRulesParser::RangefunctionContext* ctx
 }
 
 void BaseListener::visitErrorNode(antlr4::tree::ErrorNode* node){
-    throw ParsingError("Error input. Prompt: " + node->getText());
+    throw exceptions::ParsingError(node->getText());
 }
 
 void BaseListener::enterLhs_comp(ParseRulesParser::Lhs_compContext* ctx){

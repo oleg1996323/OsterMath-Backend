@@ -3,86 +3,126 @@
 #include <BaseErrorListener.h>
 #include <DefaultErrorStrategy.h>
 
-class ParsingStrategy: public antlr4::DefaultErrorStrategy{
-    public:
-    virtual void recover(antlr4::Parser *recognizer, std::exception_ptr e) override;
-
-    /// Make sure we don't attempt to recover inline; if the parser
-    ///  successfully recovers, it won't throw an exception.
-    virtual antlr4::Token* recoverInline(antlr4::Parser *recognizer) override;
-
-    /// <summary>
-    /// Make sure we don't attempt to recover from problems in subrules. </summary>
-    virtual void sync(antlr4::Parser *recognizer) override;
-
-    virtual void reportNoViableAlternative(antlr4::Parser *recognizer, const antlr4::NoViableAltException &e) override;
-};
-
-
-
-void ParsingStrategy::recover(antlr4::Parser *recognizer, std::exception_ptr e) {
-    using namespace antlr4;
-    ParserRuleContext *context = recognizer->getContext();
-    do {
-        context->exception = e;
-        if (context->parent == nullptr)
-        break;
-        context = static_cast<ParserRuleContext *>(context->parent);
-    } while (true);
-
-    try {
-        std::rethrow_exception(e); // Throw the exception to be able to catch and rethrow nested.
-    #if defined(_MSC_FULL_VER) && _MSC_FULL_VER < 190023026
-    } catch (RecognitionException &inner) {
-        throw ParseCancellationException(inner.what());
-    #else
-    } catch (RecognitionException & /*inner*/) {
-        std::throw_with_nested(ParseCancellationException());
-    #endif
+namespace exceptions{
+    const char* Exception::get_prompt() const{
+        return what();
     }
-}
 
-antlr4::Token* ParsingStrategy::recoverInline(antlr4::Parser *recognizer)  {
-    using namespace antlr4;
-    InputMismatchException e(recognizer);
-    std::exception_ptr exception = std::make_exception_ptr(e);
-
-    ParserRuleContext *context = recognizer->getContext();
-    do {
-        context->exception = exception;
-        if (context->parent == nullptr)
-        break;
-        context = static_cast<ParserRuleContext *>(context->parent);
-    } while (true);
-
-    try {
-        throw e;
-    #if defined(_MSC_FULL_VER) && _MSC_FULL_VER < 190023026
-    } catch (InputMismatchException &inner) {
-        throw ParseCancellationException(inner.what());
-    #else
-    } catch (InputMismatchException & /*inner*/) {
-        std::throw_with_nested(ParseCancellationException());
-    #endif
+    ParsingError::ParsingError(const std::string& error):
+    Exception(error){}
+    const char* ParsingError::error_abbr(){
+        return "#NAME?";
     }
-}
+    const char* ParsingError::get_error() const{
+        return "Parsing error";
+    }
+    EXCEPTION_TYPE ParsingError::type() const{
+        return EXCEPTION_TYPE::PARSING;
+    }
+    const char* ParsingError::get_prompt() const{
+        return what();
+    }
 
-void ParsingStrategy::sync(antlr4::Parser * parser) {
-}
+    UnequalSizeArrays::UnequalSizeArrays(const std::string& function_name):
+    Exception(std::string()+"Unequal sizes of arrays in function "+function_name){}
+    const char* UnequalSizeArrays::error_abbr(){
+        return "#VAL!";
+    }
+    const char* UnequalSizeArrays::get_error() const{
+        return "Function array argument error";
+    }
+    EXCEPTION_TYPE UnequalSizeArrays::type() const{
+        return EXCEPTION_TYPE::UNQEQUAL_ARRAYS;
+    }
+    const char* UnequalSizeArrays::get_prompt() const{
+        return what();
+    }
 
-void ParsingStrategy::reportNoViableAlternative(antlr4::Parser *recognizer, const antlr4::NoViableAltException &e){
-    using namespace antlr4;
-    TokenStream *tokens = recognizer->getTokenStream();
-    std::string input;
-    if (tokens != nullptr) {
-        if (e.getStartToken()->getType() == Token::EOF) {
-        input = "<EOF>";
-        } else {
-        input = tokens->getText(e.getStartToken(), e.getOffendingToken());
+    UnknownTypeArray::UnknownTypeArray():
+    Exception("Unavaible to use array of unknown (not defined) type"){}
+    const char* UnknownTypeArray::error_abbr(){
+        return "#TYPE!";
+    }
+    const char* UnknownTypeArray::get_error() const{
+        return "Unknown type of array";
+    }
+    EXCEPTION_TYPE UnknownTypeArray::type() const{
+        return EXCEPTION_TYPE::UNKNOWN_TYPE_ARRAY;
+    }
+    const char* UnknownTypeArray::get_prompt() const{
+        return what();
+    }
+
+    IncorrectTypeArrays::IncorrectTypeArrays(const std::string& type_expected):
+    Exception("Incorrect type. Should be "+type_expected){}
+    const char* IncorrectTypeArrays::error_abbr(){
+        return "#TYPE!";
+    }
+    const char* IncorrectTypeArrays::get_error() const{
+        return "Incorrect type of array";
+    }
+    EXCEPTION_TYPE IncorrectTypeArrays::type() const{
+        return EXCEPTION_TYPE::INCORRECT_TYPE_ARRAYS;
+    }
+    const char* IncorrectTypeArrays::get_prompt() const{
+        return what();
+    }
+
+    CyclicReference::CyclicReference(const std::string& var_name):
+    Exception("Var "+var_name+" is self-refered"){}
+    const char* CyclicReference::error_abbr(){
+        return "#CYCLE!";
+    }
+    const char* CyclicReference::get_error() const{
+        return "Cyclic reference";
+    }
+    EXCEPTION_TYPE CyclicReference::type() const{
+        return EXCEPTION_TYPE::CYCLIC;
+    }
+    const char* CyclicReference::get_prompt() const{
+        return what();
+    }
+
+    DivisionZero::DivisionZero():
+    Exception("Division by 0"){}
+    const char* DivisionZero::error_abbr(){
+        return "#DIV/0";
+    }
+    const char* DivisionZero::get_error() const{
+        return "Zero division";
+    }
+    EXCEPTION_TYPE DivisionZero::type() const{
+        return EXCEPTION_TYPE::DIVISION_ZERO;
+    }
+    const char* DivisionZero::get_prompt() const{
+        return what();
+    }
+
+    const char* get_except_abbr(EXCEPTION_TYPE type){
+        switch (type)
+        {
+        case EXCEPTION_TYPE::PARSING:
+            return ParsingError::error_abbr();
+            break;
+        case EXCEPTION_TYPE::CYCLIC:
+            return CyclicReference::error_abbr();
+            break;
+        case EXCEPTION_TYPE::DIVISION_ZERO:
+            return DivisionZero::error_abbr();
+            break;
+        case EXCEPTION_TYPE::INCORRECT_TYPE_ARRAYS:
+            return IncorrectTypeArrays::error_abbr();
+            break;
+        case EXCEPTION_TYPE::UNKNOWN_TYPE_ARRAY:
+            return UnknownTypeArray::error_abbr();
+            break;
+        case EXCEPTION_TYPE::UNQEQUAL_ARRAYS:
+            return UnequalSizeArrays::error_abbr();
+            break;
+        default:
+            assert(true);
+            return "";
+            break;
         }
-    } else {
-        input = "<unknown input>";
     }
-    std::string msg = "no viable alternative at input " + escapeWSAndQuote(input);
-    recognizer->notifyErrorListeners(e.getOffendingToken(), msg, std::make_exception_ptr(e));
 }

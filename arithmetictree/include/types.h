@@ -34,7 +34,7 @@ class VariableBase: public FormattingData{
     template<typename T>
     void define(T&& value);
 
-    std::string_view name() const;
+    std::string name() const;
     void set_name(std::string_view name);
     void refresh() const;
 
@@ -64,7 +64,7 @@ class VariableBase: public FormattingData{
 
     const VariableDomain& get_domains() const;
 
-    std::string_view get_data_base_name() const;
+    std::string get_data_base_name() const;
 
     Result result();
 

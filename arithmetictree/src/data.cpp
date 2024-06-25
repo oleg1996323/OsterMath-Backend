@@ -47,8 +47,7 @@ void BaseData::rename_var(const std::string& current_name,const std::string& new
         auto var = vars_.at(current_name);
         vars_.erase(current_name);
         var_names_.erase(current_name);
-        var_names_.insert(new_name);
-        var->set_name(vars_.emplace(new_name, var).first->first);
+        var->set_name(vars_.emplace(*var_names_.emplace(new_name).first, var).first->first);
     }
 }
 
@@ -90,10 +89,6 @@ void BaseData::setstream(std::istream& stream){
 void BaseData::read_new(){
     if(parser_)
         parser_->parse_entry();
-}
-
-void BaseData::parse_entry(){
-    return parser_->parse_entry();
 }
 
 void BaseData::set_pool(DataPool* pool){
@@ -174,7 +169,7 @@ BaseData* DataPool::get(std::string_view name_data) noexcept{
     return result!=data_bases_.end() && *result?result->get():nullptr;
 }
 
-const std::list<std::shared_ptr<BaseData>>& DataPool::data_bases() const{
+const std::deque<std::shared_ptr<BaseData>>& DataPool::data_bases() const{
     return data_bases_;
 }
 

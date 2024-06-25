@@ -4,7 +4,7 @@
 #include <unordered_set>
 #include <string>
 #include <memory>
-#include <list>
+#include <deque>
 #include "def.h"
 #include "expr_parser.h"
 
@@ -60,8 +60,6 @@ class BaseData{
 
     void rename_var(const std::string& current_name,const std::string& new_name);
 
-    void parse_entry();
-
     void serialize(serialization::SerialData& serial_data);
 
     void deserialize(serialization::SerialData& serial_data);
@@ -111,12 +109,12 @@ class DataPool{
 
     void deserialize(serialization::SerialData& serial_data);
 
-    const std::list<std::shared_ptr<BaseData>>& data_bases() const;
+    const std::deque<std::shared_ptr<BaseData>>& data_bases() const;
 
     private:
     std::string name_;
     std::unordered_set<std::string> data_names_;
-    std::list<std::shared_ptr<BaseData>> data_bases_;
+    std::deque<std::shared_ptr<BaseData>> data_bases_;
 };
 
 using namespace std::string_view_literals;

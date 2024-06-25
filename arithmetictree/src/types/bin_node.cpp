@@ -1,5 +1,6 @@
 #include "bin_node.h"
 #include "def.h"
+#include "exception/exception.h"
 
 void BinaryNode::insert(std::shared_ptr<Node> node){
     if(childs_.size()<2){
@@ -68,7 +69,7 @@ Result BinaryNode::execute(size_t index){
             rhs_cache(index) = child(1)->execute(index).get<Value_t>();
         }
         if(operation_==BINARY_OP::DIV && rhs_cache(index)==0.)
-            throw std::logic_error("Division by 0 (NULL)");
+            throw exceptions::DivisionZero();
         return __calculate__(index);
     }
     else

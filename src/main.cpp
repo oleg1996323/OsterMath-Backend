@@ -8,16 +8,30 @@
 #ifdef DEBUG
 
 int main(){   
-    Testing();
-
-    // std::string str = "String number 1.";
-    // std::string_view str_v = str;
-
-    // std::cout<<"String: "<<str_v<<". Lenght: "<<str_v.size()<<std::endl;
-
-    // str = "Another string number 1.";
-    // std::cout<<"String: "<<str_v<<". Lenght: "<<str_v.size()<<std::endl;
-
+    //Testing();
+    DataPool pool("main");
+    pool.add_data("any");
+    BaseData* data = pool.get("any");
+    std::string first = R"(VAR(#I)=1+1)";
+    std::string second = R"(VAR(#I)=2+2)";
+    {
+        std::stringstream stream(first);
+        data->setstream(stream);
+        data->read_new();
+        std::stringstream result;
+        data->get("I")->set_stream(result);
+        data->get("I")->print_result();
+        std::cout<<result.str()<<std::endl;
+    }
+    {
+        std::stringstream stream(second);
+        data->setstream(stream);
+        data->read_new();
+        std::stringstream result;
+        data->get("I")->set_stream(result);
+        data->get("I")->print_result();
+        std::cout<<result.str()<<std::endl;
+    }
     return 0;
 }
 

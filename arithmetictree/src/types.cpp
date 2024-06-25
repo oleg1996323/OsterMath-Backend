@@ -18,8 +18,8 @@ VariableBase::VariableBase(std::string_view name, BaseData* data_base):
     data_base_(data_base)
 {}
 
-std::string_view VariableBase::name() const{
-    return name_;
+std::string VariableBase::name() const{
+    return std::string(name_);
 }
 
 void VariableBase::set_name(std::string_view name){
@@ -50,7 +50,9 @@ Result VariableBase::result() const{
 
 std::string VariableBase::text(){
     std::ostringstream stream;
+    #ifndef USER_INTERFACE
     node_->print_text(stream);
+    #endif
     stream<<" = ";
     if(node_->has_childs()){
         node_->child(0)->print_text(stream);
@@ -133,6 +135,6 @@ const VariableDomain& VariableBase::get_domains() const{
     return domains_;
 }
 
-std::string_view VariableBase::get_data_base_name() const{
-    return data_base_->name();
+std::string VariableBase::get_data_base_name() const{
+    return std::string(data_base_->name());
 }

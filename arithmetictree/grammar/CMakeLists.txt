@@ -77,6 +77,8 @@ set(ANTLR_GENERATED_FILES ${PROJECT_RUNTIME_ANTLR}/runtime/src)
 
 target_include_directories(antlr4_static INTERFACE ${ANTLR_GENERATED_FILES})
 
+set_target_properties(antlr4_static PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
 set_target_properties(antlr4_static
     PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/lib"
