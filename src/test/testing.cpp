@@ -10,6 +10,7 @@ bool CalculationsCheck(const std::string& input_str, const std::string& check_va
     BaseData* data = pool.get("any");
     std::istringstream input(input_str);
     data->setstream(input);
+    data->read_new();
     std::ostringstream output;
     data->get("I")->set_stream(output);
     // data->get("A")->set_stream(output);
@@ -91,6 +92,7 @@ VAR(#D)=[500,200,100]
     BaseData* data = pool.get("any");
     std::istringstream input(str_in);
     data->setstream(input);
+    data->read_new();
     std::ostringstream output;
     data->get("I")->set_stream(output);
     data->get("A")->set_stream(output);

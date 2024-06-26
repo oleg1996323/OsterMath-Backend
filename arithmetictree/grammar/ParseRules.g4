@@ -91,7 +91,8 @@ array
     ;
 
 input_array:
-    expr #ItemArray
+    array #ItemArray
+    | expr #ItemArray
     ;
 
 number

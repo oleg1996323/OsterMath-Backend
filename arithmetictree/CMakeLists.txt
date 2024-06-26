@@ -95,7 +95,7 @@ target_include_directories(arithmetictree
 message(STATUS ${USER_INTERFACE})
 
 if(NOT USER_INTERFACE)
-    set_target_properties(arithmetictree exceptions
+    set_target_properties(arithmetictree exceptions bailerror
         PROPERTIES
         ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_LIST_DIR}/lib/uiless/Debug"
         LIBRARY_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_LIST_DIR}/lib/uiless/Debug"
@@ -105,7 +105,7 @@ if(NOT USER_INTERFACE)
         RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_LIST_DIR}/bin/uiless/Release"
     )
 else()
-    set_target_properties(arithmetictree
+    set_target_properties(arithmetictree exceptions bailerror
         PROPERTIES
         ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_LIST_DIR}/lib/ui/Debug"
         LIBRARY_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_LIST_DIR}/lib/ui/Debug"

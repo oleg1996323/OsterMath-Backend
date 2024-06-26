@@ -21,7 +21,7 @@ bool functions::auxiliary::check_sizes_arrays(std::vector<size_t>& sz_depth_meas
     if(arrays.size()!=0 && !arrays.front()->empty())
         sz_depth_measure.push_back(arrays.front()->size());
 
-    return !std::all_of(arrays.begin(),arrays.end(),[&sz_depth_measure](ArrayNode* array){
+    return std::all_of(arrays.begin(),arrays.end(),[&sz_depth_measure](ArrayNode* array){
 
         if(std::all_of(array->begin(),array->end(),[](std::shared_ptr<Node>& node){return node->type()==NODE_TYPE::ARRAY;}))
         {
@@ -37,13 +37,13 @@ bool functions::auxiliary::check_sizes_arrays(std::vector<size_t>& sz_depth_meas
 }
 
 bool functions::auxiliary::arrays_numeric(const std::vector<ArrayNode*>& arrays){
-    return(!std::all_of(arrays.begin(),arrays.end(),[](ArrayNode* node){
+    return std::all_of(arrays.begin(),arrays.end(),[](ArrayNode* node){
         return node->is_numeric();
-    }));
+    });
 }
 
 bool functions::auxiliary::arrays_string(const std::vector<ArrayNode*>& arrays){
-    return !std::all_of(arrays.begin(),arrays.end(),[](ArrayNode* node){
+    return std::all_of(arrays.begin(),arrays.end(),[](ArrayNode* node){
         return node->is_string();
     });
 }
