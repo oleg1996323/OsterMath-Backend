@@ -16,7 +16,9 @@ enum EXCEPTION_TYPE{
     UNQEQUAL_ARRAYS,
     UNKNOWN_TYPE_ARRAY,
     INCORRECT_TYPE_ARRAYS,
-    DIVISION_ZERO
+    DIVISION_ZERO,
+    INVALID_TYPE_ARG,
+    INVALID_NUMBER_ARGS
 };
 
 class Exception: public std::runtime_error{
@@ -81,6 +83,26 @@ class DivisionZero: public Exception{
     public:
     using Exception::Exception;
     DivisionZero();
+    static const char* error_abbr();
+    virtual const char* get_error() const;
+    virtual EXCEPTION_TYPE type() const;
+    virtual const char* get_prompt() const;
+};
+
+class InvalidTypeOfArgument:public Exception{
+    public:
+    using Exception::Exception;
+    InvalidTypeOfArgument(const std::string&);
+    static const char* error_abbr();
+    virtual const char* get_error() const;
+    virtual EXCEPTION_TYPE type() const;
+    virtual const char* get_prompt() const;
+};
+
+class InvalidNumberOfArguments:public Exception{
+    public:
+    using Exception::Exception;
+    InvalidNumberOfArguments(size_t);
     static const char* error_abbr();
     virtual const char* get_error() const;
     virtual EXCEPTION_TYPE type() const;

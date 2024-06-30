@@ -17,23 +17,57 @@ size_t pow(size_t base, size_t pow){
     else return 1;    
 }
 
-bool functions::auxiliary::check_sizes_arrays(std::vector<size_t>& sz_depth_measure,const std::vector<ArrayNode*>& arrays){
-    if(arrays.size()!=0 && !arrays.front()->empty())
-        sz_depth_measure.push_back(arrays.front()->size());
+void init_sz_depth_measure(std::vector<size_t>& sz_depth_measure, ArrayNode* array){
+    sz_depth_measure.push_back(array->size());
+    if(array->size()!=0 && array->child(0)->type()==NODE_TYPE::ARRAY)
+        init_sz_depth_measure(sz_depth_measure,reinterpret_cast<ArrayNode*>(array->child(0).get()));
+}
 
-    return std::all_of(arrays.begin(),arrays.end(),[&sz_depth_measure](ArrayNode* array){
-
-        if(std::all_of(array->begin(),array->end(),[](std::shared_ptr<Node>& node){return node->type()==NODE_TYPE::ARRAY;}))
+bool functions::auxiliary::check_sizes_arrays(std::vector<size_t>& sz_depth_measure,const std::vector<ArrayNode*>& arrays, size_t& loc_c){
+    if(std::all_of(arrays.begin(),arrays.end(),[&sz_depth_measure, &loc_c](ArrayNode* array){
+        //происходит дублирование при каждом прохождении последующих массивов после 1-го
+        if(std::all_of(array->begin(),array->end(),[](std::shared_ptr<Node>& node){return node->is_array();}))
         {
             std::vector<ArrayNode*> in_arrays;
             in_arrays.reserve(array->size());
-            for(std::shared_ptr<Node>& item_array:*array){
+            for(std::shared_ptr<Node> item_array:*array){
                 in_arrays.push_back(reinterpret_cast<ArrayNode*>(item_array.get()));
             }
-            return array->size()==sz_depth_measure.back() && check_sizes_arrays(sz_depth_measure,in_arrays);
+            if(array->size()==sz_depth_measure.at(loc_c)){
+                ++loc_c;
+                if(check_sizes_arrays(sz_depth_measure,in_arrays,loc_c)){
+                    return true;
+                }
+                else{
+                    return false;
+                }
+            }
+            else return false;
         }
-        return array->size()==sz_depth_measure.back();
-    });
+        else if(!std::any_of(array->begin(),array->end(),[](std::shared_ptr<Node>& node){return node->is_array();}))
+            return array->size()==sz_depth_measure.at(loc_c);
+        else return false;
+    })){
+        --loc_c;
+        return true;
+    }
+    else{
+        --loc_c;
+        return false;
+    }
+}
+
+bool functions::auxiliary::check_sizes_arrays(std::vector<size_t>& sz_depth_measure,const std::vector<ArrayNode*>& arrays){
+    size_t loc_c=0;
+    if(sz_depth_measure.size()==0){
+        if(arrays.size()!=0 && !arrays.front()->empty()){
+            loc_c = 0;
+            init_sz_depth_measure(sz_depth_measure,arrays.front());
+        }
+        else loc_c = 0;
+    }
+
+    return check_sizes_arrays(sz_depth_measure,arrays,loc_c);
 }
 
 bool functions::auxiliary::arrays_numeric(const std::vector<ArrayNode*>& arrays){
@@ -82,14 +116,17 @@ Value_t functions::Arithmetic::SumProduct(const std::vector<ArrayNode*>& arrays)
     size_t array_depth = proxy_array_iterator->depth();
 
     for(auto array:arrays){
-        for(;proxy_array_iterator->is_iterable();++*proxy_array_iterator.get()){
+        do
+        {
             Node* node = array;
             for(size_t depth=0; depth<array_depth;++depth){
-                std::cout<<"Iterator: "<<proxy_array_iterator->current_iterator(depth)<<std::endl;
+                //std::cout<<"Iterator: "<<proxy_array_iterator->current_iterator(depth)<<std::endl;
                 node = node->child(proxy_array_iterator->current_iterator(depth)).get();
             }
+            std::cout<<"Iterator: "<<proxy_array_iterator->seq_iterator(array_depth-1)<<std::endl;
             value_vector.at(proxy_array_iterator->seq_iterator(array_depth-1))*=node->execute().get<Value_t>();
-        }
+            std::cout<<value_vector.at(proxy_array_iterator->seq_iterator(array_depth-1))<<std::endl;
+        } while (++*proxy_array_iterator.get());
         proxy_array_iterator->reset_iterator();
     }
 
@@ -119,13 +156,13 @@ Value_t functions::Arithmetic::Sum(const std::vector<ArrayNode*>& arrays){
     }
 
     size_t array_depth = proxy_array_iterator->depth();
-    std::cout<<"Iterator: "<<proxy_array_iterator->current_iterator(0)<<std::endl;
+    //std::cout<<"Iterator: "<<proxy_array_iterator->current_iterator(0)<<std::endl;
 
     for(auto& array:arrays){
         for(;proxy_array_iterator->is_iterable();++*proxy_array_iterator.get()){
             Node* node = array;
             for(size_t depth=0; depth<array_depth;++depth){
-                std::cout<<"Iterator: "<<proxy_array_iterator->current_iterator(depth)<<std::endl;
+                //std::cout<<"Iterator: "<<proxy_array_iterator->current_iterator(depth)<<std::endl;
                 node = node->child(proxy_array_iterator->current_iterator(depth)).get();
             }
             result+=node->execute().get<Value_t>();
@@ -158,13 +195,13 @@ Value_t functions::Arithmetic::Product(const std::vector<ArrayNode*>& arrays){
     }
 
     size_t array_depth = proxy_array_iterator->depth();
-    std::cout<<"Iterator: "<<proxy_array_iterator->current_iterator(0)<<std::endl;
+    //std::cout<<"Iterator: "<<proxy_array_iterator->current_iterator(0)<<std::endl;
 
     for(auto& array:arrays){
         for(;proxy_array_iterator->is_iterable();++*proxy_array_iterator.get()){
             Node* node = array;
             for(size_t depth=0; depth<array_depth;++depth){
-                std::cout<<"Iterator: "<<proxy_array_iterator->current_iterator(depth)<<std::endl;
+                //std::cout<<"Iterator: "<<proxy_array_iterator->current_iterator(depth)<<std::endl;
                 node = node->child(proxy_array_iterator->current_iterator(depth)).get();
             }
             result*=node->execute().get<Value_t>();

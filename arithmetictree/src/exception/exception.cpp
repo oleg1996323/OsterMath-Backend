@@ -98,6 +98,38 @@ namespace exceptions{
         return what();
     }
 
+    InvalidTypeOfArgument::InvalidTypeOfArgument(const std::string& expected_type):
+    Exception("Invalid argument. Prompt: expected "+expected_type){}
+
+    const char* InvalidTypeOfArgument::error_abbr(){
+        return "#TYPE!";
+    }
+    const char* InvalidTypeOfArgument::get_error() const{
+        return "Invalid type of argument";
+    }
+    EXCEPTION_TYPE InvalidTypeOfArgument::type() const{
+        return EXCEPTION_TYPE::INVALID_TYPE_ARG;
+    }
+    const char* InvalidTypeOfArgument::get_prompt() const{
+        return what();
+    }
+
+    InvalidNumberOfArguments::InvalidNumberOfArguments(size_t expected_number_args):
+    Exception("Invalid number of arguments. Prompt: expected "+std::to_string(expected_number_args)+" arguments"){}
+
+    const char* InvalidNumberOfArguments::error_abbr(){
+        return "#ARG!";
+    }
+    const char* InvalidNumberOfArguments::get_error() const{
+        return "Invalid number of arguments";
+    }
+    EXCEPTION_TYPE InvalidNumberOfArguments::type() const{
+        return EXCEPTION_TYPE::INVALID_NUMBER_ARGS;
+    }
+    const char* InvalidNumberOfArguments::get_prompt() const{
+        return what();
+    }
+
     const char* get_except_abbr(EXCEPTION_TYPE type){
         switch (type)
         {
@@ -118,6 +150,12 @@ namespace exceptions{
             break;
         case EXCEPTION_TYPE::UNQEQUAL_ARRAYS:
             return UnequalSizeArrays::error_abbr();
+            break;
+        case EXCEPTION_TYPE::INVALID_TYPE_ARG:
+            return InvalidTypeOfArgument::error_abbr();
+            break;
+        case EXCEPTION_TYPE::INVALID_NUMBER_ARGS:
+            return InvalidNumberOfArguments::error_abbr();
             break;
         default:
             assert(true);

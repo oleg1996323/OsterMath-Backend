@@ -51,6 +51,8 @@ target_include_directories(bailerror
                         ${ANTLR_Parserules_OUTPUT_DIR}
                         ${ANTLR_GENERATED_FILES})
 
+set_target_properties(bailerror PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
 add_library(
     exceptions STATIC
     ${ANTLR_Parserules_CXX_OUTPUTS}

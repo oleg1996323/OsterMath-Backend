@@ -105,5 +105,6 @@ class ProxySizeDepthMeasure{
     std::unique_ptr<ProxySizeDepthMeasure> next_level_;
     ProxySizeDepthMeasure* parent_;
     size_t sz_;
+    mutable size_t total_childs_ = 0;
     size_t current_iterator_ = 0;
 };

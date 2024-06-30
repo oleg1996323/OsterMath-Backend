@@ -4,8 +4,6 @@
 #include "types.h"
 #include "serialize.h"
 
-size_t Node::counter = 0;
-
 NODE_TYPE Node::type() const{
     return NODE_TYPE::UNDEF;
 }
@@ -13,17 +11,13 @@ NODE_TYPE Node::type() const{
 Node::Node(size_t sz):
     childs_([&sz](){std::vector<std::shared_ptr<Node>> vector;
                     vector.reserve(sz);
-                    return vector;}()),
-                    node_count(counter++){
-                        std::cout<<node_count<<std::endl;
-                    }
+                    return vector;}()){}
 
-Node::Node():node_count(counter++){
-    std::cout<<node_count<<std::endl;
-}
+Node::Node()=default;
 
 void Node::refresh(){
     execute();
+    refresh_parent_links();
     caller_ = true;
     for(auto parent:parents_)
         parent->refresh();
@@ -69,6 +63,14 @@ bool Node::refer_to(std::string_view var_name) const{
     }
 }
 
+void Node::refresh_parent_links() const{
+    if(type()==NODE_TYPE::VARIABLE){
+        for(Node* parent:parents_)
+            if(!parent || parent->type()==NODE_TYPE::UNDEF)
+                parents_.erase(parent);
+    }
+}
+
 void Node::get_array_childs(std::vector<std::shared_ptr<Node>>& childs) const{
     for(auto child:childs_){
         if(child->type()==NODE_TYPE::ARRAY)
@@ -79,10 +81,6 @@ void Node::get_array_childs(std::vector<std::shared_ptr<Node>>& childs) const{
 
 const std::unordered_set<Node*>& Node::parents() const{
     return parents_;
-}
-
-size_t Node::id() const{
-    return node_count;
 }
 
 void Node::serialize_header(serialization::SerialData& serial_data, const std::shared_ptr<Node>& from){

@@ -40,6 +40,4 @@ class VariableNode:public Node{
 
     private:
     VariableBase* var_;
-
-    void refresh_parent_links() const;
 };

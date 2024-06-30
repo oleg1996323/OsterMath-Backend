@@ -11,7 +11,7 @@ Result RangeOperationNode::execute(){
     else if(operation_==RANGE_OP::PROD)
         result = 1.;
     for(size_t i=0;i<range_size;++i){
-        std::cout<<"Index: "<<i<<std::endl;
+        //std::cout<<"Index: "<<i<<std::endl;
         if(operation_==RANGE_OP::SUM)
             result+=execute(i).get<Value_t>();
         else if(operation_==RANGE_OP::PROD)

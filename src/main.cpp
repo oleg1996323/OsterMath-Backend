@@ -24,77 +24,26 @@ int main(){
     DataPool pool("main");
     pool.add_data("any");
     BaseData* data = pool.get("any");
-    std::string first = R"(VAR(#A)=[2,2,2]
-VAR(#B)=[2,2,2]
-VAR(#I)=sumproduct(VAR(#A),VAR(#B))
+    std::string first = R"(VAR(#A)=[[2],2,2]
+VAR(#B)=[[2],2,2]
+VAR(#C)=sumproduct(#A,#B)
 )";
-    std::string second = R"(VAR(#I)=2+!)";
+//,[[2,2,2],[2,2,2]]
+
     {
         std::stringstream stream(first);
         data->setstream(stream);
         std::stringstream result;
         exception_handler([&](){
             data->read_new();
-            data->get("I")->set_stream(result);
-            data->get("I")->refresh();
-            data->get("I")->print_result();
+            data->get("C")->set_stream(result);
+            data->get("C")->refresh();
+            data->get("C")->print_result();
         });
-        first = R"(VAR(#I)=sumproduct(VAR(#A),B)
-        )";
-        
-        stream = std::stringstream(first);
-        exception_handler([&](){
-            data->read_new();
-            data->get("I")->set_stream(result);
-            data->get("I")->refresh();
-            data->get("I")->print_result();
-        });
-        
-        first = R"(VAR(#B)=[2,2]
-)";
-        stream = std::stringstream(first);
-        exception_handler([&](){
-            data->read_new();
-            data->get("I")->set_stream(result);
-            data->get("I")->refresh();
-            data->get("I")->print_result();
-        });
-        std::cout<<result.str()<<std::endl;
 
-        first = R"(VAR(#I)=sumproduct(VAR(#A),VAR(#B))
-)";
-        stream = std::stringstream(first);
-        exception_handler([&](){
-            data->read_new();
-            data->get("I")->set_stream(result);
-            data->get("I")->refresh();
-            data->get("I")->print_result();
-        });
-        std::cout<<result.str()<<std::endl;
-
-        first = R"(VAR(#B)=[2,2,2]
-)";
-        stream = std::stringstream(first);
-        exception_handler([&](){
-            data->read_new();
-            data->get("I")->set_stream(result);
-            data->get("I")->refresh();
-            data->get("I")->print_result();
-        });
         std::cout<<result.str()<<std::endl;
     }
     
-    {
-        std::stringstream stream(second);
-        data->setstream(stream);
-        std::stringstream result;
-        exception_handler([&](){
-            data->read_new();
-            data->get("I")->set_stream(result);
-            data->get("I")->print_result();
-        });
-        std::cout<<result.str()<<std::endl;
-    }
     return 0;
 }
 

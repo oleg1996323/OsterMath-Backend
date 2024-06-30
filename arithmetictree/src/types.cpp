@@ -4,11 +4,11 @@
 #include "data.h"
 
 void VariableBase::print_result(){
-    get_stream()<<result()<<std::endl;
+    get_stream()<<result();
 }
 
 void VariableBase::print_text(){
-    get_stream()<<text()<<std::endl;
+    get_stream()<<text();
 }
 
 VariableBase::VariableBase(std::string_view name, BaseData* data_base):
@@ -29,6 +29,7 @@ void VariableBase::set_name(std::string_view name){
 #include "arithmetic_types.h"
 
 void VariableBase::refresh() const{
+    node_->refresh_parent_links();
     node_->refresh();
 }
 

@@ -56,8 +56,11 @@ class Node{
     }
 
     void release_childs(){
-        for(auto child:childs_)
-            child.reset();
+        for(auto child:childs_){
+            assert(child->parents_.contains(this));
+            child->parents_.erase(this);
+        }
+        childs_.clear();
     }
 
     bool has_childs() const{
@@ -88,11 +91,18 @@ class Node{
 
     void deserialize_header(serialization::SerialData& serial_data, const std::shared_ptr<Node>& from);
 
+    void refresh_parent_links() const;
+
     virtual void print_text(std::ostream& stream) const;
 
     virtual void print_result(std::ostream& stream) const = 0;
 
-    virtual ~Node(){}
+    virtual ~Node(){
+        for(auto child:childs_){
+            assert(child->parents_.contains(this));
+            child->parents_.erase(this);
+        }
+    }
 
     void add_parent(Node*);
 
@@ -106,8 +116,6 @@ class Node{
         return caller_;
     }
 
-    size_t id() const;
-
     template<typename T, typename... U>
     void recursive_function_applied_to_all_childs(std::function<T(const std::shared_ptr<Node>&,U...)> func);
 
@@ -118,8 +126,6 @@ class Node{
     std::vector<std::shared_ptr<Node>> childs_;
     bool caller_ = false;
     private:
-    static size_t counter;
-    size_t node_count;
 
     private:
 

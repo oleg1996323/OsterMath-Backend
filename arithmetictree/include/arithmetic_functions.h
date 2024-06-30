@@ -10,6 +10,7 @@ class ArrayNode;
 
 namespace functions{
     namespace auxiliary{
+        void init_sz_depth_measure(std::vector<size_t>& sz_depth_measure, ArrayNode* array);
         bool check_sizes_arrays(std::vector<size_t>& sz_depth_measure,const std::vector<ArrayNode*>& arrays);
         TYPE_VAL getting_arrays_type(const std::vector<ArrayNode*>& arrays);
 

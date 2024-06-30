@@ -13,19 +13,13 @@ VariableBase* VariableNode::variable() noexcept{
 }
 
 Result VariableNode::execute(){
-    if(has_childs())
-        return childs_.at(0)->execute();
-    else return 0;
+    return execute(0);
 }
 
 Result VariableNode::execute(size_t index){
-    return childs_.at(0)->execute(index);
-}
-
-void VariableNode::refresh_parent_links() const{
-    for(auto iterator_node = parents_.begin();iterator_node!=parents_.end();++iterator_node)
-        if(!(*iterator_node))
-            parents_.erase(iterator_node);
+    if(has_childs())
+        return childs_.at(0)->execute(index);
+    else return 0;
 }
 
 bool VariableNode::is_numeric() const{

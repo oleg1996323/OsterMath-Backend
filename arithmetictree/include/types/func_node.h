@@ -58,7 +58,7 @@ class FunctionNode:public Node{
     {
         if(array_type_function)
             throw std::runtime_error("Incorrect constructor. Prompt: function is array-type.");
-        std::cout<<(int)NUMBER_OF_ARGUMENT[(int)op]<<std::endl;
+        //std::cout<<(int)NUMBER_OF_ARGUMENT[(int)op]<<std::endl;
     }
 
     FunctionNode(FUNCTION_OP op, size_t arr_sz):
@@ -68,7 +68,7 @@ class FunctionNode:public Node{
     {
         if(!array_type_function)
             throw std::runtime_error("Incorrect constructor. Prompt: function is not array-type.");
-        std::cout<<(int)NUMBER_OF_ARGUMENT[(int)op]<<std::endl;
+        //std::cout<<(int)NUMBER_OF_ARGUMENT[(int)op]<<std::endl;
     }
 
     std::shared_ptr<Node> child(size_t id) const;

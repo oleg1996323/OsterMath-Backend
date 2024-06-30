@@ -19,31 +19,31 @@ Value_t BinaryNode::__calculate__(size_t index){
     {
         case BINARY_OP::ADD:
         #ifdef DEBUG
-            std::cout<<"Add: "<<lhs_cache(index)<<" and "<<rhs_cache(index)<<std::endl;
+            //std::cout<<"Add: "<<lhs_cache(index)<<" and "<<rhs_cache(index)<<std::endl;
         #endif
             return lhs_cache(index)+rhs_cache(index);
             break;
         case BINARY_OP::SUB:
         #ifdef DEBUG
-            std::cout<<"Sub: "<<lhs_cache(index)<<" and "<<rhs_cache(index)<<std::endl;
+            //std::cout<<"Sub: "<<lhs_cache(index)<<" and "<<rhs_cache(index)<<std::endl;
         #endif
             return lhs_cache(index)-rhs_cache(index);
             break;
         case BINARY_OP::MUL:
         #ifdef DEBUG
-            std::cout<<"Mul: "<<lhs_cache(index)<<" and "<<rhs_cache(index)<<std::endl;
+            //std::cout<<"Mul: "<<lhs_cache(index)<<" and "<<rhs_cache(index)<<std::endl;
         #endif
             return lhs_cache(index)*rhs_cache(index);
             break;
         case BINARY_OP::DIV:
         #ifdef DEBUG
-            std::cout<<"Div: "<<lhs_cache(index)<<" and "<<rhs_cache(index)<<std::endl;
+            //std::cout<<"Div: "<<lhs_cache(index)<<" and "<<rhs_cache(index)<<std::endl;
         #endif
             return lhs_cache(index)/rhs_cache(index);
             break;
         case BINARY_OP::POW:
         #ifdef DEBUG
-            std::cout<<"Pow: "<<lhs_cache(index)<<" and "<<rhs_cache(index)<<std::endl;
+            //std::cout<<"Pow: "<<lhs_cache(index)<<" and "<<rhs_cache(index)<<std::endl;
         #endif
             return pow(lhs_cache(index),rhs_cache(index));
             break;

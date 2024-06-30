@@ -32,83 +32,112 @@ FUNCTION_OP FunctionNode::operation() const{
     return operation_;
 }
 
+#include <numeric>
+
 Result FunctionNode::execute(){
-    if(array_type_function?childs_.size()>0:childs_.size()==childs_.capacity()){
+    if(array_type_function){
         if(!cache_.has_value()){
-            switch (operation_){
-                case FUNCTION_OP::LN:
-                    cache_ =  log(child(0)->execute().get<Value_t>());
-                    return cache_;
-                    break;
-                case FUNCTION_OP::LG10:
-                    cache_ =  log10(child(0)->execute().get<Value_t>());
-                    return cache_;
-                    break;
-                case FUNCTION_OP::EXP:
-                    cache_ = exp(child(0)->execute().get<Value_t>());
-                    return cache_;
-                    break;
-                case FUNCTION_OP::LOG_BASE:
-                    cache_ = log(child(0)->execute().get<Value_t>())/log(child(1)->execute().get<Value_t>());
-                    return cache_;
-                    break;
-                case FUNCTION_OP::SUMPRODUCT:
-                {
+            if(childs_.size()>0){
+                if(std::all_of(childs_.begin(),childs_.end(),[&](const std::shared_ptr<Node>& child){
+                    return child->is_array();
+                })){
                     std::vector<ArrayNode*> arrays;
                     for(std::shared_ptr<Node>& child:childs_){
-                        if(child->is_array()){
+                        if(child->is_numeric()){
                             ArrayNode* push_node;
                             if(child->type()==NODE_TYPE::VARIABLE && child->childs().size()==1)
-                               push_node = reinterpret_cast<ArrayNode*>(child->child(0).get());
+                                push_node = reinterpret_cast<ArrayNode*>(child->child(0).get());
                             else 
                                 push_node = reinterpret_cast<ArrayNode*>(child.get());
                             arrays.push_back(push_node);
                         }
-                        else throw std::invalid_argument("Invalid function parameter");
+                        else throw exceptions::InvalidTypeOfArgument("numeric value or numeric array");
                     }
-                    cache_ = functions::Arithmetic::SumProduct(arrays);
-                    break;
+                    switch(operation_){
+                        case FUNCTION_OP::SUMPRODUCT:
+                            cache_ = functions::Arithmetic::SumProduct(arrays);
+                            break;
+                        case FUNCTION_OP::SUM:
+                            cache_ = functions::Arithmetic::Sum(arrays);
+                            break;
+                        case FUNCTION_OP::PROD:
+                            cache_ = functions::Arithmetic::Product(arrays);
+                            break;
+                        default:
+                            throw std::invalid_argument("Unknown function operation");
+                    }
                 }
-                case FUNCTION_OP::SUM:
-                {
-                    std::vector<ArrayNode*> arrays;
-                    for(std::shared_ptr<Node>& child:childs_){
-                        if(child->is_array()){
-                            ArrayNode* push_node;
-                            if(child->type()==NODE_TYPE::VARIABLE && child->childs().size()==1)
-                               push_node = reinterpret_cast<ArrayNode*>(child->child(0).get());
-                            else 
-                                push_node = reinterpret_cast<ArrayNode*>(child.get());
-                            arrays.push_back(push_node);
+                else{
+                    if(std::all_of(childs_.begin(),childs_.end(),[&](const std::shared_ptr<Node>& child){
+                        return !child->is_array() && child->is_numeric();
+                    })){
+                        Value_t init;
+                        
+                        switch(operation_){
+                            case FUNCTION_OP::SUMPRODUCT:
+                                init = 1.;
+                                std::for_each(childs_.begin(),childs_.end(),[&](const std::shared_ptr<Node>& child)->Result{
+                                    return init*=child->execute().get<Value_t>();
+                                });
+                                cache_ = init;
+                                break;
+                            case FUNCTION_OP::SUM:
+                                init = 0.;
+                                std::for_each(childs_.begin(),childs_.end(),[&](const std::shared_ptr<Node>& child)->Result{
+                                    return init+=child->execute().get<Value_t>();
+                                });
+                                cache_ = init;
+                                break;
+                            case FUNCTION_OP::PROD:
+                                init = 1.;
+                                std::for_each(childs_.begin(),childs_.end(),[&](const std::shared_ptr<Node>& child)->Result{
+                                    return init*=child->execute().get<Value_t>();
+                                });
+                                cache_ = init;
+                                break;
+                            default:
+                                throw std::invalid_argument("Unknown function operation");
                         }
-                        else throw std::invalid_argument("Invalid function parameter");
                     }
-                    cache_ = functions::Arithmetic::Sum(arrays);
-                    break;
+                    else throw exceptions::InvalidTypeOfArgument("numeric value or numeric array");
                 }
-                case FUNCTION_OP::PROD:
-                {
-                    std::vector<ArrayNode*> arrays;
-                    for(std::shared_ptr<Node>& child:childs_){
-                        if(child->is_array()){
-                            ArrayNode* push_node;
-                            if(child->type()==NODE_TYPE::VARIABLE && child->childs().size()==1)
-                               push_node = reinterpret_cast<ArrayNode*>(child->child(0).get());
-                            else 
-                                push_node = reinterpret_cast<ArrayNode*>(child.get());
-                            arrays.push_back(push_node);
-                        }
-                        else throw std::invalid_argument("Invalid function parameter");
-                    }
-                    cache_ = functions::Arithmetic::Product(arrays);
-                    break;
-                }
-                default:
-                    throw std::invalid_argument("Unknown multiargument operation");
+                
             }
+            else cache_=0;
         }
     }
-    else throw std::invalid_argument("Invalid number of arguments");
+    else{
+        if(childs_.size()==childs_.capacity()){
+            if(!cache_.has_value()){
+                if(std::all_of(childs_.begin(),childs_.end(),[&](const std::shared_ptr<Node>& child){
+                    return child->is_numeric() && !child->is_array();
+                })){
+                    switch (operation_){
+                        case FUNCTION_OP::LN:
+                            cache_ =  log(child(0)->execute().get<Value_t>());
+                            return cache_;
+                            break;
+                        case FUNCTION_OP::LG10:
+                            cache_ =  log10(child(0)->execute().get<Value_t>());
+                            return cache_;
+                            break;
+                        case FUNCTION_OP::EXP:
+                            cache_ = exp(child(0)->execute().get<Value_t>());
+                            return cache_;
+                            break;
+                        case FUNCTION_OP::LOG_BASE:
+                            cache_ = log(child(0)->execute().get<Value_t>())/log(child(1)->execute().get<Value_t>());
+                            return cache_;
+                            break;
+                        default:
+                            throw std::invalid_argument("Unknown function operation");
+                    }
+                }
+                else exceptions::InvalidTypeOfArgument("numeric value");
+            }
+        }
+        else exceptions::InvalidNumberOfArguments(childs_.capacity());
+    }
     return cache_;
 }
 

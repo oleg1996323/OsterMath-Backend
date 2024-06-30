@@ -68,7 +68,9 @@ bool ProxySizeDepthMeasure::operator++(){
 }
 
 bool ProxySizeDepthMeasure::is_iterable() const{
-    if(current_iterator_<sz_ || (next_level_ && next_level_->is_iterable()))
+    if(current_iterator_+1<sz_)
+        return true;
+    else if(next_level_ && next_level_->is_iterable())
         return true;
     else return false;
 }
@@ -89,6 +91,13 @@ size_t ProxySizeDepthMeasure::depth(){
     return depth; 
 }
 
+void ProxySizeDepthMeasure::depth(size_t& uppper_depth){
+    ++uppper_depth;
+    if(next_level_)
+        next_level_->depth(uppper_depth);
+    else return;
+}
+
 void ProxySizeDepthMeasure::reset_iterator(){
     current_iterator_ = 0;
     if(next_level_)
@@ -99,6 +108,7 @@ size_t ProxySizeDepthMeasure::current_iterator(int32_t depth) const{
     if(depth>=0){
         if(depth>0){
             if(next_level_){
+                --depth;
                 return next_level_->current_iterator_ref(depth);
             }
             else 
@@ -132,13 +142,6 @@ size_t ProxySizeDepthMeasure::current_iterator_ref(int32_t& depth) const{
     else throw std::invalid_argument("Argument cannot be less than 0");
 }
 
-void ProxySizeDepthMeasure::depth(size_t& uppper_depth){
-    ++uppper_depth;
-    if(next_level_)
-        depth(uppper_depth);
-    else return;
-}
-
 size_t ProxySizeDepthMeasure::size(size_t depth) const{
     if(depth>0){
         --depth;
@@ -164,7 +167,9 @@ size_t ProxySizeDepthMeasure::seq_iterator(int32_t depth) const{
     if(depth>=0){
         if(depth>0){
             if(next_level_){
-                return total_size_childs()*current_iterator_+next_level_->seq_iterator_ref(depth);;
+                --depth;
+                //std::cout<<"Total size childs: "<<total_size_childs()<<std::endl;
+                return next_level_->total_size_childs()*current_iterator_+next_level_->seq_iterator_ref(depth);
             }
             else 
                 throw std::invalid_argument("Unavailable depth");
@@ -183,7 +188,7 @@ size_t ProxySizeDepthMeasure::seq_iterator_ref(int32_t& depth) const{
         if(depth>0){
             if(next_level_){
                 --depth;
-                return total_size_childs()*current_iterator_+next_level_->seq_iterator_ref(depth);
+                return next_level_->total_size_childs()*current_iterator_+next_level_->seq_iterator_ref(depth);
             }
             else 
                 throw std::invalid_argument("Unavailable depth");
@@ -198,11 +203,10 @@ size_t ProxySizeDepthMeasure::seq_iterator_ref(int32_t& depth) const{
 }
 
 bool ProxySizeDepthMeasure::increase_iterator(){
-    if(++current_iterator_<sz_){
+    if(++current_iterator_<sz_)
         return true;
-    }
     else {
-        if(parent_ && parent_->is_iterable()){
+        if(parent_){
             current_iterator_ = 0;
             return parent_->increase_iterator();
         }
@@ -211,7 +215,11 @@ bool ProxySizeDepthMeasure::increase_iterator(){
 }
 
 size_t ProxySizeDepthMeasure::total_size_childs() const{
-    if(next_level_)
-        return next_level_->total_size_childs();
-    else return sz_;
+    if(total_childs_==0){
+        if(next_level_){
+            total_childs_ = sz_*next_level_->total_size_childs();
+        }
+        else total_childs_ = sz_;
+    }
+    return total_childs_;
 }
