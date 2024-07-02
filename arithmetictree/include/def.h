@@ -15,7 +15,7 @@ using Result_t = std::variant<std::monostate,Value_t,std::string, Node*>;
 
 #define ENUM_NAME(p) #p;
 
-enum class TYPE_VAL{
+enum TYPE_VAL{
     UNKNOWN,
     STRING_ARRAY,
     NUMERIC_ARRAY,

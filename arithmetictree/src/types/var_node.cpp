@@ -1,5 +1,6 @@
 #include "types.h"
 #include "var_node.h"
+#include "exception/exception.h"
 
 VariableNode::VariableNode(VariableBase* variable):Node(),
     var_(variable){}
@@ -14,13 +15,23 @@ VariableBase* VariableNode::variable() noexcept{
 
 Result VariableNode::execute(){
     if(has_childs())
-        return childs_.at(0)->execute();
+        if(!refer_to(var_->name()))
+            return childs_.at(0)->execute();
+        else {
+            throw exceptions::CyclicReference(var_->name());
+            return 0;
+        }
     else return 0;
 }
 
 Result VariableNode::execute(size_t index){
     if(has_childs())
-        return childs_.at(0)->execute(index);
+        if(!refer_to(var_->name()))
+            return childs_.at(0)->execute(index);
+        else {
+            throw exceptions::CyclicReference(var_->name());
+            return 0;
+        }
     else return 0;
 }
 

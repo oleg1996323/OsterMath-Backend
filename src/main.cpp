@@ -36,65 +36,63 @@ void define_section_subelements(STRUCT_SECTION& section_sizes, ArrayNode* array)
     }
 }
 
-int main(){
-    DataPool pool("main");
-    pool.add_data("any");
-    BaseData* data = pool.get("any");
-    std::string string = R"(VAR(#A)=[]
-)";
-//,[[2,2,2],[2,2,2]]
-
-    {
-        std::stringstream stream(string);
-        data->setstream(stream);
-        data->read_new();
-    }
-    STRUCT_SECTION section_sizes;
-    if(data->get("A")->is_array())
-        define_section_subelements(section_sizes,reinterpret_cast<ArrayNode*>(data->get("A")->node()->execute().get<Node*>()));
-    else data->get("A")->node()->execute().get<Value_t>();
-    std::cout<<"Max depth: "<<section_sizes.max_size_depth<<std::endl;
-    return 0;
-}
-
-// exceptions::EXCEPTION_TYPE exception_handler(std::function<void()> function){
-//     try{
-//         function();
-//         return exceptions::NOEXCEPT;
-//     }
-//     catch(const exceptions::Exception& err){
-//         std::cout<<"Warning exception: "<<err.get_error()<<"Prompt: "<<err.get_prompt()<<std::endl;
-//         return err.type();
-//     }
-// }
-
-// int main(){   
-//     //Testing();
+// int main(){
 //     DataPool pool("main");
 //     pool.add_data("any");
 //     BaseData* data = pool.get("any");
-//     std::string first = R"(VAR(#A)=[[2],2,2]
-// VAR(#B)=[[2],2,2]
-// VAR(#C)=sumproduct(#A,#B)
+//     std::string string = R"(VAR(#A)=#A
 // )";
 // //,[[2,2,2],[2,2,2]]
 
 //     {
-//         std::stringstream stream(first);
+//         std::stringstream stream(string);
 //         data->setstream(stream);
-//         std::stringstream result;
-//         exception_handler([&](){
-//             data->read_new();
-//             data->get("C")->set_stream(result);
-//             data->get("C")->refresh();
-//             data->get("C")->print_result();
-//         });
-
-//         std::cout<<result.str()<<std::endl;
+//         data->read_new();
 //     }
-    
+//     STRUCT_SECTION section_sizes;
+//     if(data->get("A")->is_array())
+//         define_section_subelements(section_sizes,reinterpret_cast<ArrayNode*>(data->get("A")->node()->execute().get<Node*>()));
+//     else data->get("A")->node()->execute().get<Value_t>();
+//     std::cout<<"Max depth: "<<section_sizes.max_size_depth<<std::endl;
 //     return 0;
 // }
+
+exceptions::EXCEPTION_TYPE exception_handler(std::function<void()> function){
+    try{
+        function();
+        return exceptions::NOEXCEPT;
+    }
+    catch(const exceptions::Exception& err){
+        std::cout<<"Warning exception: "<<err.get_error()<<"Prompt: "<<err.get_prompt()<<std::endl;
+        return err.type();
+    }
+}
+
+int main(){   
+    //Testing();
+    DataPool pool("main");
+    pool.add_data("any");
+    BaseData* data = pool.get("any");
+    std::string first = R"(VAR(#A)=1+#A
+)";
+//,[[2,2,2],[2,2,2]]
+
+    {
+        std::stringstream stream(first);
+        data->setstream(stream);
+        std::stringstream result;
+        exception_handler([&](){
+            data->read_new();
+            // data->get("C")->set_stream(result);
+            data->get("A")->refresh();
+            // data->get("C")->print_result();
+        });
+
+        // std::cout<<result.str()<<std::endl;
+    }
+    
+    return 0;
+}
 
 #else 
 

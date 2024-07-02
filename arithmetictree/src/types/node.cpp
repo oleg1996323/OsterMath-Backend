@@ -53,13 +53,12 @@ bool Node::refer_to(std::string_view var_name) const{
         return false;
     }
     else {
-        for(auto& child:childs_){
+        return std::any_of(childs_.begin(),childs_.end(),[var_name](const std::shared_ptr<Node>& child){
             if(child->type()==NODE_TYPE::VARIABLE && 
                 reinterpret_cast<const std::shared_ptr<VariableNode>&>(child)->variable()->name()==var_name)
                 return true;
             else return child->refer_to(var_name);
-        }
-        return false;
+        });
     }
 }
 
