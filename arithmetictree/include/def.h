@@ -16,12 +16,12 @@ using Result_t = std::variant<std::monostate,Value_t,std::string, Node*>;
 #define ENUM_NAME(p) #p;
 
 enum TYPE_VAL{
-    UNKNOWN,
-    STRING_ARRAY,
-    NUMERIC_ARRAY,
-    VALUE,
-    STRING,
-    ARRAY
+    UNKNOWN = 0x00,
+    VALUE = 0x02,
+    STRING = 0x04,
+    ARRAY = 0x10,
+    STRING_ARRAY = ARRAY|STRING,
+    NUMERIC_ARRAY = ARRAY|VALUE
 };
 
 class Result:public Result_t{
