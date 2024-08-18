@@ -108,7 +108,7 @@ const std::unordered_map<std::string_view,std::shared_ptr<VariableBase>> BaseDat
 }
 
 DataPool::DataPool(const std::string& name):name_(name){
-    add_data("anon"s);
+    add_data("tmp_buffer"s)->add_variable("buffer"s);
 }
 
 std::string_view DataPool::name(){

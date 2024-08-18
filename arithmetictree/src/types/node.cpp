@@ -36,6 +36,26 @@ const std::vector<std::shared_ptr<Node>>& Node::childs() const{
     return childs_;
 }
 
+TYPE_VAL Node::type_val() const{
+    if(is_numeric()){
+        if(is_array())
+            return TYPE_VAL::NUMERIC_ARRAY;
+        else return TYPE_VAL::VALUE;
+    }
+    else if(is_string()){
+        if(is_array())
+            return TYPE_VAL::STRING_ARRAY;
+        else return TYPE_VAL::STRING;
+    }
+    else if(is_array()){
+        if(is_array())
+            return TYPE_VAL::ARRAY;
+        else return TYPE_VAL::UNKNOWN;
+    }
+    else
+        return TYPE_VAL::UNKNOWN;
+}
+
 Result Node::execute() const{
     return const_cast<Node*>(this)->execute();
 }

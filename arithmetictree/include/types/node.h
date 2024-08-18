@@ -39,6 +39,8 @@ class Node{
 
     virtual NODE_TYPE type() const;
 
+    TYPE_VAL type_val() const;
+
     virtual Result execute() = 0;
 
     virtual Result execute(size_t index) = 0;
@@ -57,8 +59,8 @@ class Node{
 
     void release_childs(){
         for(auto child:childs_){
-            assert(child->parents_.contains(this));
-            child->parents_.erase(this);
+            if(child->parents_.contains(this))
+                child->parents_.erase(this);
         }
         childs_.clear();
     }
@@ -98,10 +100,7 @@ class Node{
     virtual void print_result(std::ostream& stream) const = 0;
 
     virtual ~Node(){
-        for(auto child:childs_){
-            assert(child->parents_.contains(this));
-            child->parents_.erase(this);
-        }
+        release_childs();
     }
 
     void add_parent(Node*);
