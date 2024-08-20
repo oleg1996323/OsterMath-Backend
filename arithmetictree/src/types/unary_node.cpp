@@ -25,11 +25,13 @@ void UnaryNode::print_result(std::ostream& stream) const{
     stream<<const_cast<UnaryNode*>(this)->execute();
 }
 
-void UnaryNode::insert(std::shared_ptr<Node> node){
+void UnaryNode::insert_back(std::shared_ptr<Node> node){
     assert(childs_.size()==0);
     childs_.push_back(node);
     node->add_parent(this);
 }
+
+void UnaryNode::replace(int idstd::shared_ptr<Node> node)
 
 Result UnaryNode::__calculate__(){
     return __calculate__(0);

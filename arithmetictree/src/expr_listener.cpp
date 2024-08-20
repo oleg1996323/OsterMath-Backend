@@ -41,7 +41,7 @@ void BaseListener::__insert_to_prec_node__(MODE mode_assert_check){
     auto node = anonymous_node_.top();
     anonymous_node_.pop();
     assert(!anonymous_node_.empty());
-    anonymous_node_.top()->insert(node);
+    anonymous_node_.top()->insert_back(node);
 }
 
 BaseData* BaseListener::__insert_new_data_base__(std::string&& name){

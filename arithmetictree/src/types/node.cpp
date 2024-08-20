@@ -114,3 +114,12 @@ void Node::serialize_header(serialization::SerialData& serial_data, const std::s
 void Node::deserialize_header(serialization::SerialData& serial_data, const std::shared_ptr<Node>& from){
 
 }
+
+void Node::replace_move_child_to(int id, Node* node_target){
+    if(node_target!=this && this->has_child(id)){
+        this->child(id)->parents_.erase(this);
+        this->child(id)->add_parent(this);
+        node_target->insert(id,std::move(this->child(id)));
+        this->childs_.erase(childs_.begin()+id);
+    }
+}

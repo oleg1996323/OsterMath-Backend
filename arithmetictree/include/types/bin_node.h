@@ -42,7 +42,7 @@ class BinaryNode:public Node{
         return child(1);
     }
 
-    virtual void insert(std::shared_ptr<Node> node) override;
+    virtual void insert_back(std::shared_ptr<Node> node) override;
 
     Value_t& lhs_cache() const{
         return cache_.at(0).lhs_;
@@ -83,6 +83,9 @@ class BinaryNode:public Node{
     virtual void print_result(std::ostream& stream) const override;
 
     private:
+    //insert before value at id
+    virtual void insert(int,std::shared_ptr<Node>) override;
+    virtual void replace(int,std::shared_ptr<Node>) override;
     class __cache__{
         public:
         __cache__() = default;

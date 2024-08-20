@@ -18,7 +18,12 @@ class VariableNode:public Node{
 
     VariableBase* variable() noexcept;
 
-    virtual void insert(std::shared_ptr<Node> node) override;
+    virtual void insert_back(std::shared_ptr<Node> node) override;
+
+    //insert before value at id
+    virtual void insert(int,std::shared_ptr<Node>) override;
+
+    virtual void replace(int,std::shared_ptr<Node>) override;
 
     virtual Result execute() override;
 

@@ -76,6 +76,15 @@ void VariableNode::insert(std::shared_ptr<Node> node){
     }
 }
 
+//insert before value at id
+void ValueNode::insert(int,std::shared_ptr<Node>){
+    throw std::logic_error("Invalid inserting. Prompt: Unvalailable to insert node to finite node Value");
+}
+
+void ValueNode::replace(int,std::shared_ptr<Node>){
+    throw std::logic_error("Invalid replacing. Prompt: Unvalailable to replace node to finite node Value");
+}
+
 void VariableNode::serialize(std::ostream& stream){
 
 }

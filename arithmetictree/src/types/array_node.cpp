@@ -46,12 +46,17 @@ std::vector<std::shared_ptr<Node>>::iterator ArrayNode::end(){
     return childs_.end();
 }
 
-void ArrayNode::insert(std::shared_ptr<Node> node){
-    if(childs_.size()<childs_.capacity()){
-        childs_.push_back(node);
-        node->add_parent(this);
-    }
-    else throw std::logic_error("Invalid inserting. Prompt: Unvalailable to insert node to full defined array");
+void ArrayNode::insert_back(std::shared_ptr<Node> node){
+    childs_.push_back(node);
+    node->add_parent(this);
+}
+
+void ArrayNode::insert(int id,std::shared_ptr<Node> node){
+    childs_.insert(childs_.begin()+id,node);
+}
+
+void ArrayNode::replace(int id,std::shared_ptr<Node> node){
+    childs_[id] = std::move(node);
 }
 
 void ArrayNode::serialize(std::ostream& stream){

@@ -25,7 +25,16 @@ bool ValueNode::is_array() const{
 }
 
 void ValueNode::insert(std::shared_ptr<Node> node){
+    throw std::logic_error("Invalid inserting back. Prompt: Unvalailable to insert_back node to finite node Value");
+}
+
+//insert before value at id
+void ValueNode::insert(int,std::shared_ptr<Node>){
     throw std::logic_error("Invalid inserting. Prompt: Unvalailable to insert node to finite node Value");
+}
+
+void ValueNode::replace(int,std::shared_ptr<Node>){
+    throw std::logic_error("Invalid replacing. Prompt: Unvalailable to replace node to finite node Value");
 }
 
 void ValueNode::serialize(std::ostream& stream){

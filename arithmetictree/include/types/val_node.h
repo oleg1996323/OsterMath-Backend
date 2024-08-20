@@ -34,7 +34,12 @@ class ValueNode:public Node{
 
     virtual bool is_array() const override;
 
-    virtual void insert(std::shared_ptr<Node> node) override;
+    virtual void insert_back(std::shared_ptr<Node> node) override;
+
+    //insert before value at id
+    virtual void insert(int,std::shared_ptr<Node>) override;
+
+    virtual void replace(int,std::shared_ptr<Node>) override;
 
     virtual void print_text(std::ostream& stream) const override;
 

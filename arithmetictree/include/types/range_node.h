@@ -22,7 +22,7 @@ class RangeOperationNode:public Node{
 
     virtual Result execute(size_t index) override;
 
-    virtual void insert(std::shared_ptr<Node> node) override;
+    virtual void insert_back(std::shared_ptr<Node> node) override;
 
     virtual void print_text(std::ostream& stream) const override;
 

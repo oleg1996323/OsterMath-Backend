@@ -62,7 +62,7 @@ bool RangeOperationNode::is_array() const{
     return false;
 }
 
-void RangeOperationNode::insert(std::shared_ptr<Node> node){
+void RangeOperationNode::insert_back(std::shared_ptr<Node> node){
     range_expression = node;
     node->add_parent(this);
 }

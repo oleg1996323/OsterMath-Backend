@@ -34,7 +34,9 @@ class UnaryNode:public Node{
         return childs_.at(0);
     }
 
-    virtual void insert(std::shared_ptr<Node> node) override;
+    virtual void insert_back(std::shared_ptr<Node> node) override;
+
+    virtual void replace(int,std::shared_ptr<Node>) override;
 
     virtual Result execute() override;
 

@@ -83,7 +83,12 @@ class Node{
 
     void refresh();
 
-    virtual void insert(std::shared_ptr<Node> node) = 0;
+    virtual void insert_back(std::shared_ptr<Node>) = 0;
+
+    //insert before value at id
+    virtual void insert(int,std::shared_ptr<Node>) = 0;
+
+    virtual void replace(int,std::shared_ptr<Node>) = 0;
 
     virtual void serialize(std::ostream& stream) = 0;
 
@@ -106,6 +111,8 @@ class Node{
     void add_parent(Node*);
 
     bool has_parents() const;
+
+    void replace_move_child_to(int,Node*);
 
     const std::unordered_set<Node*>& parents() const;
 

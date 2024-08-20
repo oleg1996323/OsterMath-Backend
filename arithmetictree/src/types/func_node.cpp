@@ -185,9 +185,19 @@ void FunctionNode::print_result(std::ostream& stream) const{
     stream<<const_cast<FunctionNode*>(this)->execute();
 }
 
-void FunctionNode::insert(std::shared_ptr<Node> node){
+void FunctionNode::insert_back(std::shared_ptr<Node> node){
     if(childs_.size()<childs_.capacity()){
         childs_.push_back(node);
+        node->add_parent(this);
+    }
+    else throw std::logic_error("Invalid inserting. Prompt: Unvalailable to insert node to full defined function node");
+}
+
+void FunctionNode::insert(int id,std::shared_ptr<Node> node){}
+
+void FunctionNode::replace(int id,std::shared_ptr<Node> node){
+    if(childs_.size()<childs_.capacity()){
+        childs_.at(id) = std::move(node);
         node->add_parent(this);
     }
     else throw std::logic_error("Invalid inserting. Prompt: Unvalailable to insert node to full defined function node");

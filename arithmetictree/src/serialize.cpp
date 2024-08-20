@@ -345,7 +345,7 @@ void SerialData::deserialize_body(){
             uint64_t node_id = 0;
             data_stream_.read(reinterpret_cast<char*>(&node_id),sizeof(node_id));
             nodes_dependencies_.at(parent_id)[iter_dep]=node_id;
-            nodes_.at(parent_id)->insert(nodes_.at(node_id));
+            nodes_.at(parent_id)->insert_back(nodes_.at(node_id));
         }
     }
 }

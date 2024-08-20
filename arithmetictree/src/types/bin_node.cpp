@@ -2,12 +2,16 @@
 #include "def.h"
 #include "exception/exception.h"
 
-void BinaryNode::insert(std::shared_ptr<Node> node){
+void BinaryNode::replace(int, std::shared_ptr<Node>){}
+
+void BinaryNode::insert(int, std::shared_ptr<Node>){}
+
+void BinaryNode::insert_back(std::shared_ptr<Node> node){
     if(childs_.size()<2){
         childs_.push_back(node);
         node->add_parent(this);
     }
-    else std::logic_error("Invalid inserting. Prompt: Unvalailable to insert vjre than 2 nodes to binary node");
+    else std::logic_error("Invalid inserting. Prompt: Unvalailable to insert more than 2 nodes to binary node");
 }
 
 Value_t BinaryNode::__calculate__(){
