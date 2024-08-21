@@ -21,6 +21,8 @@ class UnaryNode:public Node{
     friend VariableNode;
     public:
     UnaryNode(UNARY_OP op):operation_(op){}
+    UnaryNode(const UnaryNode& other);
+    UnaryNode(UnaryNode&&) = delete;
 
     virtual NODE_TYPE type() const override{
         return NODE_TYPE::UNARY;
@@ -36,8 +38,6 @@ class UnaryNode:public Node{
 
     virtual void insert_back(std::shared_ptr<Node> node) override;
 
-    virtual void replace(int,std::shared_ptr<Node>) override;
-
     virtual Result execute() override;
 
     virtual Result execute(size_t index) override;
@@ -47,14 +47,6 @@ class UnaryNode:public Node{
     virtual bool is_string() const override;
 
     virtual bool is_array() const override;
-
-    virtual void serialize(std::ostream& stream) override{
-
-    }
-
-    virtual void deserialize(std::ostream& stream) override{
-
-    }
 
     UNARY_OP operation() const;
 

@@ -8,6 +8,8 @@ ArrayNode::ArrayNode(size_t sz):
     Node(sz)
 {}
 
+ArrayNode::ArrayNode(const ArrayNode& other):Node(other){}
+
 NODE_TYPE ArrayNode::type() const{
     return NODE_TYPE::ARRAY;
 }
@@ -51,20 +53,18 @@ void ArrayNode::insert_back(std::shared_ptr<Node> node){
     node->add_parent(this);
 }
 
-void ArrayNode::insert(int id,std::shared_ptr<Node> node){
+void ArrayNode::insert(size_t id,std::shared_ptr<Node> node){
+    if(!(id<childs_.size()))
+        childs_.resize(id+1);
     childs_.insert(childs_.begin()+id,node);
+    node->add_parent(this);
 }
 
-void ArrayNode::replace(int id,std::shared_ptr<Node> node){
+void ArrayNode::replace(size_t id,std::shared_ptr<Node> node){
+    if(!(id<childs_.size()))
+        childs_.resize(id+1);
     childs_[id] = std::move(node);
-}
-
-void ArrayNode::serialize(std::ostream& stream){
-
-}
-
-void ArrayNode::deserialize(std::ostream& stream){
-
+    node->add_parent(this);
 }
 
 bool ArrayNode::is_numeric() const{

@@ -59,6 +59,7 @@ std::string VariableBase::text(){
         node_->child(0)->print_text(stream);
     }
     else stream<<"#NAN";
+    std::string str = stream.str();
     return stream.str();
 }
 

@@ -5,12 +5,11 @@
 class ValueNode:public Node{
     public:
     ValueNode()=default;
-    
     ValueNode(Value_t&& value):val_(std::move(value)){}
-
     ValueNode(const Value_t& value):val_(value){}
-
     ValueNode(std::string&& value):val_(value){}
+    ValueNode(const ValueNode& other);
+    ValueNode(ValueNode&&) = delete;
 
     virtual NODE_TYPE type() const override{
         return NODE_TYPE::VALUE;
@@ -36,18 +35,9 @@ class ValueNode:public Node{
 
     virtual void insert_back(std::shared_ptr<Node> node) override;
 
-    //insert before value at id
-    virtual void insert(int,std::shared_ptr<Node>) override;
-
-    virtual void replace(int,std::shared_ptr<Node>) override;
-
     virtual void print_text(std::ostream& stream) const override;
 
     virtual void print_result(std::ostream& stream) const override;
-
-    virtual void serialize(std::ostream& stream) override;
-
-    virtual void deserialize(std::ostream& stream) override;
 
     private:
     std::optional<Value_t> val_;

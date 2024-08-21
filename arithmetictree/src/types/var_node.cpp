@@ -65,30 +65,15 @@ void VariableNode::print_result(std::ostream& stream) const{
         childs_.at(0)->print_result(stream);
 }
 
-void VariableNode::insert(std::shared_ptr<Node> node){
+void VariableNode::insert_back(std::shared_ptr<Node> node){
     if(childs_.size()<1){
         childs_.push_back(node);
         node->add_parent(this);
     }
     else {
-        childs_.at(0)=node;
+        if(node->type()!=NODE_TYPE::VARIABLE)
+            node->parents().clear();
+        childs_.at(0)=std::move(node);
         node->add_parent(this);
     }
-}
-
-//insert before value at id
-void ValueNode::insert(int,std::shared_ptr<Node>){
-    throw std::logic_error("Invalid inserting. Prompt: Unvalailable to insert node to finite node Value");
-}
-
-void ValueNode::replace(int,std::shared_ptr<Node>){
-    throw std::logic_error("Invalid replacing. Prompt: Unvalailable to replace node to finite node Value");
-}
-
-void VariableNode::serialize(std::ostream& stream){
-
-}
-
-void VariableNode::deserialize(std::ostream& stream){
-
 }

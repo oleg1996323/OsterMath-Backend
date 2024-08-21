@@ -38,6 +38,10 @@ bool CalculationsCheck(const std::string& input_str, const std::string& check_va
         std::cout.setf(std::ios::boolalpha);
         std::cout<<"any exists: "<<pool.exists("any")<<std::endl;
         std::cout<<"other exists: "<<pool.exists("other")<<std::endl;
+        std::string out = output.str();
+        std::string check = check_val;
+        std::cout<<output.str()<<std::endl;
+        std::cout<<check_val<<std::endl;
         assert(output.str() == check_val);
     }
     catch(const std::invalid_argument& err){
@@ -262,8 +266,8 @@ VAR(#I) = 5
 }
 
 void Testing(){
-    // Test_Correct_Sum_Result_For_Array();
-    // Test_Correct_SumProduct_Result_For_Array();
+    Test_Correct_Sum_Result_For_Array();
+    Test_Correct_SumProduct_Result_For_Array();
     Test_Correct_Product_Result_For_Array();
     Test_Simple_Arithmetic_With_Variable();
     Test_Range_Operation_With_Var_Arrays();

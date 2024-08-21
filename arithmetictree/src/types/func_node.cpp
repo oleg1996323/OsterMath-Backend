@@ -5,6 +5,12 @@
 #include "array_node.h"
 #include "arithmetic_functions.h"
 
+FunctionNode::FunctionNode(const FunctionNode& other):
+Node(other),
+operation_(other.operation_),
+cache_(other.cache_),
+array_type_function(other.array_type_function){}
+
 bool FunctionNode::is_numeric() const{
     return std::all_of(childs_.begin(),childs_.end(),[](std::shared_ptr<Node> child){
         return child->is_numeric();
@@ -175,8 +181,13 @@ void FunctionNode::print_text(std::ostream& stream) const{
         stream<<"sumproduct(";
     else stream<<"";
 
-    for(auto child:childs_){
-        child->print_text(stream);
+    if(has_childs())
+        for(auto child:childs_){
+            child->print_text(stream);
+        }
+    else {
+        Node node;
+        node.print_text(stream);
     }
     stream<<")";
 }
@@ -191,22 +202,4 @@ void FunctionNode::insert_back(std::shared_ptr<Node> node){
         node->add_parent(this);
     }
     else throw std::logic_error("Invalid inserting. Prompt: Unvalailable to insert node to full defined function node");
-}
-
-void FunctionNode::insert(int id,std::shared_ptr<Node> node){}
-
-void FunctionNode::replace(int id,std::shared_ptr<Node> node){
-    if(childs_.size()<childs_.capacity()){
-        childs_.at(id) = std::move(node);
-        node->add_parent(this);
-    }
-    else throw std::logic_error("Invalid inserting. Prompt: Unvalailable to insert node to full defined function node");
-}
-
-void FunctionNode::serialize(std::ostream& stream){
-
-}
-
-void FunctionNode::deserialize(std::ostream& stream){
-
 }

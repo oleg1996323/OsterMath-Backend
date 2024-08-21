@@ -71,6 +71,9 @@ class FunctionNode:public Node{
         //std::cout<<(int)NUMBER_OF_ARGUMENT[(int)op]<<std::endl;
     }
 
+    FunctionNode(const FunctionNode& other);
+    FunctionNode(FunctionNode&&) = delete;
+
     std::shared_ptr<Node> child(size_t id) const;
 
     virtual NODE_TYPE type() const override{
@@ -82,11 +85,6 @@ class FunctionNode:public Node{
     }
 
     virtual void insert_back(std::shared_ptr<Node> node) override;
-
-    //insert before value at id
-    virtual void insert(int,std::shared_ptr<Node>) override;
-
-    virtual void replace(int,std::shared_ptr<Node>) override;
 
     virtual Result execute() override;
 
@@ -101,10 +99,6 @@ class FunctionNode:public Node{
     virtual bool is_string() const override;
 
     virtual bool is_array() const override;
-
-    virtual void serialize(std::ostream& stream) override;
-
-    virtual void deserialize(std::ostream& stream) override;
 
     FUNCTION_OP operation() const;
 

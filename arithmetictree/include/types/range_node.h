@@ -13,6 +13,8 @@ enum class RANGE_OP{
 class RangeOperationNode:public Node{
     public:
     RangeOperationNode(RANGE_OP op):operation_(op){}
+    RangeOperationNode(const RangeOperationNode& other);
+    RangeOperationNode(RangeOperationNode&&) = delete;
 
     virtual NODE_TYPE type() const override{
         return NODE_TYPE::RANGEOP;
@@ -27,10 +29,6 @@ class RangeOperationNode:public Node{
     virtual void print_text(std::ostream& stream) const override;
 
     virtual void print_result(std::ostream& stream) const override;
-
-    virtual void serialize(std::ostream& stream) override;
-
-    virtual void deserialize(std::ostream& stream) override;
 
     virtual bool is_numeric() const override;
 
@@ -49,7 +47,6 @@ class RangeOperationNode:public Node{
     void define_range_length();
 
     mutable size_t range_size = 0;
-    std::shared_ptr<Node> range_expression;
     RANGE_OP operation_;
     Result cache_;
 };

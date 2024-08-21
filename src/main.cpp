@@ -69,27 +69,27 @@ exceptions::EXCEPTION_TYPE exception_handler(std::function<void()> function){
 }
 
 int main(){   
-    //Testing();
-    DataPool pool("main");
-    pool.add_data("any");
-    BaseData* data = pool.get("any");
-    std::string first = R"(VAR(#A)=1+#A
-)";
-//,[[2,2,2],[2,2,2]]
+    Testing();
+//     DataPool pool("main");
+//     pool.add_data("any");
+//     BaseData* data = pool.get("any");
+//     std::string first = R"(VAR(#A)=1+#A
+// )";
+// //,[[2,2,2],[2,2,2]]
 
-    {
-        std::stringstream stream(first);
-        data->setstream(stream);
-        std::stringstream result;
-        exception_handler([&](){
-            data->read_new();
-            // data->get("C")->set_stream(result);
-            data->get("A")->refresh();
-            // data->get("C")->print_result();
-        });
+//     {
+//         std::stringstream stream(first);
+//         data->setstream(stream);
+//         std::stringstream result;
+//         exception_handler([&](){
+//             data->read_new();
+//             // data->get("C")->set_stream(result);
+//             data->get("A")->refresh();
+//             // data->get("C")->print_result();
+//         });
 
-        // std::cout<<result.str()<<std::endl;
-    }
+//         // std::cout<<result.str()<<std::endl;
+//     }
     
     return 0;
 }

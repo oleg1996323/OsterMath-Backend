@@ -34,20 +34,21 @@ namespace serialization{
 class Node{
     public:
     Node(size_t sz);
-
     Node();
+    Node(const Node& other);
+    Node(Node&& other) = delete;
 
     virtual NODE_TYPE type() const;
 
     TYPE_VAL type_val() const;
 
-    virtual Result execute() = 0;
+    virtual Result execute();
 
-    virtual Result execute(size_t index) = 0;
+    virtual Result execute(size_t index);
 
-    Result execute() const;
+    virtual Result execute() const;
 
-    Result execute(size_t index) const;
+    virtual Result execute(size_t index) const;
 
     const std::shared_ptr<Node>& child(size_t id) const{
         return childs_.at(id);
@@ -75,46 +76,41 @@ class Node{
 
     virtual void get_array_childs(std::vector<std::shared_ptr<Node>>& childs) const;
 
-    virtual bool is_numeric() const = 0;
+    virtual bool is_numeric() const;
 
-    virtual bool is_string() const = 0;
+    virtual bool is_string() const;
 
-    virtual bool is_array() const = 0;
+    virtual bool is_array() const;
+
+    virtual bool is_empty() const;
 
     void refresh();
 
-    virtual void insert_back(std::shared_ptr<Node>) = 0;
+    virtual void insert_back(std::shared_ptr<Node>);
 
     //insert before value at id
-    virtual void insert(int,std::shared_ptr<Node>) = 0;
+    virtual void insert(size_t,std::shared_ptr<Node>);
 
-    virtual void replace(int,std::shared_ptr<Node>) = 0;
-
-    virtual void serialize(std::ostream& stream) = 0;
-
-    virtual void deserialize(std::ostream& stream) = 0;
-
-    void serialize_header(serialization::SerialData& serial_data, const std::shared_ptr<Node>& from);
-
-    void deserialize_header(serialization::SerialData& serial_data, const std::shared_ptr<Node>& from);
+    virtual void replace(size_t,std::shared_ptr<Node>);
 
     void refresh_parent_links() const;
 
     virtual void print_text(std::ostream& stream) const;
 
-    virtual void print_result(std::ostream& stream) const = 0;
+    virtual void print_result(std::ostream& stream) const;
 
-    virtual ~Node(){
-        release_childs();
-    }
+    virtual ~Node();
 
     void add_parent(Node*);
 
     bool has_parents() const;
 
-    void replace_move_child_to(int,Node*);
+    void replace_move_child_to(Node*,size_t,size_t);
+    void replace_copy_child_to(Node*,size_t,size_t);
 
     const std::unordered_set<Node*>& parents() const;
+
+    std::unordered_set<Node*>& parents();
 
     bool refer_to(std::string_view var_name) const;
 

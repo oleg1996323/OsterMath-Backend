@@ -1,10 +1,16 @@
 #include "range_node.h"
 #include "def.h"
 
+RangeOperationNode::RangeOperationNode(const RangeOperationNode& other):
+Node(other),
+range_size(other.range_size),
+operation_(other.operation_),
+cache_(other.cache_)
+{}
+
 Result RangeOperationNode::execute(){
     Value_t result;
-    childs_.clear();
-    range_expression->get_array_childs(childs_);
+    child(0)->get_array_childs(childs_);
     define_range_length();
     if(operation_==RANGE_OP::SUM)
         result = 0.;
@@ -21,8 +27,8 @@ Result RangeOperationNode::execute(){
 }
 
 Result RangeOperationNode::execute(size_t index){
-    if(range_expression)
-        return range_expression->execute(index);
+    if(has_childs())
+        return childs_.at(0)->execute(index);
     else return 0.;
 }
 
@@ -33,8 +39,12 @@ void RangeOperationNode::print_text(std::ostream& stream) const{
         stream<<"sum_i(";
     else stream<<"";
 
-    range_expression->print_text(stream);
-
+    if(has_childs())
+        childs_.at(0)->print_text(stream);
+    else {
+        Node node;
+        node.print_text(stream);
+    }
     stream<<")";
 }
 
@@ -47,14 +57,14 @@ void RangeOperationNode::print_result(std::ostream& stream) const{
 }
 
 bool RangeOperationNode::is_numeric() const{
-    if(range_expression)
-        return range_expression->is_numeric();
+    if(has_childs())
+        return childs_.at(0)->is_numeric();
     else return false;
 }
 
 bool RangeOperationNode::is_string() const{
-    if(range_expression)
-        return range_expression->is_string();
+    if(has_childs())
+        return childs_.at(0)->is_string();
     else return false;
 }
 
@@ -63,16 +73,11 @@ bool RangeOperationNode::is_array() const{
 }
 
 void RangeOperationNode::insert_back(std::shared_ptr<Node> node){
-    range_expression = node;
+    if(has_childs())
+        childs_.at(0) = node;
+    else
+        childs_.push_back(node);
     node->add_parent(this);
-}
-
-void RangeOperationNode::serialize(std::ostream& stream){
-    
-}
-
-void RangeOperationNode::deserialize(std::ostream& stream){
-
 }
 
 void RangeOperationNode::define_range_length(){

@@ -2,9 +2,9 @@
 #include "def.h"
 #include "exception/exception.h"
 
-void BinaryNode::replace(int, std::shared_ptr<Node>){}
-
-void BinaryNode::insert(int, std::shared_ptr<Node>){}
+BinaryNode::BinaryNode(const BinaryNode& other):
+Node(other),
+operation_(other.operation_){}
 
 void BinaryNode::insert_back(std::shared_ptr<Node> node){
     if(childs_.size()<2){
@@ -82,9 +82,19 @@ Result BinaryNode::execute(size_t index){
 }
 
 void BinaryNode::print_text(std::ostream& stream) const{
-    childs_.at(0)->print_text(stream);
+    if(has_child(0))
+        childs_.at(0)->print_text(stream);
+    else{
+        Node node;
+        node.print_text(stream);
+    }
     stream<<(char)operation_;
-    childs_.at(1)->print_text(stream);
+    if(has_child(1))
+        childs_.at(1)->print_text(stream);
+    else {
+        Node node;
+        node.print_text(stream);
+    }
 }
 
 void BinaryNode::print_result(std::ostream& stream) const{

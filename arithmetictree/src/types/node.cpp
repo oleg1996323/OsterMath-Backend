@@ -8,12 +8,33 @@ NODE_TYPE Node::type() const{
     return NODE_TYPE::UNDEF;
 }
 
+Node::~Node(){
+    for(Node* parent:parents_){
+        for(std::shared_ptr<Node>& child:parent->childs_)
+            if(child.get()==this)
+                child.reset();
+    }
+    release_childs();
+}
+
 Node::Node(size_t sz):
     childs_([&sz](){std::vector<std::shared_ptr<Node>> vector;
                     vector.reserve(sz);
                     return vector;}()){}
 
 Node::Node()=default;
+
+//don't copy parents
+Node::Node(const Node& other){
+    if(&other!=this){
+        for(const std::shared_ptr<Node>& child:other.childs_){
+            release_childs();
+            if(child->type()!=NODE_TYPE::VARIABLE)
+                childs_.push_back(std::make_shared<Node>(*child.get()));
+            else childs_.push_back(child);
+        }
+    }
+}
 
 void Node::refresh(){
     execute();
@@ -57,15 +78,35 @@ TYPE_VAL Node::type_val() const{
 }
 
 Result Node::execute() const{
-    return const_cast<Node*>(this)->execute();
+    return 0;
 }
 
 Result Node::execute(size_t index) const{
-    return const_cast<Node*>(this)->execute(index);
+    return 0;
 }
 
-void Node::print_text(std::ostream& stream) const{
-    stream<<"#NaN"<<std::endl;
+Result Node::execute(){
+    return 0;
+}
+
+Result Node::execute(size_t index){
+    return 0;
+}
+
+bool Node::is_empty() const{
+    return true;
+}
+
+bool Node::is_array() const{
+    return false;
+}
+
+bool Node::is_numeric() const{
+    return false;
+}
+
+bool Node::is_string() const{
+    return false;
 }
 
 bool Node::refer_to(std::string_view var_name) const{
@@ -99,27 +140,43 @@ void Node::get_array_childs(std::vector<std::shared_ptr<Node>>& childs) const{
 }
 
 const std::unordered_set<Node*>& Node::parents() const{
+    return parents();
+}
+
+std::unordered_set<Node*>& Node::parents(){
     return parents_;
 }
 
-void Node::serialize_header(serialization::SerialData& serial_data, const std::shared_ptr<Node>& from){
-    // for(auto& child:childs_){
-    //     if(!serial_data.contains_node(child) && child!=from){
-    //         serial_data.insert_node(child);
-    //         child->serialize_header(serial_data,from);
-    //     }
-    // }
-}
-
-void Node::deserialize_header(serialization::SerialData& serial_data, const std::shared_ptr<Node>& from){
-
-}
-
-void Node::replace_move_child_to(int id, Node* node_target){
+void Node::replace_move_child_to(Node* node_target,size_t id, size_t at_pos){
     if(node_target!=this && this->has_child(id)){
         this->child(id)->parents_.erase(this);
-        this->child(id)->add_parent(this);
-        node_target->insert(id,std::move(this->child(id)));
+        this->child(id)->add_parent(node_target);
+        node_target->insert(at_pos,std::move(this->child(id)));
         this->childs_.erase(childs_.begin()+id);
     }
+}
+
+void Node::replace_copy_child_to(Node* node_target,size_t id, size_t at_pos){
+    if(node_target!=this && this->has_child(id)){
+        node_target->insert(at_pos,std::make_shared<Node>(*child(id).get()));
+    }
+}
+
+void Node::insert_back(std::shared_ptr<Node>){
+    throw std::logic_error("Invalid inserting. Prompt: Unvalailable to insert back child to this type of node");
+}
+
+void Node::insert(size_t,std::shared_ptr<Node>){
+    throw std::logic_error("Invalid inserting. Prompt: Unvalailable to insert child to this type of node");
+}
+
+void Node::replace(size_t,std::shared_ptr<Node>){
+    throw std::logic_error("Invalid inserting. Prompt: Unvalailable to replace child to this type of node");
+}
+
+void Node::print_text(std::ostream& stream) const{
+    stream<<"$NaN";
+}
+void Node::print_result(std::ostream& stream) const{
+
 }
