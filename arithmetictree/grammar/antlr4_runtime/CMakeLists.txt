@@ -4,7 +4,7 @@ cmake_minimum_required (VERSION 3.15)
 # 3.15 needed to avid spew of warnings related to overriding cl command line flags
 
 set(CMAKE_MACOSX_RPATH OFF)
-set(CMAKE_CXX_COMPILER "/usr/bin/g++")
+
 enable_testing()
 
 # Detect build type, fallback to release and throw a warning if use didn't specify any
