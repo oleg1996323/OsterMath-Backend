@@ -21,18 +21,22 @@ class Node;
 class BaseListener: public ParseRulesBaseListener{
     enum class MODE{
         VARDEF,
-        RANGEOPERATION,
-        MULTIARGFUNCTION,
-        FUNCTIONOPERATION,
-        DOMAIN_DEFINITION,
-        LHS_DOMAIN,
-        RHS_DOMAIN,
-        EXPR_DOMAIN,
-        ARRAY_DEFINITION,
-        ARRAY_ITEM_DEFINITION,
-        EXPRESSION,
-        VALUE
+        RANGEOPERATION = 0b000000000000001,
+        MULTIARGFUNCTION = 0b000000000000010,
+        FUNCTIONOPERATION = 0b000000000000100,
+        DOMAIN_DEFINITION = 0b000000000001000,
+        LHS_DOMAIN = 0b000000000010000,
+        RHS_DOMAIN = 0b000000000100000,
+        EXPR_DOMAIN = 0b000000001000000,
+        ARRAY_DEFINITION = 0b000000010000000,
+        ARRAY_ITEM_DEFINITION = 0b000000100000000,
+        EXPRESSION = 0b000001000000000,
+        VALUE = 0b000010000000000,
+        NODE = 0b000100000000000
     };
+
+    friend MODE operator|(MODE lhs,MODE rhs);
+    friend MODE operator&(MODE lhs,MODE rhs);
 
     bool is_range_operation() const;
     bool is_function_operation() const;
@@ -46,13 +50,13 @@ class BaseListener: public ParseRulesBaseListener{
 
     BaseData* __insert_new_data_base__(std::string&& name);
 
-    BaseData* data_base_;
-    std::shared_ptr<VariableNode> current_var_;
     std::stack<std::shared_ptr<Node>> anonymous_node_;
     std::stack<MODE> mode_;
-
     std::optional<Domain> domain_;
-
+    std::shared_ptr<Node> current_node_;
+    std::unique_ptr<INFO_NODE> info;
+    BaseData* data_base_;
+    
     public:
     BaseListener(BaseData* data_base):
     data_base_(data_base)
@@ -136,3 +140,6 @@ class BaseListener: public ParseRulesBaseListener{
     virtual void visitErrorNode(antlr4::tree::ErrorNode * /*node*/) override;
 
 };
+
+BaseListener::MODE operator|(BaseListener::MODE lhs,BaseListener::MODE rhs);
+BaseListener::MODE operator&(BaseListener::MODE lhs,BaseListener::MODE rhs);

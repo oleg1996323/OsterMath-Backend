@@ -31,6 +31,12 @@ namespace serialization{
     class SerialData;
 }
 
+struct INFO_NODE{
+    Node* parent = nullptr;
+    int id = -1;
+};
+
+
 class Node{
     public:
     Node(size_t sz);
@@ -58,11 +64,13 @@ class Node{
         return childs_.at(id);
     }
 
+    INFO_NODE child(const std::vector<size_t>& indexes);
+    INFO_NODE child(const std::vector<size_t>& indexes) const;
+
     void release_childs(){
-        for(auto child:childs_){
-            if(child->parents_.contains(this))
+        for(std::shared_ptr<Node>& child:childs_)
+            if(child)
                 child->parents_.erase(this);
-        }
         childs_.clear();
     }
 
@@ -89,9 +97,9 @@ class Node{
     virtual void insert_back(std::shared_ptr<Node>);
 
     //insert before value at id
-    virtual void insert(size_t,std::shared_ptr<Node>);
+    virtual std::shared_ptr<Node> insert(size_t,std::shared_ptr<Node>);
 
-    virtual void replace(size_t,std::shared_ptr<Node>);
+    virtual std::shared_ptr<Node> replace(size_t,std::shared_ptr<Node>);
 
     void refresh_parent_links() const;
 

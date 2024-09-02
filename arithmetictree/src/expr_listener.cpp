@@ -35,17 +35,32 @@ bool BaseListener::is__array_item_definition() const{
 }
 
 void BaseListener::__insert_to_prec_node__(MODE mode_assert_check){
-    assert(mode_.top()==mode_assert_check);
+    MODE m = mode_.top();
+    assert(m&mode_assert_check);
     mode_.pop();
     assert(!anonymous_node_.empty());
     auto node = anonymous_node_.top();
     anonymous_node_.pop();
     assert(!anonymous_node_.empty());
-    anonymous_node_.top()->insert_back(node);
+    if(info && anonymous_node_.size()==1){
+        if(anonymous_node_.top()->type()==NODE_TYPE::VARIABLE)
+            anonymous_node_.top()->insert_back(node);
+        else{
+            info->parent->replace(info->id,node)->parents().erase(info->parent);
+        }
+    }
+    else anonymous_node_.top()->insert_back(node);
 }
 
 BaseData* BaseListener::__insert_new_data_base__(std::string&& name){
     return data_base_->get_pool()->add_data(name);
+}
+
+BaseListener::MODE operator|(BaseListener::MODE lhs,BaseListener::MODE rhs){
+    return static_cast<BaseListener::MODE>(static_cast<unsigned>(lhs) | static_cast<unsigned>(rhs)); 
+}
+BaseListener::MODE operator&(BaseListener::MODE lhs,BaseListener::MODE rhs){
+    return static_cast<BaseListener::MODE>(static_cast<unsigned>(lhs) & static_cast<unsigned>(rhs)); 
 }
 
 void BaseListener::enterParens(ParseRulesParser::ParensContext* ctx){
@@ -62,20 +77,65 @@ void BaseListener::exitParens(ParseRulesParser::ParensContext* ctx){
 
 void BaseListener::enterVariable(ParseRulesParser::VariableContext *ctx) {
     assert(!mode_.empty());
-    mode_.push(MODE::VALUE);
     BaseData* db_tmp;
-    if(ctx->DATABASE())
-        db_tmp = __insert_new_data_base__(ctx->DATABASE()->getText());
-    else db_tmp = data_base_;
+    auto node_ctx = ctx->node_access();
+    if(!ctx->VARIABLE())
+        throw exceptions::ParsingError("Error parsing variable name");
 
-    VariableBase* ptr = db_tmp->add_variable(ctx->VARIABLE()->getText()).get();
-    anonymous_node_.push(ptr->node());
-
-    //unknown how to add node
+    if(node_ctx){
+        if(node_ctx->UINT().size()==0){
+            if(ctx->DATABASE())
+                db_tmp = __insert_new_data_base__(ctx->DATABASE()->getText());
+            else db_tmp = data_base_;
+            mode_.push(MODE::VALUE);
+            VariableBase* ptr = db_tmp->add_variable(ctx->VARIABLE()->getText()).get();
+            anonymous_node_.push(ptr->node());
+        }
+        else{
+            if(ctx->DATABASE()){
+                if(!data_base_->get_pool()->exists(ctx->DATABASE()->getText()))
+                    throw exceptions::VariableDontExists(ctx->VARIABLE()->getText());
+                else
+                    db_tmp = data_base_->get_pool()->get(ctx->DATABASE()->getText());
+            }
+            else{
+                db_tmp = data_base_;
+            }
+            
+            if(db_tmp->exists(ctx->VARIABLE()->getText())){
+                std::vector<size_t> ids;
+                ids.reserve(node_ctx->UINT().size());
+                for(auto id : node_ctx->UINT()){
+                    std::stringstream sstream(id->getText());
+                    size_t result;
+                    sstream >> result;
+                    ids.push_back(result);
+                }
+                info = std::make_unique<INFO_NODE>(db_tmp->get(ctx->VARIABLE()->getText())->node()->child({ids}));
+                if(!info || !info->parent || info->id==-1 || !info->parent->has_child(info->id) || !info->parent->child(info->id)){
+                    exceptions::NodeChildDontExists(ctx->getText());
+                    return;
+                }
+                anonymous_node_.push(info->parent->child(info->id));
+            }
+            else{
+                throw exceptions::VariableDontExists(ctx->VARIABLE()->getText());
+            }
+            mode_.push(MODE::NODE);
+        }
+    }
+    else{
+        if(ctx->DATABASE())
+            db_tmp = __insert_new_data_base__(ctx->DATABASE()->getText());
+        else db_tmp = data_base_;
+        mode_.push(MODE::VALUE);
+        VariableBase* ptr = db_tmp->add_variable(ctx->VARIABLE()->getText()).get();
+        anonymous_node_.push(ptr->node());
+    }
 }
 
 void BaseListener::exitVariable(ParseRulesParser::VariableContext *ctx) {
-    __insert_to_prec_node__(MODE::VALUE);
+    __insert_to_prec_node__(MODE::VALUE | MODE::NODE);
 }
 
 void BaseListener::enterUnaryOp(ParseRulesParser::UnaryOpContext *ctx) {
@@ -142,7 +202,7 @@ void BaseListener::exitBinaryOp(ParseRulesParser::BinaryOpContext *ctx) {
 
 //an array definition {for example: [1,2,3,...]}
 void BaseListener::enterArray(ParseRulesParser::ArrayContext *ctx) {
-    assert(!mode_.empty() && current_var_);
+    assert(!mode_.empty() && current_node_);
     anonymous_node_.push(std::make_shared<ArrayNode>(ctx->input_array().size()));
     mode_.push(MODE::ARRAY_DEFINITION);
 }
@@ -286,24 +346,72 @@ void BaseListener::enterVardefinition(ParseRulesParser::VardefinitionContext * c
     assert(anonymous_node_.empty());
     mode_.push(MODE::VARDEF);
     //by default the database from which we define variable must exists
+    BaseData* db_tmp;
+    auto node_ctx = ctx->node_access();
+    if(!ctx->VARIABLE())
+        throw exceptions::ParsingError("Error parsing variable name");
 
-    if(ctx->VARIABLE()){
-        //creating in active sheet
-        BaseData* c_var_db_tmp;
-        if(ctx->DATABASE())
-            c_var_db_tmp = __insert_new_data_base__(ctx->DATABASE()->getText());
-        else c_var_db_tmp = data_base_;
-        current_var_ = c_var_db_tmp->add_variable(ctx->VARIABLE()->getText())->node();
+    if(node_ctx){
+        if(node_ctx->UINT().size()==0){
+            if(ctx->DATABASE())
+                db_tmp = __insert_new_data_base__(ctx->DATABASE()->getText());
+            else db_tmp = data_base_;
+            current_node_ = db_tmp->add_variable(ctx->VARIABLE()->getText())->node();
+            current_node_->release_childs();
+            if(!ctx->value_type())
+                current_node_->insert_back(std::make_shared<Node>());
+            anonymous_node_.push(current_node_);
+        }
+        else{
+            if(ctx->DATABASE()){
+                if(!data_base_->get_pool()->exists(ctx->DATABASE()->getText()))
+                    throw exceptions::VariableDontExists(ctx->VARIABLE()->getText());
+                else
+                    db_tmp = data_base_->get_pool()->get(ctx->DATABASE()->getText());
+            }
+            else{
+                db_tmp = data_base_;
+            }
+            
+            if(db_tmp->exists(ctx->VARIABLE()->getText())){
+                std::vector<size_t> ids;
+                ids.reserve(node_ctx->UINT().size());
+                for(auto id : node_ctx->UINT()){
+                    if(id){
+                        std::stringstream sstream(id->getText());
+                        size_t result;
+                        sstream >> result;
+                        ids.push_back(result);
+                    }
+                }
+                info = std::make_unique<INFO_NODE>(db_tmp->get(ctx->VARIABLE()->getText())->node()->child({ids}));
+                if(!info || !info->parent || info->id==-1 || !info->parent->has_child(info->id) || !info->parent->child(info->id)){
+                    exceptions::NodeChildDontExists(ctx->getText());
+                    return;
+                }
+                anonymous_node_.push(info->parent->child(info->id));
+            }
+            else{
+                throw exceptions::VariableDontExists(ctx->VARIABLE()->getText());
+            }
+        }
     }
-    else assert(false);
-    current_var_->release_childs();
-    anonymous_node_.push(current_var_);
+    else{
+        if(ctx->DATABASE())
+                db_tmp = __insert_new_data_base__(ctx->DATABASE()->getText());
+        else db_tmp = data_base_;
+        current_node_ = db_tmp->add_variable(ctx->VARIABLE()->getText())->node();
+        current_node_->release_childs();
+        if(!ctx->value_type())
+            current_node_->insert_back(std::make_shared<Node>());
+        anonymous_node_.push(current_node_);
+    }
 }
 
 void BaseListener::exitVardefinition(ParseRulesParser::VardefinitionContext * ctx){ 
     assert(mode_.top()==MODE::VARDEF);
     assert(anonymous_node_.size()==1);
-    current_var_.reset();
+    current_node_.reset();
     anonymous_node_.pop();
     mode_.pop();
 }
@@ -346,7 +454,7 @@ void BaseListener::enterComparision(ParseRulesParser::ComparisionContext* ctx){
         if(ctx->DATABASE())
             c_var_db_tmp = __insert_new_data_base__(ctx->DATABASE()->getText());
         else c_var_db_tmp = data_base_;
-        current_var_ = c_var_db_tmp->add_variable(ctx->VARIABLE()->getText())->node();
+        current_node_ = c_var_db_tmp->add_variable(ctx->VARIABLE()->getText())->node();
     }
     else assert(false);
 }
@@ -355,10 +463,11 @@ void BaseListener::exitComparision(ParseRulesParser::ComparisionContext* ctx){
     assert(is_domain_definition());
     mode_.pop();
     assert(anonymous_node_.empty());
-    assert(current_var_);
+    assert(current_node_);
     assert(domain_.has_value());
-    current_var_->variable()->add_domain(std::move(domain_.value()));
-    current_var_.reset();
+    if(current_node_->type()==NODE_TYPE::VARIABLE)
+        reinterpret_cast<VariableNode*>(current_node_.get())->variable()->add_domain(std::move(domain_.value()));
+    current_node_.reset();
 }
 
 void BaseListener::enterString(ParseRulesParser::StringContext* ctx){

@@ -18,7 +18,9 @@ enum EXCEPTION_TYPE{
     INCORRECT_TYPE_ARRAYS,
     DIVISION_ZERO,
     INVALID_TYPE_ARG,
-    INVALID_NUMBER_ARGS
+    INVALID_NUMBER_ARGS,
+    VARIABLE_DONT_EXISTS,
+    NODE_DONT_EXISTS
 };
 
 class Exception: public std::runtime_error{
@@ -103,6 +105,26 @@ class InvalidNumberOfArguments:public Exception{
     public:
     using Exception::Exception;
     InvalidNumberOfArguments(size_t);
+    static const char* error_abbr();
+    virtual const char* get_error() const;
+    virtual EXCEPTION_TYPE type() const;
+    virtual const char* get_prompt() const;
+};
+
+class VariableDontExists:public Exception{
+    public:
+    using Exception::Exception;
+    VariableDontExists(const std::string&);
+    static const char* error_abbr();
+    virtual const char* get_error() const;
+    virtual EXCEPTION_TYPE type() const;
+    virtual const char* get_prompt() const;
+};
+
+class NodeChildDontExists:public Exception{
+    public:
+    using Exception::Exception;
+    NodeChildDontExists(const std::string&);
     static const char* error_abbr();
     virtual const char* get_error() const;
     virtual EXCEPTION_TYPE type() const;

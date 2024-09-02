@@ -8,13 +8,13 @@ using namespace std::string_literals;
 
 uint16_t BaseData::counter = 0;
 
-BaseData::BaseData(std::string_view name):name_(name), data_count(counter++){}
+BaseData::BaseData(std::string_view name):name_(name), buffer_(std::make_shared<VariableBase>("buffer",this)), data_count(counter++){}
 
 VariableBase* BaseData::get(std::string_view name){
     if(!exists(name))
         throw std::invalid_argument("Variable "s + std::string(name) + " don't exists.\n");
     else
-        return vars_.at(name)?vars_.at(name).get():nullptr; 
+        return vars_.at(name)?vars_.at(name).get():nullptr;
 };
 
 const VariableBase* BaseData::get(std::string_view name) const{
@@ -75,6 +75,10 @@ void BaseData::erase(std::string_view var_name){
     vars_.erase(var_name);
 }
 
+void BaseData::remove_variables(){
+    vars_.clear();
+}
+
 #include <iostream>
 #include "expr_parser.h"
 
@@ -107,9 +111,11 @@ const std::unordered_map<std::string_view,std::shared_ptr<VariableBase>> BaseDat
     return vars_;
 }
 
-DataPool::DataPool(const std::string& name):name_(name){
-    add_data("tmp_buffer"s)->add_variable("buffer"s);
+std::shared_ptr<VariableBase> BaseData::get_buffer() const{
+    return buffer_;
 }
+
+DataPool::DataPool(const std::string& name):name_(name){}
 
 std::string_view DataPool::name(){
     return name_;

@@ -16,8 +16,8 @@ class ArrayNode:public Node{
     virtual Result execute(size_t index) override;
     virtual void insert_back(std::shared_ptr<Node> node) override;
     //insert before value at id
-    virtual void insert(size_t,std::shared_ptr<Node>) override;
-    virtual void replace(size_t,std::shared_ptr<Node>) override;
+    virtual std::shared_ptr<Node> insert(size_t,std::shared_ptr<Node>) override;
+    virtual std::shared_ptr<Node> replace(size_t,std::shared_ptr<Node>) override;
     size_t size() const;
     bool empty() const;
     std::vector<std::shared_ptr<Node>>::const_iterator begin() const;

@@ -3,6 +3,7 @@
 #include "var_node.h"
 #include "types.h"
 #include "serialize.h"
+#include "exception/exception.h"
 
 NODE_TYPE Node::type() const{
     return NODE_TYPE::UNDEF;
@@ -166,17 +167,46 @@ void Node::insert_back(std::shared_ptr<Node>){
     throw std::logic_error("Invalid inserting. Prompt: Unvalailable to insert back child to this type of node");
 }
 
-void Node::insert(size_t,std::shared_ptr<Node>){
+std::shared_ptr<Node> Node::insert(size_t,std::shared_ptr<Node>){
     throw std::logic_error("Invalid inserting. Prompt: Unvalailable to insert child to this type of node");
 }
 
-void Node::replace(size_t,std::shared_ptr<Node>){
+std::shared_ptr<Node> Node::replace(size_t,std::shared_ptr<Node>){
     throw std::logic_error("Invalid inserting. Prompt: Unvalailable to replace child to this type of node");
 }
 
 void Node::print_text(std::ostream& stream) const{
-    stream<<"$NaN";
 }
 void Node::print_result(std::ostream& stream) const{
+    stream<<0;
+}
 
+INFO_NODE Node::child(const std::vector<size_t>& indexes){
+    INFO_NODE info;
+    if(type()!=NODE_TYPE::VARIABLE)
+        if(indexes.size()>1 && has_child(*indexes.begin()))
+            return child(*indexes.begin())->child(std::vector<size_t>(indexes.cbegin()+1,indexes.cend()));
+        else if(indexes.size()==1 && has_child(*indexes.begin())){
+            info.parent = this;
+            info.id = *indexes.begin();
+            return info;
+        }
+        else return info;
+    else{
+        if(has_child(0)){
+            if(indexes.size()>1 && child(0)->has_child(*indexes.begin()))
+                return child(0)->child(*indexes.begin())->child(std::vector<size_t>(indexes.cbegin()+1,indexes.cend()));
+            else if(indexes.size()==1 && child(0)->has_child(*indexes.begin())){
+                info.parent = child(0).get();
+                info.id = *indexes.begin();
+                return info;
+            }
+            else return info;
+        }
+        else return info;
+    }
+}
+
+INFO_NODE Node::child(const std::vector<size_t>& indexes) const{
+    return child(indexes);
 }

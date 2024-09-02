@@ -123,9 +123,9 @@ Value_t functions::Arithmetic::SumProduct(const std::vector<ArrayNode*>& arrays)
                 //std::cout<<"Iterator: "<<proxy_array_iterator->current_iterator(depth)<<std::endl;
                 node = node->child(proxy_array_iterator->current_iterator(depth)).get();
             }
-            std::cout<<"Iterator: "<<proxy_array_iterator->seq_iterator(array_depth-1)<<std::endl;
+            //std::cout<<"Iterator: "<<proxy_array_iterator->seq_iterator(array_depth-1)<<std::endl;
             value_vector.at(proxy_array_iterator->seq_iterator(array_depth-1))*=node->execute().get<Value_t>();
-            std::cout<<value_vector.at(proxy_array_iterator->seq_iterator(array_depth-1))<<std::endl;
+            //std::cout<<value_vector.at(proxy_array_iterator->seq_iterator(array_depth-1))<<std::endl;
         } while (++*proxy_array_iterator.get());
         proxy_array_iterator->reset_iterator();
     }
@@ -166,7 +166,7 @@ Value_t functions::Arithmetic::Sum(const std::vector<ArrayNode*>& arrays){
                 //std::cout<<"Iterator: "<<proxy_array_iterator->current_iterator(depth)<<std::endl;
                 node = node->child(proxy_array_iterator->current_iterator(depth)).get();
             }
-            std::cout<<"Iterator: "<<proxy_array_iterator->seq_iterator(array_depth-1)<<std::endl;
+            //std::cout<<"Iterator: "<<proxy_array_iterator->seq_iterator(array_depth-1)<<std::endl;
             result+=node->execute().get<Value_t>();
         } while (++*proxy_array_iterator.get());
         proxy_array_iterator->reset_iterator();
@@ -207,7 +207,7 @@ Value_t functions::Arithmetic::Product(const std::vector<ArrayNode*>& arrays){
                 //std::cout<<"Iterator: "<<proxy_array_iterator->current_iterator(depth)<<std::endl;
                 node = node->child(proxy_array_iterator->current_iterator(depth)).get();
             }
-            std::cout<<"Iterator: "<<proxy_array_iterator->seq_iterator(array_depth-1)<<std::endl;
+            //std::cout<<"Iterator: "<<proxy_array_iterator->seq_iterator(array_depth-1)<<std::endl;
             result*=node->execute().get<Value_t>();
         } while (++*proxy_array_iterator.get());
         proxy_array_iterator->reset_iterator();

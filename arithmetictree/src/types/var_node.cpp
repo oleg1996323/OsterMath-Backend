@@ -66,14 +66,16 @@ void VariableNode::print_result(std::ostream& stream) const{
 }
 
 void VariableNode::insert_back(std::shared_ptr<Node> node){
-    if(childs_.size()<1){
-        childs_.push_back(node);
-        node->add_parent(this);
-    }
-    else {
-        if(node->type()!=NODE_TYPE::VARIABLE)
-            node->parents().clear();
-        childs_.at(0)=std::move(node);
-        node->add_parent(this);
+    if(node){
+        if(childs_.size()<1){
+            childs_.push_back(node);
+            node->add_parent(this);
+        }
+        else {
+            if(node->type()!=NODE_TYPE::VARIABLE)
+                node->parents().clear();
+            childs_.at(0)=node;
+            node->add_parent(this);
+        }
     }
 }

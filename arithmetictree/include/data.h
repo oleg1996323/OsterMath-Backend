@@ -7,6 +7,7 @@
 #include <deque>
 #include "def.h"
 #include "expr_parser.h"
+#include "types.h"
 
 
 class VariableBase;
@@ -70,6 +71,10 @@ class BaseData{
 
     const std::unordered_map<std::string_view,std::shared_ptr<VariableBase>> variables() const;
 
+    void remove_variables();
+
+    std::shared_ptr<VariableBase> get_buffer() const;
+
     uint16_t id() const;
 
     private:
@@ -77,6 +82,7 @@ class BaseData{
     std::unordered_map<std::string_view,std::shared_ptr<VariableBase>> vars_;
     std::string_view name_;
     std::unique_ptr<Parser> parser_;
+    mutable std::shared_ptr<VariableBase> buffer_;
     DataPool* pool_;
     std::string generate_hash_name();
     static uint16_t counter;

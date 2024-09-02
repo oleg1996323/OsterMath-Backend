@@ -49,22 +49,32 @@ std::vector<std::shared_ptr<Node>>::iterator ArrayNode::end(){
 }
 
 void ArrayNode::insert_back(std::shared_ptr<Node> node){
-    childs_.push_back(node);
-    node->add_parent(this);
+    if(node){
+        childs_.push_back(node);
+        node->add_parent(this);
+    }
 }
 
-void ArrayNode::insert(size_t id,std::shared_ptr<Node> node){
-    if(!(id<childs_.size()))
-        childs_.resize(id+1);
-    childs_.insert(childs_.begin()+id,node);
-    node->add_parent(this);
+std::shared_ptr<Node> ArrayNode::insert(size_t id,std::shared_ptr<Node> node){
+    if(node){
+        if(!(id<childs_.size()))
+            childs_.resize(id+1);
+        childs_.insert(childs_.begin()+id,node);
+        childs_[id]->add_parent(this);
+        return node;
+    }
+    else return std::make_shared<Node>();
 }
 
-void ArrayNode::replace(size_t id,std::shared_ptr<Node> node){
-    if(!(id<childs_.size()))
-        childs_.resize(id+1);
-    childs_[id] = std::move(node);
-    node->add_parent(this);
+std::shared_ptr<Node> ArrayNode::replace(size_t id,std::shared_ptr<Node> node){
+    if(node){
+        if(!(id<childs_.size()))
+            childs_.resize(id+1);
+        childs_[id].swap(node);
+        childs_[id]->add_parent(this);
+        return node;
+    }
+    else return std::make_shared<Node>();
 }
 
 bool ArrayNode::is_numeric() const{
@@ -84,25 +94,36 @@ bool ArrayNode::is_array() const{
 }
 
 void ArrayNode::print_text(std::ostream& stream) const{
+    // if(&stream!=&std::cout)
+    //     print_text(std::cout);
+    bool first = true;
     stream<<'[';
     if(!childs_.empty()){
         for(auto child:childs_){
-                child->print_text(stream);
+            if(first)
+                first = false;
+            else
                 stream<<"; ";
+            child->print_text(stream);  
         }
-        stream.seekp(-2,std::ios_base::end);
     }
     stream<<']';
 }
 
 void ArrayNode::print_result(std::ostream& stream) const{
+    // if(&stream!=&std::cout)
+    //     print_result(std::cout);
+    bool first = true;
     stream<<'[';
     if(!childs_.empty()){
         for(auto child:childs_){
-                child->print_result(stream);
+            if(first)
+                first = false;
+            else
                 stream<<"; ";
+            child->print_result(stream);
+                
         }
-        stream.seekp(-2,std::ios_base::end);
     }
     stream<<']';
 }

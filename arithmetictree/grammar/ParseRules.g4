@@ -36,6 +36,8 @@ LARGER_EQUAL: ('>=' | '=>');
 EQUAL: '=';
 LESS: ('<=' | '=<');
 LESS_EQUAL: '<';
+UINT: [0-9]+ (EXPONENT)?;
+value_type: array | expr | string;
 comparator: LARGER | LARGER_EQUAL | EQUAL | LESS | LESS_EQUAL;
 
 input:
@@ -48,12 +50,16 @@ line_input:
     | comparision
     ;
 
+node_access:
+    WS* ('(' WS* ')') | ('('WS* UINT WS* ')') | ('(' WS* UINT WS* (';' WS* UINT)* WS* ')') WS*
+    ;
+
 variable:
-    WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')') | WS* VARIABLE WS*) WS*
+    WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) node_access? ')') | (VARIABLE node_access?))  WS*
     ;
 
 vardefinition:
-    WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')') | WS* VARIABLE WS*) WS* '=' WS* (array | expr | string) WS* EOL
+    WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) node_access? ')') | (VARIABLE node_access?)) WS* '=' WS* value_type? WS* EOL
     ;
 
 comparision:
@@ -87,7 +93,7 @@ expr
 
 array
     :
-    '[' WS* input_array WS* (',' WS* input_array)*']'
+    '[' WS* input_array WS* (';' WS* input_array)*']'
     ;
 
 input_array:
@@ -113,14 +119,14 @@ function
     | WS* ACOS '('WS* expr WS*')' WS*
     | WS* ASIN '('WS* expr WS*')' WS*
     | WS* FACTORIAL '('WS* expr WS*')' WS*
-    | WS* LOG_X '(' WS* expr WS* ',' WS* expr WS* ')' WS*
+    | WS* LOG_X '(' WS* expr WS* ';' WS* expr WS* ')' WS*
     ;
 
 multiargfunction
     :
-    WS* SUMPRODUCT '(' expr ',' expr (',' expr )*')'
-    | WS* SUM '(' expr ',' expr (',' expr )*')'
-    | WS* PRODUCT '(' expr ',' expr (',' expr )*')'
+    WS* SUMPRODUCT '(' expr ';' expr (';' expr )*')'
+    | WS* SUM '(' expr ';' expr (';' expr )*')'
+    | WS* PRODUCT '(' expr ';' expr (';' expr )*')'
     ;
 
 rangefunction
@@ -160,8 +166,9 @@ ASTERISK: '^' '*'+;
 
 fragment INT: [-+]? UINT;
 EXPONENT: [eE] INT;
-UINT: [0-9]+ (EXPONENT)?;
 FLOAT: INT '.' UINT (EXPONENT)?;
+ID_NUMBER: [0-9]+;
+
 
 string
     :

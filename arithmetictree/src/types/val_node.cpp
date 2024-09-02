@@ -1,4 +1,5 @@
 #include "val_node.h"
+#include "array_node.h"
 
 void ValueNode::print_text(std::ostream& stream) const{
     if(val_.has_value())

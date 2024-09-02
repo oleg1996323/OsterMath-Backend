@@ -157,10 +157,47 @@ namespace exceptions{
         case EXCEPTION_TYPE::INVALID_NUMBER_ARGS:
             return InvalidNumberOfArguments::error_abbr();
             break;
+        case EXCEPTION_TYPE::VARIABLE_DONT_EXISTS:
+            return VariableDontExists::error_abbr();
+            break;
+        case EXCEPTION_TYPE::NODE_DONT_EXISTS:
+            return NodeChildDontExists::error_abbr();
+            break;
         default:
             assert(true);
             return "";
             break;
         }
+    }
+
+    VariableDontExists::VariableDontExists(const std::string& name):
+    Exception("Variable "+name+"don't exists"){}
+
+    const char* VariableDontExists::error_abbr(){
+        return "#NAME?";
+    }
+    const char* VariableDontExists::get_error() const{
+        return "Variable don't exists";
+    }
+    EXCEPTION_TYPE VariableDontExists::type() const{
+        return EXCEPTION_TYPE::PARSING;
+    }
+    const char* VariableDontExists::get_prompt() const{
+        return what();
+    }
+
+    NodeChildDontExists::NodeChildDontExists(const std::string& error):
+    Exception(error){}
+    const char* NodeChildDontExists::error_abbr(){
+        return "#NAME?";
+    }
+    const char* NodeChildDontExists::get_error() const{
+        return "Node don't exists";
+    }
+    EXCEPTION_TYPE NodeChildDontExists::type() const{
+        return EXCEPTION_TYPE::NODE_DONT_EXISTS;
+    }
+    const char* NodeChildDontExists::get_prompt() const{
+        return what();
     }
 }
