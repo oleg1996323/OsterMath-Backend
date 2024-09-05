@@ -55,11 +55,11 @@ node_access:
     ;
 
 variable:
-    WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) node_access? ')') | (VARIABLE node_access?))  WS*
+    WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*)')'node_access?) | (VARIABLE node_access?))  WS*
     ;
 
 vardefinition:
-    WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) node_access? ')') | (VARIABLE node_access?)) WS* '=' WS* value_type? WS* EOL
+    WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*)')'node_access?) | (VARIABLE node_access?)) WS* '=' WS* value_type? WS* EOL
     ;
 
 comparision:

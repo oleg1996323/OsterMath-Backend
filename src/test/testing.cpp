@@ -1,6 +1,7 @@
 #include "test/testing.h"
 #include "data.h"
 #include "arithmetic_types.h"
+#include "exception/exception.h"
 
 #ifdef DEBUG
 
@@ -45,6 +46,14 @@ bool CalculationsCheck(const std::string& input_str, const std::string& check_va
         assert(output.str() == check_val);
     }
     catch(const std::invalid_argument& err){
+        std::cout<<err.what()<<std::endl;
+        return false;
+    }
+    catch(const exceptions::InvalidNumberOfArguments& err){
+        std::cout<<err.what()<<std::endl;
+        return false;
+    }
+    catch(const exceptions::InvalidTypeOfArgument& err){
         std::cout<<err.what()<<std::endl;
         return false;
     }
@@ -256,7 +265,7 @@ VAR(#I) = 5
 void Testing_input_node_assign_1(){
     std::string str_in = 
 R"(VAR(#I)=[1;1;1;1;1]
-VAR(#I(1)) = 2
+VAR(#I)(1) = 2
 )";
     std::string equal = R"([1; 2; 1; 1; 1])";
     CalculationsCheck(str_in,equal);

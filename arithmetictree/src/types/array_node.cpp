@@ -15,6 +15,8 @@ NODE_TYPE ArrayNode::type() const{
 }
 
 Result ArrayNode::execute(){
+    for(auto child:childs_)
+        child->execute();
     return this;
 }
 

@@ -70,6 +70,8 @@ class VariableBase: public FormattingData{
 
     Result result() const;
 
+    std::string full_name() const;
+
     protected:
     void set_data_base(BaseData* data_pool);
     BaseData* get_data_base() const;

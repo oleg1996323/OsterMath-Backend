@@ -34,8 +34,9 @@ namespace serialization{
 struct INFO_NODE{
     Node* parent = nullptr;
     int id = -1;
-};
 
+    std::shared_ptr<Node> node() const;
+};
 
 class Node{
     public:

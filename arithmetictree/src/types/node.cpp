@@ -5,6 +5,11 @@
 #include "serialize.h"
 #include "exception/exception.h"
 
+std::shared_ptr<Node> INFO_NODE::node() const{
+    if(parent && id!=-1 && parent->has_child(id))
+        return parent->child(id);
+}
+
 NODE_TYPE Node::type() const{
     return NODE_TYPE::UNDEF;
 }

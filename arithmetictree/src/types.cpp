@@ -126,3 +126,10 @@ const VariableDomain& VariableBase::get_domains() const{
 std::string VariableBase::get_data_base_name() const{
     return std::string(data_base_->name());
 }
+
+std::string VariableBase::full_name() const{
+    std::string str;
+    std::stringstream sstream(str);
+    node_->print_text(sstream);
+    return sstream.str();
+}
