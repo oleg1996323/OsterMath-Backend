@@ -8,6 +8,7 @@
 std::shared_ptr<Node> INFO_NODE::node() const{
     if(parent && id!=-1 && parent->has_child(id))
         return parent->child(id);
+    else throw exceptions::NodeChildDontExists("");
 }
 
 NODE_TYPE Node::type() const{
@@ -196,7 +197,7 @@ INFO_NODE Node::child(const std::vector<size_t>& indexes){
             info.id = *indexes.begin();
             return info;
         }
-        else return info;
+        else throw exceptions::NodeChildDontExists("");
     else{
         if(has_child(0)){
             if(indexes.size()>1 && child(0)->has_child(*indexes.begin()))
@@ -206,9 +207,9 @@ INFO_NODE Node::child(const std::vector<size_t>& indexes){
                 info.id = *indexes.begin();
                 return info;
             }
-            else return info;
+            else throw exceptions::NodeChildDontExists("");
         }
-        else return info;
+        else throw exceptions::NodeChildDontExists("");
     }
 }
 

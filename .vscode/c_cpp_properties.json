@@ -10,8 +10,18 @@
             "compilerPath": "/usr/bin/g++",
             "compilerArgs": [],
             "defines": [
-                "CMAKE_BUILD_TYPE=Debug"
+                "CMAKE_BUILD_TYPE=Release"
             ]
+        },
+        {
+            "name": "Release",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [],
+            "cStandard": "c17",
+            "cppStandard": "c++14",
+            "intelliSenseMode": "linux-clang-x64"
         }
     ],
     "version": 4
