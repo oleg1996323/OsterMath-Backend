@@ -137,9 +137,6 @@ class Node{
     std::vector<std::shared_ptr<Node>> childs_;
     bool caller_ = false;
     private:
-
-    private:
-
     template<typename T, typename... U>
     void recursive_function_applied_to_all_childs(std::function<T(const std::shared_ptr<Node>&,U...)> func, Node* root);
 };

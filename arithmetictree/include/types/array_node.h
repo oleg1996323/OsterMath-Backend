@@ -10,7 +10,8 @@ class ArrayNode:public Node{
     ArrayNode(size_t sz);
     ArrayNode(const ArrayNode& other);
     ArrayNode(ArrayNode&&) = delete;
-
+    ArrayNode(std::shared_ptr<ValueNode>&& val);
+    ArrayNode(const std::shared_ptr<ValueNode>& val);
     virtual NODE_TYPE type() const override;
     virtual Result execute() override;
     virtual Result execute(size_t index) override;
