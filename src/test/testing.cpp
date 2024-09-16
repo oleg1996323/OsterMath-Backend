@@ -270,6 +270,14 @@ VAR(#I)(1) = 2
     std::string equal = R"([1; 2; 1; 1; 1])";
     CalculationsCheck(str_in,equal);
 }
+void Testing_input_node_assign_2(){
+    std::string str_in = 
+R"(VAR(#I)=[[1;1;1;1;1;1];1;1;1;1;1]
+VAR(#I)(0;5) = 
+)";
+    std::string equal = R"([[1; 1; 1; 1; 1; 0]; 1; 1; 1; 1; 1])";
+    CalculationsCheck(str_in,equal);
+}
 
 void Testing(){
     Test_Correct_Sum_Result_For_Array();
@@ -282,6 +290,7 @@ void Testing(){
     Testing_compare_vars_1();
     Testing_compare_vars_2();
     Testing_input_node_assign_1();
+    Testing_input_node_assign_2();
 }
 
 #endif

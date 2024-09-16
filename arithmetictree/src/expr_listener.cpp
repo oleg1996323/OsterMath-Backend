@@ -389,7 +389,11 @@ void BaseListener::enterVardefinition(ParseRulesParser::VardefinitionContext * c
                     exceptions::NodeChildDontExists(ctx->getText());
                     return;
                 }
+
                 anonymous_node_.push(info->parent->child(info->id));
+                
+                if(!ctx->value_type())
+                    info->parent->replace(info->id,std::make_shared<Node>());
             }
             else{
                 throw exceptions::VariableDontExists(ctx->VARIABLE()->getText());
