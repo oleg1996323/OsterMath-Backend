@@ -33,6 +33,7 @@ namespace serialization{
 
 struct INFO_NODE{
     Node* parent = nullptr;
+    //std::shared_ptr<INFO_NODE> parent_info;
     int id = -1;
 
     std::shared_ptr<Node> node() const;
@@ -129,7 +130,6 @@ class Node{
 
     template<typename T, typename... U>
     void recursive_function_applied_to_all_childs(std::function<T(const std::shared_ptr<Node>&,U...)> func);
-
     const std::vector<std::shared_ptr<Node>>& childs() const;
     
     protected:
@@ -139,6 +139,8 @@ class Node{
     private:
     template<typename T, typename... U>
     void recursive_function_applied_to_all_childs(std::function<T(const std::shared_ptr<Node>&,U...)> func, Node* root);
+    INFO_NODE child(const std::vector<size_t>& indexes, const Node* caller) const;
+    INFO_NODE child(const std::vector<size_t>& indexes, Node* caller);
 };
 
 template<typename T, typename... U>
