@@ -37,6 +37,8 @@ struct INFO_NODE{
     int id = -1;
 
     std::shared_ptr<Node> node() const;
+    bool has_node() const;
+    bool is_valid() const;
 };
 
 class Node{

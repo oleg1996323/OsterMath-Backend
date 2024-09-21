@@ -202,7 +202,7 @@ void BaseListener::exitBinaryOp(ParseRulesParser::BinaryOpContext *ctx) {
 
 //an array definition {for example: [1,2,3,...]}
 void BaseListener::enterArray(ParseRulesParser::ArrayContext *ctx) {
-    assert(!mode_.empty() && current_node_);
+    assert(!mode_.empty() && (current_node_ || anonymous_node_.size()!=0));
     anonymous_node_.push(std::make_shared<ArrayNode>(ctx->input_array().size()));
     mode_.push(MODE::ARRAY_DEFINITION);
 }
@@ -212,7 +212,7 @@ void BaseListener::exitArray(ParseRulesParser::ArrayContext *ctx) {
 }
 
 void BaseListener::enterNumber(ParseRulesParser::NumberContext* ctx){
-    assert(!mode_.empty());
+    assert(!mode_.empty() && (current_node_ || anonymous_node_.size()!=0));
     mode_.push(MODE::VALUE);
     anonymous_node_.push(std::make_shared<ValueNode>(ctx->getText()));
 }
@@ -222,7 +222,7 @@ void BaseListener::exitNumber(ParseRulesParser::NumberContext* ctx){
 }
 
 void BaseListener::enterMultiargfunction(ParseRulesParser::MultiargfunctionContext* ctx){
-    assert(!mode_.empty());
+    assert(!mode_.empty() && (current_node_ || anonymous_node_.size()!=0));
     mode_.push(MODE::MULTIARGFUNCTION);
     if(ctx->PRODUCT())
         anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::PROD,ctx->expr().size()));
@@ -233,7 +233,7 @@ void BaseListener::enterMultiargfunction(ParseRulesParser::MultiargfunctionConte
 }
 
 void BaseListener::enterFunction(ParseRulesParser::FunctionContext* ctx){
-    assert(!mode_.empty());
+    assert(!mode_.empty() && (current_node_ || anonymous_node_.size()!=0));
     mode_.push(MODE::FUNCTIONOPERATION);
     if(ctx){
         if(ctx->EXP())
@@ -259,7 +259,7 @@ void BaseListener::enterFunction(ParseRulesParser::FunctionContext* ctx){
 }
 
 void BaseListener::enterRangefunction(ParseRulesParser::RangefunctionContext* ctx){
-    assert(!mode_.empty());
+    assert(!mode_.empty() && (current_node_ || anonymous_node_.size()!=0));
     mode_.push(MODE::RANGEOPERATION);
     if(ctx->SUM_I())
         anonymous_node_.push(std::make_shared<RangeOperationNode>(RANGE_OP::SUM));
@@ -285,8 +285,7 @@ void BaseListener::visitErrorNode(antlr4::tree::ErrorNode* node){
 }
 
 void BaseListener::enterLhs_comp(ParseRulesParser::Lhs_compContext* ctx){
-    assert(!mode_.empty());
-    assert(anonymous_node_.empty());
+    assert(!mode_.empty() && (current_node_ || anonymous_node_.size()!=0));
     mode_.push(MODE::LHS_DOMAIN);
     //by default the database from which we define variable must exists
     anonymous_node_.push(std::make_shared<UnaryNode>(UNARY_OP::NOTHING));
@@ -294,7 +293,7 @@ void BaseListener::enterLhs_comp(ParseRulesParser::Lhs_compContext* ctx){
 
 void BaseListener::exitLhs_comp(ParseRulesParser::Lhs_compContext* ctx){
     if(ctx){
-        assert(!mode_.empty());
+        assert(!mode_.empty() && (current_node_ || anonymous_node_.size()!=0));
         assert(mode_.top()==MODE::LHS_DOMAIN);
         mode_.pop();
         assert(anonymous_node_.size()==1);
@@ -304,8 +303,7 @@ void BaseListener::exitLhs_comp(ParseRulesParser::Lhs_compContext* ctx){
 }
 
 void BaseListener::enterRhs_comp(ParseRulesParser::Rhs_compContext* ctx){
-    assert(!mode_.empty());
-    assert(anonymous_node_.empty());
+    assert(!mode_.empty() && (current_node_ || anonymous_node_.size()!=0));
     mode_.push(MODE::RHS_DOMAIN);
     //by default the database from which we define variable must exists
     anonymous_node_.push(std::make_shared<UnaryNode>(UNARY_OP::NOTHING));
@@ -323,7 +321,7 @@ void BaseListener::exitRhs_comp(ParseRulesParser::Rhs_compContext* ctx){
 }
 
 void BaseListener::enterExpr_comp(ParseRulesParser::Expr_compContext* ctx){
-    assert(!mode_.empty());
+    assert(!mode_.empty() && (current_node_ || anonymous_node_.size()!=0));
     assert(anonymous_node_.empty());
     mode_.push(MODE::EXPR_DOMAIN);
     //by default the database from which we define variable must exists

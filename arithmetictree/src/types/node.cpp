@@ -6,9 +6,21 @@
 #include "exception/exception.h"
 
 std::shared_ptr<Node> INFO_NODE::node() const{
-    if(parent && id!=-1 && parent->has_child(id))
+    if(has_node())
         return parent->child(id);
     else throw exceptions::NodeChildDontExists("");
+}
+
+bool INFO_NODE::has_node() const{
+    if(is_valid() && parent->has_child(id))
+        return true;
+    else return false;
+}
+
+bool INFO_NODE::is_valid() const{
+    if(parent && id>-1)
+        return true;
+    else return false;
 }
 
 NODE_TYPE Node::type() const{
@@ -85,19 +97,19 @@ TYPE_VAL Node::type_val() const{
 }
 
 Result Node::execute() const{
-    return 0;
+    return "#NAN";
 }
 
 Result Node::execute(size_t index) const{
-    return 0;
+    return "#NAN";
 }
 
 Result Node::execute(){
-    return 0;
+    return "#NAN";
 }
 
 Result Node::execute(size_t index){
-    return 0;
+    return "#NAN";
 }
 
 bool Node::is_empty() const{
