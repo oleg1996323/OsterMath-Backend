@@ -40,7 +40,7 @@ FUNCTION_OP FunctionNode::operation() const{
 
 #include <numeric>
 
-Result FunctionNode::execute(){
+Result FunctionNode::execute(){ //TODO add checking for arrays size comparision
     if(array_type_function){
         if(!cache_.has_value()){
             if(childs_.size()>0){
