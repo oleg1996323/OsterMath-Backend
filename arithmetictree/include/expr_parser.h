@@ -12,7 +12,7 @@ class ErrorListener;
 class BaseListener;
 class BailErrorListener;
 class BaseData;
-class ParseRulesParser;
+class head_interactorParser;
 
 namespace antlr4{
     class ParseTree;
@@ -40,7 +40,7 @@ public:
         antlr4::ANTLRInputStream* antlr_stream_;
         Lexer* lexer_;
         antlr4::CommonTokenStream* input_;
-        ParseRulesParser* base_parser_;
+        head_interactorParser* base_parser_;
         BailErrorListener* error_listener;
         BaseListener* listener_;
         bailerror::ErrorListener* err_listener_;

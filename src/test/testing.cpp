@@ -278,8 +278,13 @@ VAR(#I)(0;5) =
     std::string equal = R"([[1; 1; 1; 1; 1; 0]; 1; 1; 1; 1; 1])";
     CalculationsCheck(str_in,equal);
 }
-
+#include "detector.h"
 void Testing(){
+    {
+        parse* p = new parse();
+        delete p;
+    }
+
     Test_Correct_Sum_Result_For_Array();
     Test_Correct_SumProduct_Result_For_Array();
     Test_Correct_Product_Result_For_Array();

@@ -68,14 +68,13 @@ set(PROJECT_RUNTIME_ANTLR ${CMAKE_CURRENT_LIST_DIR}/antlr4_runtime)
 # Создаем цель сборки для внешней директории
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/antlr4_runtime)
 
-make_directory(${PROJECT_RUNTIME_ANTLR}/runtime/src)
+make_directory(${PROJECT_RUNTIME_ANTLR}/runtime/src/head_interactor)
 
-antlr_target(Parserules ${CMAKE_CURRENT_LIST_DIR}/ParseRules.g4 LEXER PARSER LISTENER)
+ANTLR_TARGET(head_interactor ${CMAKE_CURRENT_LIST_DIR}/head_interactor.g4 LEXER PARSER LISTENER)
 
+set(ANTLR_GENERATED_FILES_head_interactor ${PROJECT_RUNTIME_ANTLR}/runtime/src/head_interactor)
 
-set(ANTLR_GENERATED_FILES ${PROJECT_RUNTIME_ANTLR}/runtime/src)
-
-target_include_directories(antlr4_static INTERFACE ${ANTLR_GENERATED_FILES})
+target_include_directories(antlr4_static INTERFACE ${ANTLR_GENERATED_FILES_head_interactor})
 
 set_target_properties(antlr4_static PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
@@ -88,6 +87,30 @@ set_target_properties(antlr4_static
 
 include_directories(
     ${ANTLR4_INCLUDE_DIRS}
-    ${ANTLR_Parserules_OUTPUT_DIR}
+    ${ANTLR_head_interactor_OUTPUT_DIR}
     ${PROJECT_RUNTIME_ANTLR}/runtime/src
 )
+
+add_library(head_interactor STATIC ${ANTLR_GENERATED_FILES_head_interactor})
+target_link_libraries(head_interactor PRIVATE antlr4_static)
+
+make_directory(${PROJECT_RUNTIME_ANTLR}/runtime/src/detect_type_function)
+
+ANTLR_TARGET(detect_type_function ${CMAKE_CURRENT_LIST_DIR}/detect_type_function.g4 LEXER PARSER LISTENER)
+
+set(ANTLR_GENERATED_FILES_detect_type_function ${PROJECT_RUNTIME_ANTLR}/runtime/src/detect_type_function)
+#file(GLOB_RECURSE ANTLR_GENERATED_FILES_head_interactor ${PROJECT_RUNTIME_ANTLR}/runtime/src/detect_type_function/head_interactor*.g4)
+#file(GLOB_RECURSE ANTLR_GENERATED_FILES_detect_type_function ${PROJECT_RUNTIME_ANTLR}/runtime/src/detect_type_function/detect_type_function*.g4)
+
+target_include_directories(antlr4_static INTERFACE ${ANTLR_GENERATED_FILES_detect_type_function})
+
+set_target_properties(antlr4_static PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+include_directories(
+    ${ANTLR4_INCLUDE_DIRS}
+    ${ANTLR_detect_type_function_OUTPUT_DIR}
+    ${PROJECT_RUNTIME_ANTLR}/runtime/src
+)
+
+add_library(detect_type_function STATIC ${ANTLR_GENERATED_FILES_detect_type_function})
+target_link_libraries(detect_type_function PRIVATE antlr4_static)

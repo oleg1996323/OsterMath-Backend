@@ -37,7 +37,7 @@ add_executable(physical_props ${physprop_SOURCE})
 
 message(STATUS ${ARITHM_TREE_INCLUDE_DIR})
 #target_link_directories(physical_props PUBLIC ${ARITHM_TREE_LIBRARY_DIR})
-target_link_libraries(physical_props PUBLIC arithmetictree)
+target_link_libraries(physical_props PUBLIC arithmetictree detector)
 target_include_directories(physical_props PUBLIC ${ARITHM_TREE_INCLUDE_DIR})
 target_compile_definitions(physical_props PUBLIC $<$<CONFIG:Debug>:DEBUG>)
 

@@ -1,10 +1,10 @@
 #pragma once
 #include "def.h"
-#include "ParseRulesLexer.h"
+#include "head_interactorLexer.h"
 
-class Lexer: public ParseRulesLexer{
+class Lexer: public head_interactorLexer{
 public:
-    Lexer(antlr4::ANTLRInputStream& stream):ParseRulesLexer(&stream)
+    Lexer(antlr4::ANTLRInputStream& stream):head_interactorLexer(&stream)
     {
         token_stream_ = std::make_unique<antlr4::CommonTokenStream>(this);
     }
