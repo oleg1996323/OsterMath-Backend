@@ -43,6 +43,6 @@ grammar/antlr-4.13.1-complete.jar
 Makefile
 CMakeCache.txt
 .cmake
-arithmetictree/grammar/antlr4_runtime
-arithmetictree/grammar/bin
-arithmetictree/grammar/lib
+grammar/antlr4_runtime
+grammar/bin
+grammar/lib

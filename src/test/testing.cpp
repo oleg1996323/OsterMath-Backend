@@ -216,28 +216,13 @@ R"(#I=SUM_I(#A+#B*#C)
 
 str_in = R"(VAR(#I)=SUM_I(#A+(#B*#C)^#D)
 VAR(#A)=[1;1;1]
-VAR(#B)=[1;1;LOG_X(EXP(2);pi)]
+VAR(#B)=[1;1;1]
 VAR(#C)=3
 VAR(#D)=[2;3;4]
 )";
-
-    DataPool pool("main");
-    pool.add_data("any");
-    BaseData* data = pool.get("any");
-    std::istringstream input(str_in);
-    data->setstream(input);
-    std::ostringstream output;
-    try{
-        data->get("I")->set_stream(output);
-        data->get("I")->print_result();
-        std::cout<<output.str()<<std::endl;
-        data->get("I")->print_text();
-        std::cout<<output.str()<<std::endl;
-        //assert(output.str() == check_val);
-    }
-    catch(const std::invalid_argument& err){
-        std::cout<<err.what()<<std::endl;
-    }
+//9+27+81=117
+    equal = R"(120)";
+    CalculationsCheck(str_in,equal);
 }
 
 void Testing_compare_vars_1(){
@@ -278,7 +263,7 @@ VAR(#I)(0;5) =
     std::string equal = R"([[1; 1; 1; 1; 1; 0]; 1; 1; 1; 1; 1])";
     CalculationsCheck(str_in,equal);
 }
-#include "detector.h"
+#include "detector/detector.h"
 void Testing(){
     {
         parse* p = new parse();

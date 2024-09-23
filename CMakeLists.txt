@@ -1,29 +1,34 @@
-cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
-project(PhysicalProps)
+cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
+project(ostermath_be)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_COMPILER "/usr/bin/g++")
-if(NOT CMAKE_BUILD_TYPE)
-    message(FATAL_ERROR "Not defined config")
-endif()
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/arithmetictree/CMakeLists.txt)
+set(OSTERMATH_BE_DIR ${CMAKE_CURRENT_LIST_DIR})
+include(${CMAKE_CURRENT_LIST_DIR}/grammar/CMakeLists.txt)
+message(STATUS "detector: {CMAKE_CURRENT_LIST_DIR}/detector/CMakeLists.txt")
+include(${CMAKE_CURRENT_LIST_DIR}/detector/CMakeLists.txt)
 
-file(GLOB_RECURSE physprop_SOURCE
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/**.cpp
+file(GLOB_RECURSE ostermath_be_SOURCES
+    ${CMAKE_CURRENT_LIST_DIR}/src/**.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/include/**.h
 )
 
-file(GLOB_RECURSE physprop_INCLUDE
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
-)
+#message(STATUS ${ostermath_be_SOURCES})
+
+set(OSTERMATH_BE_INCLUDE_DIR 
+                            ${CMAKE_CURRENT_LIST_DIR}/include 
+                            ${CMAKE_CURRENT_LIST_DIR}/include/types 
+                            ${CMAKE_CURRENT_LIST_DIR}/include/exception)
+set(OSTERMATH_BE_LIBRARY_DIR ${CMAKE_CURRENT_LIST_DIR}/lib)
 
 set(Boost_USE_STATIC_LIBS        ON)  # only find static libs
-set(Boost_USE_DEBUG_LIBS        ON)  # ignore debug libs and
+set(Boost_USE_DEBUG_LIBS        OFF)  # ignore debug libs and
 set(Boost_USE_RELEASE_LIBS       ON)  # only find release libs
 set(Boost_USE_MULTITHREADED      ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
 
-find_package(Boost 1.75.0 REQUIRED COMPONENTS json)
+find_package(Boost 1.75.0 REQUIRED)
 
 if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
@@ -31,17 +36,129 @@ else()
     message(FATAL_ERROR "Boost not found")
 endif()
 
+#message(STATUS "${ANTLR_GENERATED_SOURCES}")
+
+set(USER_INTERFACE ON)
+
+add_library(
+    bailerror STATIC
+    ${ANTLR_head_interactor_CXX_OUTPUTS}
+    ${CMAKE_CURRENT_LIST_DIR}/src/exception/bailerror.cpp
+)
+message(STATUS "Bailerror: ${ANTLR_head_interactor_OUTPUT_DIR}
+                        ${ANTLR_GENERATED_FILES_DIR}")
+target_include_directories(bailerror
+                    PUBLIC
+                        ${CMAKE_CURRENT_LIST_DIR}/include
+                        ${CMAKE_CURRENT_LIST_DIR}/include/exception
+                        ${ANTLR_head_interactor_OUTPUT_DIR}
+                        ${ANTLR_GENERATED_FILES_DIR})
+
+set_target_properties(bailerror PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+add_library(
+    exceptions STATIC
+    ${ANTLR_head_interactor_CXX_OUTPUTS}
+    ${CMAKE_CURRENT_LIST_DIR}/src/exception/exception.cpp
+)
+
+set_target_properties(exceptions PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+target_include_directories(exceptions
+                    PUBLIC
+                        ${CMAKE_CURRENT_LIST_DIR}/include
+                        ${CMAKE_CURRENT_LIST_DIR}/include/exception
+                        ${ANTLR_head_interactor_OUTPUT_DIR}
+                        ${ANTLR_GENERATED_FILES_DIR})
+
+add_library(
+    ostermath_be STATIC
+    ${ostermath_be_SOURCES}
+    ${ANTLR_head_interactor_CXX_OUTPUTS}
+)
+
+set_target_properties(ostermath_be PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+target_link_libraries(ostermath_be PUBLIC Boost::boost exceptions PRIVATE bailerror head_interactor)
+target_compile_definitions(ostermath_be PUBLIC $<$<CONFIG:Debug>:DEBUG>)
+
+target_include_directories(ostermath_be
+                    PUBLIC 
+                        ${CMAKE_CURRENT_LIST_DIR}/include
+                        ${CMAKE_CURRENT_LIST_DIR}/include/types
+                        ${ANTLR_head_interactor_OUTPUT_DIR}
+
+                    PRIVATE
+                        ${CMAKE_CURRENT_LIST_DIR}/include/exception
+                        ${ANTLR_GENERATED_FILES_head_interactor})
+
+message(STATUS ${USER_INTERFACE})
+
+install(
+    TARGETS ostermath_be
+    LIBRARY DESTINATION ${CMAKE_CURRENT_LIST_DIR}/lib
+    ARCHIVE DESTINATION ${CMAKE_CURRENT_LIST_DIR}/lib
+    RUNTIME DESTINATION ${CMAKE_CURRENT_LIST_DIR}/bin
+    INCLUDES DESTINATION ${CMAKE_CURRENT_LIST_DIR}/include
+    EXPORT ostermath_be
+)
+
+set_directory_properties(PROPERTIES VS_STARTUP_PROJECT ostermath_be)
+
+file(GLOB_RECURSE detector_SOURCES
+    ${CMAKE_CURRENT_LIST_DIR}/src/detector/**.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/include/detector/**.h
+)
+
+message(STATUS ${detector_SOURCES})
+
+message(STATUS ${USER_INTERFACE})
+
+if(NOT USER_INTERFACE)
+    set_target_properties(ostermath_be exceptions bailerror
+        PROPERTIES
+        ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_LIST_DIR}/lib/Debug/uiless"
+        LIBRARY_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_LIST_DIR}/lib/Debug/uiless"
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_LIST_DIR}/bin/Debug/uiless"
+        ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_LIST_DIR}/lib/Release/uiless"
+        LIBRARY_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_LIST_DIR}/lib/Release/uiless"
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_LIST_DIR}/bin/Release/uiless"
+    )
+else()
+    set_target_properties(ostermath_be exceptions bailerror
+        PROPERTIES
+        ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_LIST_DIR}/lib/Debug/ui"
+        LIBRARY_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_LIST_DIR}/lib/Debug/ui"
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_LIST_DIR}/bin/Debug/ui"
+        ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_LIST_DIR}/lib/Release/ui"
+        LIBRARY_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_LIST_DIR}/lib/Release/ui"
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_LIST_DIR}/bin/Release/ui"
+    )
+    target_compile_definitions(ostermath_be PUBLIC USER_INTERFACE)
+endif()
+
+if(NOT CMAKE_BUILD_TYPE)
+    message(FATAL_ERROR "Not defined config")
+endif()
+
+file(GLOB_RECURSE test_SOURCE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/test/**.cpp
+)
+
+file(GLOB_RECURSE test_INCLUDE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/test/**.h
+)
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/include/types)
 
-add_executable(physical_props ${physprop_SOURCE})
+add_executable(test ${test_SOURCE})
 
 message(STATUS ${ARITHM_TREE_INCLUDE_DIR})
-#target_link_directories(physical_props PUBLIC ${ARITHM_TREE_LIBRARY_DIR})
-target_link_libraries(physical_props PUBLIC arithmetictree detector)
-target_include_directories(physical_props PUBLIC ${ARITHM_TREE_INCLUDE_DIR})
-target_compile_definitions(physical_props PUBLIC $<$<CONFIG:Debug>:DEBUG>)
+target_link_libraries(test PUBLIC ostermath_be detector)
+target_include_directories(test PUBLIC ${ARITHM_TREE_INCLUDE_DIR})
+target_compile_definitions(test PUBLIC $<$<CONFIG:Debug>:DEBUG>)
 
-set_target_properties(physical_props
+set_target_properties(test
     PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/lib"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/shared"
@@ -49,3 +166,5 @@ set_target_properties(physical_props
 )
 
 message(STATUS ${CMAKE_CURRENT_SOURCE_DIR})
+
+add_test(NAME test COMMAND test)

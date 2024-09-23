@@ -5,7 +5,7 @@
             "name": "Debug",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceRoot}/bin/physical_props",
+            "program": "${workspaceRoot}/bin/test",
             "cwd": "${workspaceRoot}",
             "logging": {"engineLogging":"warning",
                         "exceptions": true},
