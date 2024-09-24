@@ -81,7 +81,6 @@ void BaseListener::enterVariable(head_interactorParser::VariableContext *ctx) {
     auto node_ctx = ctx->node_access();
     if(!ctx->VARIABLE())
         throw exceptions::ParsingError("Error parsing variable name");
-
     if(node_ctx){
         if(node_ctx->UINT().size()==0){
             if(ctx->DATABASE())

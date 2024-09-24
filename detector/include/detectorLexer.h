@@ -1,10 +1,12 @@
 #pragma once
 #include "def.h"
-#include "detector_type_function.h"
+#include "detect_type_functionLexer.h"
 
-class Lexer: public head_interactorLexer{
+namespace expression{
+
+class Lexer: public detect_type_functionLexer{
 public:
-    Lexer(antlr4::ANTLRInputStream& stream):head_interactorLexer(&stream)
+    Lexer(antlr4::ANTLRInputStream& stream):detect_type_functionLexer(&stream)
     {
         token_stream_ = std::make_unique<antlr4::CommonTokenStream>(this);
     }
@@ -20,3 +22,4 @@ public:
 private:
     std::unique_ptr<antlr4::CommonTokenStream> token_stream_;
 };
+}

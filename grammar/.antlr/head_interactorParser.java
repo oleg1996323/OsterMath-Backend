@@ -1,4 +1,4 @@
-// Generated from /home/oster/Electrolisys/grammar/detect_type_function.g4 by ANTLR 4.13.1
+// Generated from /home/oster/Electrolisys/grammar/head_interactor.g4 by ANTLR 4.13.1
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
@@ -9,7 +9,7 @@ import java.util.Iterator;
 import java.util.ArrayList;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast", "CheckReturnValue"})
-public class detect_type_functionParser extends Parser {
+public class head_interactorParser extends Parser {
 	static { RuntimeMetaData.checkVersion("4.13.1", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
@@ -93,7 +93,7 @@ public class detect_type_functionParser extends Parser {
 	}
 
 	@Override
-	public String getGrammarFileName() { return "detect_type_function.g4"; }
+	public String getGrammarFileName() { return "head_interactor.g4"; }
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }
@@ -104,7 +104,7 @@ public class detect_type_functionParser extends Parser {
 	@Override
 	public ATN getATN() { return _ATN; }
 
-	public detect_type_functionParser(TokenStream input) {
+	public head_interactorParser(TokenStream input) {
 		super(input);
 		_interp = new ParserATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
 	}
@@ -194,11 +194,11 @@ public class detect_type_functionParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class ComparatorContext extends ParserRuleContext {
-		public TerminalNode LARGER() { return getToken(detect_type_functionParser.LARGER, 0); }
-		public TerminalNode LARGER_EQUAL() { return getToken(detect_type_functionParser.LARGER_EQUAL, 0); }
-		public TerminalNode EQUAL() { return getToken(detect_type_functionParser.EQUAL, 0); }
-		public TerminalNode LESS() { return getToken(detect_type_functionParser.LESS, 0); }
-		public TerminalNode LESS_EQUAL() { return getToken(detect_type_functionParser.LESS_EQUAL, 0); }
+		public TerminalNode LARGER() { return getToken(head_interactorParser.LARGER, 0); }
+		public TerminalNode LARGER_EQUAL() { return getToken(head_interactorParser.LARGER_EQUAL, 0); }
+		public TerminalNode EQUAL() { return getToken(head_interactorParser.EQUAL, 0); }
+		public TerminalNode LESS() { return getToken(head_interactorParser.LESS, 0); }
+		public TerminalNode LESS_EQUAL() { return getToken(head_interactorParser.LESS_EQUAL, 0); }
 		public ComparatorContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -243,7 +243,7 @@ public class detect_type_functionParser extends Parser {
 		public Line_inputContext line_input(int i) {
 			return getRuleContext(Line_inputContext.class,i);
 		}
-		public TerminalNode EOF() { return getToken(detect_type_functionParser.EOF, 0); }
+		public TerminalNode EOF() { return getToken(head_interactorParser.EOF, 0); }
 		public InputContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -351,13 +351,13 @@ public class detect_type_functionParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class Node_accessContext extends ParserRuleContext {
-		public List<TerminalNode> WS() { return getTokens(detect_type_functionParser.WS); }
+		public List<TerminalNode> WS() { return getTokens(head_interactorParser.WS); }
 		public TerminalNode WS(int i) {
-			return getToken(detect_type_functionParser.WS, i);
+			return getToken(head_interactorParser.WS, i);
 		}
-		public List<TerminalNode> UINT() { return getTokens(detect_type_functionParser.UINT); }
+		public List<TerminalNode> UINT() { return getTokens(head_interactorParser.UINT); }
 		public TerminalNode UINT(int i) {
-			return getToken(detect_type_functionParser.UINT, i);
+			return getToken(head_interactorParser.UINT, i);
 		}
 		public Node_accessContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -572,12 +572,12 @@ public class detect_type_functionParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class VariableContext extends ParserRuleContext {
-		public List<TerminalNode> WS() { return getTokens(detect_type_functionParser.WS); }
+		public List<TerminalNode> WS() { return getTokens(head_interactorParser.WS); }
 		public TerminalNode WS(int i) {
-			return getToken(detect_type_functionParser.WS, i);
+			return getToken(head_interactorParser.WS, i);
 		}
-		public TerminalNode VARIABLE() { return getToken(detect_type_functionParser.VARIABLE, 0); }
-		public TerminalNode DATABASE() { return getToken(detect_type_functionParser.DATABASE, 0); }
+		public TerminalNode VARIABLE() { return getToken(head_interactorParser.VARIABLE, 0); }
+		public TerminalNode DATABASE() { return getToken(head_interactorParser.DATABASE, 0); }
 		public Node_accessContext node_access() {
 			return getRuleContext(Node_accessContext.class,0);
 		}
@@ -758,17 +758,17 @@ public class detect_type_functionParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class VardefinitionContext extends ParserRuleContext {
-		public TerminalNode EQUAL() { return getToken(detect_type_functionParser.EQUAL, 0); }
-		public TerminalNode EOL() { return getToken(detect_type_functionParser.EOL, 0); }
-		public List<TerminalNode> WS() { return getTokens(detect_type_functionParser.WS); }
+		public TerminalNode EQUAL() { return getToken(head_interactorParser.EQUAL, 0); }
+		public TerminalNode EOL() { return getToken(head_interactorParser.EOL, 0); }
+		public List<TerminalNode> WS() { return getTokens(head_interactorParser.WS); }
 		public TerminalNode WS(int i) {
-			return getToken(detect_type_functionParser.WS, i);
+			return getToken(head_interactorParser.WS, i);
 		}
 		public Value_typeContext value_type() {
 			return getRuleContext(Value_typeContext.class,0);
 		}
-		public TerminalNode VARIABLE() { return getToken(detect_type_functionParser.VARIABLE, 0); }
-		public TerminalNode DATABASE() { return getToken(detect_type_functionParser.DATABASE, 0); }
+		public TerminalNode VARIABLE() { return getToken(head_interactorParser.VARIABLE, 0); }
+		public TerminalNode DATABASE() { return getToken(head_interactorParser.DATABASE, 0); }
 		public Node_accessContext node_access() {
 			return getRuleContext(Node_accessContext.class,0);
 		}
@@ -1000,16 +1000,16 @@ public class detect_type_functionParser extends Parser {
 		public Rhs_compContext rhs_comp() {
 			return getRuleContext(Rhs_compContext.class,0);
 		}
-		public TerminalNode EOL() { return getToken(detect_type_functionParser.EOL, 0); }
-		public TerminalNode VARIABLE() { return getToken(detect_type_functionParser.VARIABLE, 0); }
-		public List<TerminalNode> WS() { return getTokens(detect_type_functionParser.WS); }
+		public TerminalNode EOL() { return getToken(head_interactorParser.EOL, 0); }
+		public TerminalNode VARIABLE() { return getToken(head_interactorParser.VARIABLE, 0); }
+		public List<TerminalNode> WS() { return getTokens(head_interactorParser.WS); }
 		public TerminalNode WS(int i) {
-			return getToken(detect_type_functionParser.WS, i);
+			return getToken(head_interactorParser.WS, i);
 		}
 		public Expr_compContext expr_comp() {
 			return getRuleContext(Expr_compContext.class,0);
 		}
-		public TerminalNode DATABASE() { return getToken(detect_type_functionParser.DATABASE, 0); }
+		public TerminalNode DATABASE() { return getToken(head_interactorParser.DATABASE, 0); }
 		public ComparisionContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -1419,11 +1419,11 @@ public class detect_type_functionParser extends Parser {
 		public ExprContext expr() {
 			return getRuleContext(ExprContext.class,0);
 		}
-		public TerminalNode ADD() { return getToken(detect_type_functionParser.ADD, 0); }
-		public TerminalNode SUB() { return getToken(detect_type_functionParser.SUB, 0); }
-		public List<TerminalNode> WS() { return getTokens(detect_type_functionParser.WS); }
+		public TerminalNode ADD() { return getToken(head_interactorParser.ADD, 0); }
+		public TerminalNode SUB() { return getToken(head_interactorParser.SUB, 0); }
+		public List<TerminalNode> WS() { return getTokens(head_interactorParser.WS); }
 		public TerminalNode WS(int i) {
-			return getToken(detect_type_functionParser.WS, i);
+			return getToken(head_interactorParser.WS, i);
 		}
 		public UnaryOpContext(ExprContext ctx) { copyFrom(ctx); }
 	}
@@ -1472,15 +1472,15 @@ public class detect_type_functionParser extends Parser {
 		public ExprContext expr(int i) {
 			return getRuleContext(ExprContext.class,i);
 		}
-		public TerminalNode POW() { return getToken(detect_type_functionParser.POW, 0); }
-		public TerminalNode MUL() { return getToken(detect_type_functionParser.MUL, 0); }
-		public TerminalNode DIV() { return getToken(detect_type_functionParser.DIV, 0); }
-		public List<TerminalNode> WS() { return getTokens(detect_type_functionParser.WS); }
+		public TerminalNode POW() { return getToken(head_interactorParser.POW, 0); }
+		public TerminalNode MUL() { return getToken(head_interactorParser.MUL, 0); }
+		public TerminalNode DIV() { return getToken(head_interactorParser.DIV, 0); }
+		public List<TerminalNode> WS() { return getTokens(head_interactorParser.WS); }
 		public TerminalNode WS(int i) {
-			return getToken(detect_type_functionParser.WS, i);
+			return getToken(head_interactorParser.WS, i);
 		}
-		public TerminalNode ADD() { return getToken(detect_type_functionParser.ADD, 0); }
-		public TerminalNode SUB() { return getToken(detect_type_functionParser.SUB, 0); }
+		public TerminalNode ADD() { return getToken(head_interactorParser.ADD, 0); }
+		public TerminalNode SUB() { return getToken(head_interactorParser.SUB, 0); }
 		public BinaryOpContext(ExprContext ctx) { copyFrom(ctx); }
 	}
 
@@ -1770,9 +1770,9 @@ public class detect_type_functionParser extends Parser {
 		public Input_arrayContext input_array(int i) {
 			return getRuleContext(Input_arrayContext.class,i);
 		}
-		public List<TerminalNode> WS() { return getTokens(detect_type_functionParser.WS); }
+		public List<TerminalNode> WS() { return getTokens(head_interactorParser.WS); }
 		public TerminalNode WS(int i) {
-			return getToken(detect_type_functionParser.WS, i);
+			return getToken(head_interactorParser.WS, i);
 		}
 		public ArrayContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -1955,8 +1955,8 @@ public class detect_type_functionParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class NumberContext extends ParserRuleContext {
-		public TerminalNode UINT() { return getToken(detect_type_functionParser.UINT, 0); }
-		public TerminalNode FLOAT() { return getToken(detect_type_functionParser.FLOAT, 0); }
+		public TerminalNode UINT() { return getToken(head_interactorParser.UINT, 0); }
+		public TerminalNode FLOAT() { return getToken(head_interactorParser.FLOAT, 0); }
 		public NumberContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -1995,8 +1995,8 @@ public class detect_type_functionParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class ConstantContext extends ParserRuleContext {
-		public TerminalNode PI() { return getToken(detect_type_functionParser.PI, 0); }
-		public TerminalNode EXP() { return getToken(detect_type_functionParser.EXP, 0); }
+		public TerminalNode PI() { return getToken(head_interactorParser.PI, 0); }
+		public TerminalNode EXP() { return getToken(head_interactorParser.EXP, 0); }
 		public ConstantContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -2035,26 +2035,26 @@ public class detect_type_functionParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class FunctionContext extends ParserRuleContext {
-		public TerminalNode LN() { return getToken(detect_type_functionParser.LN, 0); }
+		public TerminalNode LN() { return getToken(head_interactorParser.LN, 0); }
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);
 		}
 		public ExprContext expr(int i) {
 			return getRuleContext(ExprContext.class,i);
 		}
-		public List<TerminalNode> WS() { return getTokens(detect_type_functionParser.WS); }
+		public List<TerminalNode> WS() { return getTokens(head_interactorParser.WS); }
 		public TerminalNode WS(int i) {
-			return getToken(detect_type_functionParser.WS, i);
+			return getToken(head_interactorParser.WS, i);
 		}
-		public TerminalNode LG() { return getToken(detect_type_functionParser.LG, 0); }
-		public TerminalNode EXP() { return getToken(detect_type_functionParser.EXP, 0); }
-		public TerminalNode SQRT() { return getToken(detect_type_functionParser.SQRT, 0); }
-		public TerminalNode COS() { return getToken(detect_type_functionParser.COS, 0); }
-		public TerminalNode SIN() { return getToken(detect_type_functionParser.SIN, 0); }
-		public TerminalNode ACOS() { return getToken(detect_type_functionParser.ACOS, 0); }
-		public TerminalNode ASIN() { return getToken(detect_type_functionParser.ASIN, 0); }
-		public TerminalNode FACTORIAL() { return getToken(detect_type_functionParser.FACTORIAL, 0); }
-		public TerminalNode LOG_X() { return getToken(detect_type_functionParser.LOG_X, 0); }
+		public TerminalNode LG() { return getToken(head_interactorParser.LG, 0); }
+		public TerminalNode EXP() { return getToken(head_interactorParser.EXP, 0); }
+		public TerminalNode SQRT() { return getToken(head_interactorParser.SQRT, 0); }
+		public TerminalNode COS() { return getToken(head_interactorParser.COS, 0); }
+		public TerminalNode SIN() { return getToken(head_interactorParser.SIN, 0); }
+		public TerminalNode ACOS() { return getToken(head_interactorParser.ACOS, 0); }
+		public TerminalNode ASIN() { return getToken(head_interactorParser.ASIN, 0); }
+		public TerminalNode FACTORIAL() { return getToken(head_interactorParser.FACTORIAL, 0); }
+		public TerminalNode LOG_X() { return getToken(head_interactorParser.LOG_X, 0); }
 		public FunctionContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -2849,19 +2849,19 @@ public class detect_type_functionParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class MultiargfunctionContext extends ParserRuleContext {
-		public TerminalNode SUMPRODUCT() { return getToken(detect_type_functionParser.SUMPRODUCT, 0); }
+		public TerminalNode SUMPRODUCT() { return getToken(head_interactorParser.SUMPRODUCT, 0); }
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);
 		}
 		public ExprContext expr(int i) {
 			return getRuleContext(ExprContext.class,i);
 		}
-		public List<TerminalNode> WS() { return getTokens(detect_type_functionParser.WS); }
+		public List<TerminalNode> WS() { return getTokens(head_interactorParser.WS); }
 		public TerminalNode WS(int i) {
-			return getToken(detect_type_functionParser.WS, i);
+			return getToken(head_interactorParser.WS, i);
 		}
-		public TerminalNode SUM() { return getToken(detect_type_functionParser.SUM, 0); }
-		public TerminalNode PRODUCT() { return getToken(detect_type_functionParser.PRODUCT, 0); }
+		public TerminalNode SUM() { return getToken(head_interactorParser.SUM, 0); }
+		public TerminalNode PRODUCT() { return getToken(head_interactorParser.PRODUCT, 0); }
 		public MultiargfunctionContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -3032,15 +3032,15 @@ public class detect_type_functionParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class RangefunctionContext extends ParserRuleContext {
-		public TerminalNode SUM_I() { return getToken(detect_type_functionParser.SUM_I, 0); }
+		public TerminalNode SUM_I() { return getToken(head_interactorParser.SUM_I, 0); }
 		public ExprContext expr() {
 			return getRuleContext(ExprContext.class,0);
 		}
-		public List<TerminalNode> WS() { return getTokens(detect_type_functionParser.WS); }
+		public List<TerminalNode> WS() { return getTokens(head_interactorParser.WS); }
 		public TerminalNode WS(int i) {
-			return getToken(detect_type_functionParser.WS, i);
+			return getToken(head_interactorParser.WS, i);
 		}
-		public TerminalNode PRODUCT_I() { return getToken(detect_type_functionParser.PRODUCT_I, 0); }
+		public TerminalNode PRODUCT_I() { return getToken(head_interactorParser.PRODUCT_I, 0); }
 		public RangefunctionContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -3217,7 +3217,7 @@ public class detect_type_functionParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class StringContext extends ParserRuleContext {
-		public TerminalNode STRING() { return getToken(detect_type_functionParser.STRING, 0); }
+		public TerminalNode STRING() { return getToken(head_interactorParser.STRING, 0); }
 		public StringContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}

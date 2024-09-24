@@ -47,27 +47,23 @@ else()
 	message(STATUS "ANTLR4 already installed")
 endif()
 
-message(STATUS "CMAKE_CURRENT_LIST_DIR: ${CMAKE_CURRENT_LIST_DIR}")
+
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/antlr4_runtime)
 make_directory(${PROJECT_RUNTIME_ANTLR}/runtime/src)
 
 set(PROJECT_RUNTIME_ANTLR ${CMAKE_CURRENT_LIST_DIR}/antlr4_runtime)
 set(ANTLR_GENERATED_FILES_DIR ${PROJECT_RUNTIME_ANTLR}/runtime/src)
-set(CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_LIST_DIR}/bin)
 set(ANTLR_EXECUTABLE ${CMAKE_CURRENT_LIST_DIR}/antlr-4.13.1-complete.jar)
-file(GLOB_RECURSE ANTLR_GENERATED_SOURCES 
-        ${ANTLR_GENERATED_FILES_DIR}/*.cpp
-        ${ANTLR_GENERATED_FILES_DIR}/*.h)
-message(STATUS "Generated sources: ${ANTLR_GENERATED_FILES_DIR}")
+
+add_definitions(
+	-DANTLR4CPP_STATIC
+	-D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS
+)
+
+include(${CMAKE_CURRENT_LIST_DIR}/FindANTLR.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/head_interactor.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/detector_parser.cmake)
-message(STATUS "Generated files: ${ANTLR_GENERATED_FILES_DIR}")
-message(STATUS "Generated dir: ${ANTLR_GENERATED_FILES_DIR}")
+
 include_directories(
     ${ANTLR_GENERATED_FILES_DIR}
 )
-set(ANTLR_detector_SOURCE   ${ANTLR_detect_type_function_CXX_OUTPUTS}
-                            ${ANTLR_GENERATED_SOURCES})
-
-set(ANTLR_head_interactor_SOURCE   ${ANTLR_head_interactor_CXX_OUTPUTS}
-                            ${ANTLR_GENERATED_SOURCES})

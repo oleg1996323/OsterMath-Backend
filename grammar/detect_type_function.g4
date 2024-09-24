@@ -1,4 +1,5 @@
 grammar detect_type_function;
+import head_interactor;
 
 fragment A : [aA];
 fragment B : [bB];

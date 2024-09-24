@@ -2,6 +2,10 @@
 #include "data.h"
 #include "arithmetic_types.h"
 #include "exception/exception.h"
+#include "detectorLexer.h"
+#include "detectorListener.h"
+#include "detectorParser.h"
+#include "detector.h"
 
 #ifdef DEBUG
 
@@ -263,10 +267,23 @@ VAR(#I)(0;5) =
     std::string equal = R"([[1; 1; 1; 1; 1; 0]; 1; 1; 1; 1; 1])";
     CalculationsCheck(str_in,equal);
 }
-#include "detector/detector.h"
+
+bool DetectorParsing(const std::string& input_str, expression::item::ITEM_TYPE check_val){
+    return expression::Parser();
+}
+
+void Testing_detector_1(){
+    std::string str_in = 
+R"(=SUMPRODUCT(VAR(#I);VAR(#A)) 
+)";
+    expression::item::ITEM_TYPE equal = ;
+    DetectorParsing(str_in,equal);
+}
+
+#include "detector.h"
 void Testing(){
     {
-        parse* p = new parse();
+        expression::Parser* p = new Parser();
         delete p;
     }
 

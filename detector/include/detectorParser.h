@@ -4,8 +4,9 @@
 #include <iostream>
 #include <sstream>
 #include "def.h"
-#include "g"
+#include "detect_type_functionParser.h"
 
+namespace expression{
 class Lexer;
 namespace bailerror{
 class ErrorListener;
@@ -13,7 +14,7 @@ class ErrorListener;
 class BaseListener;
 class BailErrorListener;
 class BaseData;
-class head_interactorParser;
+class detect_type_functionParser;
 
 namespace antlr4{
     class ParseTree;
@@ -41,7 +42,7 @@ public:
         antlr4::ANTLRInputStream* antlr_stream_;
         Lexer* lexer_;
         antlr4::CommonTokenStream* input_;
-        head_interactorParser* base_parser_;
+        detect_type_functionParser* base_parser_;
         BailErrorListener* error_listener;
         BaseListener* listener_;
         bailerror::ErrorListener* err_listener_;
@@ -51,4 +52,7 @@ public:
     BaseData* data_;
     std::unique_ptr<std::istream> stream_;
     void __init__();
+    
 };
+
+}
