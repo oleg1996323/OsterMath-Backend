@@ -1,5 +1,4 @@
 grammar detect_type_function;
-import head_interactor;
 
 fragment A : [aA];
 fragment B : [bB];
@@ -28,18 +27,12 @@ fragment X : [xX];
 fragment Y : [yY];
 fragment Z : [zZ];
 
-VARIABLE: '#' [a-zA-Z] ((QUOTE | ASTERISK) | [a-zA-Z0-9])* {setText(getText().substr(1, getText().length()-1));};
-DATABASE: '!(\'' [a-zA-Z0-9_] (~[()!,;#' ])* '\')' {setText(getText().substr(3, getText().length()-5));}; 
+VARIABLE: '#' [a-zA-Z] ((QUOTE | ASTERISK) | [a-zA-Z0-9])*;
+DATABASE: '!(\'' [a-zA-Z0-9_] (~[()!,;#' ])* '\')';
 WS: [ \t]+ -> skip;
 EOL: '\r'? '\n';
-LARGER: '>';
-LARGER_EQUAL: ('>=' | '=>');
-EQUAL: '=';
-LESS: ('<=' | '=<');
-LESS_EQUAL: '<';
 UINT: [0-9]+ (EXPONENT)?;
 value_type: array | expr | string;
-comparator: LARGER | LARGER_EQUAL | EQUAL | LESS | LESS_EQUAL;
 
 input:
     line_input+
@@ -47,8 +40,8 @@ input:
     ;
 
 line_input:
-    vardefinition
-    | comparision
+    array
+    | expr
     ;
 
 node_access:
@@ -57,27 +50,6 @@ node_access:
 
 variable:
     WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*)')'node_access?) | (VARIABLE node_access?))  WS*
-    ;
-
-vardefinition:
-    WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*)')'node_access?) | (VARIABLE node_access?)) WS* '=' WS* value_type? WS* EOL
-    ;
-
-comparision:
-    WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')') | WS* VARIABLE WS*)  WS* ':' WS* lhs_comp WS* comparator
-     WS* rhs_comp WS* (':' WS* expr_comp WS*)? EOL
-    ;
-
-lhs_comp:
-    expr
-    ;
-
-rhs_comp:
-    expr
-    ;
-
-expr_comp:
-    expr
     ;
 
 expr
@@ -142,8 +114,6 @@ MUL: '*' ;
 DIV: '/' ;
 POW: '^' ;
 
-
-
 SUMPRODUCT: S U M P R O D U C T;
 SUMPRODUCT_I: SUMPRODUCT '_' I;
 SUM: S U M;
@@ -169,7 +139,6 @@ fragment INT: [-+]? UINT;
 EXPONENT: [eE] INT;
 FLOAT: INT '.' UINT (EXPONENT)?;
 ID_NUMBER: [0-9]+;
-
 
 string
     :

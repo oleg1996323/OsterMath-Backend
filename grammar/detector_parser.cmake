@@ -36,7 +36,5 @@ set_target_properties(antlr4_static
 set(WITH_STATIC_CRT OFF CACHE BOOL "Visual C++ static CRT for ANTLR" FORCE)
 
 include_directories(
-    ${ANTLR4_INCLUDE_DIRS}
     ${ANTLR_detect_type_function_OUTPUT_DIR}
 )
-message(STATUS ${ANTLR_detect_type_function_OUTPUT_DIR})

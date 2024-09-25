@@ -4,7 +4,6 @@
 #include "exception/exception.h"
 #include "detectorLexer.h"
 #include "detectorListener.h"
-#include "detectorParser.h"
 #include "detector.h"
 
 #ifdef DEBUG
@@ -268,25 +267,20 @@ VAR(#I)(0;5) =
     CalculationsCheck(str_in,equal);
 }
 
-bool DetectorParsing(const std::string& input_str, expression::item::ITEM_TYPE check_val){
-    return expression::Parser();
+void DetectorParsing(const std::string& input_str, detail::__ParseSegmentation__::PARSING_INFO check_val){
+    detail::parse(input_str)==check_val;
 }
 
 void Testing_detector_1(){
     std::string str_in = 
 R"(=SUMPRODUCT(VAR(#I);VAR(#A)) 
 )";
-    expression::item::ITEM_TYPE equal = ;
+    detail::__ParseSegmentation__::PARSING_INFO equal(nullptr);
     DetectorParsing(str_in,equal);
 }
 
 #include "detector.h"
 void Testing(){
-    {
-        expression::Parser* p = new Parser();
-        delete p;
-    }
-
     Test_Correct_Sum_Result_For_Array();
     Test_Correct_SumProduct_Result_For_Array();
     Test_Correct_Product_Result_For_Array();
@@ -298,6 +292,7 @@ void Testing(){
     Testing_compare_vars_2();
     Testing_input_node_assign_1();
     Testing_input_node_assign_2();
+    Testing_detector_1();
 }
 
 #endif

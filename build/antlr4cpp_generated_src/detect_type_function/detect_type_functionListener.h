@@ -17,9 +17,6 @@ public:
   virtual void enterValue_type(detect_type_functionParser::Value_typeContext *ctx) = 0;
   virtual void exitValue_type(detect_type_functionParser::Value_typeContext *ctx) = 0;
 
-  virtual void enterComparator(detect_type_functionParser::ComparatorContext *ctx) = 0;
-  virtual void exitComparator(detect_type_functionParser::ComparatorContext *ctx) = 0;
-
   virtual void enterInput(detect_type_functionParser::InputContext *ctx) = 0;
   virtual void exitInput(detect_type_functionParser::InputContext *ctx) = 0;
 
@@ -31,21 +28,6 @@ public:
 
   virtual void enterVariable(detect_type_functionParser::VariableContext *ctx) = 0;
   virtual void exitVariable(detect_type_functionParser::VariableContext *ctx) = 0;
-
-  virtual void enterVardefinition(detect_type_functionParser::VardefinitionContext *ctx) = 0;
-  virtual void exitVardefinition(detect_type_functionParser::VardefinitionContext *ctx) = 0;
-
-  virtual void enterComparision(detect_type_functionParser::ComparisionContext *ctx) = 0;
-  virtual void exitComparision(detect_type_functionParser::ComparisionContext *ctx) = 0;
-
-  virtual void enterLhs_comp(detect_type_functionParser::Lhs_compContext *ctx) = 0;
-  virtual void exitLhs_comp(detect_type_functionParser::Lhs_compContext *ctx) = 0;
-
-  virtual void enterRhs_comp(detect_type_functionParser::Rhs_compContext *ctx) = 0;
-  virtual void exitRhs_comp(detect_type_functionParser::Rhs_compContext *ctx) = 0;
-
-  virtual void enterExpr_comp(detect_type_functionParser::Expr_compContext *ctx) = 0;
-  virtual void exitExpr_comp(detect_type_functionParser::Expr_compContext *ctx) = 0;
 
   virtual void enterUnaryOp(detect_type_functionParser::UnaryOpContext *ctx) = 0;
   virtual void exitUnaryOp(detect_type_functionParser::UnaryOpContext *ctx) = 0;

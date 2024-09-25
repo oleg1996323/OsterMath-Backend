@@ -1,9 +1,8 @@
 #pragma once
-#include "def.h"
 #include "detect_type_functionLexer.h"
+#include <iostream>
 
-namespace expression{
-
+namespace detail{
 class Lexer: public detect_type_functionLexer{
 public:
     Lexer(antlr4::ANTLRInputStream& stream):detect_type_functionLexer(&stream)

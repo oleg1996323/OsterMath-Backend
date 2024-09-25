@@ -19,9 +19,6 @@ public:
   virtual void enterValue_type(detect_type_functionParser::Value_typeContext * /*ctx*/) override { }
   virtual void exitValue_type(detect_type_functionParser::Value_typeContext * /*ctx*/) override { }
 
-  virtual void enterComparator(detect_type_functionParser::ComparatorContext * /*ctx*/) override { }
-  virtual void exitComparator(detect_type_functionParser::ComparatorContext * /*ctx*/) override { }
-
   virtual void enterInput(detect_type_functionParser::InputContext * /*ctx*/) override { }
   virtual void exitInput(detect_type_functionParser::InputContext * /*ctx*/) override { }
 
@@ -33,21 +30,6 @@ public:
 
   virtual void enterVariable(detect_type_functionParser::VariableContext * /*ctx*/) override { }
   virtual void exitVariable(detect_type_functionParser::VariableContext * /*ctx*/) override { }
-
-  virtual void enterVardefinition(detect_type_functionParser::VardefinitionContext * /*ctx*/) override { }
-  virtual void exitVardefinition(detect_type_functionParser::VardefinitionContext * /*ctx*/) override { }
-
-  virtual void enterComparision(detect_type_functionParser::ComparisionContext * /*ctx*/) override { }
-  virtual void exitComparision(detect_type_functionParser::ComparisionContext * /*ctx*/) override { }
-
-  virtual void enterLhs_comp(detect_type_functionParser::Lhs_compContext * /*ctx*/) override { }
-  virtual void exitLhs_comp(detect_type_functionParser::Lhs_compContext * /*ctx*/) override { }
-
-  virtual void enterRhs_comp(detect_type_functionParser::Rhs_compContext * /*ctx*/) override { }
-  virtual void exitRhs_comp(detect_type_functionParser::Rhs_compContext * /*ctx*/) override { }
-
-  virtual void enterExpr_comp(detect_type_functionParser::Expr_compContext * /*ctx*/) override { }
-  virtual void exitExpr_comp(detect_type_functionParser::Expr_compContext * /*ctx*/) override { }
 
   virtual void enterUnaryOp(detect_type_functionParser::UnaryOpContext * /*ctx*/) override { }
   virtual void exitUnaryOp(detect_type_functionParser::UnaryOpContext * /*ctx*/) override { }

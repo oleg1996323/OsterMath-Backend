@@ -3,15 +3,24 @@ project(detector)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_COMPILER "/usr/bin/g++")
+if(NOT CMAKE_BUILD_TYPE)
+    message(FATAL_ERROR "Not defined config")
+endif()
+
+set(DETECTOR_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/include)
+include_directories(${DETECTOR_INCLUDE_DIR})
+
+file(GLOB_RECURSE DETECTOR_SOURCES
+        ${CMAKE_CURRENT_LIST_DIR}/include/**.h
+        ${CMAKE_CURRENT_LIST_DIR}/src/**.cpp)
 
 add_library(
     detector SHARED
     ${ANTLR_detect_type_function_CXX_OUTPUTS}
+    ${DETECTOR_SOURCES}
 )
 target_link_libraries(detector PRIVATE antlr4_static)
 target_compile_definitions(detector PUBLIC $<$<CONFIG:Debug>:DEBUG>)
-
-set(DETECTOR_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/include)
 target_include_directories(detector
                     PUBLIC 
                         ${DETECTOR_INCLUDE_DIR}
@@ -38,8 +47,3 @@ install(
     EXPORT detector
 )
 
-if(NOT CMAKE_BUILD_TYPE)
-    message(FATAL_ERROR "Not defined config")
-endif()
-
-include_directories(${DETECTOR_INCLUDE_DIR})

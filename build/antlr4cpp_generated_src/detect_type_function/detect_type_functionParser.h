@@ -13,22 +13,19 @@ class  detect_type_functionParser : public antlr4::Parser {
 public:
   enum {
     T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, 
-    T__7 = 8, VARIABLE = 9, DATABASE = 10, WS = 11, EOL = 12, LARGER = 13, 
-    LARGER_EQUAL = 14, EQUAL = 15, LESS = 16, LESS_EQUAL = 17, UINT = 18, 
-    ADD = 19, SUB = 20, MUL = 21, DIV = 22, POW = 23, SUMPRODUCT = 24, SUMPRODUCT_I = 25, 
-    SUM = 26, SUM_I = 27, PRODUCT = 28, PRODUCT_I = 29, LN = 30, LG = 31, 
-    LOG_X = 32, EXP = 33, SQRT = 34, PI = 35, COS = 36, SIN = 37, ASIN = 38, 
-    ACOS = 39, FACTORIAL = 40, QUOTE = 41, ASTERISK = 42, EXPONENT = 43, 
-    FLOAT = 44, ID_NUMBER = 45, STRING = 46
+    VARIABLE = 8, DATABASE = 9, WS = 10, EOL = 11, UINT = 12, ADD = 13, 
+    SUB = 14, MUL = 15, DIV = 16, POW = 17, SUMPRODUCT = 18, SUMPRODUCT_I = 19, 
+    SUM = 20, SUM_I = 21, PRODUCT = 22, PRODUCT_I = 23, LN = 24, LG = 25, 
+    LOG_X = 26, EXP = 27, SQRT = 28, PI = 29, COS = 30, SIN = 31, ASIN = 32, 
+    ACOS = 33, FACTORIAL = 34, QUOTE = 35, ASTERISK = 36, EXPONENT = 37, 
+    FLOAT = 38, ID_NUMBER = 39, STRING = 40
   };
 
   enum {
-    RuleValue_type = 0, RuleComparator = 1, RuleInput = 2, RuleLine_input = 3, 
-    RuleNode_access = 4, RuleVariable = 5, RuleVardefinition = 6, RuleComparision = 7, 
-    RuleLhs_comp = 8, RuleRhs_comp = 9, RuleExpr_comp = 10, RuleExpr = 11, 
-    RuleArray = 12, RuleInput_array = 13, RuleNumber = 14, RuleConstant = 15, 
-    RuleFunction = 16, RuleMultiargfunction = 17, RuleRangefunction = 18, 
-    RuleString = 19
+    RuleValue_type = 0, RuleInput = 1, RuleLine_input = 2, RuleNode_access = 3, 
+    RuleVariable = 4, RuleExpr = 5, RuleArray = 6, RuleInput_array = 7, 
+    RuleNumber = 8, RuleConstant = 9, RuleFunction = 10, RuleMultiargfunction = 11, 
+    RuleRangefunction = 12, RuleString = 13
   };
 
   explicit detect_type_functionParser(antlr4::TokenStream *input);
@@ -49,16 +46,10 @@ public:
 
 
   class Value_typeContext;
-  class ComparatorContext;
   class InputContext;
   class Line_inputContext;
   class Node_accessContext;
   class VariableContext;
-  class VardefinitionContext;
-  class ComparisionContext;
-  class Lhs_compContext;
-  class Rhs_compContext;
-  class Expr_compContext;
   class ExprContext;
   class ArrayContext;
   class Input_arrayContext;
@@ -84,23 +75,6 @@ public:
 
   Value_typeContext* value_type();
 
-  class  ComparatorContext : public antlr4::ParserRuleContext {
-  public:
-    ComparatorContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *LARGER();
-    antlr4::tree::TerminalNode *LARGER_EQUAL();
-    antlr4::tree::TerminalNode *EQUAL();
-    antlr4::tree::TerminalNode *LESS();
-    antlr4::tree::TerminalNode *LESS_EQUAL();
-
-    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
-    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
-   
-  };
-
-  ComparatorContext* comparator();
-
   class  InputContext : public antlr4::ParserRuleContext {
   public:
     InputContext(antlr4::ParserRuleContext *parent, size_t invokingState);
@@ -120,8 +94,8 @@ public:
   public:
     Line_inputContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    VardefinitionContext *vardefinition();
-    ComparisionContext *comparision();
+    ArrayContext *array();
+    ExprContext *expr();
 
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
     virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
@@ -162,86 +136,6 @@ public:
   };
 
   VariableContext* variable();
-
-  class  VardefinitionContext : public antlr4::ParserRuleContext {
-  public:
-    VardefinitionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *EQUAL();
-    antlr4::tree::TerminalNode *EOL();
-    std::vector<antlr4::tree::TerminalNode *> WS();
-    antlr4::tree::TerminalNode* WS(size_t i);
-    Value_typeContext *value_type();
-    antlr4::tree::TerminalNode *VARIABLE();
-    antlr4::tree::TerminalNode *DATABASE();
-    Node_accessContext *node_access();
-
-    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
-    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
-   
-  };
-
-  VardefinitionContext* vardefinition();
-
-  class  ComparisionContext : public antlr4::ParserRuleContext {
-  public:
-    ComparisionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    Lhs_compContext *lhs_comp();
-    ComparatorContext *comparator();
-    Rhs_compContext *rhs_comp();
-    antlr4::tree::TerminalNode *EOL();
-    antlr4::tree::TerminalNode *VARIABLE();
-    std::vector<antlr4::tree::TerminalNode *> WS();
-    antlr4::tree::TerminalNode* WS(size_t i);
-    Expr_compContext *expr_comp();
-    antlr4::tree::TerminalNode *DATABASE();
-
-    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
-    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
-   
-  };
-
-  ComparisionContext* comparision();
-
-  class  Lhs_compContext : public antlr4::ParserRuleContext {
-  public:
-    Lhs_compContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    ExprContext *expr();
-
-    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
-    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
-   
-  };
-
-  Lhs_compContext* lhs_comp();
-
-  class  Rhs_compContext : public antlr4::ParserRuleContext {
-  public:
-    Rhs_compContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    ExprContext *expr();
-
-    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
-    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
-   
-  };
-
-  Rhs_compContext* rhs_comp();
-
-  class  Expr_compContext : public antlr4::ParserRuleContext {
-  public:
-    Expr_compContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    ExprContext *expr();
-
-    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
-    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
-   
-  };
-
-  Expr_compContext* expr_comp();
 
   class  ExprContext : public antlr4::ParserRuleContext {
   public:

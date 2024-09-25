@@ -1,10 +1,10 @@
 #pragma once
-#include "arithmetic_types.h"
 #include "detect_type_functionParser.h"
 
-namespace expression{
+namespace detail{
 namespace item{
-    enum ITEM_TYPE{
+    enum class ITEM_TYPE{
+        NONE,
         UNKNOWN,
         VARIABLE,
         PARENTHESES,
@@ -13,25 +13,64 @@ namespace item{
         RANGE_FUNCTION,
         FUNCTION,
         ARRAY,
-        VALUE
+        VALUE,
+        LITERAL,
+        STRING
+    };
+    enum class FUNCTION{
+        NONE,
+        LN,
+        LG,
+        LOG_X,
+        FACTORIAL,
+        SIN,
+        COS,
+        ASIN,
+        ACOS,
+        SQRT,
+        EXP,
+        SUM,
+        PRODUCT,
+        SUMPRODUCT,
+        SUM_I,
+        PRODUCT_I
     };
 }
 class __ParseSegmentation__{
-    struct PARSING_INFO{
-        uint32_t start_ = 0;
-        uint32_t stop_ = 0-1;
-        std::unique_ptr<PARSING_INFO> next_;
-        item::ITEM_TYPE;
-    }
     public:
-    
-    __ParseSegmentation__(){
-        Node node = Node();
-    }
-    private:
-    
-};
-//TODO add enums from arithmetic_types.h
+    struct PARSING_INFO{
+        private:
+        
+        uint32_t start_ = 0;
+        uint32_t stop_ = 0;
+        public:
+        PARSING_INFO* prev_ = nullptr;
+        PARSING_INFO* next_ = nullptr;
+        bool initialized_ = false;
+        item::ITEM_TYPE type_=item::ITEM_TYPE::NONE;
+        item::FUNCTION func_=item::FUNCTION::NONE;
 
-item::ITEM_TYPE parse(std::string expression);
+        PARSING_INFO(PARSING_INFO*);
+        ~PARSING_INFO();
+        PARSING_INFO& init(uint32_t start, uint32_t stop);
+        void push_back(PARSING_INFO*);
+        bool operator==(const PARSING_INFO&);
+    };
+
+    __ParseSegmentation__(const std::string&);
+    private:
+    std::string expression_{};
+    PARSING_INFO* parse_result_;
+};
+
+class ExpressionDynamicChangeManager:public __ParseSegmentation__{
+    public:
+    //any new result struct put("")
+    void setPos();
+};
+
+__ParseSegmentation__::PARSING_INFO parse(const std::string&);
 }
+
+using ItemsParsingInfo = detail::__ParseSegmentation__::PARSING_INFO;
+using ParseExpressionManager = detail::__ParseSegmentation__;

@@ -8,7 +8,24 @@ if(NOT CMAKE_BUILD_TYPE)
     message(FATAL_ERROR "Not defined config")
 endif()
 
+set(Boost_USE_STATIC_LIBS        ON)  # only find static libs
+set(Boost_USE_DEBUG_LIBS        OFF)  # ignore debug libs and
+set(Boost_USE_RELEASE_LIBS       ON)  # only find release libs
+set(Boost_USE_MULTITHREADED      ON)
+set(Boost_USE_STATIC_RUNTIME    OFF)
+
+find_package(Boost 1.75.0 REQUIRED)
+
+if(Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIRS})
+else()
+    message(FATAL_ERROR "Boost not found")
+endif()
+
+set(USER_INTERFACE ON)
+
 set(OSTERMATH_BE_DIR ${CMAKE_CURRENT_LIST_DIR})
+
 include(${CMAKE_CURRENT_LIST_DIR}/grammar/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/detector/CMakeLists.txt)
 
@@ -35,22 +52,6 @@ set(OSTERMATH_BE_INCLUDE_DIR_PRIVATE
                             ${CMAKE_CURRENT_LIST_DIR}/include/exception)
 set(OSTERMATH_BE_LIBRARY_DIR ${CMAKE_CURRENT_LIST_DIR}/lib)
 
-set(Boost_USE_STATIC_LIBS        ON)  # only find static libs
-set(Boost_USE_DEBUG_LIBS        OFF)  # ignore debug libs and
-set(Boost_USE_RELEASE_LIBS       ON)  # only find release libs
-set(Boost_USE_MULTITHREADED      ON)
-set(Boost_USE_STATIC_RUNTIME    OFF)
-
-find_package(Boost 1.75.0 REQUIRED)
-
-if(Boost_FOUND)
-    include_directories(${Boost_INCLUDE_DIRS})
-else()
-    message(FATAL_ERROR "Boost not found")
-endif()
-
-set(USER_INTERFACE ON)
-
 add_library(
     bailerror INTERFACE
     ${CMAKE_CURRENT_LIST_DIR}/src/exception/bailerror.cpp
@@ -71,8 +72,6 @@ add_library(
 )
 target_link_libraries(exceptions PRIVATE antlr4_static)
 set_target_properties(exceptions PROPERTIES POSITION_INDEPENDENT_CODE ON)
-
-message(STATUS "ANTLR_GENERATED_FILES_DIR: ${ANTLR_GENERATED_FILES_DIR} ${ANTLR_head_interactor_OUTPUT_DIR}")
 
 target_include_directories(exceptions
     PUBLIC
@@ -184,7 +183,6 @@ include_directories(${OSTERMATH_BE_INCLUDE_DIR}
 
 add_executable(test ${test_INCLUDE} ${test_SOURCE})
 
-message(STATUS ${OSTERMATH_BE_INCLUDE_DIR} ${DETECTOR_INCLUDE_DIR})
 target_link_libraries(test PRIVATE ostermath_be detector head_interactor)
 target_include_directories(test INTERFACE ${OSTERMATH_BE_INCLUDE_DIR} ${DETECTOR_INCLUDE_DIR})
 target_compile_definitions(test PUBLIC $<$<CONFIG:Debug>:DEBUG>)
@@ -195,7 +193,5 @@ set_target_properties(test
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/shared"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/bin"
 )
-
-message(STATUS ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_test(NAME "test" COMMAND test)
