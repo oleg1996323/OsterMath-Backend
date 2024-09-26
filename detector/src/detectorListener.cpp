@@ -4,159 +4,163 @@
 using namespace std::string_view_literals;
 
 namespace detail{
-
-ItemsParsingInfo* get_info_ptr(void* info){
-    return static_cast<ItemsParsingInfo*>(info);
-}
+BaseListener::BaseListener():
+info(new ItemsParsingInfo(nullptr))
+{}
 BaseListener::~BaseListener(){
     if(info)
-        delete(ItemsParsingInfo*) info;
+        delete info;
 }
-void* BaseListener::get_info() const{
+ItemsParsingInfo* BaseListener::get_info() const{
     return info;
 }
-void BaseListener::enterParens(detect_type_functionParser::ParensContext* ctx){
-    ctx->getStart()->getStartIndex();
+void BaseListener::swap_info(ItemsParsingInfo** other){
+    ItemsParsingInfo* buf = *other;
+    *other = info;
+    info = buf;
 }
-void BaseListener::exitParens(detect_type_functionParser::ParensContext* ctx){
-    ctx->getStop()->getStopIndex();
-}
-void BaseListener::enterVariable(detect_type_functionParser::VariableContext *ctx) {
-    ctx->getStart()->getStartIndex();
-    //if(ctx->)
-}
-void BaseListener::exitVariable(detect_type_functionParser::VariableContext *ctx) {
-    ctx->getStop()->getStopIndex();
-}
-void BaseListener::enterUnaryOp(detect_type_functionParser::UnaryOpContext *ctx) {
-    assert(ctx);
+bool BaseListener::is_root() const noexcept{
     assert(info);
-    get_info_ptr(info)->type_=item::ITEM_TYPE::UNARY;
+    return !info->prev_;
 }
-void BaseListener::exitUnaryOp(detect_type_functionParser::UnaryOpContext* ctx)  {
-    
+void BaseListener::child_containing_item(){
+    if(is_root())
+        info = info->push_back_next(new ItemsParsingInfo(info));
+    else
+        info = info->push_back_child(new ItemsParsingInfo(info));
 }
+void BaseListener::terminal_item(){
+    assert(info);
+    info = info->push_back_child(new ItemsParsingInfo(info));
+}
+void BaseListener::enterParens(detect_type_functionParser::ParensContext* ctx){
+    assert(info);
+    assert(ctx);
+    child_containing_item();
+}
+void BaseListener::exitParens(detect_type_functionParser::ParensContext* ctx){}
+void BaseListener::enterVariable(detect_type_functionParser::VariableContext *ctx) {
+    assert(info);
+    assert(ctx);
+    terminal_item();
+    info->type_ = item::ITEM_TYPE::VARIABLE;
+}
+void BaseListener::exitVariable(detect_type_functionParser::VariableContext *ctx) {}
+void BaseListener::enterUnaryOp(detect_type_functionParser::UnaryOpContext *ctx) {
+    assert(info);
+    assert(ctx);
+    child_containing_item();
+    info->type_=item::ITEM_TYPE::UNARY;
+}
+void BaseListener::exitUnaryOp(detect_type_functionParser::UnaryOpContext* ctx)  {}
 //binary operator {for example: Expr + Expr or Expr / Expr}
 void BaseListener::enterBinaryOp(detect_type_functionParser::BinaryOpContext *ctx) {
     assert(ctx);
     assert(info);
-    get_info_ptr(info)->type_=item::ITEM_TYPE::BINARY;
+    assert(ctx->children.size()==2);
+    child_containing_item();
+    info->type_=item::ITEM_TYPE::BINARY;
 }
-void BaseListener::exitBinaryOp(detect_type_functionParser::BinaryOpContext *ctx) {
-    
-}
-//an array definition {for example: [1,2,3,...]}
+void BaseListener::exitBinaryOp(detect_type_functionParser::BinaryOpContext *ctx) {}
 void BaseListener::enterArray(detect_type_functionParser::ArrayContext *ctx) {
     assert(ctx);
     assert(info);
-    get_info_ptr(info)->type_=item::ITEM_TYPE::ARRAY;
+    child_containing_item();
+    info->type_=item::ITEM_TYPE::ARRAY;
 }
-void BaseListener::exitArray(detect_type_functionParser::ArrayContext *ctx) {
-    
-}
+void BaseListener::exitArray(detect_type_functionParser::ArrayContext *ctx) {}
 void BaseListener::enterLiteral(detect_type_functionParser::LiteralContext *ctx){
     assert(ctx);
     assert(info);
-    get_info_ptr(info)->type_=item::ITEM_TYPE::LITERAL;
+    terminal_item();
+    info->type_=item::ITEM_TYPE::LITERAL;
 }
-void BaseListener::exitLiteral(detect_type_functionParser::LiteralContext *ctx){
-
-}
+void BaseListener::exitLiteral(detect_type_functionParser::LiteralContext *ctx){}
 void BaseListener::enterMultiargfunction(detect_type_functionParser::MultiargfunctionContext* ctx){
     assert(ctx);
     assert(info);
-    ItemsParsingInfo* info_ptr = get_info_ptr(info);
-    info_ptr->type_=item::ITEM_TYPE::FUNCTION;
+    child_containing_item();
+    info->type_=item::ITEM_TYPE::FUNCTION;
     if(ctx->PRODUCT()) //here emplace the function type to info
-        info_ptr->func_ = item::FUNCTION::PRODUCT;
+        info->func_ = item::FUNCTION::PRODUCT;
     else if(ctx->SUMPRODUCT())
-        info_ptr->func_ = item::FUNCTION::SUMPRODUCT;
+        info->func_ = item::FUNCTION::SUMPRODUCT;
     else if(ctx->SUM()){
-        info_ptr->func_ = item::FUNCTION::SUM;
+        info->func_ = item::FUNCTION::SUM;
     }
 }
 void BaseListener::enterFunction(detect_type_functionParser::FunctionContext* ctx){
     assert(ctx);
     assert(info);
-    ItemsParsingInfo* info_ptr = get_info_ptr(info);
-    info_ptr->type_=item::ITEM_TYPE::FUNCTION;
+    child_containing_item();
+    info->type_=item::ITEM_TYPE::FUNCTION;
     if(ctx->LN()){ //here emplace the function type to info
-        info_ptr->func_ = item::FUNCTION::LN;
+        info->func_ = item::FUNCTION::LN;
     }
     else if(ctx->ACOS()){
-        info_ptr->func_ = item::FUNCTION::ACOS;
+        info->func_ = item::FUNCTION::ACOS;
     }
     else if(ctx->ASIN()){
-        info_ptr->func_ = item::FUNCTION::ASIN;
+        info->func_ = item::FUNCTION::ASIN;
     }
     else if(ctx->FACTORIAL()){
-        info_ptr->func_ = item::FUNCTION::FACTORIAL;
+        info->func_ = item::FUNCTION::FACTORIAL;
     }
     else if(ctx->COS()){
-        info_ptr->func_ = item::FUNCTION::COS;
+        info->func_ = item::FUNCTION::COS;
     }
     else if(ctx->SIN()){
-        info_ptr->func_ = item::FUNCTION::SIN;
+        info->func_ = item::FUNCTION::SIN;
     }
     else if(ctx->EXP()){
-        info_ptr->func_ = item::FUNCTION::EXP;
+        info->func_ = item::FUNCTION::EXP;
     }
     else if(ctx->LOG_X()){
-        info_ptr->func_ = item::FUNCTION::LOG_X;
+        info->func_ = item::FUNCTION::LOG_X;
     }
     else if(ctx->LG()){
-        info_ptr->func_ = item::FUNCTION::LG;
+        info->func_ = item::FUNCTION::LG;
     }
     else if(ctx->SQRT()){
-        info_ptr->func_ = item::FUNCTION::SQRT;
+        info->func_ = item::FUNCTION::SQRT;
     }
     else assert(true);
 }
 void BaseListener::enterRangefunction(detect_type_functionParser::RangefunctionContext* ctx){
     assert(ctx);
     assert(info);
-    get_info_ptr(info)->type_=item::ITEM_TYPE::RANGE_FUNCTION;
+    child_containing_item();
+    info->type_=item::ITEM_TYPE::RANGE_FUNCTION;
     if(ctx->PRODUCT_I())//here emplace the function type to info
-        get_info_ptr(info)->type_=item::ITEM_TYPE::RANGE_FUNCTION;
+        info->type_=item::ITEM_TYPE::RANGE_FUNCTION;
     else if(ctx->SUM_I())
-        get_info_ptr(info)->type_=item::ITEM_TYPE::RANGE_FUNCTION;
+        info->type_=item::ITEM_TYPE::RANGE_FUNCTION;
     else assert(true);
 }
-void BaseListener::exitFunction(detect_type_functionParser::FunctionContext* ctx){
-    
-}
-void BaseListener::exitMultiargfunction(detect_type_functionParser::MultiargfunctionContext* ctx){
-    
-}
-void BaseListener::exitRangefunction(detect_type_functionParser::RangefunctionContext* ctx){
-    
-}
+void BaseListener::exitFunction(detect_type_functionParser::FunctionContext* ctx){}
+void BaseListener::exitMultiargfunction(detect_type_functionParser::MultiargfunctionContext* ctx){}
+void BaseListener::exitRangefunction(detect_type_functionParser::RangefunctionContext* ctx){}
 void BaseListener::visitErrorNode(antlr4::tree::ErrorNode* node){
-    
+    std::cerr<<"Error parsing occured"<<std::endl;
 }
 void BaseListener::enterString(detect_type_functionParser::StringContext* ctx){
     assert(ctx);
     assert(info);
-    get_info_ptr(info)->type_=item::ITEM_TYPE::STRING;
+    terminal_item();
+    info->type_=item::ITEM_TYPE::STRING;
 }
-void BaseListener::exitString(detect_type_functionParser::StringContext* ctx){
-    
-}
+void BaseListener::exitString(detect_type_functionParser::StringContext* ctx){}
 void BaseListener::enterEveryRule(antlr4::ParserRuleContext* ctx){
-    if(ctx){
-        if(!info)
-            info = new ItemsParsingInfo(nullptr);
-        else{
-            get_info_ptr(info)->push_back(new ItemsParsingInfo(get_info_ptr(info)));
-        }
-    }
+    
 }
 void BaseListener::exitEveryRule(antlr4::ParserRuleContext* ctx){
     if(ctx){
         assert(info);
-        get_info_ptr(info)->init(
+        info->init(
             ctx->getStart()->getStartIndex(),
             ctx->getStop()->getStopIndex());
+        if(!is_root())
+            info = info->prev_;
     }
 }
 }

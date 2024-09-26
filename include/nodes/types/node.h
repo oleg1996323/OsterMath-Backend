@@ -4,7 +4,7 @@
 #include <vector>
 #include <unordered_set>
 #include <functional>
-#include "def.h"
+#include "nodes/def.h"
 
 class Node;
 class UnaryNode;

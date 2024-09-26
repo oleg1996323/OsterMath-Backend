@@ -19,9 +19,6 @@ public:
   virtual void enterValue_type(detect_type_functionParser::Value_typeContext * /*ctx*/) override { }
   virtual void exitValue_type(detect_type_functionParser::Value_typeContext * /*ctx*/) override { }
 
-  virtual void enterInput(detect_type_functionParser::InputContext * /*ctx*/) override { }
-  virtual void exitInput(detect_type_functionParser::InputContext * /*ctx*/) override { }
-
   virtual void enterLine_input(detect_type_functionParser::Line_inputContext * /*ctx*/) override { }
   virtual void exitLine_input(detect_type_functionParser::Line_inputContext * /*ctx*/) override { }
 
@@ -51,9 +48,6 @@ public:
 
   virtual void enterArray(detect_type_functionParser::ArrayContext * /*ctx*/) override { }
   virtual void exitArray(detect_type_functionParser::ArrayContext * /*ctx*/) override { }
-
-  virtual void enterItemArray(detect_type_functionParser::ItemArrayContext * /*ctx*/) override { }
-  virtual void exitItemArray(detect_type_functionParser::ItemArrayContext * /*ctx*/) override { }
 
   virtual void enterNumber(detect_type_functionParser::NumberContext * /*ctx*/) override { }
   virtual void exitNumber(detect_type_functionParser::NumberContext * /*ctx*/) override { }

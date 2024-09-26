@@ -5,6 +5,7 @@
 #include "detectorLexer.h"
 #include "detectorListener.h"
 #include "detector.h"
+#include 
 
 #ifdef DEBUG
 
@@ -267,16 +268,21 @@ VAR(#I)(0;5) =
     CalculationsCheck(str_in,equal);
 }
 
-void DetectorParsing(const std::string& input_str, detail::__ParseSegmentation__::PARSING_INFO check_val){
-    detail::parse(input_str)==check_val;
+void DetectorParsing(const std::string& input_str, ItemsParsingInfo* check_val){
+    ItemsParsingInfo result = detail::parse(input_str);
+    bool is_equal = (result==*check_val);
 }
 
 void Testing_detector_1(){
     std::string str_in = 
-R"(=SUMPRODUCT(VAR(#I);VAR(#A)) 
-)";
-    detail::__ParseSegmentation__::PARSING_INFO equal(nullptr);
+R"(=SUMPRODUCT(VAR(#I);VAR(#A)))";
+    size_t sz = str_in.size();
+    ItemsParsingInfo* equal =  new ItemsParsingInfo(nullptr);
+    equal->set_start(1);
+    equal->set_stop(str_in.size()-2);
     DetectorParsing(str_in,equal);
+    delete equal;
+    std::cout<<ns_debug_detector_static::count<<std::endl;
 }
 
 #include "detector.h"

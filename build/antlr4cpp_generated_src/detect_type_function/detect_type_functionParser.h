@@ -13,19 +13,19 @@ class  detect_type_functionParser : public antlr4::Parser {
 public:
   enum {
     T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, 
-    VARIABLE = 8, DATABASE = 9, WS = 10, EOL = 11, UINT = 12, ADD = 13, 
-    SUB = 14, MUL = 15, DIV = 16, POW = 17, SUMPRODUCT = 18, SUMPRODUCT_I = 19, 
-    SUM = 20, SUM_I = 21, PRODUCT = 22, PRODUCT_I = 23, LN = 24, LG = 25, 
-    LOG_X = 26, EXP = 27, SQRT = 28, PI = 29, COS = 30, SIN = 31, ASIN = 32, 
-    ACOS = 33, FACTORIAL = 34, QUOTE = 35, ASTERISK = 36, EXPONENT = 37, 
-    FLOAT = 38, ID_NUMBER = 39, STRING = 40
+    VARIABLE = 8, DATABASE = 9, LARGER = 10, LARGER_EQUAL = 11, EQUAL = 12, 
+    LESS = 13, LESS_EQUAL = 14, SUMPRODUCT = 15, SUMPRODUCT_I = 16, SUM = 17, 
+    SUM_I = 18, PRODUCT = 19, PRODUCT_I = 20, LN = 21, LG = 22, LOG_X = 23, 
+    EXP = 24, SQRT = 25, PI = 26, COS = 27, SIN = 28, ASIN = 29, ACOS = 30, 
+    FACTORIAL = 31, STRING = 32, WS = 33, EOL = 34, UINT = 35, ADD = 36, 
+    SUB = 37, MUL = 38, DIV = 39, POW = 40, QUOTE = 41, ASTERISK = 42, EXPONENT = 43, 
+    FLOAT = 44, ID_NUMBER = 45
   };
 
   enum {
-    RuleValue_type = 0, RuleInput = 1, RuleLine_input = 2, RuleNode_access = 3, 
-    RuleVariable = 4, RuleExpr = 5, RuleArray = 6, RuleInput_array = 7, 
-    RuleNumber = 8, RuleConstant = 9, RuleFunction = 10, RuleMultiargfunction = 11, 
-    RuleRangefunction = 12, RuleString = 13
+    RuleValue_type = 0, RuleLine_input = 1, RuleNode_access = 2, RuleVariable = 3, 
+    RuleExpr = 4, RuleArray = 5, RuleNumber = 6, RuleConstant = 7, RuleFunction = 8, 
+    RuleMultiargfunction = 9, RuleRangefunction = 10, RuleString = 11
   };
 
   explicit detect_type_functionParser(antlr4::TokenStream *input);
@@ -46,13 +46,11 @@ public:
 
 
   class Value_typeContext;
-  class InputContext;
   class Line_inputContext;
   class Node_accessContext;
   class VariableContext;
   class ExprContext;
   class ArrayContext;
-  class Input_arrayContext;
   class NumberContext;
   class ConstantContext;
   class FunctionContext;
@@ -74,21 +72,6 @@ public:
   };
 
   Value_typeContext* value_type();
-
-  class  InputContext : public antlr4::ParserRuleContext {
-  public:
-    InputContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    std::vector<Line_inputContext *> line_input();
-    Line_inputContext* line_input(size_t i);
-    antlr4::tree::TerminalNode *EOF();
-
-    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
-    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
-   
-  };
-
-  InputContext* input();
 
   class  Line_inputContext : public antlr4::ParserRuleContext {
   public:
@@ -225,8 +208,10 @@ public:
   public:
     ArrayContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    std::vector<Input_arrayContext *> input_array();
-    Input_arrayContext* input_array(size_t i);
+    std::vector<ExprContext *> expr();
+    ExprContext* expr(size_t i);
+    std::vector<ArrayContext *> array();
+    ArrayContext* array(size_t i);
     std::vector<antlr4::tree::TerminalNode *> WS();
     antlr4::tree::TerminalNode* WS(size_t i);
 
@@ -236,31 +221,6 @@ public:
   };
 
   ArrayContext* array();
-
-  class  Input_arrayContext : public antlr4::ParserRuleContext {
-  public:
-    Input_arrayContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-   
-    Input_arrayContext() = default;
-    void copyFrom(Input_arrayContext *context);
-    using antlr4::ParserRuleContext::copyFrom;
-
-    virtual size_t getRuleIndex() const override;
-
-   
-  };
-
-  class  ItemArrayContext : public Input_arrayContext {
-  public:
-    ItemArrayContext(Input_arrayContext *ctx);
-
-    ArrayContext *array();
-    ExprContext *expr();
-    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
-    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
-  };
-
-  Input_arrayContext* input_array();
 
   class  NumberContext : public antlr4::ParserRuleContext {
   public:

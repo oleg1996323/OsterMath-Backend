@@ -17,9 +17,6 @@ public:
   virtual void enterValue_type(detect_type_functionParser::Value_typeContext *ctx) = 0;
   virtual void exitValue_type(detect_type_functionParser::Value_typeContext *ctx) = 0;
 
-  virtual void enterInput(detect_type_functionParser::InputContext *ctx) = 0;
-  virtual void exitInput(detect_type_functionParser::InputContext *ctx) = 0;
-
   virtual void enterLine_input(detect_type_functionParser::Line_inputContext *ctx) = 0;
   virtual void exitLine_input(detect_type_functionParser::Line_inputContext *ctx) = 0;
 
@@ -49,9 +46,6 @@ public:
 
   virtual void enterArray(detect_type_functionParser::ArrayContext *ctx) = 0;
   virtual void exitArray(detect_type_functionParser::ArrayContext *ctx) = 0;
-
-  virtual void enterItemArray(detect_type_functionParser::ItemArrayContext *ctx) = 0;
-  virtual void exitItemArray(detect_type_functionParser::ItemArrayContext *ctx) = 0;
 
   virtual void enterNumber(detect_type_functionParser::NumberContext *ctx) = 0;
   virtual void exitNumber(detect_type_functionParser::NumberContext *ctx) = 0;

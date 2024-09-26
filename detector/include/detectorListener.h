@@ -1,13 +1,19 @@
 #pragma once
 #include "detect_type_functionBaseListener.h"
+#include "detector.h"
 
 using namespace std::string_view_literals;
 namespace detail{
 class BaseListener: public detect_type_functionBaseListener{
     public:
-    void* info;
+    ItemsParsingInfo* info;
+    BaseListener();
     ~BaseListener();
-    void* get_info() const;
+    ItemsParsingInfo* get_info() const;
+    void swap_info(ItemsParsingInfo**);
+    bool is_root() const noexcept;
+    void child_containing_item();
+    void terminal_item();
     virtual void enterParens(detect_type_functionParser::ParensContext* ctx) override;
     virtual void exitParens(detect_type_functionParser::ParensContext* ctx) override;
     virtual void enterVariable(detect_type_functionParser::VariableContext *ctx) override;

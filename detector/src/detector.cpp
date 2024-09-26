@@ -3,14 +3,19 @@
 #include "detectorListener.h"
 #include "BaseErrorListener.h"
 #include "BailErrorStrategy.h"
+#include "def.h"
 
 namespace detail{
-    __ParseSegmentation__::__ParseSegmentation__(const std::string&){
+    __ParseSegmentation__::__ParseSegmentation__(const std::string& text):
+    expression_(text){
 
     }
     
-    ItemsParsingInfo::PARSING_INFO::PARSING_INFO(PARSING_INFO* prev):
-    prev_(prev){}
+    ItemsParsingInfo::PARSING_INFO::PARSING_INFO(ItemsParsingInfo* prev):
+    prev_(prev){
+        ++count;
+        std::cout<<count<<std::endl;
+    }
 
     ItemsParsingInfo& ItemsParsingInfo::init(uint32_t start, uint32_t stop){
         start_ = start;
@@ -19,7 +24,7 @@ namespace detail{
         return *this;
     }
 
-    bool ItemsParsingInfo::operator==(const PARSING_INFO& other){
+    bool ItemsParsingInfo::operator==(const ItemsParsingInfo& other){
         return  initialized_ || other.initialized_?
                 (initialized_&&other.initialized_?
                 (start_==other.start_ &&
@@ -28,16 +33,35 @@ namespace detail{
                 (next_ || other.next_)?(next_&&other.next_?*next_==*other.next_:false):true):false):true;
     }
 
-    void ItemsParsingInfo::push_back(PARSING_INFO* ptr){
+    ItemsParsingInfo* ItemsParsingInfo::push_back_next(ItemsParsingInfo* ptr){
         assert(ptr);
         if(next_)
-            next_->push_back(ptr);
+            return next_->push_back_next(ptr);
         else next_ = ptr;
+        return next_;
+    }
+
+    ItemsParsingInfo* ItemsParsingInfo::push_back_child(ItemsParsingInfo* ptr){
+        assert(ptr);
+        return childs_.emplace_back(ptr);
+    }
+
+    void ItemsParsingInfo::set_start(uint32_t start_pos){
+        start_ = start_pos;
+    }
+    void ItemsParsingInfo::set_stop(uint32_t stop_pos){
+        stop_ = stop_pos;
     }
 
     ItemsParsingInfo::~PARSING_INFO(){
+        --count;
+        std::cout<<count<<std::endl;
         if(next_)
             delete next_;
+        if(!childs_.empty()){
+            for(ItemsParsingInfo* child:childs_)
+                delete child;
+        }
     }
 
     ItemsParsingInfo parse(const std::string& expression){
@@ -59,14 +83,15 @@ namespace detail{
         auto error_handler = std::make_shared<antlr4::DefaultErrorStrategy>();
         base_parser_->setErrorHandler(error_handler);
         base_parser_->removeErrorListeners();
-        tree_ = base_parser_->input();
+        tree_ = base_parser_->line_input();
         antlr4::tree::ParseTreeWalker::DEFAULT.walk(listener_,tree_);
-        ItemsParsingInfo result = *reinterpret_cast<ItemsParsingInfo*>(listener_->get_info());
+        ItemsParsingInfo* result = nullptr;
+        listener_->swap_info(&result);
         delete antlr_stream_;
         delete lexer_;
         delete base_parser_;
         delete listener_;
         delete error_listener;
-        return result;
+        return *result;
     }
 }
