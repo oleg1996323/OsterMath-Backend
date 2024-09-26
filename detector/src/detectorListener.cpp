@@ -33,50 +33,50 @@ void BaseListener::terminal_item(){
     assert(info);
     info = info->push_back_child(new ItemsParsingInfo(info));
 }
-void BaseListener::enterParens(detect_type_functionParser::ParensContext* ctx){
+void BaseListener::enterParens(detect_type_function::ParensContext* ctx){
     assert(info);
     assert(ctx);
     child_containing_item();
 }
-void BaseListener::exitParens(detect_type_functionParser::ParensContext* ctx){}
-void BaseListener::enterVariable(detect_type_functionParser::VariableContext *ctx) {
+void BaseListener::exitParens(detect_type_function::ParensContext* ctx){}
+void BaseListener::enterVariable(detect_type_function::VariableContext *ctx) {
     assert(info);
     assert(ctx);
     terminal_item();
     info->type_ = item::ITEM_TYPE::VARIABLE;
 }
-void BaseListener::exitVariable(detect_type_functionParser::VariableContext *ctx) {}
-void BaseListener::enterUnaryOp(detect_type_functionParser::UnaryOpContext *ctx) {
+void BaseListener::exitVariable(detect_type_function::VariableContext *ctx) {}
+void BaseListener::enterUnaryOp(detect_type_function::UnaryOpContext *ctx) {
     assert(info);
     assert(ctx);
     child_containing_item();
     info->type_=item::ITEM_TYPE::UNARY;
 }
-void BaseListener::exitUnaryOp(detect_type_functionParser::UnaryOpContext* ctx)  {}
+void BaseListener::exitUnaryOp(detect_type_function::UnaryOpContext* ctx)  {}
 //binary operator {for example: Expr + Expr or Expr / Expr}
-void BaseListener::enterBinaryOp(detect_type_functionParser::BinaryOpContext *ctx) {
+void BaseListener::enterBinaryOp(detect_type_function::BinaryOpContext *ctx) {
     assert(ctx);
     assert(info);
     assert(ctx->children.size()==2);
     child_containing_item();
     info->type_=item::ITEM_TYPE::BINARY;
 }
-void BaseListener::exitBinaryOp(detect_type_functionParser::BinaryOpContext *ctx) {}
-void BaseListener::enterArray(detect_type_functionParser::ArrayContext *ctx) {
+void BaseListener::exitBinaryOp(detect_type_function::BinaryOpContext *ctx) {}
+void BaseListener::enterArray(detect_type_function::ArrayContext *ctx) {
     assert(ctx);
     assert(info);
     child_containing_item();
     info->type_=item::ITEM_TYPE::ARRAY;
 }
-void BaseListener::exitArray(detect_type_functionParser::ArrayContext *ctx) {}
-void BaseListener::enterLiteral(detect_type_functionParser::LiteralContext *ctx){
+void BaseListener::exitArray(detect_type_function::ArrayContext *ctx) {}
+void BaseListener::enterLiteral(detect_type_function::LiteralContext *ctx){
     assert(ctx);
     assert(info);
     terminal_item();
     info->type_=item::ITEM_TYPE::LITERAL;
 }
-void BaseListener::exitLiteral(detect_type_functionParser::LiteralContext *ctx){}
-void BaseListener::enterMultiargfunction(detect_type_functionParser::MultiargfunctionContext* ctx){
+void BaseListener::exitLiteral(detect_type_function::LiteralContext *ctx){}
+void BaseListener::enterMultiargfunction(detect_type_function::MultiargfunctionContext* ctx){
     assert(ctx);
     assert(info);
     child_containing_item();
@@ -89,7 +89,7 @@ void BaseListener::enterMultiargfunction(detect_type_functionParser::Multiargfun
         info->func_ = item::FUNCTION::SUM;
     }
 }
-void BaseListener::enterFunction(detect_type_functionParser::FunctionContext* ctx){
+void BaseListener::enterFunction(detect_type_function::FunctionContext* ctx){
     assert(ctx);
     assert(info);
     child_containing_item();
@@ -126,7 +126,7 @@ void BaseListener::enterFunction(detect_type_functionParser::FunctionContext* ct
     }
     else assert(true);
 }
-void BaseListener::enterRangefunction(detect_type_functionParser::RangefunctionContext* ctx){
+void BaseListener::enterRangefunction(detect_type_function::RangefunctionContext* ctx){
     assert(ctx);
     assert(info);
     child_containing_item();
@@ -137,19 +137,19 @@ void BaseListener::enterRangefunction(detect_type_functionParser::RangefunctionC
         info->type_=item::ITEM_TYPE::RANGE_FUNCTION;
     else assert(true);
 }
-void BaseListener::exitFunction(detect_type_functionParser::FunctionContext* ctx){}
-void BaseListener::exitMultiargfunction(detect_type_functionParser::MultiargfunctionContext* ctx){}
-void BaseListener::exitRangefunction(detect_type_functionParser::RangefunctionContext* ctx){}
+void BaseListener::exitFunction(detect_type_function::FunctionContext* ctx){}
+void BaseListener::exitMultiargfunction(detect_type_function::MultiargfunctionContext* ctx){}
+void BaseListener::exitRangefunction(detect_type_function::RangefunctionContext* ctx){}
 void BaseListener::visitErrorNode(antlr4::tree::ErrorNode* node){
     std::cerr<<"Error parsing occured"<<std::endl;
 }
-void BaseListener::enterString(detect_type_functionParser::StringContext* ctx){
+void BaseListener::enterString(detect_type_function::StringContext* ctx){
     assert(ctx);
     assert(info);
     terminal_item();
     info->type_=item::ITEM_TYPE::STRING;
 }
-void BaseListener::exitString(detect_type_functionParser::StringContext* ctx){}
+void BaseListener::exitString(detect_type_function::StringContext* ctx){}
 void BaseListener::enterEveryRule(antlr4::ParserRuleContext* ctx){
     
 }

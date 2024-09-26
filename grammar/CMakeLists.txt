@@ -61,8 +61,23 @@ add_definitions(
 )
 
 include(${CMAKE_CURRENT_LIST_DIR}/FindANTLR.cmake)
+
+antlr_target(fundamental ${CMAKE_CURRENT_LIST_DIR}/fundamental.g4 LEXER)
+antlr_target(main_lexics ${CMAKE_CURRENT_LIST_DIR}/main_lexics.g4 LEXER)
+
+target_include_directories(antlr4_static INTERFACE ${ANTLR_GENERATED_FILES_DIR})
+
+
 include(${CMAKE_CURRENT_LIST_DIR}/head_interactor.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/detector_parser.cmake)
+
+set_target_properties(antlr4_static
+    PROPERTIES
+    POSITION_INDEPENDENT_CODE ON
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/shared"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/bin"
+)
 
 include_directories(
     ${ANTLR_GENERATED_FILES_DIR}

@@ -15,22 +15,13 @@ else()
 endif()
 
 antlr_target(head_interactor ${CMAKE_CURRENT_LIST_DIR}/head_interactor.g4 
-                    LEXER
                     PARSER
-                    LISTENER)
-target_include_directories(antlr4_static INTERFACE ${ANTLR_GENERATED_FILES_DIR})
+                    LISTENER
+                    DEPENDS_ANTLR main_lexics
+                    COMPILE_FLAGS -lib ${ANTLR_main_lexics_OUTPUT_DIR})
 
-
-set_target_properties(antlr4_static
-    PROPERTIES
-    POSITION_INDEPENDENT_CODE ON
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/lib"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/shared"
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/bin"
-)
+target_include_directories(antlr4_static INTERFACE ${ANTLR_GENERATED_FILES_DIR} ${ANTLR_head_interactor_OUTPUT_DIR})
 
 include_directories(
-    ${ANTLR4_INCLUDE_DIRS}
     ${ANTLR_head_interactor_OUTPUT_DIR}
-    ${ANTLR_GENERATED_FILES_DIR}
 )

@@ -9,7 +9,7 @@ Parser::ParseItems::ParseItems(std::istream& stream, BaseData* data_base):
     antlr_stream_(new antlr4::ANTLRInputStream(stream)),
     lexer_(new Lexer(*antlr_stream_)),
     input_(lexer_->GetCommonTokenStream()),
-    base_parser_(new head_interactorParser(input_)),
+    base_parser_(new head_interactor(input_)),
     listener_(new BaseListener(data_base)),
     err_listener_(new bailerror::ErrorListener()){
         lexer_->removeErrorListeners();

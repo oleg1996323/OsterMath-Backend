@@ -1,11 +1,11 @@
 #pragma once
-#include "detect_type_functionLexer.h"
+#include "main_lexics.h"
 #include <iostream>
 
 namespace detail{
-class Lexer: public detect_type_functionLexer{
+class Lexer: public main_lexics{
 public:
-    Lexer(antlr4::ANTLRInputStream& stream):detect_type_functionLexer(&stream)
+    Lexer(antlr4::ANTLRInputStream& stream):main_lexics(&stream)
     {
         token_stream_ = std::make_unique<antlr4::CommonTokenStream>(this);
     }

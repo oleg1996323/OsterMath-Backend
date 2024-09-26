@@ -1,10 +1,10 @@
 #pragma once
 #include "def.h"
-#include "head_interactorLexer.h"
+#include "main_lexics.h"
 
-class Lexer: public head_interactorLexer{
+class Lexer: public main_lexics{
 public:
-    Lexer(antlr4::ANTLRInputStream& stream):head_interactorLexer(&stream)
+    Lexer(antlr4::ANTLRInputStream& stream):main_lexics(&stream)
     {
         token_stream_ = std::make_unique<antlr4::CommonTokenStream>(this);
     }

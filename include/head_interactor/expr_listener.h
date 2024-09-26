@@ -62,80 +62,80 @@ class BaseListener: public head_interactorBaseListener{
     data_base_(data_base)
     {}
 
-    virtual void enterParens(head_interactorParser::ParensContext* ctx) override;
+    virtual void enterParens(head_interactor::ParensContext* ctx) override;
 
-    virtual void exitParens(head_interactorParser::ParensContext* ctx) override;
+    virtual void exitParens(head_interactor::ParensContext* ctx) override;
 
-    virtual void enterVardefinition(head_interactorParser::VardefinitionContext * ctx) override;
+    virtual void enterVardefinition(head_interactor::VardefinitionContext * ctx) override;
     
-    virtual void exitVardefinition(head_interactorParser::VardefinitionContext * ctx) override;
+    virtual void exitVardefinition(head_interactor::VardefinitionContext * ctx) override;
 
-    virtual void enterVariable(head_interactorParser::VariableContext *ctx) override;
+    virtual void enterVariable(head_interactor::VariableContext *ctx) override;
 
-    virtual void exitVariable(head_interactorParser::VariableContext *ctx) override;
+    virtual void exitVariable(head_interactor::VariableContext *ctx) override;
 
-    virtual void enterUnaryOp(head_interactorParser::UnaryOpContext *ctx) override;
+    virtual void enterUnaryOp(head_interactor::UnaryOpContext *ctx) override;
 
-    virtual void exitUnaryOp(head_interactorParser::UnaryOpContext* ctx) override;
+    virtual void exitUnaryOp(head_interactor::UnaryOpContext* ctx) override;
 
-    virtual void enterLiteral(head_interactorParser::LiteralContext *ctx) override;
+    virtual void enterLiteral(head_interactor::LiteralContext *ctx) override;
 
-    virtual void exitLiteral(head_interactorParser::LiteralContext *ctx) override;
+    virtual void exitLiteral(head_interactor::LiteralContext *ctx) override;
 
     //a connstant definition {for example: Lg(Expr)}
-    virtual void enterConstant(head_interactorParser::ConstantContext *ctx) override;
+    virtual void enterConstant(head_interactor::ConstantContext *ctx) override;
 
-    virtual void exitConstant(head_interactorParser::ConstantContext *ctx) override;
+    virtual void exitConstant(head_interactor::ConstantContext *ctx) override;
 
     //binary operator {for example: Expr + Expr or Expr / Expr}
-    virtual void enterBinaryOp(head_interactorParser::BinaryOpContext *ctx) override;
+    virtual void enterBinaryOp(head_interactor::BinaryOpContext *ctx) override;
 
-    virtual void exitBinaryOp(head_interactorParser::BinaryOpContext *ctx) override;
+    virtual void exitBinaryOp(head_interactor::BinaryOpContext *ctx) override;
 
     //an array definition {for example: [1,2,3,...]}
-    virtual void enterArray(head_interactorParser::ArrayContext *ctx) override;
+    virtual void enterArray(head_interactor::ArrayContext *ctx) override;
 
-    virtual void exitArray(head_interactorParser::ArrayContext *ctx) override;
+    virtual void exitArray(head_interactor::ArrayContext *ctx) override;
 
-    virtual void enterItemArray(head_interactorParser::ItemArrayContext *ctx) override;
+    virtual void enterItemArray(head_interactor::ItemArrayContext *ctx) override;
 
-    virtual void exitItemArray(head_interactorParser::ItemArrayContext *ctx) override;
+    virtual void exitItemArray(head_interactor::ItemArrayContext *ctx) override;
 
-    virtual void enterRangefunction(head_interactorParser::RangefunctionContext* ctx) override;
+    virtual void enterRangefunction(head_interactor::RangefunctionContext* ctx) override;
 
-    virtual void exitRangefunction(head_interactorParser::RangefunctionContext* ctx) override;
+    virtual void exitRangefunction(head_interactor::RangefunctionContext* ctx) override;
 
-    virtual void enterNumber(head_interactorParser::NumberContext* ctx) override;
+    virtual void enterNumber(head_interactor::NumberContext* ctx) override;
 
-    virtual void exitNumber(head_interactorParser::NumberContext* ctx) override;
+    virtual void exitNumber(head_interactor::NumberContext* ctx) override;
 
-    virtual void enterMultiargfunction(head_interactorParser::MultiargfunctionContext* ctx) override;
+    virtual void enterMultiargfunction(head_interactor::MultiargfunctionContext* ctx) override;
 
-    virtual void exitMultiargfunction(head_interactorParser::MultiargfunctionContext* ctx) override;
+    virtual void exitMultiargfunction(head_interactor::MultiargfunctionContext* ctx) override;
 
-    virtual void enterFunction(head_interactorParser::FunctionContext* ctx) override;
+    virtual void enterFunction(head_interactor::FunctionContext* ctx) override;
 
-    virtual void exitFunction(head_interactorParser::FunctionContext* ctx) override;
+    virtual void exitFunction(head_interactor::FunctionContext* ctx) override;
 
-    virtual void enterComparision(head_interactorParser::ComparisionContext* ctx) override;
+    virtual void enterComparision(head_interactor::ComparisionContext* ctx) override;
 
-    virtual void exitComparision(head_interactorParser::ComparisionContext* ctx) override;
+    virtual void exitComparision(head_interactor::ComparisionContext* ctx) override;
 
-    virtual void enterLhs_comp(head_interactorParser::Lhs_compContext* ctx) override;
+    virtual void enterLhs_comp(head_interactor::Lhs_compContext* ctx) override;
 
-    virtual void exitLhs_comp(head_interactorParser::Lhs_compContext* ctx) override;
+    virtual void exitLhs_comp(head_interactor::Lhs_compContext* ctx) override;
 
-    virtual void enterRhs_comp(head_interactorParser::Rhs_compContext* ctx) override;
+    virtual void enterRhs_comp(head_interactor::Rhs_compContext* ctx) override;
 
-    virtual void exitRhs_comp(head_interactorParser::Rhs_compContext* ctx) override;
+    virtual void exitRhs_comp(head_interactor::Rhs_compContext* ctx) override;
 
-    virtual void enterExpr_comp(head_interactorParser::Expr_compContext* ctx) override;
+    virtual void enterExpr_comp(head_interactor::Expr_compContext* ctx) override;
 
-    virtual void exitExpr_comp(head_interactorParser::Expr_compContext* ctx) override;
+    virtual void exitExpr_comp(head_interactor::Expr_compContext* ctx) override;
 
-    virtual void enterString(head_interactorParser::StringContext * ctx) override;
+    virtual void enterString(head_interactor::StringContext * ctx) override;
 
-    virtual void exitString(head_interactorParser::StringContext * ctx) override;
+    virtual void exitString(head_interactor::StringContext * ctx) override;
 
     virtual void visitErrorNode(antlr4::tree::ErrorNode * /*node*/) override;
 

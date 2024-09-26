@@ -3,7 +3,7 @@
 #include "detectorListener.h"
 #include "BaseErrorListener.h"
 #include "BailErrorStrategy.h"
-#include "def.h"
+#include "definitions.h"
 
 namespace detail{
     __ParseSegmentation__::__ParseSegmentation__(const std::string& text):
@@ -13,8 +13,8 @@ namespace detail{
     
     ItemsParsingInfo::PARSING_INFO::PARSING_INFO(ItemsParsingInfo* prev):
     prev_(prev){
-        ++count;
-        std::cout<<count<<std::endl;
+        ++ns_debug_detector_static::count;
+        std::cout<<ns_debug_detector_static::count<<std::endl;
     }
 
     ItemsParsingInfo& ItemsParsingInfo::init(uint32_t start, uint32_t stop){
@@ -54,8 +54,8 @@ namespace detail{
     }
 
     ItemsParsingInfo::~PARSING_INFO(){
-        --count;
-        std::cout<<count<<std::endl;
+        --ns_debug_detector_static::count;
+        std::cout<<ns_debug_detector_static::count<<std::endl;
         if(next_)
             delete next_;
         if(!childs_.empty()){
@@ -70,12 +70,12 @@ namespace detail{
         antlr4::ANTLRInputStream* antlr_stream_ = new antlr4::ANTLRInputStream(stream);
         Lexer* lexer_ = new Lexer(*antlr_stream_);
         antlr4::CommonTokenStream* input_;
-        detect_type_functionParser* base_parser_;
+        detect_type_function* base_parser_;
         antlr4::BaseErrorListener* error_listener;
         BaseListener* listener_;
         antlr4::tree::ParseTree* tree_;
         input_ = lexer_->GetCommonTokenStream();
-        base_parser_ = new detect_type_functionParser(input_);
+        base_parser_ = new detect_type_function(input_);
         listener_ = new BaseListener();
         error_listener = new antlr4::BaseErrorListener();
         lexer_->removeErrorListeners();

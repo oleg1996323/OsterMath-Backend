@@ -14,25 +14,14 @@ else()
     )
 endif()
 
-add_definitions(
-    -DANTLR4CPP_STATIC
-    -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS
-)
-
 antlr_target(detect_type_function ${CMAKE_CURRENT_LIST_DIR}/detect_type_function.g4 
-                        LEXER
-                        PARSER
-                        LISTENER)
+                                    PARSER
+                                    LISTENER
+                                    DEPENDS_ANTLR main_lexics
+                                    COMPILE_FLAGS -lib ${ANTLR_main_lexics_OUTPUT_DIR})
 
-target_include_directories(antlr4_static INTERFACE ${ANTLR_GENERATED_FILES_DIR})
+target_include_directories(antlr4_static INTERFACE ${ANTLR_GENERATED_FILES_DIR} ${ANTLR_detect_type_function_OUTPUT_DIR})
 
-set_target_properties(antlr4_static
-    PROPERTIES
-    POSITION_INDEPENDENT_CODE ON
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/lib"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/shared"
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/bin"
-)
 set(WITH_STATIC_CRT OFF CACHE BOOL "Visual C++ static CRT for ANTLR" FORCE)
 
 include_directories(

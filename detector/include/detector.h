@@ -1,6 +1,7 @@
 #pragma once
-#include "detect_type_functionParser.h"
 #include <functional>
+#include <cstdint>
+#include <string>
 
 namespace detail{
 namespace item{

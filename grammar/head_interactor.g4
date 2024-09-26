@@ -1,5 +1,5 @@
-grammar head_interactor;
-import main_lexics;
+parser grammar head_interactor;
+options { tokenVocab=main_lexics; }
 
 value_type: array | expr | string;
 comparator: LARGER | LARGER_EQUAL | EQUAL | LESS | LESS_EQUAL;
@@ -15,20 +15,20 @@ line_input:
     ;
 
 node_access:
-    WS* ('(' WS* ')') | ('('WS* UINT WS* ')') | ('(' WS* UINT WS* (';' WS* UINT)* WS* ')') WS*
+    WS* (Lb WS* Rb) | (LbWS* UINT WS* Rb) | (Lb WS* UINT WS* (SEPAR WS* UINT)* WS* Rb) WS*
     ;
 
 variable:
-    WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*)')'node_access?) | (VARIABLE node_access?))  WS*
+    WS* ((VAR_TAG Lb (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*)Rb node_access?) | (VARIABLE node_access?))  WS*
     ;
 
 vardefinition:
-    WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*)')'node_access?) | (VARIABLE node_access?)) WS* '=' WS* value_type? WS* EOL
+    WS* ((VAR_TAG Lb (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*)Rb node_access?) | (VARIABLE node_access?)) WS* EQUAL WS* value_type? WS* EOL
     ;
 
 comparision:
-    WS* (('VAR(' (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) ')') | WS* VARIABLE WS*)  WS* ':' WS* lhs_comp WS* comparator
-     WS* rhs_comp WS* (':' WS* expr_comp WS*)? EOL
+    WS* ((VAR_TAG Lb (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) Rb) | WS* VARIABLE WS*)  WS* COL WS* lhs_comp WS* comparator
+     WS* rhs_comp WS* (COL WS* expr_comp WS*)? EOL
     ;
 
 lhs_comp:
@@ -45,7 +45,7 @@ expr_comp:
 
 expr
     : 
-    '(' expr ')'                                            # Parens
+    Lb expr Rb                                              # Parens
     | variable                                              # VariableInExpr
     | (function | multiargfunction | rangefunction)         # FunctionCall
     | (number | constant)                                   # Literal
@@ -57,7 +57,7 @@ expr
 
 array
     :
-    '[' WS* input_array WS* (';' WS* input_array)*']'
+    BEG_ARR WS* input_array WS* (SEPAR WS* input_array)*END_ARR
     ;
 
 input_array:
@@ -74,32 +74,32 @@ constant:
     ;
 
 function
-    : WS* LN '(' WS* expr WS* ')' WS*
-    | WS* LG '(' WS* expr WS* ')' WS*
-    | WS* EXP '(' WS* expr WS* ')' WS*
-    | WS* SQRT '(' WS* expr WS* ')' WS*
-    | WS* COS '('WS* expr WS*')' WS*
-    | WS* SIN '('WS* expr WS*')' WS*
-    | WS* ACOS '('WS* expr WS*')' WS*
-    | WS* ASIN '('WS* expr WS*')' WS*
-    | WS* FACTORIAL '('WS* expr WS*')' WS*
-    | WS* LOG_X '(' WS* expr WS* ';' WS* expr WS* ')' WS*
+    : WS* LN Lb WS* expr WS* Rb WS*
+    | WS* LG Lb WS* expr WS* Rb WS*
+    | WS* EXP Lb WS* expr WS* Rb WS*
+    | WS* SQRT Lb WS* expr WS* Rb WS*
+    | WS* COS Lb WS* expr WS* Rb WS*
+    | WS* SIN Lb WS* expr WS* Rb WS*
+    | WS* ACOS Lb WS* expr WS* Rb WS*
+    | WS* ASIN Lb WS* expr WS* Rb WS*
+    | WS* FACTORIAL Lb WS* expr WS* Rb WS*
+    | WS* LOG_X Lb WS* expr WS* SEPAR WS* expr WS*  Rb WS*
     ;
 
 multiargfunction
     :
-    WS* SUMPRODUCT '(' expr ';' expr (';' expr )*')'
-    | WS* SUM '(' expr ';' expr (';' expr )*')'
-    | WS* PRODUCT '(' expr ';' expr (';' expr )*')'
+    WS* SUMPRODUCT Lb expr SEPAR expr (SEPAR expr )* Rb
+    | WS* SUM Lb expr SEPAR expr (SEPAR expr )* Rb
+    | WS* PRODUCT Lb expr SEPAR expr (SEPAR expr )* Rb
     ;
 
 rangefunction
     :
-    WS* SUM_I '(' WS* expr WS* ')' WS*
-    | WS* PRODUCT_I '(' WS* expr WS* ')' WS*
+    WS* SUM_I Lb WS* expr WS*  Rb WS*
+    | WS* PRODUCT_I Lb WS* expr WS*  Rb WS*
     ;
 
 string
     :
-    '"' STRING '"'
+    DOUBLE_QUOTE STRING DOUBLE_QUOTE
     ;

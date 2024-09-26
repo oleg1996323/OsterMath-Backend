@@ -86,6 +86,7 @@ add_library(
     head_interactor STATIC
     ${head_interactor_SOURCES}
     ${ANTLR_head_interactor_CXX_OUTPUTS}
+    ${ANTLR_main_lexics_CXX_OUTPUTS}
 )
         
 target_link_libraries(head_interactor PUBLIC Boost::boost exceptions PRIVATE bailerror antlr4_static)
@@ -94,8 +95,9 @@ target_compile_definitions(head_interactor PUBLIC $<$<CONFIG:Debug>:DEBUG>)
 target_include_directories(head_interactor
     PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}/include/head_interactor
-        ${ANTLR_head_interactor_OUTPUT_DIR}
     PRIVATE
+        ${ANTLR_head_interactor_OUTPUT_DIR}
+        ${ANTLR_main_lexics_OUTPUT_DIR}
         ${CMAKE_CURRENT_LIST_DIR}/include/exception
         ${CMAKE_CURRENT_LIST_DIR}/include
         ${CMAKE_CURRENT_LIST_DIR}/include/types
@@ -125,6 +127,7 @@ target_include_directories(ostermath_be
                     PUBLIC 
                         ${OSTERMATH_BE_INCLUDE_DIR}
                         ${ANTLR_head_interactor_OUTPUT_DIR}
+                        ${ANTLR_main_lexics_OUTPUT_DIR}
                     PRIVATE
                         ${OSTERMATH_BE_INCLUDE_DIR_PRIVATE}
                         ${ANTLR_GENERATED_FILES_DIR})

@@ -26,6 +26,7 @@ target_include_directories(detector
                         ${DETECTOR_INCLUDE_DIR}
                     PRIVATE
                         ${ANTLR_detect_type_function_OUTPUT_DIR}
+                        ${ANTLR_main_lexics_OUTPUT_DIR}
                         ${ANTLR_GENERATED_FILES_DIR})
 set_target_properties(detector
     PROPERTIES

@@ -32,6 +32,11 @@ EOL: '\r'? '\n';
 
 UINT: [0-9]+ (EXPONENT)?;
 
+Lb: '(';
+Rb: ')';
+COL: ':';
+SEPAR: ';';
+
 ADD: '+' ;
 SUB: '-' ;
 MUL: '*' ;

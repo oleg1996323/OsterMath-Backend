@@ -5,7 +5,7 @@
 #include "detectorLexer.h"
 #include "detectorListener.h"
 #include "detector.h"
-#include 
+#include "definitions.h"
 
 #ifdef DEBUG
 

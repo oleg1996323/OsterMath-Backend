@@ -1,6 +1,11 @@
 lexer grammar main_lexics;
 import fundamental;
 
+VAR_TAG: 'VAR';
+BEG_ARR: '[';
+END_ARR: ']';
+DOUBLE_QUOTE: '"';
+
 VARIABLE: '#' [a-zA-Z] ((QUOTE | ASTERISK) | [a-zA-Z0-9])* {setText(getText().substr(1, getText().length()-1));};
 DATABASE: '!(\'' [a-zA-Z0-9_] (~[()!,;#' ])* '\')' {setText(getText().substr(3, getText().length()-5));}; 
 
