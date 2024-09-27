@@ -25,11 +25,29 @@ namespace detail{
     }
 
     bool ItemsParsingInfo::operator==(const ItemsParsingInfo& other){
+        #ifdef DEBUG
+            assert(initialized_&&other.initialized_);
+        #endif
+        bool main_types = start_==other.start_ &&
+                stop_==other.stop_ &&
+                type_==other.type_;
+        bool hext_equal = (next_ || other.next_)?(next_&&other.next_?*next_==*other.next_:false):true;
+        bool any_childs_has = !childs_.empty() || !other.childs_.empty();
+        bool all_childs_has = false;
+        bool childs_equal = false;
+        if(any_childs_has)
+            all_childs_has = !childs_.empty() && !other.childs_.empty();
+
+        if(all_childs_has)
+            childs_equal = std::equal(childs_.cbegin(),childs_.cend(),other.childs_.cbegin(),other.childs_.cend());
+
         return  initialized_ || other.initialized_?
                 (initialized_&&other.initialized_?
                 (start_==other.start_ &&
                 stop_==other.stop_ &&
-                type_==other.type_ &&
+                type_==other.type_ && 
+                (!childs_.empty() || !other.childs_.empty())?(!childs_.empty() && 
+                !other.childs_.empty()?std::equal(childs_.cbegin(),childs_.cend(),other.childs_.cbegin(),other.childs_.cend()):false):true &&
                 (next_ || other.next_)?(next_&&other.next_?*next_==*other.next_:false):true):false):true;
     }
 

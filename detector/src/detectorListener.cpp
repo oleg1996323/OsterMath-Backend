@@ -4,6 +4,12 @@
 using namespace std::string_view_literals;
 
 namespace detail{
+
+#ifdef DEBUG
+    uint16_t BaseListener::enter_count = 0;
+    uint16_t BaseListener::exit_count = 0;
+#endif
+
 BaseListener::BaseListener():
 info(new ItemsParsingInfo(nullptr))
 {}
@@ -42,6 +48,9 @@ void BaseListener::exitParens(detect_type_function::ParensContext* ctx){}
 void BaseListener::enterVariable(detect_type_function::VariableContext *ctx) {
     assert(info);
     assert(ctx);
+    assert(info->type_!=item::ITEM_TYPE::VARIABLE && 
+    info->type_!=item::ITEM_TYPE::VALUE && 
+    info->type_!=item::ITEM_TYPE::STRING);
     terminal_item();
     info->type_ = item::ITEM_TYPE::VARIABLE;
 }
@@ -72,6 +81,9 @@ void BaseListener::exitArray(detect_type_function::ArrayContext *ctx) {}
 void BaseListener::enterLiteral(detect_type_function::LiteralContext *ctx){
     assert(ctx);
     assert(info);
+    assert(info->type_!=item::ITEM_TYPE::VARIABLE && 
+    info->type_!=item::ITEM_TYPE::VALUE && 
+    info->type_!=item::ITEM_TYPE::STRING);
     terminal_item();
     info->type_=item::ITEM_TYPE::LITERAL;
 }
@@ -79,6 +91,9 @@ void BaseListener::exitLiteral(detect_type_function::LiteralContext *ctx){}
 void BaseListener::enterMultiargfunction(detect_type_function::MultiargfunctionContext* ctx){
     assert(ctx);
     assert(info);
+    assert(info->type_!=item::ITEM_TYPE::VARIABLE && 
+        info->type_!=item::ITEM_TYPE::VALUE && 
+        info->type_!=item::ITEM_TYPE::STRING);
     child_containing_item();
     info->type_=item::ITEM_TYPE::FUNCTION;
     if(ctx->PRODUCT()) //here emplace the function type to info
@@ -146,21 +161,35 @@ void BaseListener::visitErrorNode(antlr4::tree::ErrorNode* node){
 void BaseListener::enterString(detect_type_function::StringContext* ctx){
     assert(ctx);
     assert(info);
+    assert(info->type_!=item::ITEM_TYPE::VARIABLE && 
+    info->type_!=item::ITEM_TYPE::VALUE && 
+    info->type_!=item::ITEM_TYPE::STRING);
     terminal_item();
     info->type_=item::ITEM_TYPE::STRING;
 }
 void BaseListener::exitString(detect_type_function::StringContext* ctx){}
 void BaseListener::enterEveryRule(antlr4::ParserRuleContext* ctx){
-    
+    assert(info);
+    #ifdef DEBUG
+        ++enter_count;
+    #endif
+    //std::cout<<"Item enter: "<<ctx->getText()<<std::endl;
 }
 void BaseListener::exitEveryRule(antlr4::ParserRuleContext* ctx){
+    #ifdef DEBUG
+        ++exit_count;
+    #endif
     if(ctx){
-        assert(info);
-        info->init(
-            ctx->getStart()->getStartIndex(),
-            ctx->getStop()->getStopIndex());
-        if(!is_root())
-            info = info->prev_;
+        if(!dynamic_cast<detect_type_function::ExprContext*>(ctx) &&
+        !dynamic_cast<detect_type_function::Node_accessContext*>(ctx)){
+            assert(info);
+            //std::cout<<"Item exit: "<<ctx->getText()<<std::endl;
+            info->init(
+                ctx->getStart()->getStartIndex(),
+                ctx->getStop()->getStopIndex());
+            if(!is_root())
+                info = info->prev_;
+        }
     }
 }
 }

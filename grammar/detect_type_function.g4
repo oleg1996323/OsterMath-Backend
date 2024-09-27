@@ -1,19 +1,17 @@
 parser grammar detect_type_function;
 options { tokenVocab=main_lexics; }
 
-value_type: array | expr | string;
-
 line_input:
-    array
-    | expr
+    WS* EQUAL WS* (array | expr | string) EOL?
+    | EOL
     ;
 
 node_access:
-    WS* (Lb  WS*  Rb) | (Lb WS* UINT WS*  Rb) | (Lb  WS* UINT WS* (SEPAR WS* UINT)* WS*  Rb) WS*
+    WS* (Lb  WS*  Rb) | (Lb WS* UINT WS*  Rb) | (Lb  WS* UINT WS* (';' WS* UINT)* WS*  Rb) WS*
     ;
 
 variable:
-    WS* ((VAR_TAG (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) Rb node_access?) | (VARIABLE node_access?))  WS*
+    WS* ((VAR_TAG Lb (WS* DATABASE VARIABLE WS* | WS* VARIABLE WS*) Rb node_access?) | (VARIABLE node_access?))  WS*
     ;
 
 expr
@@ -30,7 +28,7 @@ expr
 
 array
     :
-    BEG_ARR WS* (expr | array) WS* (SEPAR WS* (expr | array))*END_ARR
+    BEG_ARR WS* (expr | array) WS* (';' WS* (expr | array))*END_ARR
     ;
 
 number
@@ -51,14 +49,14 @@ function
     | WS* ACOS Lb WS* expr WS* Rb WS*
     | WS* ASIN Lb WS* expr WS* Rb WS*
     | WS* FACTORIAL Lb WS* expr WS* Rb WS*
-    | WS* LOG_X Lb  WS* expr WS* SEPAR WS* expr WS*  Rb WS*
+    | WS* LOG_X Lb  WS* expr WS* ';' WS* expr WS*  Rb WS*
     ;
 
 multiargfunction
     :
-    WS* SUMPRODUCT Lb  expr SEPAR expr (SEPAR expr )* Rb
-    | WS* SUM Lb  expr SEPAR expr (SEPAR expr )* Rb
-    | WS* PRODUCT Lb  expr SEPAR expr (SEPAR expr )* Rb
+    WS* SUMPRODUCT Lb  expr ';' expr (';' expr )* Rb
+    | WS* SUM Lb  expr ';' expr (';' expr )* Rb
+    | WS* PRODUCT Lb  expr ';' expr (';' expr )* Rb
     ;
 
 rangefunction

@@ -6,6 +6,11 @@ using namespace std::string_view_literals;
 namespace detail{
 class BaseListener: public detect_type_functionBaseListener{
     public:
+    #ifdef DEBUG
+        static uint16_t enter_count;
+        static uint16_t exit_count;
+    #endif
+
     ItemsParsingInfo* info;
     BaseListener();
     ~BaseListener();

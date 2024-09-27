@@ -271,16 +271,34 @@ VAR(#I)(0;5) =
 void DetectorParsing(const std::string& input_str, ItemsParsingInfo* check_val){
     ItemsParsingInfo result = detail::parse(input_str);
     bool is_equal = (result==*check_val);
+    assert(is_equal);
+    std::cout<<detail::BaseListener::enter_count<<std::endl;
+    std::cout<<detail::BaseListener::exit_count<<std::endl;
 }
 
 void Testing_detector_1(){
     std::string str_in = 
-R"(=SUMPRODUCT(VAR(#I);VAR(#A)))";
-    size_t sz = str_in.size();
+R"(=SUMPRODUCT(VAR(#I); VAR(#A)))";
     ItemsParsingInfo* equal =  new ItemsParsingInfo(nullptr);
-    equal->set_start(1);
-    equal->set_stop(str_in.size()-2);
-    DetectorParsing(str_in,equal);
+    equal->init(0,str_in.size()-1);
+    equal->type_ = detail::item::ITEM_TYPE::NONE;
+    equal->func_ = detail::item::FUNCTION::NONE;
+    auto sumproduct = equal->push_back_next(new ItemsParsingInfo(equal));
+    sumproduct->type_=detail::item::ITEM_TYPE::FUNCTION;
+    sumproduct->func_=detail::item::FUNCTION::SUMPRODUCT;
+    sumproduct->init(1,str_in.size()-1);
+    auto var_i = sumproduct->push_back_child(new ItemsParsingInfo(sumproduct));
+    var_i->type_ = detail::item::ITEM_TYPE::VARIABLE;
+    var_i->func_ = detail::item::FUNCTION::NONE;
+    var_i->init(12,18);
+    auto var_a = sumproduct->push_back_child(new ItemsParsingInfo(sumproduct));
+    var_a->type_ = detail::item::ITEM_TYPE::VARIABLE;
+    var_a->func_ = detail::item::FUNCTION::NONE;
+    var_a->init(21,str_in.size()-2);
+    ItemsParsingInfo result = detail::parse(str_in);
+    bool is_equal = (result==*equal);
+    assert(is_equal);
+    //DetectorParsing(str_in,equal);
     delete equal;
     std::cout<<ns_debug_detector_static::count<<std::endl;
 }
