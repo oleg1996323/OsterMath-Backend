@@ -1,5 +1,6 @@
 #pragma once
 #include <stdexcept>
+#include "abstract_event.h"
     /// <summary>
     /// Instead of recovering from exception {@code e}, re-throw it wrapped
     ///  in a <seealso cref="ParseCancellationException"/> so it is not caught by the
@@ -11,6 +12,7 @@ namespace exceptions{
 
 enum EXCEPTION_TYPE{
     NOEXCEPT,
+    EXCEPTION,
     PARSING,
     CYCLIC,
     UNQEQUAL_ARRAYS,
@@ -23,13 +25,33 @@ enum EXCEPTION_TYPE{
     NODE_DONT_EXISTS
 };
 
-class Exception: public std::runtime_error{
+class AbstractException: public std::runtime_error, public AbstractEvent{
     public:
     using std::runtime_error::runtime_error;
+    AbstractException(const char* arg);
+    virtual ~AbstractException() = default;
     //error abbreviation
     static const char* error_abbr();
     virtual const char* get_error() const = 0;
     virtual EXCEPTION_TYPE type() const = 0;
+    virtual const char* get_prompt() const;
+    private:
+    virtual const char* __get_title__() const override;
+    virtual size_t __type__() const override;
+    virtual const char* __get_prompt__() const override;
+};
+
+class Exception: public AbstractException{
+    public:
+    using AbstractException::AbstractException;
+    //error abbreviation
+    static const char* error_abbr();
+    virtual const char* get_error() const{
+        return "";
+    };
+    virtual EXCEPTION_TYPE type() const{
+        return EXCEPTION;
+    };
     virtual const char* get_prompt() const;
 };
 

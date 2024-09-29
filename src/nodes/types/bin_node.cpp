@@ -1,6 +1,6 @@
 #include "bin_node.h"
 #include "def.h"
-#include "exception/exception.h"
+#include "events_errors/exception.h"
 
 BinaryNode::BinaryNode(const BinaryNode& other):
 Node(other),

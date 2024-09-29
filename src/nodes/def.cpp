@@ -2,6 +2,9 @@
 #include "node.h"
 #include "arithmetic_functions.h"
 #include "arithmetic_types.h"
+#include "events_errors/abstract_event.h"
+#include "events_errors/warning.h"
+#include "events_errors/exception.h"
 #include <string>
 
 Result_t& Result::get(){
@@ -30,6 +33,18 @@ bool Result::is_array() const{
 
 bool Result::has_value() const{
     return !std::holds_alternative<std::monostate>(*this);
+}
+
+bool Result::is_event() const{
+    return std::holds_alternative<std::shared_ptr<AbstractEvent>>(*this);
+}
+
+bool Result::is_error() const{
+    return is_event()?(dynamic_cast<exceptions::Exception*>(get<std::shared_ptr<AbstractEvent>>().get())?true:false):false;
+}
+
+bool Result::is_warning() const{
+    return is_event()?(dynamic_cast<warnings::Warning*>(get<std::shared_ptr<AbstractEvent>>().get())?true:false):false;
 }
 
 std::ostream& Result::operator<<(std::ostream& os)

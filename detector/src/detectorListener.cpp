@@ -12,7 +12,12 @@ namespace detail{
 
 BaseListener::BaseListener():
 info(new ItemsParsingInfo(nullptr))
-{}
+{
+    #ifdef DEBUG
+    enter_count = 0;
+    exit_count = 0;
+    #endif
+}
 BaseListener::~BaseListener(){
     if(info)
         delete info;

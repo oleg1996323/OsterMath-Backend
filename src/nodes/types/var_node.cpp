@@ -1,6 +1,6 @@
 #include "types.h"
 #include "var_node.h"
-#include "exception/exception.h"
+#include "events_errors/exception.h"
 
 VariableNode::VariableNode(VariableBase* variable):Node(),
     var_(variable){}

@@ -4,8 +4,24 @@
 #include <DefaultErrorStrategy.h>
 
 namespace exceptions{
+    AbstractException::AbstractException(const char* arg):
+    std::runtime_error(arg){
+        event_t_ = EVENT_TYPE::EXCEPTION;
+    }
+
     const char* Exception::get_prompt() const{
         return what();
+    }
+
+    const char* AbstractException::__get_title__() const{
+        return get_error();
+    }
+    size_t AbstractException::__type__() const{
+        return (size_t)type();
+    }
+
+    const char* AbstractException::__get_prompt__() const{
+        return get_prompt();
     }
 
     ParsingError::ParsingError(const std::string& error):

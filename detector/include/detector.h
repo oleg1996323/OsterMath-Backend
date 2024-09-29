@@ -35,7 +35,10 @@ namespace item{
         PRODUCT,
         SUMPRODUCT,
         SUM_I,
-        PRODUCT_I
+        PRODUCT_I,
+        CONCAT,
+        SEARCH_STRING,
+        CONTAIN_TEXT
     };
 }
 class __ParseSegmentation__{

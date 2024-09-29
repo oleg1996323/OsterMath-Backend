@@ -1,7 +1,7 @@
 #include "test/testing.h"
 #include "data.h"
 #include "arithmetic_types.h"
-#include "exception/exception.h"
+#include "events_errors/exception.h"
 #include "detectorLexer.h"
 #include "detectorListener.h"
 #include "detector.h"
@@ -268,7 +268,7 @@ VAR(#I)(0;5) =
     CalculationsCheck(str_in,equal);
 }
 
-void DetectorParsing(const std::string& input_str, ItemsParsingInfo* check_val){
+void DetectorCheckParsing(const std::string& input_str, ItemsParsingInfo* check_val){
     ItemsParsingInfo result = detail::parse(input_str);
     bool is_equal = (result==*check_val);
     assert(is_equal);
@@ -276,9 +276,50 @@ void DetectorParsing(const std::string& input_str, ItemsParsingInfo* check_val){
     std::cout<<detail::BaseListener::exit_count<<std::endl;
 }
 
+void Testing_detector_common(){
+    detail::parse("=1");
+    assert(ns_debug_detector_static::count==0);
+    detail::parse("=\"Stri\"N\\g\"");
+    assert(ns_debug_detector_static::count==0);
+    detail::parse("'StRing");
+    assert(ns_debug_detector_static::count==0);
+    detail::parse("=LN(2)");
+    assert(ns_debug_detector_static::count==0);
+    detail::parse("=lG(2)");
+    assert(ns_debug_detector_static::count==0);
+    detail::parse("=LoG_X(2;2)");
+    assert(ns_debug_detector_static::count==0);
+    detail::parse("=ExP(2)");
+    assert(ns_debug_detector_static::count==0);
+    detail::parse("=SqRt(2)");
+    assert(ns_debug_detector_static::count==0);
+    detail::parse("=Pi()");
+    assert(ns_debug_detector_static::count==0);
+    detail::parse("=CoS(0.5)");
+    assert(ns_debug_detector_static::count==0);
+    detail::parse("=Sin(0.0)");
+    assert(ns_debug_detector_static::count==0);
+    detail::parse("=Asin(Sin(0.5))");
+    assert(ns_debug_detector_static::count==0);
+    detail::parse("=acos(cos(0.25))");
+    assert(ns_debug_detector_static::count==0);
+    detail::parse("=Factorial(2)");
+    assert(ns_debug_detector_static::count==0);
+    detail::parse("=VAR(#I)(1;2)");
+    assert(ns_debug_detector_static::count==0);
+    detail::parse("=VAR(#I)");
+    assert(ns_debug_detector_static::count==0);
+    detail::parse("=SUMPRODUCT(VAR(#I); VAR(#A))");
+    assert(ns_debug_detector_static::count==0);
+    detail::parse("=SEARCHSTRING(\"string\"; \"string\")");
+    assert(ns_debug_detector_static::count==0);
+    detail::parse("=VAR(#I)");
+    assert(ns_debug_detector_static::count==0);
+}
+
 void Testing_detector_1(){
     std::string str_in = 
-R"(=SUMPRODUCT(VAR(#I); VAR(#A)))";
+R"(=SUMPRODUCT(VAR(#I);      VAR(#A)))";
     ItemsParsingInfo* equal =  new ItemsParsingInfo(nullptr);
     equal->init(0,str_in.size()-1);
     equal->type_ = detail::item::ITEM_TYPE::NONE;
@@ -295,12 +336,61 @@ R"(=SUMPRODUCT(VAR(#I); VAR(#A)))";
     var_a->type_ = detail::item::ITEM_TYPE::VARIABLE;
     var_a->func_ = detail::item::FUNCTION::NONE;
     var_a->init(21,str_in.size()-2);
-    ItemsParsingInfo result = detail::parse(str_in);
-    bool is_equal = (result==*equal);
-    assert(is_equal);
-    //DetectorParsing(str_in,equal);
+    DetectorCheckParsing(str_in,equal);
     delete equal;
-    std::cout<<ns_debug_detector_static::count<<std::endl;
+    assert(ns_debug_detector_static::count==0);
+}
+
+void Testing_detector_2(){
+    std::string str_in = 
+    R"('string)";
+    ItemsParsingInfo* equal =  new ItemsParsingInfo(nullptr);
+    equal->init(0,str_in.size()-1);
+    equal->type_ = detail::item::ITEM_TYPE::NONE;
+    equal->func_ = detail::item::FUNCTION::NONE;
+    auto item_str = equal->push_back_child(new ItemsParsingInfo(equal));
+    item_str->type_ = detail::item::ITEM_TYPE::STRING;
+    item_str->func_ = detail::item::FUNCTION::NONE;
+    item_str->init(0,str_in.size()-1);
+    DetectorCheckParsing(str_in,equal);
+    delete equal;
+    assert(ns_debug_detector_static::count==0);
+}
+
+void Testing_detector_3(){
+    std::string str_in = 
+    R"(="string")";
+    ItemsParsingInfo* equal =  new ItemsParsingInfo(nullptr);
+    equal->init(0,str_in.size()-1);
+    equal->type_ = detail::item::ITEM_TYPE::NONE;
+    equal->func_ = detail::item::FUNCTION::NONE;
+    auto item_str = equal->push_back_child(new ItemsParsingInfo(equal));
+    item_str->type_ = detail::item::ITEM_TYPE::STRING;
+    item_str->func_ = detail::item::FUNCTION::NONE;
+    item_str->init(1,str_in.size()-1);
+    DetectorCheckParsing(str_in,equal);
+    delete equal;
+    assert(ns_debug_detector_static::count==0);
+}
+
+void Testing_detector_4(){
+    std::string str_in = 
+    R"(=CONCAT("string", "other_string\""))";
+    ItemsParsingInfo* equal =  new ItemsParsingInfo(nullptr);
+    equal->init(0,str_in.size()-1);
+    equal->type_ = detail::item::ITEM_TYPE::NONE;
+    equal->func_ = detail::item::FUNCTION::NONE;
+    auto concat = equal->push_back_next(new ItemsParsingInfo(equal));
+    concat->type_=detail::item::ITEM_TYPE::FUNCTION;
+    //concat->func_=detail::item::FUNCTION::;
+    //sumproduct->init(1,str_in.size()-1);
+    auto item_str = equal->push_back_child(new ItemsParsingInfo(equal));
+    item_str->type_ = detail::item::ITEM_TYPE::STRING;
+    item_str->func_ = detail::item::FUNCTION::NONE;
+    item_str->init(1,str_in.size()-1);
+    DetectorCheckParsing(str_in,equal);
+    delete equal;
+    assert(ns_debug_detector_static::count==0);
 }
 
 #include "detector.h"
@@ -316,7 +406,11 @@ void Testing(){
     Testing_compare_vars_2();
     Testing_input_node_assign_1();
     Testing_input_node_assign_2();
+    Testing_detector_common();
     Testing_detector_1();
+    Testing_detector_2();
+    Testing_detector_3();
+    //Testing_detector_4();
 }
 
 #endif

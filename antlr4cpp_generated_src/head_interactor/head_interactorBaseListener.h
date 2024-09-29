@@ -19,23 +19,17 @@ public:
   virtual void enterValue_type(head_interactor::Value_typeContext * /*ctx*/) override { }
   virtual void exitValue_type(head_interactor::Value_typeContext * /*ctx*/) override { }
 
-  virtual void enterComparator(head_interactor::ComparatorContext * /*ctx*/) override { }
-  virtual void exitComparator(head_interactor::ComparatorContext * /*ctx*/) override { }
-
   virtual void enterInput(head_interactor::InputContext * /*ctx*/) override { }
   virtual void exitInput(head_interactor::InputContext * /*ctx*/) override { }
 
   virtual void enterLine_input(head_interactor::Line_inputContext * /*ctx*/) override { }
   virtual void exitLine_input(head_interactor::Line_inputContext * /*ctx*/) override { }
 
-  virtual void enterNode_access(head_interactor::Node_accessContext * /*ctx*/) override { }
-  virtual void exitNode_access(head_interactor::Node_accessContext * /*ctx*/) override { }
-
-  virtual void enterVariable(head_interactor::VariableContext * /*ctx*/) override { }
-  virtual void exitVariable(head_interactor::VariableContext * /*ctx*/) override { }
-
   virtual void enterVardefinition(head_interactor::VardefinitionContext * /*ctx*/) override { }
   virtual void exitVardefinition(head_interactor::VardefinitionContext * /*ctx*/) override { }
+
+  virtual void enterComparator(head_interactor::ComparatorContext * /*ctx*/) override { }
+  virtual void exitComparator(head_interactor::ComparatorContext * /*ctx*/) override { }
 
   virtual void enterComparision(head_interactor::ComparisionContext * /*ctx*/) override { }
   virtual void exitComparision(head_interactor::ComparisionContext * /*ctx*/) override { }
@@ -48,6 +42,18 @@ public:
 
   virtual void enterExpr_comp(head_interactor::Expr_compContext * /*ctx*/) override { }
   virtual void exitExpr_comp(head_interactor::Expr_compContext * /*ctx*/) override { }
+
+  virtual void enterArray(head_interactor::ArrayContext * /*ctx*/) override { }
+  virtual void exitArray(head_interactor::ArrayContext * /*ctx*/) override { }
+
+  virtual void enterItemArray(head_interactor::ItemArrayContext * /*ctx*/) override { }
+  virtual void exitItemArray(head_interactor::ItemArrayContext * /*ctx*/) override { }
+
+  virtual void enterNode_access(head_interactor::Node_accessContext * /*ctx*/) override { }
+  virtual void exitNode_access(head_interactor::Node_accessContext * /*ctx*/) override { }
+
+  virtual void enterVariable(head_interactor::VariableContext * /*ctx*/) override { }
+  virtual void exitVariable(head_interactor::VariableContext * /*ctx*/) override { }
 
   virtual void enterUnaryOp(head_interactor::UnaryOpContext * /*ctx*/) override { }
   virtual void exitUnaryOp(head_interactor::UnaryOpContext * /*ctx*/) override { }
@@ -67,12 +73,6 @@ public:
   virtual void enterBinaryOp(head_interactor::BinaryOpContext * /*ctx*/) override { }
   virtual void exitBinaryOp(head_interactor::BinaryOpContext * /*ctx*/) override { }
 
-  virtual void enterArray(head_interactor::ArrayContext * /*ctx*/) override { }
-  virtual void exitArray(head_interactor::ArrayContext * /*ctx*/) override { }
-
-  virtual void enterItemArray(head_interactor::ItemArrayContext * /*ctx*/) override { }
-  virtual void exitItemArray(head_interactor::ItemArrayContext * /*ctx*/) override { }
-
   virtual void enterNumber(head_interactor::NumberContext * /*ctx*/) override { }
   virtual void exitNumber(head_interactor::NumberContext * /*ctx*/) override { }
 
@@ -90,6 +90,9 @@ public:
 
   virtual void enterString(head_interactor::StringContext * /*ctx*/) override { }
   virtual void exitString(head_interactor::StringContext * /*ctx*/) override { }
+
+  virtual void enterString_arg(head_interactor::String_argContext * /*ctx*/) override { }
+  virtual void exitString_arg(head_interactor::String_argContext * /*ctx*/) override { }
 
 
   virtual void enterEveryRule(antlr4::ParserRuleContext * /*ctx*/) override { }

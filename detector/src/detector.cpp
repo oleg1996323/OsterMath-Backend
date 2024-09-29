@@ -14,7 +14,9 @@ namespace detail{
     ItemsParsingInfo::PARSING_INFO::PARSING_INFO(ItemsParsingInfo* prev):
     prev_(prev){
         ++ns_debug_detector_static::count;
-        std::cout<<ns_debug_detector_static::count<<std::endl;
+        #ifdef DEBUG
+        //std::cout<<"Constructed: "<<ns_debug_detector_static::count<<std::endl;
+        #endif
     }
 
     ItemsParsingInfo& ItemsParsingInfo::init(uint32_t start, uint32_t stop){
@@ -39,7 +41,9 @@ namespace detail{
             all_childs_has = !childs_.empty() && !other.childs_.empty();
 
         if(all_childs_has)
-            childs_equal = std::equal(childs_.cbegin(),childs_.cend(),other.childs_.cbegin(),other.childs_.cend());
+            childs_equal = std::equal(childs_.cbegin(),childs_.cend(),other.childs_.cbegin(),other.childs_.cend(),[](ItemsParsingInfo* lhs,ItemsParsingInfo* rhs){
+                return (*lhs)==(*rhs);
+            });
 
         return  initialized_ || other.initialized_?
                 (initialized_&&other.initialized_?
@@ -47,7 +51,10 @@ namespace detail{
                 stop_==other.stop_ &&
                 type_==other.type_ && 
                 (!childs_.empty() || !other.childs_.empty())?(!childs_.empty() && 
-                !other.childs_.empty()?std::equal(childs_.cbegin(),childs_.cend(),other.childs_.cbegin(),other.childs_.cend()):false):true &&
+                !other.childs_.empty()?std::equal(childs_.cbegin(),childs_.cend(),other.childs_.cbegin(),other.childs_.cend(),
+                    [](ItemsParsingInfo* lhs,ItemsParsingInfo* rhs){
+                    return (*lhs)==(*rhs);
+                }):false):true &&
                 (next_ || other.next_)?(next_&&other.next_?*next_==*other.next_:false):true):false):true;
     }
 
@@ -73,7 +80,9 @@ namespace detail{
 
     ItemsParsingInfo::~PARSING_INFO(){
         --ns_debug_detector_static::count;
-        std::cout<<ns_debug_detector_static::count<<std::endl;
+        #ifdef DEBUG
+        //std::cout<<"Constructed: "<<ns_debug_detector_static::count<<std::endl;
+        #endif
         if(next_)
             delete next_;
         if(!childs_.empty()){

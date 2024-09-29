@@ -3,7 +3,7 @@
 #include "var_node.h"
 #include "types.h"
 #include "serialize.h"
-#include "exception/exception.h"
+#include "events_errors/exception.h"
 
 std::shared_ptr<Node> INFO_NODE::node() const{
     if(has_node())

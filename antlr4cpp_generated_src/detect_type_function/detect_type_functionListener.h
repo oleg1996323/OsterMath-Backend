@@ -14,11 +14,11 @@
 class  detect_type_functionListener : public antlr4::tree::ParseTreeListener {
 public:
 
-  virtual void enterValue_type(detect_type_function::Value_typeContext *ctx) = 0;
-  virtual void exitValue_type(detect_type_function::Value_typeContext *ctx) = 0;
-
   virtual void enterLine_input(detect_type_function::Line_inputContext *ctx) = 0;
   virtual void exitLine_input(detect_type_function::Line_inputContext *ctx) = 0;
+
+  virtual void enterArray(detect_type_function::ArrayContext *ctx) = 0;
+  virtual void exitArray(detect_type_function::ArrayContext *ctx) = 0;
 
   virtual void enterNode_access(detect_type_function::Node_accessContext *ctx) = 0;
   virtual void exitNode_access(detect_type_function::Node_accessContext *ctx) = 0;
@@ -44,9 +44,6 @@ public:
   virtual void enterBinaryOp(detect_type_function::BinaryOpContext *ctx) = 0;
   virtual void exitBinaryOp(detect_type_function::BinaryOpContext *ctx) = 0;
 
-  virtual void enterArray(detect_type_function::ArrayContext *ctx) = 0;
-  virtual void exitArray(detect_type_function::ArrayContext *ctx) = 0;
-
   virtual void enterNumber(detect_type_function::NumberContext *ctx) = 0;
   virtual void exitNumber(detect_type_function::NumberContext *ctx) = 0;
 
@@ -64,6 +61,9 @@ public:
 
   virtual void enterString(detect_type_function::StringContext *ctx) = 0;
   virtual void exitString(detect_type_function::StringContext *ctx) = 0;
+
+  virtual void enterString_arg(detect_type_function::String_argContext *ctx) = 0;
+  virtual void exitString_arg(detect_type_function::String_argContext *ctx) = 0;
 
 
 };

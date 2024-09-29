@@ -5,13 +5,14 @@ class VariableNode;
 class Node;
 class ArrayNode;
 class VariableNode;
+class AbstractEvent;
 
 #include <variant>
 
 
 using Value_t = boost::multiprecision::cpp_dec_float_50;
 using Bound_types = std::variant<std::monostate,Node*>;
-using Result_t = std::variant<std::monostate,Value_t,std::string, Node*>;
+using Result_t = std::variant<std::monostate,Value_t,std::string, Node*, std::shared_ptr<AbstractEvent>>;
 
 #define ENUM_NAME(p) #p;
 
@@ -22,6 +23,15 @@ enum TYPE_VAL{
     ARRAY = 0xF0,
     STRING_ARRAY = ARRAY | STRING,
     NUMERIC_ARRAY = ARRAY | VALUE
+};
+
+constexpr const char* NAMES_OF_ARGUMENT[6] = {
+    {"Unknown"},
+    {"Value"},
+    {"String"},
+    {"Array"},
+    {"String array"},
+    {"Numeric array"}
 };
 
 class Result:public Result_t{
@@ -49,6 +59,12 @@ class Result:public Result_t{
     bool is_array() const;
 
     bool has_value() const;
+
+    bool is_event() const;
+
+    bool is_error() const;
+
+    bool is_warning() const;
 
     private:
 };

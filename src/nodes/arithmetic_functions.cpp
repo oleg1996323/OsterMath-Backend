@@ -215,3 +215,12 @@ Value_t functions::Arithmetic::Product(const std::vector<ArrayNode*>& arrays){
 
     return result;
 }
+
+Value_t functions::Arithmetic::CorrelationCoefficient(const ArrayNode* arr_1,const ArrayNode* arr_2){
+    if constexpr (std::is_same_v<std::remove_reference_t<decltype(exec)>, decltype(std::execution::seq)>){
+
+    }
+    else{
+        
+    }
+}

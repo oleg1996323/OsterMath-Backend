@@ -32,8 +32,8 @@ include(${CMAKE_CURRENT_LIST_DIR}/detector/CMakeLists.txt)
 file(GLOB_RECURSE ostermath_be_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/src/nodes/**.cpp
     ${CMAKE_CURRENT_LIST_DIR}/include/nodes/**.h
-    ${CMAKE_CURRENT_LIST_DIR}/src/exception/**.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/include/exception/**.h
+    ${CMAKE_CURRENT_LIST_DIR}/src/events_errors/**.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/include/events_errors/**.h
     ${CMAKE_CURRENT_LIST_DIR}/src/*.cpp
     ${CMAKE_CURRENT_LIST_DIR}/include/*.h
 )
@@ -49,17 +49,17 @@ set(OSTERMATH_BE_INCLUDE_DIR
                             ${CMAKE_CURRENT_LIST_DIR}/include/nodes/types
                             ${CMAKE_CURRENT_LIST_DIR}/include/head_interactor)
 set(OSTERMATH_BE_INCLUDE_DIR_PRIVATE 
-                            ${CMAKE_CURRENT_LIST_DIR}/include/exception)
+                            ${CMAKE_CURRENT_LIST_DIR}/include/events_errors)
 set(OSTERMATH_BE_LIBRARY_DIR ${CMAKE_CURRENT_LIST_DIR}/lib)
 
 add_library(
     bailerror INTERFACE
-    ${CMAKE_CURRENT_LIST_DIR}/src/exception/bailerror.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/events_errors/bailerror.cpp
 )
 target_include_directories(bailerror
                     INTERFACE
                         ${CMAKE_CURRENT_LIST_DIR}/include
-                        ${CMAKE_CURRENT_LIST_DIR}/include/exception
+                        ${CMAKE_CURRENT_LIST_DIR}/include/events_errors
                         ${ANTLR_head_interactor_OUTPUT_DIR}
                         ${ANTLR_GENERATED_FILES_DIR})
 
@@ -67,7 +67,7 @@ set_target_properties(bailerror PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 add_library(
     exceptions STATIC
-    ${CMAKE_CURRENT_LIST_DIR}/src/exception/exception.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/events_errors/exception.cpp
     ${ANTLR_head_interactor_CXX_OUTPUTS}
 )
 target_link_libraries(exceptions PRIVATE antlr4_static)
@@ -98,7 +98,7 @@ target_include_directories(head_interactor
     PRIVATE
         ${ANTLR_head_interactor_OUTPUT_DIR}
         ${ANTLR_main_lexics_OUTPUT_DIR}
-        ${CMAKE_CURRENT_LIST_DIR}/include/exception
+        ${CMAKE_CURRENT_LIST_DIR}/include/events_errors
         ${CMAKE_CURRENT_LIST_DIR}/include
         ${CMAKE_CURRENT_LIST_DIR}/include/types
         ${ANTLR_GENERATED_FILES_DIR})

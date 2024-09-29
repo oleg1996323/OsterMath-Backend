@@ -223,37 +223,125 @@ void BaseListener::exitNumber(head_interactor::NumberContext* ctx){
 void BaseListener::enterMultiargfunction(head_interactor::MultiargfunctionContext* ctx){
     assert(!mode_.empty() && (current_node_ || anonymous_node_.size()!=0));
     mode_.push(MODE::MULTIARGFUNCTION);
-    if(ctx->PRODUCT())
-        anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::PROD,ctx->expr().size()));
-    else if(ctx->SUMPRODUCT())
-        anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::SUMPRODUCT,ctx->expr().size()));
-    else if(ctx->SUM())
-        anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::SUM,ctx->expr().size()));
+    std::cout<<ctx->getStart()->getType()<<std::endl;
+    switch (ctx->getStart()->getType()){
+        case head_interactor::SUMPRODUCT:{
+            anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::SUMPRODUCT,ctx->expr().size()));
+            break;
+        }
+        case head_interactor::PRODUCT:{
+            anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::PROD,ctx->expr().size()));
+            break;
+        }
+        case head_interactor::SUM:{
+            anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::SUM,ctx->expr().size()));
+            break;
+        }
+        case head_interactor::AVERAGE:{
+            anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::AVERAGE,ctx->expr().size()));
+            break;
+        }
+        case head_interactor::ROOT_MEAN_SQUARE:{
+            anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::SUMPRODUCT,ctx->expr().size()));
+            break;
+        }
+        case head_interactor::ROOT_MEAN_SQUARE_ERROR:{
+            anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::ROOT_MEAN_SQUARE_ERROR,ctx->expr().size()));
+            break;
+        }
+        case head_interactor::MEDIAN:{
+            anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::MEDIAN,ctx->expr().size()));
+            break;
+        }
+        case head_interactor::CONCAT:{
+            anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::CONCAT,ctx->expr().size()));
+            break;
+        }
+        case head_interactor::SEARCH_STRING:{
+            anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::SEARCH_TEXT,ctx->expr().size()));
+            break;
+        }
+        case head_interactor::CONTAIN_TEXT:{
+            anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::CONTAIN_TEXT,ctx->expr().size()));
+            break;
+        }
+        default:{
+            throw std::runtime_error("Unknown input of function context");
+        }
+    }
 }
 
 void BaseListener::enterFunction(head_interactor::FunctionContext* ctx){
     assert(!mode_.empty() && (current_node_ || anonymous_node_.size()!=0));
     mode_.push(MODE::FUNCTIONOPERATION);
-    if(ctx){
-        if(ctx->EXP())
+    switch (ctx->getStart()->getType()){
+        case head_interactor::EXP:{
             anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::EXP));
-        else if(ctx->LG())
+            break;
+        }
+        case head_interactor::LG:{
             anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::LG10));
-        else if(ctx->LN())
+            break;
+        }
+        case head_interactor::LN:{
             anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::LN));
-        else if(ctx->LOG_X())
+            break;
+        }
+        case head_interactor::LOG_X:{
             anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::LOG_BASE));
-        else if(ctx->SIN())
+            break;
+        }
+        case head_interactor::SIN:{
             anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::SIN));
-        else if(ctx->COS())
+            break;
+        }
+        case head_interactor::COS:{
             anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::COS));
-        else if(ctx->ASIN())
+            break;
+        }
+        case head_interactor::ASIN:{
             anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::ASIN));
-        else if(ctx->ACOS())
+            break;
+        }
+        case head_interactor::ACOS:{
             anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::ACOS));
-        else if(ctx->FACTORIAL())
+            break;
+        }
+        case head_interactor::FACTORIAL:{
             anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::FACTORIAL));
-        else throw std::invalid_argument("Unknown input of function context");
+            break;
+        }
+        case head_interactor::WEIBULL_DISTRIB:{
+            anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::STD_NORM_DISTRIB));
+            break;
+        }
+        case head_interactor::GAUSS:{
+            anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::GAUSS));
+            break;
+        }
+        case head_interactor::STD_NORM_DISTRIB:{
+            anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::STD_NORM_DISTRIB));
+            break;
+        }
+        case head_interactor::NORM_DISTRIB:{
+            anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::NORM_DISTRIB));
+            break;
+        }
+        case head_interactor::PEARSON:{
+            anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::PEARSON));
+            break;
+        }
+        case head_interactor::GAMMA:{
+            anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::GAMMA));
+            break;
+        }
+        case head_interactor::GAMMA_REV:{
+            anonymous_node_.push(std::make_shared<FunctionNode>(FUNCTION_OP::GAMMA_REV));
+            break;
+        }
+        default:{
+            throw std::runtime_error("Unknown input of function context");
+        }
     }
 }
 
