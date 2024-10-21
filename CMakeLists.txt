@@ -15,6 +15,8 @@ set(Boost_USE_MULTITHREADED      ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
 
 find_package(Boost 1.75.0 REQUIRED)
+set(wgrib2_DIR "~/wgrib2/build")
+find_package(wgrib2 REQUIRED)
 
 if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})

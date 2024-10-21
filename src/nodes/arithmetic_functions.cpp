@@ -217,10 +217,77 @@ Value_t functions::Arithmetic::Product(const std::vector<ArrayNode*>& arrays){
 }
 
 Value_t functions::Arithmetic::CorrelationCoefficient(const ArrayNode* arr_1,const ArrayNode* arr_2){
-    if constexpr (std::is_same_v<std::remove_reference_t<decltype(exec)>, decltype(std::execution::seq)>){
+    using Real = Value_t;
+    using std::sqrt;
+    std::vector<std::shared_ptr<Node>>::const_iterator u_it = arr_1->begin();
+    std::vector<std::shared_ptr<Node>>::const_iterator v_it = arr_2->begin();
+    std::vector<std::shared_ptr<Node>>::const_iterator u_end = arr_1->end();
+    std::vector<std::shared_ptr<Node>>::const_iterator v_end = arr_2->end();
+    Real cov = 0;
+    Real rho_ = 1.;
+    Real mu_u;
+    Real mu_v;
+    if((*u_it)->type_val() && (*v_it)->is_numeric()){
+        if((*u_it)->execute().is_value()){
+            mu_u = (*u_it)->execute().get<Real>();
+            ++u_it;
+        }
+        else if((*u_it)->execute().is_array()){
+            rho_ = CorrelationCoefficient();
+        }
+        else{
 
+        }
     }
-    else{
-        
+    Real mu_v = *v_it++;
+    Real Qu = 0;
+    Real Qv = 0;
+    std::size_t i = 1;
+
+    while(u_it != u_end && v_it != v_end)
+    {
+        Real u_tmp;
+        Real v_tmp;
+        if((*u_it++)->execute().is_value() && (*v_it++)->execute().is_value())
+        u_tmp = (*u_it++)->execute().get<Real>() - mu_u;
+        v_tmp = (*v_it++)->execute().get<Real>() - mu_v;
+        Qu = Qu + (i*u_tmp*u_tmp)/(i+1);
+        Qv = Qv + (i*v_tmp*v_tmp)/(i+1);
+        cov += i*u_tmp*v_tmp/(i+1);
+        mu_u = mu_u + u_tmp/(i+1);
+        mu_v = mu_v + v_tmp/(i+1);
+        ++i;
+    }
+
+
+    // If one dataset is constant, then the correlation coefficient is undefined.
+    // See https://stats.stackexchange.com/questions/23676/normalized-correlation-with-a-constant-vector
+    // Thanks to zbjornson for pointing this out.
+    if (Qu == 0 || Qv == 0)
+    {
+        return std::numeric_limits<Real>::quiet_NaN();
+    }
+
+    // Make sure rho in [-1, 1], even in the presence of numerical noise.
+    Real rho = cov/sqrt(Qu*Qv);
+    if (rho > 1) {
+        rho = 1;
+    }
+    if (rho < -1) {
+        rho = -1;
+    }
+
+    return rho;
+}
+
+template<typename ExecutionPolicy>
+Value_t CorrelationCoefficient(ExecutionPolicy&& exec,const ArrayNode* arr_1, const ArrayNode* arr_2){
+    if(arr_1->is_numeric() && arr_2->is_numeric()){
+        if constexpr (std::is_same_v<std::remove_reference_t<decltype(exec)>, decltype(std::execution::seq)>){
+            
+        }
+        else{
+            
+        }
     }
 }

@@ -19,6 +19,9 @@ public:
   virtual void enterLine_input(detect_type_function::Line_inputContext * /*ctx*/) override { }
   virtual void exitLine_input(detect_type_function::Line_inputContext * /*ctx*/) override { }
 
+  virtual void enterArray(detect_type_function::ArrayContext * /*ctx*/) override { }
+  virtual void exitArray(detect_type_function::ArrayContext * /*ctx*/) override { }
+
   virtual void enterNode_access(detect_type_function::Node_accessContext * /*ctx*/) override { }
   virtual void exitNode_access(detect_type_function::Node_accessContext * /*ctx*/) override { }
 
@@ -43,9 +46,6 @@ public:
   virtual void enterBinaryOp(detect_type_function::BinaryOpContext * /*ctx*/) override { }
   virtual void exitBinaryOp(detect_type_function::BinaryOpContext * /*ctx*/) override { }
 
-  virtual void enterArray(detect_type_function::ArrayContext * /*ctx*/) override { }
-  virtual void exitArray(detect_type_function::ArrayContext * /*ctx*/) override { }
-
   virtual void enterNumber(detect_type_function::NumberContext * /*ctx*/) override { }
   virtual void exitNumber(detect_type_function::NumberContext * /*ctx*/) override { }
 
@@ -63,6 +63,9 @@ public:
 
   virtual void enterString(detect_type_function::StringContext * /*ctx*/) override { }
   virtual void exitString(detect_type_function::StringContext * /*ctx*/) override { }
+
+  virtual void enterString_arg(detect_type_function::String_argContext * /*ctx*/) override { }
+  virtual void exitString_arg(detect_type_function::String_argContext * /*ctx*/) override { }
 
 
   virtual void enterEveryRule(antlr4::ParserRuleContext * /*ctx*/) override { }
