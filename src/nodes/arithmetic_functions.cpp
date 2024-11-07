@@ -217,19 +217,18 @@ Value_t functions::Arithmetic::Product(const std::vector<ArrayNode*>& arrays){
 }
 
 Value_t functions::Arithmetic::CorrelationCoefficient(const ArrayNode* arr_1,const ArrayNode* arr_2){
-    using Real = Value_t;
     using std::sqrt;
     std::vector<std::shared_ptr<Node>>::const_iterator u_it = arr_1->begin();
     std::vector<std::shared_ptr<Node>>::const_iterator v_it = arr_2->begin();
     std::vector<std::shared_ptr<Node>>::const_iterator u_end = arr_1->end();
     std::vector<std::shared_ptr<Node>>::const_iterator v_end = arr_2->end();
-    Real cov = 0;
-    Real rho_ = 1.;
-    Real mu_u;
-    Real mu_v;
+    Value_t cov = 0;
+    Value_t rho_ = 1.;
+    Value_t mu_u;
+    Value_t mu_v;
     if((*u_it)->type_val() && (*v_it)->is_numeric()){
         if((*u_it)->execute().is_value()){
-            mu_u = (*u_it)->execute().get<Real>();
+            mu_u = (*u_it)->execute().get<Value_t>();
             ++u_it;
         }
         else if((*u_it)->execute().is_array()){
@@ -239,18 +238,18 @@ Value_t functions::Arithmetic::CorrelationCoefficient(const ArrayNode* arr_1,con
 
         }
     }
-    Real mu_v = *v_it++;
-    Real Qu = 0;
-    Real Qv = 0;
+    mu_v = *v_it++;
+    Value_t Qu = 0;
+    Value_t Qv = 0;
     std::size_t i = 1;
 
     while(u_it != u_end && v_it != v_end)
     {
-        Real u_tmp;
-        Real v_tmp;
+        Value_t u_tmp;
+        Value_t v_tmp;
         if((*u_it++)->execute().is_value() && (*v_it++)->execute().is_value())
-        u_tmp = (*u_it++)->execute().get<Real>() - mu_u;
-        v_tmp = (*v_it++)->execute().get<Real>() - mu_v;
+        u_tmp = (*u_it++)->execute().get<Value_t>() - mu_u;
+        v_tmp = (*v_it++)->execute().get<Value_t>() - mu_v;
         Qu = Qu + (i*u_tmp*u_tmp)/(i+1);
         Qv = Qv + (i*v_tmp*v_tmp)/(i+1);
         cov += i*u_tmp*v_tmp/(i+1);
@@ -265,11 +264,11 @@ Value_t functions::Arithmetic::CorrelationCoefficient(const ArrayNode* arr_1,con
     // Thanks to zbjornson for pointing this out.
     if (Qu == 0 || Qv == 0)
     {
-        return std::numeric_limits<Real>::quiet_NaN();
+        return std::numeric_limits<Value_t>::quiet_NaN();
     }
 
     // Make sure rho in [-1, 1], even in the presence of numerical noise.
-    Real rho = cov/sqrt(Qu*Qv);
+    Value_t rho = cov/sqrt(Qu*Qv);
     if (rho > 1) {
         rho = 1;
     }

@@ -67,7 +67,6 @@ exceptions::EXCEPTION_TYPE exception_handler(std::function<void()> function){
         return err.type();
     }
 }
-#include <wgrib2.h>
 int main(){   
     Testing();
 //     DataPool pool("main");

@@ -11,6 +11,7 @@ ArrayNode::ArrayNode(size_t sz):
 ArrayNode::ArrayNode(const ArrayNode& other):Node(other){}
 
 NODE_TYPE ArrayNode::type() const{
+    
     return NODE_TYPE::ARRAY;
 }
 
