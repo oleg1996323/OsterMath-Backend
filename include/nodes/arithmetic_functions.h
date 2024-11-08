@@ -32,6 +32,8 @@ namespace functions{
         Value_t Sum(const std::vector<ArrayNode*>& arrays);
         Value_t Product(const std::vector<ArrayNode*>& arrays);
 
+        template<typename ExecutionPolicy>
+        Value_t CorrelationCoefficient(ExecutionPolicy&& exec,const ArrayNode* arr_1, const ArrayNode* arr_2);
         Value_t CorrelationCoefficient(const ArrayNode*, const ArrayNode*);
 
         size_t pow(size_t base, size_t pow);
@@ -44,4 +46,20 @@ namespace functions{
         }
     }
 
+}
+
+#include "correlation.h"
+#include "array_node.h"
+
+template<typename ExecutionPolicy>
+Value_t functions::Arithmetic::CorrelationCoefficient(ExecutionPolicy&& exec,const ArrayNode* arr_1, const ArrayNode* arr_2){
+    CovariationMatrix((*arr_1),(*arr_2));
+    if(arr_1->is_numeric() && arr_2->is_numeric()){
+        if constexpr (std::is_same_v<std::remove_reference_t<decltype(exec)>, decltype(std::execution::seq)>){
+            
+        }
+        else{
+            
+        }
+    }
 }

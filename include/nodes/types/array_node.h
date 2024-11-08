@@ -7,6 +7,7 @@
 
 class ArrayNode:public Node{
     public:
+    typedef std::shared_ptr<Node> value_type;
     ArrayNode(size_t sz);
     ArrayNode(const ArrayNode& other);
     ArrayNode(ArrayNode&&) = delete;
@@ -25,6 +26,8 @@ class ArrayNode:public Node{
     std::vector<std::shared_ptr<Node>>::iterator begin();
     std::vector<std::shared_ptr<Node>>::const_iterator end() const;
     std::vector<std::shared_ptr<Node>>::iterator end();
+    std::vector<std::shared_ptr<Node>>::const_iterator cbegin() const;
+    std::vector<std::shared_ptr<Node>>::const_iterator cend() const;
     virtual bool is_numeric() const override;
     virtual bool is_string() const override;
     virtual bool is_array() const override;

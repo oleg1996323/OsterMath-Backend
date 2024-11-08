@@ -51,6 +51,13 @@ std::vector<std::shared_ptr<Node>>::iterator ArrayNode::end(){
     return childs_.end();
 }
 
+std::vector<std::shared_ptr<Node>>::const_iterator ArrayNode::cbegin() const{
+    return begin();
+}
+std::vector<std::shared_ptr<Node>>::const_iterator ArrayNode::cend() const{
+    return begin();
+}
+
 void ArrayNode::insert_back(std::shared_ptr<Node> node){
     if(node){
         childs_.push_back(node);

@@ -5,7 +5,9 @@
 #include "array_node.h"
 #include "arithmetic_functions.h"
 #include "warning.h"
+#include "events_errors/check_val_type.h"
 #include <boost/math/statistics/bivariate_statistics.hpp>
+#include <boost/math/special_functions/gamma.hpp>
 
 FunctionNode::FunctionNode(const FunctionNode& other):
 Node(other),
@@ -119,7 +121,7 @@ Result FunctionNode::execute(){ //TODO add checking for arrays size comparision
         if(childs_.size()==childs_.capacity()){
             if(!cache_.has_value()){
                 if(childs_.size()!=NUMBER_OF_ARGUMENT[(size_t)operation_]){
-                    cache_ = exceptions::InvalidNumberOfArguments(childs_.size());
+                    cache_ = std::make_shared<AbstractEvent>(exceptions::InvalidNumberOfArguments(childs_.size()));
                     return cache_;
                 }
 
@@ -162,7 +164,7 @@ Result FunctionNode::execute(){ //TODO add checking for arrays size comparision
                             return cache_;
                             break;
                         case FUNCTION_OP::LOG_BASE:
-                            if(!(child(0)->type_val()&TYPE_VAL::VALUE) && !(child(0)->type_val()&TYPE_VAL::VALUE)){
+                            if(!(child(0)->type_val()&TYPE_VAL::VALUE) && !(child(1)->type_val()&TYPE_VAL::VALUE)){
                                 cache_ = std::make_shared<exceptions::InvalidTypeOfArgument>("value type");
                                 return cache_;
                             }
@@ -202,17 +204,35 @@ Result FunctionNode::execute(){ //TODO add checking for arrays size comparision
                             //may be optimized 
                             cache_ = boost::math::statistics::correlation_coefficient(
                                 std::execution::seq,
-                                child(0)->execute().get<ArrayNode>().childs_,
-                                child(1)->execute().get<ArrayNode>().childs_
-                                );
+                                child(0)->execute().get<ArrayNode>().childs(),
+                                child(1)->execute().get<ArrayNode>().childs()
+                                )->execute();
                             return cache_;
                             break;
-                        case FUNCTION_OP::SIN:
-                            cache_ = sin(child(0)->execute().get<Value_t>());
+                        case FUNCTION_OP::GAMMA:
+                            cache_ = boost::math::tgamma(child(0)->execute().get<Value_t>());
                             return cache_;
                             break;
-                        default:
-                            throw std::invalid_argument("Unknown function operation");
+                        case FUNCTION_OP::SUM:
+                            exceptions::InvalidTypeOfArgument("Invalid type of function");
+                            break;
+                        case FUNCTION_OP::PROD:
+                            exceptions::InvalidTypeOfArgument("Invalid type of function");
+                            break;
+                        case FUNCTION_OP::SUMPRODUCT:
+                            exceptions::InvalidTypeOfArgument("Invalid type of function");
+                            break;
+                        case FUNCTION_OP::CONCAT:
+                            exceptions::InvalidTypeOfArgument("Invalid type of function");
+                            break;
+                        case FUNCTION_OP::CONTAIN_TEXT:
+                            exceptions::InvalidTypeOfArgument("Invalid type of function");
+                            break;
+                        case FUNCTION_OP::GAUSS:
+                            exceptions::InvalidTypeOfArgument("Invalid type of function");
+                            break;
+                        // default:
+                        //     throw std::invalid_argument("Unknown function operation");
                     }
                 }
                 else exceptions::InvalidTypeOfArgument("numeric value");

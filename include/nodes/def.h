@@ -1,5 +1,6 @@
 #pragma once
 #include <boost/multiprecision/cpp_dec_float.hpp>
+#include <events_errors/exception.h>
 
 class VariableNode;
 class Node;
