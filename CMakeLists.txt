@@ -29,23 +29,20 @@ set(OSTERMATH_BE_DIR ${CMAKE_CURRENT_LIST_DIR})
 include(${CMAKE_CURRENT_LIST_DIR}/grammar/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/detector/CMakeLists.txt)
 
+include_directories(${CMAKE_CURRENT_LIST_DIR})
+
 file(GLOB_RECURSE ostermath_be_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/src/nodes/**.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/include/nodes/**.h
-    ${CMAKE_CURRENT_LIST_DIR}/src/events_errors/**.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/include/events_errors/**.h
     ${CMAKE_CURRENT_LIST_DIR}/src/*.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/include/*.h
 )
 
 file(GLOB_RECURSE head_interactor_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/src/head_interactor/**.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/include/head_interactor/**.h
 )
 
 set(OSTERMATH_BE_INCLUDE_DIR
                             ${CMAKE_CURRENT_LIST_DIR}/include
-                            ${CMAKE_CURRENT_LIST_DIR}/include/types
+                            ${CMAKE_CURRENT_LIST_DIR}/include/nodes
                             ${CMAKE_CURRENT_LIST_DIR}/include/nodes/types
                             ${CMAKE_CURRENT_LIST_DIR}/include/head_interactor)
 set(OSTERMATH_BE_INCLUDE_DIR_PRIVATE 
@@ -58,29 +55,60 @@ add_library(
 )
 target_include_directories(bailerror
                     INTERFACE
-                        ${CMAKE_CURRENT_LIST_DIR}/include
-                        ${CMAKE_CURRENT_LIST_DIR}/include/events_errors
-                        ${ANTLR_head_interactor_OUTPUT_DIR}
-                        ${ANTLR_GENERATED_FILES_DIR})
+                        ${CMAKE_CURRENT_LIST_DIR}/include/events_errors)
 
 set_target_properties(bailerror PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 add_library(
+    abstract_event INTERFACE
+    ${CMAKE_CURRENT_LIST_DIR}/src/events_errors/abstract_event.cpp
+)
+
+get_target_property(abstract_event_type abstract_event TYPE)
+if(${abstract_event_type} STREQUAL SHARED_LIBRARY)
+    message(STATUS ${abstract_event_type})
+    set_target_properties(abstract_event PROPERTIES POSITION_INDEPENDENT_CODE ON)
+endif()
+
+target_include_directories(abstract_event
+    INTERFACE
+        ${CMAKE_CURRENT_LIST_DIR}/include/events_errors
+    )
+
+add_library(
+    warnings STATIC
+    ${CMAKE_CURRENT_LIST_DIR}/src/events_errors/warning.cpp
+)
+
+target_link_libraries(warnings PUBLIC abstract_event)
+
+get_target_property(warnings_type warnings TYPE)
+if(${warnings_type} STREQUAL SHARED_LIBRARY)
+    message(STATUS ${warnings_type})
+    set_target_properties(warnings PROPERTIES POSITION_INDEPENDENT_CODE ON)
+endif()
+
+target_include_directories(warnings
+    PRIVATE
+        ${CMAKE_CURRENT_LIST_DIR}/include/events_errors)
+
+add_library(
     exceptions STATIC
     ${CMAKE_CURRENT_LIST_DIR}/src/events_errors/exception.cpp
-    ${ANTLR_head_interactor_CXX_OUTPUTS}
 )
-target_link_libraries(exceptions PRIVATE antlr4_static)
-set_target_properties(exceptions PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+target_link_libraries(exceptions INTERFACE abstract_event)
+
+get_target_property(exception_type exceptions TYPE)
+
+if(${exception_type} STREQUAL SHARED_LIBRARY)
+    message(STATUS ${exception_type})
+    set_target_properties(exceptions PROPERTIES POSITION_INDEPENDENT_CODE ON)
+endif()
 
 target_include_directories(exceptions
     PUBLIC
-        ${CMAKE_CURRENT_LIST_DIR}/include
-        ${CMAKE_CURRENT_LIST_DIR}/include/nodes
-        ${OSTERMATH_BE_INCLUDE_DIR_PRIVATE}
-    PRIVATE
-        ${ANTLR_head_interactor_OUTPUT_DIR}
-        ${ANTLR_GENERATED_FILES_DIR})
+        ${CMAKE_CURRENT_LIST_DIR}/include/events_errors)
 
 add_library(
     head_interactor STATIC
@@ -89,18 +117,18 @@ add_library(
     ${ANTLR_main_lexics_CXX_OUTPUTS}
 )
         
-target_link_libraries(head_interactor PUBLIC Boost::boost exceptions PRIVATE bailerror antlr4_static)
+target_link_libraries(head_interactor PUBLIC Boost::boost exceptions warnings PRIVATE antlr4_static)
 target_compile_definitions(head_interactor PUBLIC $<$<CONFIG:Debug>:DEBUG>)
         
 target_include_directories(head_interactor
     PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}/include/head_interactor
-    PRIVATE
-        ${ANTLR_head_interactor_OUTPUT_DIR}
-        ${ANTLR_main_lexics_OUTPUT_DIR}
         ${CMAKE_CURRENT_LIST_DIR}/include/events_errors
         ${CMAKE_CURRENT_LIST_DIR}/include
-        ${CMAKE_CURRENT_LIST_DIR}/include/types
+    PRIVATE
+        ${OSTERMATH_BE_INCLUDE_DIR}
+        ${ANTLR_head_interactor_OUTPUT_DIR}
+        ${ANTLR_main_lexics_OUTPUT_DIR}
         ${ANTLR_GENERATED_FILES_DIR})
 
 set_target_properties(head_interactor
@@ -117,32 +145,32 @@ set_target_properties(head_interactor
 add_library(
     ostermath_be STATIC
     ${ostermath_be_SOURCES}
-    ${ANTLR_head_interactor_CXX_OUTPUTS}
 )
 
-target_link_libraries(ostermath_be PUBLIC Boost::boost exceptions PRIVATE bailerror head_interactor)
+target_link_libraries(ostermath_be PUBLIC head_interactor)
 target_compile_definitions(ostermath_be PUBLIC $<$<CONFIG:Debug>:DEBUG>)
 
 target_include_directories(ostermath_be
                     PUBLIC 
                         ${OSTERMATH_BE_INCLUDE_DIR}
-                        ${ANTLR_head_interactor_OUTPUT_DIR}
                         ${ANTLR_main_lexics_OUTPUT_DIR}
                     PRIVATE
-                        ${OSTERMATH_BE_INCLUDE_DIR_PRIVATE}
-                        ${ANTLR_GENERATED_FILES_DIR})
+                        ${OSTERMATH_BE_INCLUDE_DIR_PRIVATE})
 
 set_directory_properties(PROPERTIES VS_STARTUP_PROJECT ostermath_be)
 
 file(GLOB_RECURSE detector_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/src/detector/**.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/include/detector/**.h
+)
+
+set_target_properties(ostermath_be
+        PROPERTIES
+        POSITION_INDEPENDENT_CODE ON;
 )
 
 if(NOT USER_INTERFACE)
-    set_target_properties(ostermath_be exceptions bailerror
+    set_target_properties(ostermath_be exceptions warnings
         PROPERTIES
-        POSITION_INDEPENDENT_CODE ON
         ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_LIST_DIR}/lib/Debug/uiless"
         LIBRARY_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_LIST_DIR}/shared/Debug/uiless"
         RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_LIST_DIR}/bin/Debug/uiless"
@@ -151,9 +179,8 @@ if(NOT USER_INTERFACE)
         RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_LIST_DIR}/bin/Release/uiless"
     )
 else()
-    set_target_properties(ostermath_be exceptions bailerror
+    set_target_properties(ostermath_be exceptions warnings
         PROPERTIES
-        POSITION_INDEPENDENT_CODE ON
         ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_LIST_DIR}/lib/Debug/ui"
         LIBRARY_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_LIST_DIR}/shared/Debug/ui"
         RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_LIST_DIR}/bin/Debug/ui"
@@ -177,16 +204,9 @@ file(GLOB_RECURSE test_SOURCE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/test/**.cpp
 )
 
-file(GLOB_RECURSE test_INCLUDE
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/test/**.h
-)
+add_executable(test ${test_SOURCE})
 
-include_directories(${OSTERMATH_BE_INCLUDE_DIR}
-                    ${OSTERMATH_BE_INCLUDE_DIR_PRIVATE})
-
-add_executable(test ${test_INCLUDE} ${test_SOURCE})
-
-target_link_libraries(test PRIVATE ostermath_be detector head_interactor)
+target_link_libraries(test PUBLIC ostermath_be detector head_interactor exceptions warnings)
 target_include_directories(test INTERFACE ${OSTERMATH_BE_INCLUDE_DIR} ${DETECTOR_INCLUDE_DIR})
 target_compile_definitions(test PUBLIC $<$<CONFIG:Debug>:DEBUG>)
 

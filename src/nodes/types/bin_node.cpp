@@ -14,42 +14,53 @@ void BinaryNode::insert_back(std::shared_ptr<Node> node){
     else std::logic_error("Invalid inserting. Prompt: Unvalailable to insert more than 2 nodes to binary node");
 }
 
-Value_t BinaryNode::__calculate__(){
+Result BinaryNode::__calculate__(){
     return __calculate__(0);
 }
 
-Value_t BinaryNode::__calculate__(size_t index){
+Result BinaryNode::__calculate__(size_t index){
+    if(!rhs_cache(index).is_value() || !lhs_cache(index).is_value())
+        return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric value");
+
+    if(operation_==BINARY_OP::DIV && rhs_cache(index).get<Value_t>()==0.)
+        return std::make_shared<exceptions::DivisionZero>();
+    return __calculate__(index);
     switch (operation_)
     {
         case BINARY_OP::ADD:
         #ifdef DEBUG
             //std::cout<<"Add: "<<lhs_cache(index)<<" and "<<rhs_cache(index)<<std::endl;
         #endif
-            return lhs_cache(index)+rhs_cache(index);
+            if(!ErrorChecking(index).is_error())
+                return lhs_cache(index).get<Value_t>()+rhs_cache(index).get<Value_t>();
             break;
         case BINARY_OP::SUB:
         #ifdef DEBUG
             //std::cout<<"Sub: "<<lhs_cache(index)<<" and "<<rhs_cache(index)<<std::endl;
         #endif
-            return lhs_cache(index)-rhs_cache(index);
+            if(!ErrorChecking(index).is_error())
+                return lhs_cache(index).get<Value_t>()-rhs_cache(index).get<Value_t>();
             break;
         case BINARY_OP::MUL:
         #ifdef DEBUG
             //std::cout<<"Mul: "<<lhs_cache(index)<<" and "<<rhs_cache(index)<<std::endl;
         #endif
-            return lhs_cache(index)*rhs_cache(index);
+            if(!ErrorChecking(index).is_error())
+                return lhs_cache(index).get<Value_t>()*rhs_cache(index).get<Value_t>();
             break;
         case BINARY_OP::DIV:
         #ifdef DEBUG
             //std::cout<<"Div: "<<lhs_cache(index)<<" and "<<rhs_cache(index)<<std::endl;
         #endif
-            return lhs_cache(index)/rhs_cache(index);
+            if(!ErrorChecking(index).is_error())
+                return lhs_cache(index).get<Value_t>()/rhs_cache(index).get<Value_t>();
             break;
         case BINARY_OP::POW:
         #ifdef DEBUG
             //std::cout<<"Pow: "<<lhs_cache(index)<<" and "<<rhs_cache(index)<<std::endl;
         #endif
-            return pow(lhs_cache(index),rhs_cache(index));
+            if(!ErrorChecking(index).is_error())
+                return pow(lhs_cache(index).get<Value_t>(),rhs_cache(index).get<Value_t>());
             break;
         default:
             throw std::invalid_argument("Unknown type of binary expression");
@@ -58,22 +69,21 @@ Value_t BinaryNode::__calculate__(size_t index){
 }
 
 Result BinaryNode::execute(){
-    return execute(0);
+    cache_ = execute(0);
+    return cache_;
 }
 
 Result BinaryNode::execute(size_t index){
     using namespace boost::multiprecision;
     if(child(0) && child(1)){
         if(child(0)->caller()) //left branch call refreshing
-            child(0)->execute(index);
+            lhs_cache(index) = child(0)->execute(index);
         else if(child(1)->caller()) //right branch call refreshing
-            child(1)->execute(index);
+            rhs_cache(index) = child(1)->execute(index);
         else{
-            lhs_cache(index) = child(0)->execute(index).get<Value_t>();
-            rhs_cache(index) = child(1)->execute(index).get<Value_t>();
+            lhs_cache(index) = child(0)->execute(index);
+            rhs_cache(index) = child(1)->execute(index);
         }
-        if(operation_==BINARY_OP::DIV && rhs_cache(index)==0.)
-            throw exceptions::DivisionZero();
         return __calculate__(index);
     }
     else

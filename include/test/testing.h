@@ -1,8 +1,4 @@
 #pragma once
-#include <iostream>
-#include <string>
-#include <string_view>
-
 #ifdef DEBUG
 
 void Test_Correct_Sum_Result_For_Array();

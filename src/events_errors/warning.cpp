@@ -1,27 +1,31 @@
-#include "events_errors/warning.h"
+#include "warning.h"
 
 namespace warnings{
-    AbstractWarning::AbstractWarning(){
+    const char* Warning::__get_abbr__() const{
+        return warning_abbr();
+    }
+
+    Warning::Warning(){
         event_t_ = EVENT_TYPE::WARNING;
     }
 
-    const char* warnings::Warning::get_prompt() const{
-        return "";
+    const char* Warning::warning_abbr(){
+        return "#WARN";
     }
 
-    const char* AbstractWarning::__get_title__() const{
+    const char* Warning::__get_title__() const{
         return get_warning();
     }
-    size_t AbstractWarning::__type__() const{
+    size_t Warning::__type__() const{
         return (size_t)type();
     }
 
-    const char* AbstractWarning::__get_prompt__() const{
+    const char* Warning::__get_prompt__() const{
         return get_prompt();
     }
 
     const char* Infinite::warning_abbr(){
-        return "#NAME?";
+        return "#INF!";
     }
     const char* Infinite::get_warning() const{
         return "Parsing error";

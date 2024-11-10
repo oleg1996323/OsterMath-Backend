@@ -16,9 +16,14 @@ NODE_TYPE ArrayNode::type() const{
 }
 
 Result ArrayNode::execute(){
-    for(auto child:childs_)
-        child->execute();
-    return this;
+    for(auto child:childs_){
+        if(child->execute().is_error()){
+            cache_ = child->cached_result();
+            return cache_;
+        }
+    }
+    cache_ = this;
+    return cache_;
 }
 
 Result ArrayNode::execute(size_t index){

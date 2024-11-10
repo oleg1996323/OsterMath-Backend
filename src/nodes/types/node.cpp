@@ -1,8 +1,6 @@
 #include "node.h"
-#include "def.h"
 #include "var_node.h"
 #include "types.h"
-#include "serialize.h"
 #include "events_errors/exception.h"
 
 std::shared_ptr<Node> INFO_NODE::node() const{
@@ -97,19 +95,19 @@ TYPE_VAL Node::type_val() const{
 }
 
 Result Node::execute() const{
-    return "#NAN";
+    return std::monostate();
 }
 
 Result Node::execute(size_t index) const{
-    return "#NAN";
+    return std::monostate();
 }
 
 Result Node::execute(){
-    return "#NAN";
+    return std::monostate();
 }
 
 Result Node::execute(size_t index){
-    return "#NAN";
+    return std::monostate();
 }
 
 bool Node::is_empty() const{

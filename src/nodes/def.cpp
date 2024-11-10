@@ -1,6 +1,5 @@
 #include "def.h"
 #include "node.h"
-#include "arithmetic_functions.h"
 #include "arithmetic_types.h"
 #include "events_errors/abstract_event.h"
 #include "events_errors/warning.h"

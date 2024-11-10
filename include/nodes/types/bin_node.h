@@ -1,5 +1,5 @@
 #pragma once
-#include "def.h"
+#include "include/nodes/def.h"
 #include "node.h"
 
 enum class BINARY_OP{
@@ -25,6 +25,13 @@ class BinaryNode:public Node{
     }
     virtual Result execute() override;
     virtual Result execute(size_t index) override;
+
+    inline virtual Result cached_result() override{
+        return cached_result(0);
+    }
+    inline virtual Result cached_result(size_t index) override{
+        return __calculate__(index);
+    }
     std::shared_ptr<Node> lhs(){
         return child(0);
     }
@@ -38,17 +45,17 @@ class BinaryNode:public Node{
         return child(1);
     }
     virtual void insert_back(std::shared_ptr<Node> node) override;
-    Value_t& lhs_cache() const{
-        return cache_.at(0).lhs_;
+    Result& lhs_cache() const{
+        return bin_cache_.at(0).first;
     }
-    Value_t& rhs_cache() const{
-        return cache_.at(0).rhs_;
+    Result& rhs_cache() const{
+        return bin_cache_.at(0).second;
     }
-    Value_t& lhs_cache(size_t index) const{
-        return cache_.at(index).lhs_;
+    Result& lhs_cache(size_t index) const{
+        return bin_cache_.at(index).first;
     }
-    Value_t& rhs_cache(size_t index) const{
-        return cache_.at(index).rhs_;
+    Result& rhs_cache(size_t index) const{
+        return bin_cache_.at(index).second;
     }
     BINARY_OP operation() const{
         return operation_;
@@ -59,51 +66,36 @@ class BinaryNode:public Node{
     virtual void print_text(std::ostream& stream) const override;
     virtual void print_result(std::ostream& stream) const override;
     private:
-    class __cache__{
-        public:
-        __cache__() = default;
 
-        __cache__(const __cache__& other){
-            *this = other;
-        }
-
-        __cache__(__cache__&& other){
-            *this=other;
-        }
-
-        __cache__& operator=(const __cache__& other){
-            if(&other != this){
-                lhs_ = other.lhs_;
-                rhs_ = other.rhs_;
-            }
-            return *this;
-        }
-
-        __cache__& operator=(__cache__&& other){
-            if(&other != this){
-                std::swap(lhs_,other.lhs_);
-                std::swap(rhs_,other.rhs_);
-            }
-            return *this;
-        }
-
-        Value_t lhs_;
-        Value_t rhs_;
-    };
-    Value_t __calculate__();
-    Value_t __calculate__(size_t index);
-    Value_t& lhs_cache(size_t index){
-        if(cache_.size()-1<index)
-            cache_.resize(index+1);
-        return cache_[index].lhs_;
-    }
-    Value_t& rhs_cache(size_t index){
-        if(cache_.size()-1<index)
-            cache_.resize(index+1);
-        return cache_[index].rhs_;
+    inline Result ErrorChecking(size_t index){
+        if(lhs_cache(index).is_error())
+            return lhs_cache(index);
+        if(rhs_cache(index).is_error())
+            return rhs_cache(index);
+        if(!lhs_cache(index).is_value())
+            return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric value");
+        if(!rhs_cache(index).is_value())
+            return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric value");
+        return std::monostate();
     }
 
-    mutable std::vector<__cache__> cache_=[](){std::vector<__cache__> res;
+    Result __calculate__();
+    Result __calculate__(size_t index);
+
+    //cannot be returned reference because of resizing cache-vector (invalidation possible)
+    Result lhs_cache(size_t index){
+        if(bin_cache_.size()-1<index)
+            bin_cache_.resize(index+1);
+        return bin_cache_[index].first;
+    }
+    //cannot be returned reference because of resizing cache-vector (invalidation possible)
+    Result rhs_cache(size_t index){
+        if(bin_cache_.size()-1<index)
+            bin_cache_.resize(index+1);
+        return bin_cache_[index].second;
+    }
+
+    mutable std::vector<std::pair<Result,Result>> bin_cache_=[](){std::vector<std::pair<Result,Result>> res;
                                                 res.resize(1);
                                                 return res;}();
     BINARY_OP operation_;

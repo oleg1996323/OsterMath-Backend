@@ -25,15 +25,23 @@ enum EXCEPTION_TYPE{
     NODE_DONT_EXISTS
 };
 
-class AbstractException: public std::runtime_error, public AbstractEvent{
+class Exception: public std::runtime_error, public AbstractEvent{
+    virtual const char* __get_abbr__() const override final;
     public:
     using std::runtime_error::runtime_error;
-    AbstractException(const char* arg);
-    virtual ~AbstractException() = default;
     //error abbreviation
-    static const char* error_abbr();
-    virtual const char* get_error() const = 0;
-    virtual EXCEPTION_TYPE type() const = 0;
+    explicit Exception(const char* arg);
+    explicit Exception(const std::string& arg);
+    virtual ~Exception() = default;
+    inline static const char* error_abbr(){
+        return "#ERR!";
+    }
+    inline virtual const char* get_error() const{
+        return "Error occured!";
+    };
+    inline virtual EXCEPTION_TYPE type() const{
+        return EXCEPTION;
+    };
     virtual const char* get_prompt() const;
     private:
     virtual const char* __get_title__() const override;
@@ -41,46 +49,32 @@ class AbstractException: public std::runtime_error, public AbstractEvent{
     virtual const char* __get_prompt__() const override;
 };
 
-class Exception: public AbstractException{
-    public:
-    using AbstractException::AbstractException;
-    //error abbreviation
-    static const char* error_abbr();
-    virtual const char* get_error() const{
-        return "";
-    };
-    virtual EXCEPTION_TYPE type() const{
-        return EXCEPTION;
-    };
-    virtual const char* get_prompt() const;
-};
-
 class ParsingError : public Exception {
     public:
     using Exception::Exception;
     ParsingError(const std::string& error);
     static const char* error_abbr();
-    virtual const char* get_error() const;
-    virtual EXCEPTION_TYPE type() const;
-    virtual const char* get_prompt() const;
+    virtual const char* get_error() const override;
+    virtual EXCEPTION_TYPE type() const override;
+    virtual const char* get_prompt() const override;
 };
 
 class UnequalSizeArrays: public Exception{
     public:
     UnequalSizeArrays(const std::string& function_name);
     static const char* error_abbr();
-    virtual const char* get_error() const;
-    virtual EXCEPTION_TYPE type() const;
-    virtual const char* get_prompt() const;
+    virtual const char* get_error() const override;
+    virtual EXCEPTION_TYPE type() const override;
+    virtual const char* get_prompt() const override;
 };
 
 class UnknownTypeArray: public Exception{
     public:
     UnknownTypeArray();
     static const char* error_abbr();
-    virtual const char* get_error() const;
-    virtual EXCEPTION_TYPE type() const;
-    virtual const char* get_prompt() const;
+    virtual const char* get_error() const override;
+    virtual EXCEPTION_TYPE type() const override;
+    virtual const char* get_prompt() const override;
 };
 
 class IncorrectTypeArrays: public Exception{
@@ -88,9 +82,9 @@ class IncorrectTypeArrays: public Exception{
     using Exception::Exception;
     IncorrectTypeArrays(const std::string& type_expected);
     static const char* error_abbr();
-    virtual const char* get_error() const;
-    virtual EXCEPTION_TYPE type() const;
-    virtual const char* get_prompt() const;
+    virtual const char* get_error() const override;
+    virtual EXCEPTION_TYPE type() const override;
+    virtual const char* get_prompt() const override;
 };
 
 class CyclicReference: public Exception{
@@ -98,9 +92,9 @@ class CyclicReference: public Exception{
     using Exception::Exception;
     CyclicReference(const std::string& var_name);
     static const char* error_abbr();
-    virtual const char* get_error() const;
-    virtual EXCEPTION_TYPE type() const;
-    virtual const char* get_prompt() const;
+    virtual const char* get_error() const override;
+    virtual EXCEPTION_TYPE type() const override;
+    virtual const char* get_prompt() const override;
 };
 
 class DivisionZero: public Exception{
@@ -108,9 +102,9 @@ class DivisionZero: public Exception{
     using Exception::Exception;
     DivisionZero();
     static const char* error_abbr();
-    virtual const char* get_error() const;
-    virtual EXCEPTION_TYPE type() const;
-    virtual const char* get_prompt() const;
+    virtual const char* get_error() const override;
+    virtual EXCEPTION_TYPE type() const override;
+    virtual const char* get_prompt() const override;
 };
 
 class InvalidTypeOfArgument:public Exception{
@@ -118,9 +112,9 @@ class InvalidTypeOfArgument:public Exception{
     using Exception::Exception;
     InvalidTypeOfArgument(const std::string&);
     static const char* error_abbr();
-    virtual const char* get_error() const;
-    virtual EXCEPTION_TYPE type() const;
-    virtual const char* get_prompt() const;
+    virtual const char* get_error() const override;
+    virtual EXCEPTION_TYPE type() const override;
+    virtual const char* get_prompt() const override;
 };
 
 class InvalidNumberOfArguments:public Exception{
@@ -128,9 +122,9 @@ class InvalidNumberOfArguments:public Exception{
     using Exception::Exception;
     InvalidNumberOfArguments(size_t);
     static const char* error_abbr();
-    virtual const char* get_error() const;
-    virtual EXCEPTION_TYPE type() const;
-    virtual const char* get_prompt() const;
+    virtual const char* get_error() const override;
+    virtual EXCEPTION_TYPE type() const override;
+    virtual const char* get_prompt() const override;
 };
 
 class VariableDontExists:public Exception{
@@ -138,9 +132,9 @@ class VariableDontExists:public Exception{
     using Exception::Exception;
     VariableDontExists(const std::string&);
     static const char* error_abbr();
-    virtual const char* get_error() const;
-    virtual EXCEPTION_TYPE type() const;
-    virtual const char* get_prompt() const;
+    virtual const char* get_error() const override;
+    virtual EXCEPTION_TYPE type() const override;
+    virtual const char* get_prompt() const override;
 };
 
 class NodeChildDontExists:public Exception{
@@ -148,9 +142,9 @@ class NodeChildDontExists:public Exception{
     using Exception::Exception;
     NodeChildDontExists(const std::string&);
     static const char* error_abbr();
-    virtual const char* get_error() const;
-    virtual EXCEPTION_TYPE type() const;
-    virtual const char* get_prompt() const;
+    virtual const char* get_error() const override;
+    virtual EXCEPTION_TYPE type() const override;
+    virtual const char* get_prompt() const override;
 };
 
 const char* get_except_abbr(EXCEPTION_TYPE);

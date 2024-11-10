@@ -89,7 +89,20 @@
         "valarray": "cpp",
         "variant": "cpp",
         "*.ipp": "cpp",
-        "hash_map": "cpp"
+        "hash_map": "cpp",
+        "cassert": "cpp",
+        "cerrno": "cpp",
+        "cfloat": "cpp",
+        "ciso646": "cpp",
+        "climits": "cpp",
+        "execution": "cpp",
+        "filesystem": "cpp",
+        "ios": "cpp",
+        "locale": "cpp",
+        "queue": "cpp",
+        "stack": "cpp",
+        "cstdbool": "cpp",
+        "version": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

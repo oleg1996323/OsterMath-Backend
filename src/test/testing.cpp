@@ -1,3 +1,6 @@
+#include <iostream>
+#include <string>
+#include <string_view>
 #include "test/testing.h"
 #include "data.h"
 #include "arithmetic_types.h"

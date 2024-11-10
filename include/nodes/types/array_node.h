@@ -1,9 +1,8 @@
 #pragma once
-#include "def.h"
-#include "node.h"
-#include "types.h"
 #include <vector>
 #include <memory>
+#include <type_traits>
+#include "node.h"
 
 class ArrayNode:public Node{
     public:
@@ -13,9 +12,26 @@ class ArrayNode:public Node{
     ArrayNode(ArrayNode&&) = delete;
     ArrayNode(std::shared_ptr<ValueNode>&& val);
     ArrayNode(const std::shared_ptr<ValueNode>& val);
+
+    template<typename T>
+    requires (!std::is_same_v<T,ArrayNode>)
+    ArrayNode operator=(std::shared_ptr<T>&& val);
     virtual NODE_TYPE type() const override;
     virtual Result execute() override;
+    inline virtual Result execute() const override{
+        return execute();
+    }
     virtual Result execute(size_t index) override;
+    virtual Result execute(size_t index) const override{
+        return execute(index);
+    }
+    inline virtual Result cached_result() const{
+        return cache_;
+    }
+    inline virtual Result cached_result(size_t index){
+        if(has_child(index))
+        return child(index)->cached_result();
+    }
     virtual void insert_back(std::shared_ptr<Node> node) override;
     //insert before value at id
     virtual std::shared_ptr<Node> insert(size_t,std::shared_ptr<Node>) override;
@@ -33,4 +49,12 @@ class ArrayNode:public Node{
     virtual bool is_array() const override;
     virtual void print_text(std::ostream& stream) const override;
     virtual void print_result(std::ostream& stream) const override;
+    private:
+    Result cache_;
 };
+
+template<typename T>
+requires (!std::is_same_v<T,ArrayNode>)
+ArrayNode ArrayNode::operator=(std::shared_ptr<T>&& val){
+    return ArrayNode().insert_back(std::forward<T>(val));
+}

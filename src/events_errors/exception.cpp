@@ -1,11 +1,18 @@
-#include <exception.h>
-#include <head_interactor.h>
-#include <BaseErrorListener.h>
-#include <DefaultErrorStrategy.h>
+#include "exception.h"
+#include <cassert>
 
 namespace exceptions{
-    AbstractException::AbstractException(const char* arg):
-    std::runtime_error(arg){
+    const char* Exception::__get_abbr__() const{
+        return error_abbr();
+    }
+
+    Exception::Exception(const char* arg):
+    std::runtime_error(arg), AbstractEvent(){
+        event_t_ = EVENT_TYPE::EXCEPTION;
+    }
+
+    Exception::Exception(const std::string& arg):
+    std::runtime_error(arg), AbstractEvent(){
         event_t_ = EVENT_TYPE::EXCEPTION;
     }
 
@@ -13,14 +20,14 @@ namespace exceptions{
         return what();
     }
 
-    const char* AbstractException::__get_title__() const{
+    const char* Exception::__get_title__() const{
         return get_error();
     }
-    size_t AbstractException::__type__() const{
+    size_t Exception::__type__() const{
         return (size_t)type();
     }
 
-    const char* AbstractException::__get_prompt__() const{
+    const char* Exception::__get_prompt__() const{
         return get_prompt();
     }
 
