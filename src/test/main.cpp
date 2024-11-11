@@ -66,7 +66,8 @@ exceptions::EXCEPTION_TYPE exception_handler(std::function<void()> function){
         return err.type();
     }
 }
-int main(){   
+int main(){
+    LOG_DURATION("Tests");   
     Testing();
 //     DataPool pool("main");
 //     pool.add_data("any");

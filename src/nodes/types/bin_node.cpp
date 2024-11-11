@@ -24,7 +24,6 @@ Result BinaryNode::__calculate__(size_t index){
 
     if(operation_==BINARY_OP::DIV && rhs_cache(index).get<Value_t>()==0.)
         return std::make_shared<exceptions::DivisionZero>();
-    return __calculate__(index);
     switch (operation_)
     {
         case BINARY_OP::ADD:
@@ -66,6 +65,7 @@ Result BinaryNode::__calculate__(size_t index){
             throw std::invalid_argument("Unknown type of binary expression");
             break;
     }
+    return Result();
 }
 
 Result BinaryNode::execute(){

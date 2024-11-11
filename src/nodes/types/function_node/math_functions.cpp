@@ -75,7 +75,6 @@ Result node_function::functions::math::Sum(FunctionNode* node){
         
         Value_t result = 0.;
         std::unique_ptr<ProxySizeDepthMeasure> proxy_array_iterator;
-        std::vector<Value_t> value_vector;
         {
             std::vector<size_t> sz_depth_measure;
             {
@@ -93,7 +92,6 @@ Result node_function::functions::math::Sum(FunctionNode* node){
             }
         }
 
-        value_vector.resize(proxy_array_iterator->total_size_childs(),1);
         size_t array_depth = proxy_array_iterator->depth();
 
         for(const std::shared_ptr<Node>& array:node->childs()){
@@ -110,7 +108,6 @@ Result node_function::functions::math::Sum(FunctionNode* node){
             proxy_array_iterator->reset_iterator();
         }
 
-        result = std::accumulate(value_vector.begin(),value_vector.end(),Value_t(0));
         return result;
     }
     else if(check_type_container_nodes(TYPE_VAL::VALUE,node->childs())){
@@ -129,7 +126,7 @@ Result node_function::functions::math::Product(FunctionNode* node){
         using T = __container_make__<childs_t,
                                     std::shared_ptr<ArrayNode>>::type;
         
-        Value_t result = 0.;
+        Value_t result = 1.;
         std::unique_ptr<ProxySizeDepthMeasure> proxy_array_iterator;
     
         {

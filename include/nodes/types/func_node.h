@@ -46,7 +46,6 @@ class FunctionNode:public Node{
     FUNCTION_OP operation() const;
     private:
     FUNCTION_OP operation_;
-    Result cache_;
     bool array_type_function;
 
     Result __multiargument_numeric_case__();

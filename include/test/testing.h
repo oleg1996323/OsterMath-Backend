@@ -1,6 +1,6 @@
 #pragma once
 #ifdef DEBUG
-
+#include "log_duration.h"
 void Test_Correct_Sum_Result_For_Array();
 
 void Test_Correct_SumProduct_Result_For_Array();

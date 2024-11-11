@@ -63,7 +63,7 @@ constexpr bool ARRAY_TYPE_FUNCTION [int(FUNCTION_OP::MEDIAN)+1] =
 
 
 //0 - if 1 or more
-constexpr size_t NUMBER_OF_ARGUMENT [int(FUNCTION_OP::MEDIAN)+1] = {
+constexpr int NUMBER_OF_ARGUMENT [int(FUNCTION_OP::MEDIAN)+1] = {
     /*LN*/{1},
     /*LG10*/{1},
     /*EXP*/{1},
@@ -73,12 +73,12 @@ constexpr size_t NUMBER_OF_ARGUMENT [int(FUNCTION_OP::MEDIAN)+1] = {
     /*ASIN*/{1},
     /*FACTORIAL*/{1},
     /*LOG_X*/{2},
-    /*SUM*/{0},
-    /*PROD*/{0},
-    /*SUMPRODUCT*/{0},
-    /*CONCAT*/{0},
-    /*SEARCH_STRING*/{0},
-    /*CONTAIN_TEXT*/{0},
+    /*SUM*/{-1},
+    /*PROD*/{-1},
+    /*SUMPRODUCT*/{-1},
+    /*CONCAT*/{-1},
+    /*SEARCH_STRING*/{-1},
+    /*CONTAIN_TEXT*/{-1},
     /*WEIBULL_DIST*/{4},
     /*GAUSS*/{1},
     /*STD_NORM_DISTRIB*/{2},
@@ -86,10 +86,10 @@ constexpr size_t NUMBER_OF_ARGUMENT [int(FUNCTION_OP::MEDIAN)+1] = {
     /*PEARSON*/{2},
     /*GAMMA*/{1},
     /*GAMMA_REV*/{3},
-    /*ROOT_MEAN_SQUARE*/{0},
-    /*ROOT_MEAN_SQUARE_ERROR*/{0},
-    /*AVERAGE*/{0},
-    /*MEDIAN*/{0}
+    /*ROOT_MEAN_SQUARE*/{-1},
+    /*ROOT_MEAN_SQUARE_ERROR*/{-1},
+    /*AVERAGE*/{-1},
+    /*MEDIAN*/{-1}
     };
 
 

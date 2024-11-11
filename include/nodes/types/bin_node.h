@@ -83,13 +83,13 @@ class BinaryNode:public Node{
     Result __calculate__(size_t index);
 
     //cannot be returned reference because of resizing cache-vector (invalidation possible)
-    Result lhs_cache(size_t index){
+    Result& lhs_cache(size_t index){
         if(bin_cache_.size()-1<index)
             bin_cache_.resize(index+1);
         return bin_cache_[index].first;
     }
     //cannot be returned reference because of resizing cache-vector (invalidation possible)
-    Result rhs_cache(size_t index){
+    Result& rhs_cache(size_t index){
         if(bin_cache_.size()-1<index)
             bin_cache_.resize(index+1);
         return bin_cache_[index].second;

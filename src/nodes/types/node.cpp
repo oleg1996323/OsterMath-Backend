@@ -42,7 +42,7 @@ Node::Node(size_t sz):
 Node::Node()=default;
 
 //don't copy parents
-Node::Node(const Node& other){
+Node::Node(const Node& other):cache_(other.cache_){
     if(&other!=this){
         for(const std::shared_ptr<Node>& child:other.childs_){
             release_childs();
