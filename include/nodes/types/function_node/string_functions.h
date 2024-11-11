@@ -20,6 +20,7 @@ namespace node_function::functions{
         }
 
         Result Concatenate(const ArrayNode* arr){
+            using namespace ::functions::auxiliary;
             std::string result;
             for(const std::shared_ptr<Node>& child:arr->childs()){
                 if(!child->execute().is_error()){
@@ -37,6 +38,7 @@ namespace node_function::functions{
         }
 
         Result Concatenate(const std::vector<std::shared_ptr<Node>>& nodes){
+            using namespace ::functions::auxiliary;
             std::string result;
             for(const std::shared_ptr<Node>& node:nodes){
                 if(!node->execute().is_error()){

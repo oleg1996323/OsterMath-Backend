@@ -51,4 +51,5 @@ class FunctionNode:public Node{
 
     Result __multiargument_numeric_case__();
     Result __fixed_size_case__();
+    std::vector<ArrayNode*> __get_vector_of_arrays__();
 };

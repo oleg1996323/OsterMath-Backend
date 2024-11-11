@@ -45,71 +45,10 @@ FUNCTION_OP FunctionNode::operation() const{
 #include <numeric>
 #include "correlation.h"
 #include "function_node/string_functions.h"
-
-Result FunctionNode::__multiargument_numeric_case__(){
-    if(check_type_arguments_for_node(TYPE_VAL::ARRAY,childs())){
-        std::vector<ArrayNode*> arrays;
-        for(std::shared_ptr<Node>& child:childs_){
-            if(child->is_numeric()){
-                ArrayNode* push_node;
-                if(child->type()==NODE_TYPE::VARIABLE && child->childs().size()==1)
-                    push_node = reinterpret_cast<ArrayNode*>(child->child(0).get());
-                else 
-                    push_node = reinterpret_cast<ArrayNode*>(child.get());
-                arrays.push_back(push_node);
-            }
-            else throw exceptions::InvalidTypeOfArgument("numeric value or numeric array");
-        }
-        switch(operation_){
-            case FUNCTION_OP::SUMPRODUCT:
-                cache_ = node_function::functions::math::SumProduct(arrays);
-                break;
-            case FUNCTION_OP::SUM:
-                cache_ = node_function::functions::math::Sum(arrays);
-                break;
-            case FUNCTION_OP::PROD:
-                cache_ = node_function::functions::math::Product(arrays);
-                break;
-            default:
-                throw std::invalid_argument("Incorrect function operation");
-        }
-    }
-    else{
-        if(check_type_arguments_for_node(TYPE_VAL::VALUE,childs())){
-            Value_t init;
-            switch(operation_){
-                case FUNCTION_OP::SUMPRODUCT:
-                    init = 1.;
-                    std::for_each(childs_.begin(),childs_.end(),[&](const std::shared_ptr<Node>& child)->Result{
-                        return init*=child->execute().get<Value_t>();
-                    });
-                    cache_ = init;
-                    break;
-                case FUNCTION_OP::SUM:
-                    init = 0.;
-                    std::for_each(childs_.begin(),childs_.end(),[&](const std::shared_ptr<Node>& child)->Result{
-                        return init+=child->execute().get<Value_t>();
-                    });
-                    cache_ = init;
-                    break;
-                case FUNCTION_OP::PROD:
-                    init = 1.;
-                    std::for_each(childs_.begin(),childs_.end(),[&](const std::shared_ptr<Node>& child)->Result{
-                        return init*=child->execute().get<Value_t>();
-                    });
-                    cache_ = init;
-                    break;
-                default:
-                    throw std::invalid_argument("Unknown function operation");
-            }
-        }
-        else throw exceptions::InvalidTypeOfArgument("numeric value or numeric array");
-    }
-}
+using namespace functions::auxiliary;
 
 Result FunctionNode::execute(){ //TODO add checking for arrays size comparision
     using namespace boost::math::policies;
-    using namespace functions::auxiliary;
     cache_ = std::monostate();
     if(array_type_function){
             if(childs_.size()>0){
@@ -236,8 +175,8 @@ Result FunctionNode::execute(){ //TODO add checking for arrays size comparision
                 }
                 cache_ = node_function::functions::math::CorrelationCoefficient(
                     std::execution::seq,
-                    reinterpret_cast<const ArrayNode*>(child(0).get()),
-                    reinterpret_cast<const ArrayNode*>(child(1).get())
+                    to_array_node(child(0)),
+                    to_array_node(child(1))
                     );
                 return cache_;
                 break;
@@ -250,40 +189,18 @@ Result FunctionNode::execute(){ //TODO add checking for arrays size comparision
                 return cache_;
                 break;
             }
-            case FUNCTION_OP::SUM:
-            //checking size is realized in functions
-            if(check_type_arguments_for_node(TYPE_VAL::NUMERIC_ARRAY,childs())){
-            std::vector<ArrayNode*> arrays = [](){
-            for(std::shared_ptr<Node>& child:childs_){
-                    child->execute();
-                    if(child->cached_result().is_error())
-                    if(child->type()==NODE_TYPE::VARIABLE && child->childs().size()==1)
-                        push_node = reinterpret_cast<ArrayNode*>(child->child(0).get());
-                    else 
-                        push_node = reinterpret_cast<ArrayNode*>(child.get());
-                    arrays.push_back(push_node);
-            }}
-        switch(operation_){
-            case FUNCTION_OP::SUMPRODUCT:
-                cache_ = node_function::functions::math::SumProduct(arrays);
+            case FUNCTION_OP::SUM:{
+                cache_ = node_function::functions::math::Sum(this);
+                return cache_;
                 break;
-            case FUNCTION_OP::SUM:
-                cache_ = node_function::functions::math::Sum(arrays);
-                break;
+            }
             case FUNCTION_OP::PROD:
-                cache_ = node_function::functions::math::Product(arrays);
-                break;
-            default:
-                throw std::invalid_argument("Incorrect function operation");
-        }
-    }
-                throw exceptions::InvalidTypeOfArgument("Invalid type of function");
-                break;
-            case FUNCTION_OP::PROD:
-                throw exceptions::InvalidTypeOfArgument("Invalid type of function");
+                cache_ = node_function::functions::math::Product(this);
+                return cache_;
                 break;
             case FUNCTION_OP::SUMPRODUCT:
-                throw exceptions::InvalidTypeOfArgument("Invalid type of function");
+                cache_ = node_function::functions::math::SumProduct(this);
+                return cache_;
                 break;
             case FUNCTION_OP::CONTAIN_TEXT:
                 throw exceptions::InvalidTypeOfArgument("Invalid type of function");
