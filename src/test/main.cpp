@@ -66,9 +66,13 @@ exceptions::EXCEPTION_TYPE exception_handler(std::function<void()> function){
         return err.type();
     }
 }
-int main(){
-    LOG_DURATION("Tests");   
-    Testing();
+
+#include <gtest/gtest.h>
+
+int main(int argc, char **argv){
+    ::testing::InitGoogleTest(&argc, argv);
+    //LOG_DURATION("Tests");   
+    //Testing();
 //     DataPool pool("main");
 //     pool.add_data("any");
 //     BaseData* data = pool.get("any");
@@ -90,7 +94,7 @@ int main(){
 //         // std::cout<<result.str()<<std::endl;
 //     }
     
-    return 0;
+    return RUN_ALL_TESTS();
 }
 
 #else 

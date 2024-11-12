@@ -5,7 +5,7 @@
             "name": "Debug",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceRoot}/bin/test",
+            "program": "${workspaceRoot}/bin/nodes_test",
             "cwd": "${workspaceRoot}",
             "logging": {"engineLogging":"warning",
                         "exceptions": true},

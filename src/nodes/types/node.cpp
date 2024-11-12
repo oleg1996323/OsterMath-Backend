@@ -44,8 +44,8 @@ Node::Node()=default;
 //don't copy parents
 Node::Node(const Node& other):cache_(other.cache_){
     if(&other!=this){
+        release_childs();
         for(const std::shared_ptr<Node>& child:other.childs_){
-            release_childs();
             if(child->type()!=NODE_TYPE::VARIABLE)
                 childs_.push_back(std::make_shared<Node>(*child.get()));
             else childs_.push_back(child);

@@ -1,0 +1,5 @@
+if(EXISTS "/home/oster/OsterMath-Backend/nodes_test[1]_tests.cmake")
+  include("/home/oster/OsterMath-Backend/nodes_test[1]_tests.cmake")
+else()
+  add_test(nodes_test_NOT_BUILT nodes_test_NOT_BUILT)
+endif()

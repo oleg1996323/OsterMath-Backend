@@ -206,19 +206,23 @@ file(GLOB_RECURSE test_SOURCE
 
 find_package(GTest CONFIG REQUIRED)
 
-add_executable(test ${test_SOURCE})
+enable_testing()
 
-target_link_libraries(test PUBLIC GTest::gtest ostermath_be detector head_interactor exceptions warnings)
-target_include_directories(test INTERFACE ${OSTERMATH_BE_INCLUDE_DIR} ${DETECTOR_INCLUDE_DIR})
-target_compile_definitions(test PUBLIC $<$<CONFIG:Debug>:DEBUG>)
+include(GoogleTest)
+add_executable(nodes_test ${test_SOURCE})
+
+target_link_libraries(nodes_test PUBLIC GTest::gtest ostermath_be detector head_interactor exceptions warnings)
+target_include_directories(nodes_test INTERFACE ${OSTERMATH_BE_INCLUDE_DIR} ${DETECTOR_INCLUDE_DIR})
+target_compile_definitions(nodes_test PUBLIC $<$<CONFIG:Debug>:DEBUG>)
 
 
 
-set_target_properties(test
+set_target_properties(nodes_test
     PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/lib"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/shared"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/bin"
 )
 
-add_test(NAME "test" COMMAND test)
+gtest_discover_tests(nodes_test)
+#add_test(NAME "Nodes" COMMAND nodes_test)
