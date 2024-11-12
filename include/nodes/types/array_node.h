@@ -18,19 +18,15 @@ class ArrayNode:public Node{
     ArrayNode operator=(std::shared_ptr<T>&& val);
     virtual NODE_TYPE type() const override;
     virtual Result execute() override;
-    inline virtual Result execute() const override{
-        return execute();
-    }
     virtual Result execute(size_t index) override;
-    virtual Result execute(size_t index) const override{
-        return execute(index);
-    }
     inline virtual Result cached_result() const{
         return cache_;
     }
     inline virtual Result cached_result(size_t index){
         if(has_child(index))
-        return child(index)->cached_result();
+            return child(index)->cached_result();
+        else
+            throw std::invalid_argument("Incorrect child's id");
     }
     virtual void insert_back(std::shared_ptr<Node> node) override;
     //insert before value at id

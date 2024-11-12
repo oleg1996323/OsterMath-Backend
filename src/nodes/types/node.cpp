@@ -94,14 +94,6 @@ TYPE_VAL Node::type_val() const{
         return TYPE_VAL::UNKNOWN;
 }
 
-Result Node::execute() const{
-    return std::monostate();
-}
-
-Result Node::execute(size_t index) const{
-    return std::monostate();
-}
-
 Result Node::execute(){
     return std::monostate();
 }

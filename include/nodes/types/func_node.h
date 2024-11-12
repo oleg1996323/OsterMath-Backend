@@ -28,7 +28,6 @@ class FunctionNode:public Node{
     }
     FunctionNode(const FunctionNode& other);
     FunctionNode(FunctionNode&&) = delete;
-    std::shared_ptr<Node> child(size_t id) const;
     inline virtual NODE_TYPE type() const override{
         return NODE_TYPE::FUNCTION;
     }
@@ -47,8 +46,4 @@ class FunctionNode:public Node{
     private:
     FUNCTION_OP operation_;
     bool array_type_function;
-
-    Result __multiargument_numeric_case__();
-    Result __fixed_size_case__();
-    std::vector<ArrayNode*> __get_vector_of_arrays__();
 };

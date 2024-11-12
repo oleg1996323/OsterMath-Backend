@@ -204,11 +204,15 @@ file(GLOB_RECURSE test_SOURCE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/test/**.cpp
 )
 
+find_package(GTest CONFIG REQUIRED)
+
 add_executable(test ${test_SOURCE})
 
-target_link_libraries(test PUBLIC ostermath_be detector head_interactor exceptions warnings)
+target_link_libraries(test PUBLIC GTest::gtest ostermath_be detector head_interactor exceptions warnings)
 target_include_directories(test INTERFACE ${OSTERMATH_BE_INCLUDE_DIR} ${DETECTOR_INCLUDE_DIR})
 target_compile_definitions(test PUBLIC $<$<CONFIG:Debug>:DEBUG>)
+
+
 
 set_target_properties(test
     PROPERTIES

@@ -1,0 +1,25 @@
+namespace node_array::test{
+bool Test_Size_Constructor();
+bool Test_Copy_Constructor();
+bool Test_Move_Constructor();
+bool Test_Move_SharedPtrVal_Constructor();
+bool Test_Copy_SharedPtrVal_Constructor();
+bool Test_Operator_Eq();
+bool Test_Type();
+bool Test_Execute_const();
+bool Test_Execute();
+bool Test_Execute_const_id();
+bool Test_Execute_id();
+bool Test_Cached_Result();
+bool Test_Cached_Result_id();
+bool Test_Insert_Back();
+bool Test_Insert();
+bool Test_Replace();
+bool Test_Begins();
+bool Test_Ends();
+bool Test_is_Numeric();
+bool Test_is_String();
+bool Test_is_Array();
+bool Test_Print_Text();
+bool Test_Print_Result();
+}

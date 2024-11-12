@@ -45,10 +45,16 @@ class Node{
     Node(Node&& other) = delete;
     TYPE_VAL type_val() const;
     inline const std::shared_ptr<Node>& child(size_t id) const{
-        return childs_.at(id);
+        if(id<childs_.size())
+            return childs_.at(id);
+        else
+            throw std::invalid_argument("Incorrect child's id");
     }
     inline std::shared_ptr<Node>& child(size_t id){
-        return childs_.at(id);
+        if(id<childs_.size())
+            return childs_.at(id);
+        else
+            throw std::invalid_argument("Incorrect child's id");
     }
     INFO_NODE child(const std::vector<size_t>& indexes);
     INFO_NODE child(const std::vector<size_t>& indexes) const;
@@ -67,9 +73,7 @@ class Node{
     }
     virtual NODE_TYPE type() const;
     virtual Result execute();
-    virtual Result execute() const;
     virtual Result execute(size_t index);
-    virtual Result execute(size_t index) const;
     inline virtual Result cached_result(){
         return std::monostate();
     }

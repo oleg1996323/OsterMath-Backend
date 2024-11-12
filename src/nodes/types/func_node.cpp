@@ -30,13 +30,6 @@ bool FunctionNode::is_array() const{
     return false;
 }
 
-std::shared_ptr<Node> FunctionNode::child(size_t id) const{
-    if(id<childs_.size())
-        return childs_.at(id);
-    else
-        throw std::invalid_argument("Incorrect child's id");
-}
-
 FUNCTION_OP FunctionNode::operation() const{
     return operation_;
 }
