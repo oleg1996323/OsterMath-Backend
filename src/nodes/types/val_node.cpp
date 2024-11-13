@@ -2,15 +2,11 @@
 #include "array_node.h"
 
 void ValueNode::print_text(std::ostream& stream) const{
-    if(val_.has_value())
-        stream<<val_.value();
-    else stream<<"#NAN";
+    stream<<val_;
 }
 
 void ValueNode::print_result(std::ostream& stream) const{
-    if(val_.has_value())
-        stream<<val_.value();
-    else stream<<"#NAN";
+    stream<<val_;
 }
 
 bool ValueNode::is_numeric() const{

@@ -8,10 +8,7 @@ ArrayNode::ArrayNode(size_t sz):
     Node(sz)
 {}
 
-ArrayNode::ArrayNode(const ArrayNode& other):Node(other){}
-
 NODE_TYPE ArrayNode::type() const{
-    
     return NODE_TYPE::ARRAY;
 }
 
@@ -143,7 +140,7 @@ void ArrayNode::print_result(std::ostream& stream) const{
     stream<<']';
 }
 
-std::ostream& operator<<(std::ostream& stream, std::shared_ptr<ArrayNode>& node){
+std::ostream& operator<<(std::ostream& stream, const std::shared_ptr<ArrayNode>& node){
     node->print_text(stream);
     return stream;
 }

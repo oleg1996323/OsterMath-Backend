@@ -41,8 +41,12 @@ class Node{
     public:
     Node(size_t sz);
     Node();
-    Node(const Node& other);
-    Node(Node&& other) = delete;
+    Node(const Node& other){
+        *this = other;
+    }
+
+    inline Node& operator=(const Node& other);
+    inline Node& operator=(Node&& other);
     TYPE_VAL type_val() const;
     inline const std::shared_ptr<Node>& child(size_t id) const{
         if(id<childs_.size())
@@ -136,4 +140,24 @@ void Node::recursive_function_applied_to_all_childs(std::function<T(const std::s
             func(child);
             child->recursive_function_applied_to_all_childs(func,this);
         }
+}
+
+Node& Node::operator=(Node&& other){
+    if(&other!=this){
+        childs_.swap(other.childs_);
+        std::swap(cache_,other.cache_);
+    }
+    return *this;
+}
+
+Node& Node::operator=(const Node& other){
+    if(&other!=this){
+        release_childs();
+        for(const std::shared_ptr<Node>& child:other.childs_){
+            if(child->type()!=NODE_TYPE::VARIABLE)
+                childs_.push_back(std::make_shared<Node>(*child.get()));
+            else childs_.push_back(child);
+        }
+    }
+    return *this;
 }

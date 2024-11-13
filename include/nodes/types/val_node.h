@@ -16,15 +16,11 @@ class ValueNode:public Node{
     }
 
     virtual Result execute() override{
-        if(val_.has_value())
-            return val_.value();
-        else return std::monostate();
+        return val_;
     }
 
     virtual Result execute(size_t index) override{
-        if(val_.has_value())
-            return val_.value();
-        else return std::monostate();
+        return val_;
     }
     
     virtual bool is_numeric() const override;
@@ -40,5 +36,5 @@ class ValueNode:public Node{
     virtual void print_result(std::ostream& stream) const override;
 
     private:
-    std::optional<Value_t> val_;
+    Value_t val_;
 };

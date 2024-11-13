@@ -6,16 +6,29 @@
 
 class ArrayNode:public Node{
     public:
+    using Node::operator=;
     typedef std::shared_ptr<Node> value_type;
     ArrayNode(size_t sz);
-    ArrayNode(const ArrayNode& other);
-    ArrayNode(ArrayNode&&) = delete;
-    ArrayNode(std::shared_ptr<ValueNode>&& val);
-    ArrayNode(const std::shared_ptr<ValueNode>& val);
-
     template<typename T>
-    requires (!std::is_same_v<T,ArrayNode>)
-    ArrayNode operator=(std::shared_ptr<T>&& val);
+    requires std::is_same_v<typename std::decay_t<T>,ArrayNode>
+    ArrayNode(T&& other):Node(std::forward<T>(other)){
+        *this = other;
+    }
+
+    template<typename SMART_PTR>
+    requires (std::is_base_of_v<Node,typename std::decay_t<SMART_PTR>::element_type> && 
+    !std::is_same_v<typename std::decay_t<SMART_PTR>::element_type,ArrayNode>)
+    ArrayNode(SMART_PTR&& val);
+
+    inline ArrayNode& operator=(const ArrayNode& arr){
+        Node::operator=(arr);
+        return *this;
+    }
+
+    inline ArrayNode& operator=(ArrayNode&& arr){
+        Node::operator=(std::move(arr));
+        return *this;
+    }
     virtual NODE_TYPE type() const override;
     virtual Result execute() override;
     virtual Result execute(size_t index) override;
@@ -45,12 +58,12 @@ class ArrayNode:public Node{
     virtual bool is_array() const override;
     virtual void print_text(std::ostream& stream) const override;
     virtual void print_result(std::ostream& stream) const override;
-    private:
-    Result cache_;
 };
 
-template<typename T>
-requires (!std::is_same_v<T,ArrayNode>)
-ArrayNode ArrayNode::operator=(std::shared_ptr<T>&& val){
-    return ArrayNode().insert_back(std::forward<T>(val));
+template<typename SMART_PTR>
+requires (std::is_base_of_v<Node,typename std::decay_t<SMART_PTR>::element_type> && 
+!std::is_same_v<typename std::decay_t<SMART_PTR>::element_type,ArrayNode>)
+inline ArrayNode::ArrayNode(SMART_PTR&& val){
+    childs_.resize(0);
+    childs_.push_back(std::forward<SMART_PTR>(val));
 }
