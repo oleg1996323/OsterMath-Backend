@@ -6,6 +6,8 @@
 #include "test/test/array_node.h"
 #include "array_node.h"
 #include "val_node.h"
+#include "func_node.h"
+#include "bin_node.h"
 #include "aux_functions.h"
 
 using namespace functions::auxiliary;
@@ -138,11 +140,47 @@ TEST(ArrayNode_test,Type_String_Array){
 TEST(ArrayNode_test,Type_Array){
     //TODO: develop string node
 }
-TEST(ArrayNode_test,Execute){
-    
+TEST(ArrayNode_test,ExecuteCorrect){
+    std::cout<<"Run test execute with expected correct result"<<std::endl;
+    std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(3);
+    arr->insert_back(std::make_shared<ValueNode>(1));
+    arr->insert_back(std::make_shared<ValueNode>(2));
+    arr->insert_back(std::make_shared<ValueNode>(100000000));
+    EXPECT_TRUE(arr->execute().is_node());
+    EXPECT_EQ(arr.get(),arr->execute().get_node());
 }
-TEST(ArrayNode_test,Execute_id){
-    
+TEST(ArrayNode_test,ExecuteError){
+    std::cout<<"Run test execute with expected error result"<<std::endl;
+    std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(3);
+    arr->insert_back(std::make_shared<ValueNode>(1));
+    arr->insert_back(std::make_shared<ValueNode>(2));
+    arr->insert_back(std::make_shared<BinaryNode>(BINARY_OP::DIV));
+    arr->child(2)->insert_back(std::make_shared<ValueNode>(100));
+    arr->child(2)->insert_back(std::make_shared<ValueNode>(0));
+    Result res = arr->execute();
+    EXPECT_TRUE(res.is_error());
+    EXPECT_EQ(exceptions::EXCEPTION_TYPE::DIVISION_ZERO,res.get_exception()->type());
+}
+TEST(ArrayNode_test,ExecuteCorrect_id){
+    std::cout<<"Run test execute with expected correct result"<<std::endl;
+    std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(3);
+    arr->insert_back(std::make_shared<ValueNode>(1));
+    arr->insert_back(std::make_shared<ValueNode>(2));
+    arr->insert_back(std::make_shared<ValueNode>(100000000));
+    EXPECT_TRUE(arr->execute(2).is_value());
+    EXPECT_EQ(100000000,arr->execute(2).get_value());
+}
+TEST(ArrayNode_test,ExecuteError_id){
+    std::cout<<"Run test execute with expected error result"<<std::endl;
+    std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(3);
+    arr->insert_back(std::make_shared<ValueNode>(1));
+    arr->insert_back(std::make_shared<ValueNode>(2));
+    arr->insert_back(std::make_shared<BinaryNode>(BINARY_OP::DIV));
+    arr->child(2)->insert_back(std::make_shared<ValueNode>(100));
+    arr->child(2)->insert_back(std::make_shared<ValueNode>(0));
+    EXPECT_TRUE(arr->execute(2).is_error());
+    Result res = arr->execute();
+    EXPECT_EQ(exceptions::EXCEPTION_TYPE::DIVISION_ZERO,res.get_exception()->type());
 }
 TEST(ArrayNode_test,Cached_Result){
     
