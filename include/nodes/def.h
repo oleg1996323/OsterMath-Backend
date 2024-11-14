@@ -15,7 +15,7 @@ class AbstractEvent;
 
 using Value_t = boost::multiprecision::cpp_dec_float_50;
 using Bound_types = std::variant<std::monostate,Node*>;
-using Result_t = std::variant<std::monostate,Value_t,std::string, Node*, std::shared_ptr<AbstractEvent>>;
+using Result_t = std::variant<std::monostate,std::string, std::vector<Value_t>, Node*, std::shared_ptr<AbstractEvent>,Value_t>;
 
 #define ENUM_NAME(p) #p;
 
@@ -82,6 +82,11 @@ class Result:public Result_t{
     }
     inline ArrayNode* get_array_node() noexcept{
         return reinterpret_cast<ArrayNode*>(get<Node*>());
+    }
+
+    //add definition
+    inline std::vector<Value_t> get_array_values() noexcept{
+
     }
 
     inline const Value_t& get_value() const noexcept{

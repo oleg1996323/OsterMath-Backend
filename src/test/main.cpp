@@ -68,8 +68,24 @@ exceptions::EXCEPTION_TYPE exception_handler(std::function<void()> function){
 }
 
 #include <gtest/gtest.h>
+#include "string_node.h"
 
 int main(int argc, char **argv){
+    std::cout<<sizeof(char)<<std::endl;
+    std::cout<<sizeof(Value_t)<<std::endl;
+    std::cout<<sizeof(std::string)<<std::endl;
+    std::cout<<sizeof(Result)<<std::endl;
+    std::cout<<sizeof(std::vector<Result>)<<std::endl;
+    std::cout<<sizeof(Bound_types)<<std::endl;
+    std::cout<<sizeof(Node)<<std::endl;
+    std::cout<<sizeof(BinaryNode)<<std::endl;
+    std::cout<<sizeof(UnaryNode)<<std::endl;
+    std::cout<<sizeof(RangeOperationNode)<<std::endl;
+    std::cout<<sizeof(FunctionNode)<<std::endl;
+    std::cout<<sizeof(ArrayNode)<<std::endl;
+    std::cout<<sizeof(ValueNode)<<std::endl;
+    std::cout<<sizeof(StringNode)<<std::endl;
+    std::cout<<sizeof(VariableNode)<<std::endl;
     ::testing::InitGoogleTest(&argc, argv);
     //LOG_DURATION("Tests");   
     //Testing();

@@ -26,12 +26,6 @@ class BinaryNode:public Node{
     virtual Result execute() override;
     virtual Result execute(size_t index) override;
 
-    inline virtual Result cached_result() override{
-        return cached_result(0);
-    }
-    inline virtual Result cached_result(size_t index) override{
-        return __calculate__(index);
-    }
     std::shared_ptr<Node> lhs(){
         return child(0);
     }
@@ -45,18 +39,14 @@ class BinaryNode:public Node{
         return child(1);
     }
     virtual void insert_back(std::shared_ptr<Node> node) override;
-    Result& lhs_cache() const{
-        return bin_cache_.at(0).first;
+
+    virtual Result cached_result() override{
+        return execute();
     }
-    Result& rhs_cache() const{
-        return bin_cache_.at(0).second;
+    inline virtual Result cached_result(size_t index) noexcept override{
+        return execute(index);
     }
-    Result& lhs_cache(size_t index) const{
-        return bin_cache_.at(index).first;
-    }
-    Result& rhs_cache(size_t index) const{
-        return bin_cache_.at(index).second;
-    }
+
     BINARY_OP operation() const{
         return operation_;
     }
@@ -68,35 +58,24 @@ class BinaryNode:public Node{
     private:
 
     inline Result ErrorChecking(size_t index){
-        if(lhs_cache(index).is_error())
-            return lhs_cache(index);
-        if(rhs_cache(index).is_error())
-            return rhs_cache(index);
-        if(!lhs_cache(index).is_value())
-            return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric value");
-        if(!rhs_cache(index).is_value())
+        if(!(has_child(0) && has_child(1) && !childs_.size()==2)){
+            cache_ = std::make_shared<exceptions::InvalidNumberOfArguments>(2);
+            return cache_;
+        }
+        if(child(0)->execute().is_error()){
+            cache_ = child(0)->cached_result();
+            return cache_;
+        }
+        if(child(1)->execute().is_error()){
+            cache_ = child(1)->cached_result();
+            return cache_;
+        }
+        if(!child(0)->cached_result(index).is_value() || !child(1)->cached_result(index).is_value())
             return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric value");
         return std::monostate();
     }
 
     Result __calculate__();
     Result __calculate__(size_t index);
-
-    //cannot be returned reference because of resizing cache-vector (invalidation possible)
-    Result& lhs_cache(size_t index){
-        if(bin_cache_.size()-1<index)
-            bin_cache_.resize(index+1);
-        return bin_cache_[index].first;
-    }
-    //cannot be returned reference because of resizing cache-vector (invalidation possible)
-    Result& rhs_cache(size_t index){
-        if(bin_cache_.size()-1<index)
-            bin_cache_.resize(index+1);
-        return bin_cache_[index].second;
-    }
-
-    mutable std::vector<std::pair<Result,Result>> bin_cache_=[](){std::vector<std::pair<Result,Result>> res;
-                                                res.resize(1);
-                                                return res;}();
     BINARY_OP operation_;
 };

@@ -120,6 +120,10 @@ class Node{
     template<typename T, typename... U>
     void recursive_function_applied_to_all_childs(std::function<T(const std::shared_ptr<Node>&,U...)> func);
     const std::vector<std::shared_ptr<Node>>& childs() const;
+
+    void flush_cache(){
+        cache_ = std::monostate();
+    }
     protected:
     Result cache_;
     mutable std::unordered_set<Node*> parents_;

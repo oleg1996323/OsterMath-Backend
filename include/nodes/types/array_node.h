@@ -34,10 +34,10 @@ class ArrayNode:public Node{
     virtual NODE_TYPE type() const override;
     virtual Result execute() override;
     virtual Result execute(size_t index) override;
-    inline virtual Result cached_result() const{
+    inline virtual Result cached_result(){
         return cache_;
     }
-    inline virtual Result cached_result(size_t index){
+    inline virtual Result cached_result(size_t index)override{
         if(has_child(index))
             return child(index)->cached_result();
         else

@@ -19,10 +19,12 @@ Result BinaryNode::__calculate__(){
 }
 
 Result BinaryNode::__calculate__(size_t index){
-    if(!rhs_cache(index).is_value() || !lhs_cache(index).is_value())
-        return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric value");
+    child(0)->flush_cache();
+    child(1)->flush_cache();
 
-    if(operation_==BINARY_OP::DIV && rhs_cache(index).get<Value_t>()==0.)
+
+
+    if(operation_==BINARY_OP::DIV && cached_result(index).get_value()==0.)
         return std::make_shared<exceptions::DivisionZero>();
     switch (operation_)
     {
@@ -31,7 +33,7 @@ Result BinaryNode::__calculate__(size_t index){
             //std::cout<<"Add: "<<lhs_cache(index)<<" and "<<rhs_cache(index)<<std::endl;
         #endif
             if(!ErrorChecking(index).is_error())
-                return lhs_cache(index).get<Value_t>()+rhs_cache(index).get<Value_t>();
+                return child(0)->cached_result(index).get<Value_t>()+child(1)->cached_result(index).get<Value_t>();
             break;
         case BINARY_OP::SUB:
         #ifdef DEBUG
@@ -68,18 +70,38 @@ Result BinaryNode::__calculate__(size_t index){
     return Result();
 }
 
+#include "aux_functions.h"
 Result BinaryNode::execute(){
+    using namespace functions::auxiliary;
     //full calculation if child exists and are arrays
-    cache_ = execute(0);
+    if(has_child(0) && has_child(1) && childs_.size()==2){
+        
+        if(check_arguments(TYPE_VAL::NUMERIC_ARRAY,child(0),child(1))){
+            if(std::dynamic_pointer_cast<ArrayNode>(child(0))->size()==
+                std::dynamic_pointer_cast<ArrayNode>(child(1))->size() &&
+                std::dynamic_pointer_cast<ArrayNode>(child(0))->size()!=0)
+                for(size_t i = 0;i < std::dynamic_pointer_cast<ArrayNode>(child(0))->size();++i){
+
+                }
+        }
+        else if(functions::auxiliary::check_arguments(TYPE_VAL::VALUE,child(0),child(1)))
+            cache_ = execute(0);
+        else{
+            cache_ = std::make_shared<exceptions::InvalidTypeOfArgument>("numeric array/value");
+        }
+    }
+    else{
+        cache_ = std::make_shared<exceptions::InvalidTypeOfArgument>("numeric array/value");
+    }
     return cache_;
 }
 
 Result BinaryNode::execute(size_t index){
     using namespace boost::multiprecision;
     if(child(0) && child(1)){
-        if(child(0)->caller()) //left branch call refreshing
-            lhs_cache(index) = child(0)->execute(index);
-        else if(child(1)->caller()) //right branch call refreshing
+        if(child(0)->caller() || child(1)->caller())
+            cached_result(index) = child(0)->execute(index);
+        else if(child(1)->caller())
             rhs_cache(index) = child(1)->execute(index);
         else{
             lhs_cache(index) = child(0)->execute(index);

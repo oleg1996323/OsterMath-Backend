@@ -45,6 +45,7 @@ class RangeOperationNode:public Node{
 
     void define_range_length();
 
+    std::vector<size_t> sz_depth_measure;
     mutable size_t range_size = 0;
     std::shared_ptr<Node> range_expression;
     RANGE_OP operation_;
