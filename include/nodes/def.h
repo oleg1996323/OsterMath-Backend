@@ -2,6 +2,7 @@
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #include <events_errors/exception.h>
 #include <events_errors/warning.h>
+#include <memory>
 
 class VariableNode;
 class Node;
@@ -67,14 +68,14 @@ class Result:public Result_t{
     inline std::string& get_string() noexcept{
         return get<std::string>();
     }
-    inline std::shared_ptr<AbstractEvent>& get_event() noexcept{
+    inline std::shared_ptr<AbstractEvent> get_event() const noexcept{
         return get<std::shared_ptr<AbstractEvent>>();
     }
-    inline std::shared_ptr<exceptions::Exception>& get_exception() noexcept{
-        return reinterpret_cast<std::shared_ptr<exceptions::Exception>&>(get<std::shared_ptr<AbstractEvent>>());
+    inline std::shared_ptr<exceptions::Exception> get_exception() const noexcept{
+        return std::dynamic_pointer_cast<exceptions::Exception>(get<std::shared_ptr<AbstractEvent>>());
     }
-    inline std::shared_ptr<warnings::Warning>& get_warning() noexcept{
-        return reinterpret_cast<std::shared_ptr<warnings::Warning>&>(get<std::shared_ptr<AbstractEvent>>());
+    inline std::shared_ptr<warnings::Warning> get_warning() const noexcept{
+        return std::dynamic_pointer_cast<warnings::Warning>(get<std::shared_ptr<AbstractEvent>>());
     }
     inline Node* get_node() noexcept{
         return get<Node*>();
@@ -88,15 +89,6 @@ class Result:public Result_t{
     }
     inline const std::string& get_string() const noexcept{
         return get<std::string>();
-    }
-    inline const std::shared_ptr<AbstractEvent>& get_event() const noexcept{
-        return get<std::shared_ptr<AbstractEvent>>();
-    }
-    inline const std::shared_ptr<exceptions::Exception>& get_exception() const noexcept{
-        return reinterpret_cast<const std::shared_ptr<exceptions::Exception>&>(get<std::shared_ptr<AbstractEvent>>());
-    }
-    inline const std::shared_ptr<warnings::Warning>& get_warning() const noexcept{
-        return reinterpret_cast<const std::shared_ptr<warnings::Warning>&>(get<std::shared_ptr<AbstractEvent>>());
     }
     inline const Node* get_node() const noexcept{
         return get<Node*>();

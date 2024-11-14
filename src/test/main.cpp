@@ -59,7 +59,7 @@ void define_section_subelements(STRUCT_SECTION& section_sizes, ArrayNode* array)
 exceptions::EXCEPTION_TYPE exception_handler(std::function<void()> function){
     try{
         function();
-        return exceptions::NOEXCEPT;
+        return exceptions::EXCEPTION_TYPE::NOEXCEPT;
     }
     catch(const exceptions::Exception& err){
         std::cout<<"Warning exception: "<<err.get_error()<<"Prompt: "<<err.get_prompt()<<std::endl;

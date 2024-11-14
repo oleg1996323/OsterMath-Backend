@@ -7,6 +7,7 @@
 #include "array_node.h"
 #include "val_node.h"
 #include "func_node.h"
+#include "string_node.h"
 #include "bin_node.h"
 #include "aux_functions.h"
 
@@ -160,6 +161,7 @@ TEST(ArrayNode_test,ExecuteError){
     Result res = arr->execute();
     EXPECT_TRUE(res.is_error());
     EXPECT_EQ(exceptions::EXCEPTION_TYPE::DIVISION_ZERO,res.get_exception()->type());
+    std::cout<<res.get_exception()->get_error()<<std::endl;
 }
 TEST(ArrayNode_test,ExecuteCorrect_id){
     std::cout<<"Run test execute with expected correct result"<<std::endl;
@@ -182,24 +184,94 @@ TEST(ArrayNode_test,ExecuteError_id){
     Result res = arr->execute();
     EXPECT_EQ(exceptions::EXCEPTION_TYPE::DIVISION_ZERO,res.get_exception()->type());
 }
-TEST(ArrayNode_test,Cached_Result){
-    
+TEST(ArrayNode_test,Cached_Result_With_Correct){
+    std::cout<<"Run test cached result when executed correct"<<std::endl;
+    std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(3);
+    arr->insert_back(std::make_shared<ValueNode>(1));
+    arr->insert_back(std::make_shared<ValueNode>(2));
+    arr->insert_back(std::make_shared<BinaryNode>(BINARY_OP::DIV));
+    arr->child(2)->insert_back(std::make_shared<ValueNode>(100));
+    arr->child(2)->insert_back(std::make_shared<ValueNode>(100));
+    EXPECT_TRUE(arr->execute().is_node());
+    EXPECT_TRUE(arr->execute(2).is_value());
+    Result res = arr->execute();
+    EXPECT_EQ(res,arr->cached_result());
+    EXPECT_EQ(arr->cached_result().get_node(),arr.get());
+}
+TEST(ArrayNode_test,Cached_Result_With_Error){
+    std::cout<<"Run test cached result when executed with error"<<std::endl;
+    std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(3);
+    arr->insert_back(std::make_shared<ValueNode>(1));
+    arr->insert_back(std::make_shared<ValueNode>(2));
+    arr->insert_back(std::make_shared<BinaryNode>(BINARY_OP::DIV));
+    arr->child(2)->insert_back(std::make_shared<ValueNode>(100));
+    arr->child(2)->insert_back(std::make_shared<ValueNode>(0));
+    EXPECT_TRUE(arr->execute(2).is_error());
+    EXPECT_TRUE(arr->execute().is_error());
+    Result res = arr->execute();
+    EXPECT_EQ(res,arr->cached_result());
+    *arr->cached_result().get_exception().get()==exceptions::DivisionZero();
+    EXPECT_EQ((*arr->cached_result().get_exception().get()),exceptions::DivisionZero(""));
 }
 TEST(ArrayNode_test,Cached_Result_id){
-    
+    std::cout<<"Run test cached at id result when executed"<<std::endl;
+    std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(3);
+    arr->insert_back(std::make_shared<ValueNode>(1));
+    arr->insert_back(std::make_shared<ValueNode>(2));
+    arr->insert_back(std::make_shared<BinaryNode>(BINARY_OP::DIV));
+    arr->child(2)->insert_back(std::make_shared<ValueNode>(100));
+    arr->child(2)->insert_back(std::make_shared<ValueNode>(100));
+    EXPECT_TRUE(arr->execute(2).is_value());
+    Result res = arr->execute();
+    EXPECT_EQ(res,arr->cached_result());
 }
 TEST(ArrayNode_test,is_Numeric){
-    
+    std::cout<<"Run test cached result when executed"<<std::endl;
+    std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(3);
+    arr->insert_back(Value_t(1));
+    arr->insert_back(std::make_shared<ValueNode>(2));
+    arr->insert_back(std::make_shared<BinaryNode>(BINARY_OP::DIV));
+    arr->child(2)->insert_back(Value_t(100));
+    arr->child(2)->insert_back(std::make_shared<ValueNode>(100));
+    arr->insert_back(std::make_shared<ArrayNode>(2));
+    arr->child(3)->insert_back(Value_t(1));
+    arr->child(3)->insert_back(Value_t(2));
+    EXPECT_TRUE(arr->is_numeric());
 }
 TEST(ArrayNode_test,is_String){
-    
+    std::cout<<"Run test is string array"<<std::endl;
+    std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(3);
+    arr->insert_back(std::string("1"));
+    arr->insert_back(std::string("2"));
+    EXPECT_TRUE(arr->is_string());
+    arr->insert_back(Value_t("2"));
+    EXPECT_FALSE(arr->is_string());
+    EXPECT_FALSE(arr->is_numeric());
 }
 TEST(ArrayNode_test,is_Array){
-    
+    std::cout<<"Run test cached result when executed"<<std::endl;
+    std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(3);
+    arr->insert_back(std::string("1"));
+    arr->insert_back(std::string("2"));
+    EXPECT_TRUE(arr->is_string());
 }
 TEST(ArrayNode_test,Print_Text){
-    
+    std::cout<<"Run test print text"<<std::endl;
+    std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(3);
+    arr->insert_back(std::string("1"));
+    arr->insert_back(std::string("2"));
+    arr->insert_back(Value_t("2"));
+    arr->print_result(std::cout);
+    EXPECT_EQ("[\"1\"; \"2\"; 2]",arr->get_text());
+    //EXPECT_FALSE(arr->is_string());
+    //EXPECT_FALSE(arr->is_numeric());
 }
 TEST(ArrayNode_test,Print_Result){
-    
+    std::cout<<"Run test print text"<<std::endl;
+    std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(3);
+    arr->insert_back(std::string("1"));
+    arr->insert_back(std::string("2"));
+    arr->insert_back(Value_t("2"));
+    arr->print_result(std::cout);
+    EXPECT_EQ("[\"1\"; \"2\"; 2]",arr->get_result());
 }

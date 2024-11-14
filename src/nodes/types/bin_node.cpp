@@ -69,6 +69,7 @@ Result BinaryNode::__calculate__(size_t index){
 }
 
 Result BinaryNode::execute(){
+    //full calculation if child exists and are arrays
     cache_ = execute(0);
     return cache_;
 }

@@ -7,18 +7,20 @@
 class ArrayNode:public Node{
     public:
     using Node::operator=;
+    using Node::insert_back;
+
     typedef std::shared_ptr<Node> value_type;
     ArrayNode(size_t sz);
     template<typename T>
     requires std::is_same_v<typename std::decay_t<T>,ArrayNode>
-    ArrayNode(T&& other):Node(std::forward<T>(other)){
+    inline ArrayNode(T&& other):Node(std::forward<T>(other)){
         *this = other;
     }
 
     template<typename SMART_PTR>
     requires (std::is_base_of_v<Node,typename std::decay_t<SMART_PTR>::element_type> && 
     !std::is_same_v<typename std::decay_t<SMART_PTR>::element_type,ArrayNode>)
-    ArrayNode(SMART_PTR&& val);
+    inline ArrayNode(SMART_PTR&& val);
 
     inline ArrayNode& operator=(const ArrayNode& arr){
         Node::operator=(arr);
@@ -65,5 +67,5 @@ requires (std::is_base_of_v<Node,typename std::decay_t<SMART_PTR>::element_type>
 !std::is_same_v<typename std::decay_t<SMART_PTR>::element_type,ArrayNode>)
 inline ArrayNode::ArrayNode(SMART_PTR&& val){
     childs_.resize(0);
-    childs_.push_back(std::forward<SMART_PTR>(val));
+    insert_back(std::forward<SMART_PTR>(val));
 }

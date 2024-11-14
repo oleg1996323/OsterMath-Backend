@@ -4,14 +4,18 @@
 RangeOperationNode::RangeOperationNode(const RangeOperationNode& other):
 Node(other),
 range_size(other.range_size),
-cache_(other.cache_),
 operation_(other.operation_)
 {}
 
 Result RangeOperationNode::execute(){
     Value_t result;
     range_expression->get_array_childs(childs_);
-    define_range_length();
+    try{
+        define_range_length();
+    }
+    catch(const exceptions::Exception& err){
+        return std::make_shared<exceptions::Exception>(err);
+    }
     if(operation_==RANGE_OP::SUM)
         result = 0.;
     else if(operation_==RANGE_OP::PROD)
@@ -81,13 +85,13 @@ void RangeOperationNode::define_range_length(){
     size_t sz = 0;
     for (auto child:childs_){
         if(sz==0){
-            sz = reinterpret_cast<std::shared_ptr<ArrayNode>&>(child)->size();
+            sz = std::dynamic_pointer_cast<ArrayNode>(child)->size();
             if(sz==0)
-                throw std::invalid_argument("Empty array argument to range-operation-function");
+                throw exceptions::InvalidSizeArrays(">0");
         }
         else{
-            if(reinterpret_cast<std::shared_ptr<ArrayNode>&>(child)->size()!=sz)
-                throw std::invalid_argument("Innegal sizes of range-operation-function arguments");
+            if(std::dynamic_pointer_cast<ArrayNode>(child)->size()!=sz)
+                throw exceptions::InvalidSizeArrays("equal");
         }
     }
     range_size = sz;

@@ -43,7 +43,7 @@ namespace node_function::functions{
             for(const std::shared_ptr<Node>& node:nodes){
                 if(!node->execute().is_error()){
                     if(check_arguments(TYPE_VAL::STRING_ARRAY,node)){
-                        Result tmp = Concatenate(reinterpret_cast<const ArrayNode*>(node.get()));
+                        Result tmp = Concatenate(dynamic_cast<const ArrayNode*>(node.get()));
                         if(tmp.is_string())
                             result+=tmp.get<std::string>();
                         else return tmp.get<std::shared_ptr<AbstractEvent>>();

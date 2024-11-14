@@ -4,6 +4,7 @@
 #include <vector>
 #include <unordered_set>
 #include <functional>
+#include <string>
 #include "nodes/def.h"
 
 class Node;
@@ -13,6 +14,7 @@ class ValueNode;
 class VariableNode;
 class MultiArgumentNode;
 class RangeOperationNode;
+class StringNode;
 
 enum class NODE_TYPE{
     UNARY,
@@ -88,12 +90,19 @@ class Node{
     virtual bool is_string() const;
     virtual bool is_array() const;
     virtual bool is_empty() const;
+    
+    template<typename T>
+    requires (std::is_same_v<T,std::string> || std::is_same_v<T,Value_t> || std::is_convertible_v<std::decay_t<T>,Value_t>)
+    void insert_back(T&& arg);
+
     virtual void insert_back(std::shared_ptr<Node>);
     //insert before value at id
     virtual std::shared_ptr<Node> insert(size_t,std::shared_ptr<Node>);
     virtual std::shared_ptr<Node> replace(size_t,std::shared_ptr<Node>);
     virtual void print_text(std::ostream& stream) const;
     virtual void print_result(std::ostream& stream) const;
+    std::string get_result() const;
+    std::string get_text() const;
     virtual ~Node();
     void add_parent(Node*);
     bool has_parents() const;
@@ -119,6 +128,10 @@ class Node{
     private:
     template<typename T, typename... U>
     void recursive_function_applied_to_all_childs(std::function<T(const std::shared_ptr<Node>&,U...)> func, Node* root);
+    void __insert_back_string_node__(const std::string& string);
+    void __insert_back_string_node__(std::string&& string);
+    void __insert_back_value_node__(const Value_t& val);
+    void __insert_back_value_node__(Value_t&& val);
     INFO_NODE child(const std::vector<size_t>& indexes, const Node* caller) const;
     INFO_NODE child(const std::vector<size_t>& indexes, Node* caller);
 };
@@ -160,4 +173,13 @@ Node& Node::operator=(const Node& other){
         }
     }
     return *this;
+}
+
+template<typename T>
+requires (std::is_same_v<T,std::string> || std::is_same_v<T,Value_t> || std::is_convertible_v<std::decay_t<T>,Value_t>)
+void Node::insert_back(T&& arg){
+    if constexpr (std::is_same_v<std::decay_t<T>,Value_t> || std::is_convertible_v<std::decay_t<T>,Value_t>)
+        __insert_back_value_node__(std::forward<T>(arg));
+    else if constexpr(std::is_same_v<std::decay_t<T>,std::string>)
+        __insert_back_string_node__(std::forward<T>(arg));
 }

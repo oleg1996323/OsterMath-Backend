@@ -25,7 +25,7 @@ DataPool deserialize_from(const std::filesystem::path& path){
 
 void SerialData::insert_var(uint64_t var_id, const std::shared_ptr<VariableNode>& node) noexcept{
     if(node)
-        nodes_[var_id]=reinterpret_cast<const std::shared_ptr<Node>&>(node);
+        nodes_[var_id]=node;
 
     for(auto parent:node->parents()){
         add_dependency((uint64_t)parent,var_id);
@@ -86,21 +86,21 @@ void SerialData::serialize_header(DataPool* pool){
                         case NODE_TYPE::ARRAY:
                             break;
                         case NODE_TYPE::BINARY:
-                            props.operation = (uint8_t)reinterpret_cast<const std::shared_ptr<BinaryNode>&>(node)->operation();
+                            props.operation = (uint8_t)std::dynamic_pointer_cast<BinaryNode>(node)->operation();
                             break;
                         case NODE_TYPE::FUNCTION:
-                            props.operation = (uint8_t)reinterpret_cast<const std::shared_ptr<FunctionNode>&>(node)->operation();
+                            props.operation = (uint8_t)std::dynamic_pointer_cast<FunctionNode>(node)->operation();
                             break;
                         case NODE_TYPE::RANGEOP:
-                            props.operation = (uint8_t)reinterpret_cast<const std::shared_ptr<RangeOperationNode>&>(node)->operation();
+                            props.operation = (uint8_t)std::dynamic_pointer_cast<RangeOperationNode>(node)->operation();
                             break;
                         case NODE_TYPE::STRING:
                             break;
                         case NODE_TYPE::UNARY:
-                            props.operation = (uint8_t)reinterpret_cast<const std::shared_ptr<UnaryNode>&>(node)->operation();
+                            props.operation = (uint8_t)std::dynamic_pointer_cast<UnaryNode>(node)->operation();
                             break;
                         case NODE_TYPE::VALUE:
-                            props.cache = reinterpret_cast<const std::shared_ptr<UnaryNode>&>(node)->execute();
+                            props.cache = std::dynamic_pointer_cast<UnaryNode>(node)->execute();
                             break;
                         case NODE_TYPE::VARIABLE:
                             break;
@@ -292,7 +292,7 @@ DataPool SerialData::deserialize_header(){
                     domain.rhs_ = nodes_from_header();
                     domain.value_if_true_ = nodes_from_header();
                     data_stream_.read(reinterpret_cast<char*>(&domain.type_),sizeof(uint8_t));
-                    reinterpret_cast<std::shared_ptr<VariableNode>&>(nodes_.at(props.id))->variable()->add_domain(std::move(domain));
+                    std::dynamic_pointer_cast<VariableNode>(nodes_.at(props.id))->variable()->add_domain(std::move(domain));
                 }
             }
             uint32_t sz_nodes;

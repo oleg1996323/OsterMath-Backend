@@ -2,7 +2,7 @@
 #include <cassert>
 
 namespace exceptions{
-    const char* Exception::__get_abbr__() const{
+    std::string Exception::__get_abbr__() const{
         return error_abbr();
     }
 
@@ -16,144 +16,159 @@ namespace exceptions{
         event_t_ = EVENT_TYPE::EXCEPTION;
     }
 
-    const char* Exception::get_prompt() const{
+    std::string Exception::get_prompt() const{
         return what();
     }
 
-    const char* Exception::__get_title__() const{
+    std::string Exception::__get_title__() const{
         return get_error();
     }
     size_t Exception::__type__() const{
         return (size_t)type();
     }
 
-    const char* Exception::__get_prompt__() const{
+    std::string Exception::__get_prompt__() const{
         return get_prompt();
     }
 
     ParsingError::ParsingError(const std::string& error):
     Exception(error){}
-    const char* ParsingError::error_abbr(){
+    std::string ParsingError::error_abbr(){
         return "#NAME?";
     }
-    const char* ParsingError::get_error() const{
+    std::string ParsingError::get_error() const{
         return "Parsing error";
     }
     EXCEPTION_TYPE ParsingError::type() const{
         return EXCEPTION_TYPE::PARSING;
     }
-    const char* ParsingError::get_prompt() const{
+    std::string ParsingError::get_prompt() const{
         return what();
     }
 
     UnequalSizeArrays::UnequalSizeArrays(const std::string& function_name):
     Exception(std::string()+"Unequal sizes of arrays in function "+function_name){}
-    const char* UnequalSizeArrays::error_abbr(){
+    std::string UnequalSizeArrays::error_abbr(){
         return "#VAL!";
     }
-    const char* UnequalSizeArrays::get_error() const{
+    std::string UnequalSizeArrays::get_error() const{
         return "Function array argument error";
     }
     EXCEPTION_TYPE UnequalSizeArrays::type() const{
-        return EXCEPTION_TYPE::UNQEQUAL_ARRAYS;
+        return EXCEPTION_TYPE::UNEQUAL_ARRAYS;
     }
-    const char* UnequalSizeArrays::get_prompt() const{
+    std::string UnequalSizeArrays::get_prompt() const{
+        return what();
+    }
+
+    InvalidSizeArrays::InvalidSizeArrays(const std::string& expected_size):
+    Exception(std::string()+"Invalid sizes of arrays in range function. Expected: "+expected_size){}
+    std::string InvalidSizeArrays::error_abbr(){
+        return "#VAL!";
+    }
+    std::string InvalidSizeArrays::get_error() const{
+        return "Invalid size of arrays";
+    }
+    EXCEPTION_TYPE InvalidSizeArrays::type() const{
+        return EXCEPTION_TYPE::INVALID_SIZE_ARRAYS;
+    }
+    std::string InvalidSizeArrays::get_prompt() const{
         return what();
     }
 
     UnknownTypeArray::UnknownTypeArray():
     Exception("Unavaible to use array of unknown (not defined) type"){}
-    const char* UnknownTypeArray::error_abbr(){
+    std::string UnknownTypeArray::error_abbr(){
         return "#TYPE!";
     }
-    const char* UnknownTypeArray::get_error() const{
+    std::string UnknownTypeArray::get_error() const{
         return "Unknown type of array";
     }
     EXCEPTION_TYPE UnknownTypeArray::type() const{
         return EXCEPTION_TYPE::UNKNOWN_TYPE_ARRAY;
     }
-    const char* UnknownTypeArray::get_prompt() const{
+    std::string UnknownTypeArray::get_prompt() const{
         return what();
     }
 
     IncorrectTypeArrays::IncorrectTypeArrays(const std::string& type_expected):
     Exception("Incorrect type. Should be "+type_expected){}
-    const char* IncorrectTypeArrays::error_abbr(){
+    std::string IncorrectTypeArrays::error_abbr(){
         return "#TYPE!";
     }
-    const char* IncorrectTypeArrays::get_error() const{
+    std::string IncorrectTypeArrays::get_error() const{
         return "Incorrect type of array";
     }
     EXCEPTION_TYPE IncorrectTypeArrays::type() const{
         return EXCEPTION_TYPE::INCORRECT_TYPE_ARRAYS;
     }
-    const char* IncorrectTypeArrays::get_prompt() const{
+    std::string IncorrectTypeArrays::get_prompt() const{
         return what();
     }
 
     CyclicReference::CyclicReference(const std::string& var_name):
     Exception("Var "+var_name+" is self-refered"){}
-    const char* CyclicReference::error_abbr(){
+    std::string CyclicReference::error_abbr(){
         return "#CYCLE!";
     }
-    const char* CyclicReference::get_error() const{
+    std::string CyclicReference::get_error() const{
         return "Cyclic reference";
     }
     EXCEPTION_TYPE CyclicReference::type() const{
         return EXCEPTION_TYPE::CYCLIC;
     }
-    const char* CyclicReference::get_prompt() const{
+    std::string CyclicReference::get_prompt() const{
         return what();
     }
 
     DivisionZero::DivisionZero():
     Exception("Division by 0"){}
-    const char* DivisionZero::error_abbr(){
+    std::string DivisionZero::error_abbr(){
         return "#DIV/0";
     }
-    const char* DivisionZero::get_error() const{
+    std::string DivisionZero::get_error() const{
         return "Zero division";
     }
     EXCEPTION_TYPE DivisionZero::type() const{
         return EXCEPTION_TYPE::DIVISION_ZERO;
     }
-    const char* DivisionZero::get_prompt() const{
+    std::string DivisionZero::get_prompt() const{
         return what();
     }
 
     InvalidTypeOfArgument::InvalidTypeOfArgument(const std::string& expected_type):
     Exception("Invalid argument. Prompt: expected "+expected_type){}
 
-    const char* InvalidTypeOfArgument::error_abbr(){
+    std::string InvalidTypeOfArgument::error_abbr(){
         return "#TYPE!";
     }
-    const char* InvalidTypeOfArgument::get_error() const{
+    std::string InvalidTypeOfArgument::get_error() const{
         return "Invalid type of argument";
     }
     EXCEPTION_TYPE InvalidTypeOfArgument::type() const{
         return EXCEPTION_TYPE::INVALID_TYPE_ARG;
     }
-    const char* InvalidTypeOfArgument::get_prompt() const{
+    std::string InvalidTypeOfArgument::get_prompt() const{
         return what();
     }
 
     InvalidNumberOfArguments::InvalidNumberOfArguments(size_t expected_number_args):
     Exception("Invalid number of arguments. Prompt: expected "+std::to_string(expected_number_args)+" arguments"){}
 
-    const char* InvalidNumberOfArguments::error_abbr(){
+    std::string InvalidNumberOfArguments::error_abbr(){
         return "#ARG!";
     }
-    const char* InvalidNumberOfArguments::get_error() const{
+    std::string InvalidNumberOfArguments::get_error() const{
         return "Invalid number of arguments";
     }
     EXCEPTION_TYPE InvalidNumberOfArguments::type() const{
         return EXCEPTION_TYPE::INVALID_NUMBER_ARGS;
     }
-    const char* InvalidNumberOfArguments::get_prompt() const{
+    std::string InvalidNumberOfArguments::get_prompt() const{
         return what();
     }
 
-    const char* get_except_abbr(EXCEPTION_TYPE type){
+    std::string get_except_abbr(EXCEPTION_TYPE type){
         switch (type)
         {
         case EXCEPTION_TYPE::PARSING:
@@ -171,7 +186,7 @@ namespace exceptions{
         case EXCEPTION_TYPE::UNKNOWN_TYPE_ARRAY:
             return UnknownTypeArray::error_abbr();
             break;
-        case EXCEPTION_TYPE::UNQEQUAL_ARRAYS:
+        case EXCEPTION_TYPE::UNEQUAL_ARRAYS:
             return UnequalSizeArrays::error_abbr();
             break;
         case EXCEPTION_TYPE::INVALID_TYPE_ARG:
@@ -186,6 +201,12 @@ namespace exceptions{
         case EXCEPTION_TYPE::NODE_DONT_EXISTS:
             return NodeChildDontExists::error_abbr();
             break;
+        case EXCEPTION_TYPE::INVALID_SIZE_ARRAYS:
+            return InvalidSizeArrays::error_abbr();
+            break;
+        case EXCEPTION_TYPE::EXCEPTION:
+            return Exception::error_abbr();
+            break;
         default:
             assert(true);
             return "";
@@ -196,31 +217,31 @@ namespace exceptions{
     VariableDontExists::VariableDontExists(const std::string& name):
     Exception("Variable "+name+"don't exists"){}
 
-    const char* VariableDontExists::error_abbr(){
+    std::string VariableDontExists::error_abbr(){
         return "#NAME?";
     }
-    const char* VariableDontExists::get_error() const{
+    std::string VariableDontExists::get_error() const{
         return "Variable don't exists";
     }
     EXCEPTION_TYPE VariableDontExists::type() const{
         return EXCEPTION_TYPE::PARSING;
     }
-    const char* VariableDontExists::get_prompt() const{
+    std::string VariableDontExists::get_prompt() const{
         return what();
     }
 
     NodeChildDontExists::NodeChildDontExists(const std::string& error):
     Exception(error){}
-    const char* NodeChildDontExists::error_abbr(){
+    std::string NodeChildDontExists::error_abbr(){
         return "#NAME?";
     }
-    const char* NodeChildDontExists::get_error() const{
+    std::string NodeChildDontExists::get_error() const{
         return "Node don't exists";
     }
     EXCEPTION_TYPE NodeChildDontExists::type() const{
         return EXCEPTION_TYPE::NODE_DONT_EXISTS;
     }
-    const char* NodeChildDontExists::get_prompt() const{
+    std::string NodeChildDontExists::get_prompt() const{
         return what();
     }
 }

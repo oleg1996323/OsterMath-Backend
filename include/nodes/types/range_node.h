@@ -13,10 +13,13 @@ enum class RANGE_OP{
 class RangeOperationNode:public Node{
     public:
     RangeOperationNode(RANGE_OP op):operation_(op){}
+    template<template<typename,typename> typename... PAIRS, typename T>
+    requires (std::is_same_v<std::pair<T,T>,PAIRS<T,T>> && ...)
+    RangeOperationNode(RANGE_OP op, PAIRS<T,T>... args):operation_(op){}
     RangeOperationNode(const RangeOperationNode& other);
     RangeOperationNode(RangeOperationNode&&) = delete;
 
-    virtual NODE_TYPE type() const override{
+    inline virtual NODE_TYPE type() const override{
         return NODE_TYPE::RANGEOP;
     }
 
@@ -28,6 +31,9 @@ class RangeOperationNode:public Node{
     virtual bool is_numeric() const override;
     virtual bool is_string() const override;
     virtual bool is_array() const override;
+    const std::shared_ptr<Node>& get_range_expression() const{
+        return range_expression;
+    }
 
     RANGE_OP operation() const;
 
@@ -41,6 +47,5 @@ class RangeOperationNode:public Node{
 
     mutable size_t range_size = 0;
     std::shared_ptr<Node> range_expression;
-    Result cache_;
     RANGE_OP operation_;
 };

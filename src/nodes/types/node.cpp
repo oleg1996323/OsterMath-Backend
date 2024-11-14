@@ -2,6 +2,7 @@
 #include "var_node.h"
 #include "types.h"
 #include "events_errors/exception.h"
+#include "string_node.h"
 
 std::shared_ptr<Node> INFO_NODE::node() const{
     if(has_node())
@@ -91,6 +92,17 @@ Result Node::execute(size_t index){
     return std::monostate();
 }
 
+std::string Node::get_result() const{
+    std::stringstream result;
+    print_result(result);
+    return result.str();
+}
+std::string Node::get_text() const{
+    std::stringstream result;
+    print_text(result);
+    return result.str();
+}
+
 bool Node::is_empty() const{
     return true;
 }
@@ -114,7 +126,7 @@ bool Node::refer_to(std::string_view var_name) const{
     else {
         return std::any_of(childs_.begin(),childs_.end(),[var_name](const std::shared_ptr<Node>& child){
             if(child->type()==NODE_TYPE::VARIABLE && 
-                reinterpret_cast<const std::shared_ptr<VariableNode>&>(child)->variable()->name()==var_name)
+                std::dynamic_pointer_cast<VariableNode>(child)->variable()->name()==var_name)
                 return true;
             else return child->refer_to(var_name);
         });
@@ -206,6 +218,19 @@ INFO_NODE Node::child(const std::vector<size_t>& indexes){
 
 INFO_NODE Node::child(const std::vector<size_t>& indexes) const{
     return child(indexes);
+}
+
+void Node::__insert_back_string_node__(const std::string& string){
+    insert_back(std::make_shared<StringNode>(string));
+}
+void Node::__insert_back_string_node__(std::string&& string){
+    insert_back(std::make_shared<StringNode>(std::move(string)));
+}
+void Node::__insert_back_value_node__(const Value_t& val){
+    insert_back(std::make_shared<ValueNode>(val));
+}
+void Node::__insert_back_value_node__(Value_t&& val){
+    insert_back(std::make_shared<ValueNode>(std::move(val)));
 }
 
 /*
