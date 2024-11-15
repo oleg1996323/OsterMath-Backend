@@ -2,11 +2,11 @@
 #include "array_node.h"
 
 void ValueNode::print_text(std::ostream& stream) const{
-    stream<<val_;
+    stream<<cache_;
 }
 
 void ValueNode::print_result(std::ostream& stream) const{
-    stream<<val_;
+    stream<<cache_;
 }
 
 bool ValueNode::is_numeric() const{

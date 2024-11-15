@@ -84,11 +84,11 @@ TYPE_VAL Node::type_val() const{
         return TYPE_VAL::UNKNOWN;
 }
 
-Result Node::execute(){
+Result Node::execute() const{
     return std::monostate();
 }
 
-Result Node::execute(size_t index){
+Result Node::execute(size_t index) const{
     return std::monostate();
 }
 
@@ -141,19 +141,19 @@ void Node::refresh_parent_links() const{
     }
 }
 
-void Node::get_array_childs(std::vector<std::shared_ptr<Node>>& childs) const{
-    for(auto child:childs_){
-        if(child->type()==NODE_TYPE::ARRAY)
-            childs.push_back(child);
-        else child->get_array_childs(childs);
-    }
-}
+// void Node::get_array_childs(std::vector<std::shared_ptr<Node>>& childs) const{
+//     for(auto child:childs_){
+//         if(child->type()==NODE_TYPE::ARRAY)
+//             childs.push_back(child);
+//         else child->get_array_childs(childs);
+//     }
+// }
 
-const std::unordered_set<Node*>& Node::parents() const{
+const std::set<Node*>& Node::parents() const{
     return parents();
 }
 
-std::unordered_set<Node*>& Node::parents(){
+std::set<Node*>& Node::parents(){
     return parents_;
 }
 

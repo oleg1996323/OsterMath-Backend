@@ -13,14 +13,14 @@ class FunctionNode;
 
 namespace node_function::functions{
     namespace math{
-        Result SumProduct(FunctionNode*);
+        Result SumProduct(const FunctionNode*);
 
         //calculate the summ of production till the defined dimension.
         //For example, if the array present a cubic dimention data for the dimensions = 2 there will be 
         //calculated only the square base of these array. Althought the calculation may depends of arrays order.
-        Result SumProduct(FunctionNode*, size_t dimensions);
-        Result Sum(FunctionNode*);
-        Result Product(FunctionNode*);
+        Result SumProduct(const FunctionNode*, size_t dimensions);
+        Result Sum(const FunctionNode*);
+        Result Product(const FunctionNode*);
 
         template<typename ExecutionPolicy>
         Result CorrelationCoefficient(ExecutionPolicy&& exec,

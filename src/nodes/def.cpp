@@ -23,11 +23,11 @@ bool Result::is_string() const{
 }
 
 bool Result::is_node() const{
-    return std::holds_alternative<Node*>(*this);
+    return std::holds_alternative<const Node*>(*this);
 }
 
 bool Result::is_array() const{
-    return is_node() && get<Node*>()->is_array();
+    return is_node() && get<const Node*>()->is_array();
 }
 
 bool Result::has_value() const{
@@ -50,7 +50,9 @@ std::ostream& Result::operator<<(std::ostream& os)
 {
     std::visit([this,&os](auto&& arg) {
         if(this->is_node())
-            this->get<Node*>()->print_result(os);
+            this->get_node()->print_result(os);
+        else if(this->is_array())
+            this->get_array_node()->print_result(os);
         os << arg;
     }, *this);
     return os;
@@ -58,7 +60,7 @@ std::ostream& Result::operator<<(std::ostream& os)
 
 std::ostream& operator<<(std::ostream& os, const Result& res){
     if(res.is_node())
-        res.get<Node*>()->print_result(os);
+        res.get<const Node*>()->print_result(os);
     else std::visit([&os](auto&& arg) {
         os << arg;
     },res);

@@ -11,6 +11,7 @@ enum class BINARY_OP{
 };
 
 class BinaryNode:public Node{
+    BINARY_OP operation_;
     friend UnaryNode;
     friend MultiArgumentNode;
     friend ValueNode;
@@ -23,8 +24,8 @@ class BinaryNode:public Node{
     virtual NODE_TYPE type() const override{
         return NODE_TYPE::BINARY;
     }
-    virtual Result execute() override;
-    virtual Result execute(size_t index) override;
+    virtual Result execute() const override;
+    virtual Result execute(size_t index) const override;
 
     std::shared_ptr<Node> lhs(){
         return child(0);
@@ -56,26 +57,8 @@ class BinaryNode:public Node{
     virtual void print_text(std::ostream& stream) const override;
     virtual void print_result(std::ostream& stream) const override;
     private:
+    inline bool IsError(size_t index);
 
-    inline Result ErrorChecking(size_t index){
-        if(!(has_child(0) && has_child(1) && !childs_.size()==2)){
-            cache_ = std::make_shared<exceptions::InvalidNumberOfArguments>(2);
-            return cache_;
-        }
-        if(child(0)->execute().is_error()){
-            cache_ = child(0)->cached_result();
-            return cache_;
-        }
-        if(child(1)->execute().is_error()){
-            cache_ = child(1)->cached_result();
-            return cache_;
-        }
-        if(!child(0)->cached_result(index).is_value() || !child(1)->cached_result(index).is_value())
-            return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric value");
-        return std::monostate();
-    }
-
-    Result __calculate__();
-    Result __calculate__(size_t index);
-    BINARY_OP operation_;
+    Result __calculate__() const;
+    Result __calculate__(size_t index) const;
 };

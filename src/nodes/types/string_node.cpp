@@ -2,11 +2,11 @@
 #include "array_node.h"
 
 void StringNode::print_text(std::ostream& stream) const{
-    stream<<"\""<<str_<<"\"";
+    stream<<"\""<<cache_<<"\"";
 }
 
 void StringNode::print_result(std::ostream& stream) const{
-    stream<<"\""<<str_<<"\"";
+    stream<<"\""<<cache_<<"\"";
 }
 
 bool StringNode::is_numeric() const{

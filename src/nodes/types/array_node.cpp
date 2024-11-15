@@ -12,7 +12,7 @@ NODE_TYPE ArrayNode::type() const{
     return NODE_TYPE::ARRAY;
 }
 
-Result ArrayNode::execute(){
+Result ArrayNode::execute() const{
     for(auto child:childs_){
         if(child->execute().is_error()){
             cache_ = child->cached_result();
@@ -23,7 +23,7 @@ Result ArrayNode::execute(){
     return cache_;
 }
 
-Result ArrayNode::execute(size_t index){
+Result ArrayNode::execute(size_t index) const{
     if(childs_.size()>index)
         return childs_.at(index)->execute(index);
     else throw std::invalid_argument("Invalid index. Prompt: out of range index");

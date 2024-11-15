@@ -5,6 +5,7 @@
 class VariableBase;
 
 class VariableNode:public Node{
+    VariableBase* var_;
     public:
     VariableNode(VariableBase* variable);
     VariableNode(const VariableNode& other);
@@ -22,9 +23,9 @@ class VariableNode:public Node{
 
     virtual void insert_back(std::shared_ptr<Node> node) override;
 
-    virtual Result execute() override;
+    virtual Result execute() const override;
 
-    virtual Result execute(size_t index) override;
+    virtual Result execute(size_t index) const override;
 
     virtual void print_text(std::ostream& stream) const override;
 
@@ -36,6 +37,8 @@ class VariableNode:public Node{
 
     virtual bool is_array() const override;
 
+    inline virtual Result cached_result() override;
+    inline virtual Result cached_result(size_t index) override;
+
     private:
-    VariableBase* var_;
 };

@@ -25,7 +25,7 @@ namespace node_function::functions{
             for(const std::shared_ptr<Node>& child:arr->childs()){
                 if(!child->execute().is_error()){
                     if(check_arguments(TYPE_VAL::STRING_ARRAY,child) && child->cached_result().is_array())
-                        result+=Concatenate(reinterpret_cast<ArrayNode*>(child->cached_result().get<Node*>())).get<std::string>();
+                        result+=Concatenate(child->cached_result().get_array_node()).get<std::string>();
                     else if(check_arguments(TYPE_VAL::STRING,child))
                         result+=child->cached_result().get<std::string>();
                     else return std::make_shared<exceptions::InvalidTypeOfArgument>("string array/string");

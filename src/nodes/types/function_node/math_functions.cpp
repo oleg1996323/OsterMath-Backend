@@ -10,7 +10,7 @@
 
 using childs_t = std::decay_t<decltype(std::declval<Node>().childs())>;
 
-Result node_function::functions::math::SumProduct(FunctionNode* node){
+Result node_function::functions::math::SumProduct(const FunctionNode* node){
     using namespace ::functions::auxiliary;
     if(check_type_container_nodes(TYPE_VAL::NUMERIC_ARRAY,node->childs())){
         using T = __container_make__<childs_t,
@@ -67,7 +67,7 @@ Result node_function::functions::math::SumProduct(FunctionNode* node){
     else return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric arrays/value");
 }
 
-Result node_function::functions::math::Sum(FunctionNode* node){
+Result node_function::functions::math::Sum(const FunctionNode* node){
     using namespace ::functions::auxiliary;
     if(check_type_container_nodes(TYPE_VAL::NUMERIC_ARRAY,node->childs())){
         using T = __container_make__<childs_t,
@@ -120,7 +120,7 @@ Result node_function::functions::math::Sum(FunctionNode* node){
     else return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric arrays/value");
 }
 
-Result node_function::functions::math::Product(FunctionNode* node){
+Result node_function::functions::math::Product(const FunctionNode* node){
     using namespace ::functions::auxiliary;
     if(check_type_container_nodes(TYPE_VAL::NUMERIC_ARRAY,node->childs())){
         using T = __container_make__<childs_t,

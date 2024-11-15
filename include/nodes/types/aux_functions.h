@@ -59,16 +59,15 @@ template<typename CHECK_VAL,typename... ARGS>
 requires __comparable_check_values_ptr__<CHECK_VAL, ARGS...> || __comparable_check_values_val__<CHECK_VAL, ARGS...>
 bool functions::auxiliary::check_arguments(CHECK_VAL check, ARGS&&... args){
     if constexpr (__comparable_check_values_ptr__<CHECK_VAL,ARGS...>){
-        if(((!(check&args->type_val())) && ...))
-            return false;
-        else return true;
+        if(((check == args->type_val()) && ...))
+            return true;
+        else return false;
     }
     else{
-        if(((!(check&args.type_val())) && ...))
-            return false;
-        else return true;
+        if(((check == args.type_val()) && ...))
+            return true;
+        else return false;
     }
-    
 };
 
 template<typename CHECK_VAL,template<typename> typename CONT,typename T>
@@ -77,7 +76,7 @@ __comparable_check_values_ptr_t__<CHECK_VAL, T> ||
 __comparable_check_values_val_t__<CHECK_VAL, T>
 bool functions::auxiliary::check_type_container_nodes(CHECK_VAL check, CONT<T> args){
     return std::all_of(args.begin(),args.end(),[&check](const std::decay_t<T>& node){
-        return node->type_val() & check;
+        return node->type_val() == check;
     });
 }
 

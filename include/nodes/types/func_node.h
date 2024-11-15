@@ -7,6 +7,9 @@
 
 
 class FunctionNode:public Node{
+    mutable Result cache_;
+    FUNCTION_OP operation_;
+    bool array_type_function;
     public:
     inline FunctionNode(FUNCTION_OP op):
     Node((int)NUMBER_OF_ARGUMENT[(int)op]),
@@ -35,15 +38,16 @@ class FunctionNode:public Node{
         return array_type_function;
     }
     virtual void insert_back(std::shared_ptr<Node> node) override;
-    virtual Result execute() override;
-    virtual Result execute(size_t index) override;
+    virtual Result execute() const override;
+    virtual Result execute(size_t index) const override;
     virtual void print_text(std::ostream& stream) const override;
     virtual void print_result(std::ostream& stream) const override;
     virtual bool is_numeric() const override;
     virtual bool is_string() const override;
     virtual bool is_array() const override;
     FUNCTION_OP operation() const;
+    virtual void flush_cache() const override{
+        cache_ = std::monostate();
+    }
     private:
-    FUNCTION_OP operation_;
-    bool array_type_function;
 };

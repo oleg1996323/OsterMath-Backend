@@ -22,13 +22,13 @@ struct STRUCT_SECTION{
     size_t max_size_depth = 0;
 };
 
-void define_section_subelements(STRUCT_SECTION& section_sizes, ArrayNode* array){
+void define_section_subelements(STRUCT_SECTION& section_sizes, const ArrayNode* array){
     if(array->has_childs()){
         section_sizes.size_=array->childs().size();
         for(std::shared_ptr<Node> child:*array){
             if(child->is_array()){
                 section_sizes.childs_.push_back(STRUCT_SECTION(&section_sizes));
-                define_section_subelements(section_sizes.childs_.back(), reinterpret_cast<ArrayNode*>(child->execute().get<Node*>()));
+                define_section_subelements(section_sizes.childs_.back(), child->execute().get_array_node());
                 section_sizes.childs_.back().update_max_size_depth();
             }
         }
@@ -72,20 +72,24 @@ exceptions::EXCEPTION_TYPE exception_handler(std::function<void()> function){
 
 int main(int argc, char **argv){
     std::cout<<sizeof(char)<<std::endl;
-    std::cout<<sizeof(Value_t)<<std::endl;
-    std::cout<<sizeof(std::string)<<std::endl;
-    std::cout<<sizeof(Result)<<std::endl;
-    std::cout<<sizeof(std::vector<Result>)<<std::endl;
-    std::cout<<sizeof(Bound_types)<<std::endl;
-    std::cout<<sizeof(Node)<<std::endl;
-    std::cout<<sizeof(BinaryNode)<<std::endl;
-    std::cout<<sizeof(UnaryNode)<<std::endl;
-    std::cout<<sizeof(RangeOperationNode)<<std::endl;
-    std::cout<<sizeof(FunctionNode)<<std::endl;
-    std::cout<<sizeof(ArrayNode)<<std::endl;
-    std::cout<<sizeof(ValueNode)<<std::endl;
-    std::cout<<sizeof(StringNode)<<std::endl;
-    std::cout<<sizeof(VariableNode)<<std::endl;
+    std::cout<<"Value_t: "<<sizeof(Value_t)<<std::endl;
+    std::cout<<"std::string: "<<sizeof(std::string)<<std::endl;
+    std::cout<<"Result: "<<sizeof(Result)<<std::endl;
+    std::cout<<"std::vector<Result>: "<<sizeof(std::vector<Result>)<<std::endl;
+    std::cout<<"Bound_types: "<<sizeof(Bound_types)<<std::endl;
+    std::cout<<"Node: "<<sizeof(Node)<<std::endl;
+    std::cout<<"BinaryNode: "<<sizeof(BinaryNode)<<std::endl;
+    std::cout<<"UnaryNode: "<<sizeof(UnaryNode)<<std::endl;
+    std::cout<<"RangeOperationNode: "<<sizeof(RangeOperationNode)<<std::endl;
+    std::cout<<"FunctionNode: "<<sizeof(FunctionNode)<<std::endl;
+    std::cout<<"ArrayNode: "<<sizeof(ArrayNode)<<std::endl;
+    std::cout<<"ValueNode: "<<sizeof(ValueNode)<<std::endl;
+    std::cout<<"StringNode: "<<sizeof(StringNode)<<std::endl;
+    std::cout<<"VariableNode: "<<sizeof(VariableNode)<<std::endl;
+    std::cout<<"std::unordered_set<Node*>: "<<sizeof(std::unordered_set<Node*>)<<std::endl;
+    std::cout<<"std::set<Node*>: "<<sizeof(std::set<Node*>)<<std::endl;
+    std::cout<<"std::list<Node*>: "<<sizeof(std::list<Node*>)<<std::endl;
+    std::cout<<"std::vector<std::shared_ptr<Node>>: "<<sizeof(std::vector<std::shared_ptr<Node>>)<<std::endl;
     ::testing::InitGoogleTest(&argc, argv);
     //LOG_DURATION("Tests");   
     //Testing();

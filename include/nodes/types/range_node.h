@@ -11,11 +11,23 @@ enum class RANGE_OP{
 //calculate some expressions by range of input values.
 //Childs should be only numeric variable-arrays and have same length
 class RangeOperationNode:public Node{
+    mutable Result cache_;
+    std::vector<VariableNode*> vars_;
+    std::shared_ptr<Node> range_expression;
+    RANGE_OP operation_;
     public:
     RangeOperationNode(RANGE_OP op):operation_(op){}
-    template<template<typename,typename> typename... PAIRS, typename T>
-    requires (std::is_same_v<std::pair<T,T>,PAIRS<T,T>> && ...)
-    RangeOperationNode(RANGE_OP op, PAIRS<T,T>... args):operation_(op){}
+
+    RangeOperationNode(RANGE_OP op, std::shared_ptr<Node> expr,const std::vector<VariableNode*>& args):
+    vars_(args),
+    range_expression(expr),
+    operation_(op){}
+
+    RangeOperationNode(RANGE_OP op, std::shared_ptr<Node> expr,std::vector<VariableNode*>&& args):
+    vars_(std::move(args)),
+    range_expression(expr),
+    operation_(op){}
+    
     RangeOperationNode(const RangeOperationNode& other);
     RangeOperationNode(RangeOperationNode&&) = delete;
 
@@ -23,30 +35,31 @@ class RangeOperationNode:public Node{
         return NODE_TYPE::RANGEOP;
     }
 
-    virtual Result execute() override;
-    virtual Result execute(size_t index) override;
+    virtual Result execute() const override;
+    virtual Result execute(size_t index) const override;
+    inline virtual Result cached_result() override{
+        return cache_;
+    }
+    inline virtual Result cached_result(size_t index){
+        return cache_;
+    }
     virtual void insert_back(std::shared_ptr<Node> node) override;
     virtual void print_text(std::ostream& stream) const override;
     virtual void print_result(std::ostream& stream) const override;
     virtual bool is_numeric() const override;
     virtual bool is_string() const override;
     virtual bool is_array() const override;
-    const std::shared_ptr<Node>& get_range_expression() const{
-        return range_expression;
-    }
+    // const std::shared_ptr<Node>& get_range_expression() const{
+    //     return range_expression;
+    // }
 
     RANGE_OP operation() const;
 
-    size_t range_length() const{
-        return range_size;
+    virtual void flush_cache() const override{
+        cache_ = std::monostate();
     }
 
     private:
 
-    void define_range_length();
-
-    std::vector<size_t> sz_depth_measure;
-    mutable size_t range_size = 0;
-    std::shared_ptr<Node> range_expression;
-    RANGE_OP operation_;
+    //void define_range_length() const;
 };

@@ -39,7 +39,7 @@ FUNCTION_OP FunctionNode::operation() const{
 #include "function_node/string_functions.h"
 using namespace functions::auxiliary;
 
-Result FunctionNode::execute(){ //TODO add checking for arrays size comparision
+Result FunctionNode::execute() const{ //TODO add checking for arrays size comparision
     using namespace boost::math::policies;
     cache_ = std::monostate();
     if(NUMBER_OF_ARGUMENT[(size_t)operation_]!=-1 && childs_.size()!=(size_t)NUMBER_OF_ARGUMENT[(size_t)operation_]){
@@ -223,7 +223,7 @@ Result FunctionNode::execute(){ //TODO add checking for arrays size comparision
     return cache_;
 }
 
-Result FunctionNode::execute(size_t index){
+Result FunctionNode::execute(size_t index) const{
     //because function is like a constant
     return execute();
 }

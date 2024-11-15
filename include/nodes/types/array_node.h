@@ -5,6 +5,7 @@
 #include "node.h"
 
 class ArrayNode:public Node{
+    mutable Result cache_;
     public:
     using Node::operator=;
     using Node::insert_back;
@@ -24,20 +25,22 @@ class ArrayNode:public Node{
 
     inline ArrayNode& operator=(const ArrayNode& arr){
         Node::operator=(arr);
+        cache_ = arr.cache_;
         return *this;
     }
 
     inline ArrayNode& operator=(ArrayNode&& arr){
         Node::operator=(std::move(arr));
+        std::swap(cache_,arr.cache_);
         return *this;
     }
     virtual NODE_TYPE type() const override;
-    virtual Result execute() override;
-    virtual Result execute(size_t index) override;
+    virtual Result execute() const override;
+    virtual Result execute(size_t index) const override;
     inline virtual Result cached_result(){
         return cache_;
     }
-    inline virtual Result cached_result(size_t index)override{
+    inline virtual Result cached_result(size_t index) override{
         if(has_child(index))
             return child(index)->cached_result();
         else
@@ -60,6 +63,9 @@ class ArrayNode:public Node{
     virtual bool is_array() const override;
     virtual void print_text(std::ostream& stream) const override;
     virtual void print_result(std::ostream& stream) const override;
+    virtual void flush_cache() const override{
+        cache_ = std::monostate();
+    }
 };
 
 template<typename SMART_PTR>

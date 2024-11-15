@@ -15,6 +15,7 @@ class ValueNode;
 class VariableNode;
 
 class UnaryNode:public Node{
+    UNARY_OP operation_;
     friend MultiArgumentNode;
     friend BinaryNode;
     friend ValueNode;
@@ -38,9 +39,9 @@ class UnaryNode:public Node{
 
     virtual void insert_back(std::shared_ptr<Node> node) override;
 
-    virtual Result execute() override;
+    virtual Result execute() const override;
 
-    virtual Result execute(size_t index) override;
+    virtual Result execute(size_t index) const override;
 
     virtual bool is_numeric() const override;
 
@@ -55,7 +56,6 @@ class UnaryNode:public Node{
     virtual void print_result(std::ostream& stream) const override;
 
     private:
-    Result __calculate__();
-    Result __calculate__(size_t index);
-    UNARY_OP operation_;
+    Result __calculate__() const;
+    Result __calculate__(size_t index) const;
 };

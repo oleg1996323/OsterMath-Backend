@@ -2,9 +2,9 @@
 #include <memory>
 #include <optional>
 #include <vector>
-#include <unordered_set>
 #include <functional>
 #include <string>
+#include <set>
 #include "nodes/def.h"
 
 class Node;
@@ -78,8 +78,8 @@ class Node{
         return childs_.size()>id;
     }
     virtual NODE_TYPE type() const;
-    virtual Result execute();
-    virtual Result execute(size_t index);
+    virtual Result execute() const;
+    virtual Result execute(size_t index) const;
     inline virtual Result cached_result(){
         return std::monostate();
     }
@@ -106,13 +106,13 @@ class Node{
     virtual ~Node();
     void add_parent(Node*);
     bool has_parents() const;
-    virtual void get_array_childs(std::vector<std::shared_ptr<Node>>& childs) const;
+    //virtual void get_array_childs(std::vector<std::shared_ptr<Node>>& childs) const;
     void replace_move_child_to(Node*,size_t,size_t);
     void replace_copy_child_to(Node*,size_t,size_t);
     void refresh_parent_links() const;
     void refresh();
-    const std::unordered_set<Node*>& parents() const;
-    std::unordered_set<Node*>& parents();
+    const std::set<Node*>& parents() const;
+    std::set<Node*>& parents();
     bool refer_to(std::string_view var_name) const;
     inline bool caller() const{
         return caller_;
@@ -121,12 +121,9 @@ class Node{
     void recursive_function_applied_to_all_childs(std::function<T(const std::shared_ptr<Node>&,U...)> func);
     const std::vector<std::shared_ptr<Node>>& childs() const;
 
-    void flush_cache(){
-        cache_ = std::monostate();
-    }
+    virtual void flush_cache() const{}
     protected:
-    Result cache_;
-    mutable std::unordered_set<Node*> parents_;
+    mutable std::set<Node*> parents_; //is less memory expensive than unordered_set
     std::vector<std::shared_ptr<Node>> childs_;
     bool caller_ = false;
     private:
@@ -160,10 +157,8 @@ void Node::recursive_function_applied_to_all_childs(std::function<T(const std::s
 }
 
 Node& Node::operator=(Node&& other){
-    if(&other!=this){
+    if(&other!=this)
         childs_.swap(other.childs_);
-        std::swap(cache_,other.cache_);
-    }
     return *this;
 }
 

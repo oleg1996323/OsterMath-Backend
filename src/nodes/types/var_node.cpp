@@ -13,7 +13,7 @@ VariableBase* VariableNode::variable() noexcept{
     return var_;
 }
 
-Result VariableNode::execute(){
+Result VariableNode::execute() const{
     if(has_childs())
         if(!refer_to(var_->name()))
             return childs_.at(0)->execute();
@@ -24,7 +24,7 @@ Result VariableNode::execute(){
     else return 0;
 }
 
-Result VariableNode::execute(size_t index){
+Result VariableNode::execute(size_t index) const{
     if(has_childs())
         if(!refer_to(var_->name()))
             return childs_.at(0)->execute(index);
@@ -33,6 +33,27 @@ Result VariableNode::execute(size_t index){
             return 0;
         }
     else return 0;
+}
+
+inline Result VariableNode::cached_result(){
+    if(has_childs()){
+        if(!refer_to(var_->name()))
+            return childs_.at(0)->cached_result();
+        else {
+            return std::make_shared<exceptions::CyclicReference>(var_->name());
+        }
+    }
+    else return std::monostate();
+}
+inline Result VariableNode::cached_result(size_t index){
+    if(has_childs()){
+        if(!refer_to(var_->name()))
+            return childs_.at(0)->cached_result(index);
+        else {
+            return std::make_shared<exceptions::CyclicReference>(var_->name());
+        }
+    }
+    else return std::monostate();
 }
 
 bool VariableNode::is_numeric() const{
