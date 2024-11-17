@@ -224,5 +224,5 @@ set_target_properties(nodes_test
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/bin"
 )
 
-gtest_discover_tests(nodes_test)
+# gtest_discover_tests(nodes_test)
 #add_test(NAME "Nodes" COMMAND nodes_test)

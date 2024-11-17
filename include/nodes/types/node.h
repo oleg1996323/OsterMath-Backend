@@ -114,6 +114,7 @@ class Node{
     const std::set<Node*>& parents() const;
     std::set<Node*>& parents();
     bool refer_to(std::string_view var_name) const;
+    std::set<VariableNode*> refer_to_vars() const;
     inline bool caller() const{
         return caller_;
     }

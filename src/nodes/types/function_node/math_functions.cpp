@@ -10,51 +10,33 @@
 
 using childs_t = std::decay_t<decltype(std::declval<Node>().childs())>;
 
-Result node_function::functions::math::SumProduct(const FunctionNode* node){
+Result node_function::functions::math::Sum(const FunctionNode* node){
     using namespace ::functions::auxiliary;
     if(check_type_container_nodes(TYPE_VAL::NUMERIC_ARRAY,node->childs())){
         using T = __container_make__<childs_t,
                                     std::shared_ptr<ArrayNode>>::type;
         
         Value_t result = 0.;
-        std::unique_ptr<ProxySizeDepthMeasure> proxy_array_iterator;
-        std::vector<Value_t> value_vector;
-        {
-            std::vector<size_t> sz_depth_measure;
-            {
-                if(!::functions::auxiliary::all_numeric(node->childs()))
-                    return std::make_shared<exceptions::IncorrectTypeArrays>("numeric");
-
-                if(!::functions::auxiliary::check_sizes_arrays(sz_depth_measure,reinterpret_cast<const T&>(node->childs())))
-                    throw exceptions::UnequalSizeArrays("Sumproduct");
-            }
-
-            for(auto sz:sz_depth_measure){
-                if(!proxy_array_iterator)
-                    proxy_array_iterator = std::make_unique<ProxySizeDepthMeasure>(sz);
-                else proxy_array_iterator->push(sz);
-            }
-        }
-
-        value_vector.resize(proxy_array_iterator->total_size_childs(),1);
-        size_t array_depth = proxy_array_iterator->depth();
+        SizeDepthMeasure sz_depth_measure;
+        if(!::functions::auxiliary::check_sizes_arrays(sz_depth_measure,reinterpret_cast<const T&>(node->childs())))
+            return std::make_shared<exceptions::UnequalSizeArrays>("Sum");
 
         for(const std::shared_ptr<Node>& array:node->childs()){
-            do
+            while(true)
             {
                 std::shared_ptr<Node> node = array;
-                for(size_t depth=0; depth<array_depth;++depth){
-                    //std::cout<<"Iterator: "<<proxy_array_iterator->current_iterator(depth)<<std::endl;
-                    node = node->child(proxy_array_iterator->current_iterator(depth));
+                for(size_t depth=0; depth<sz_depth_measure.dimensions();++depth){
+                    //std::cout<<"Iterator: "<<sz_depth_measure.current_iterator(depth)<<std::endl;
+                    node = node->child(sz_depth_measure.current_iterator(depth));
                 }
-                //std::cout<<"Iterator: "<<proxy_array_iterator->seq_iterator(array_depth-1)<<std::endl;
-                value_vector.at(proxy_array_iterator->seq_iterator(array_depth-1))*=node->execute().get<Value_t>();
-                //std::cout<<value_vector.at(proxy_array_iterator->seq_iterator(array_depth-1))<<std::endl;
-            } while (++*proxy_array_iterator.get());
-            proxy_array_iterator->reset_iterator();
+                //std::cout<<"Iterator: "<<sz_depth_measure.seq_iterator(array_depth-1)<<std::endl;
+                result+=node->execute().get<Value_t>();
+                if(sz_depth_measure.is_iterable())
+                    ++sz_depth_measure;
+                else break;
+            }
+            sz_depth_measure.reset_all_iterators();
         }
-
-        result = std::accumulate(value_vector.begin(),value_vector.end(),Value_t(0));
         return result;
     }
     else if(check_type_container_nodes(TYPE_VAL::VALUE,node->childs())){
@@ -67,47 +49,40 @@ Result node_function::functions::math::SumProduct(const FunctionNode* node){
     else return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric arrays/value");
 }
 
-Result node_function::functions::math::Sum(const FunctionNode* node){
+Result node_function::functions::math::SumProduct(const FunctionNode* node){
     using namespace ::functions::auxiliary;
     if(check_type_container_nodes(TYPE_VAL::NUMERIC_ARRAY,node->childs())){
         using T = __container_make__<childs_t,
                                     std::shared_ptr<ArrayNode>>::type;
         
         Value_t result = 0.;
-        std::unique_ptr<ProxySizeDepthMeasure> proxy_array_iterator;
-        {
-            std::vector<size_t> sz_depth_measure;
-            {
-                if(!::functions::auxiliary::all_numeric(node->childs()))
-                    return std::make_shared<exceptions::IncorrectTypeArrays>("numeric");
+        SizeDepthMeasure sz_depth_measure;
+        std::vector<Value_t> value_vector;
+        if(!::functions::auxiliary::check_sizes_arrays(sz_depth_measure,reinterpret_cast<const T&>(node->childs())))
+            return std::make_shared<exceptions::UnequalSizeArrays>("Sumproduct");
 
-                if(!::functions::auxiliary::check_sizes_arrays(sz_depth_measure,reinterpret_cast<const T&>(node->childs())))
-                    throw exceptions::UnequalSizeArrays("Sum");
-            }
-
-            for(auto sz:sz_depth_measure){
-                if(!proxy_array_iterator)
-                    proxy_array_iterator = std::make_unique<ProxySizeDepthMeasure>(sz);
-                else proxy_array_iterator->push(sz);
-            }
-        }
-
-        size_t array_depth = proxy_array_iterator->depth();
+        value_vector.resize(sz_depth_measure.max_seq_iterator(),1);
+        size_t array_depth = sz_depth_measure.dimensions();
 
         for(const std::shared_ptr<Node>& array:node->childs()){
-            do
+            while(true)
             {
                 std::shared_ptr<Node> node = array;
                 for(size_t depth=0; depth<array_depth;++depth){
-                    //std::cout<<"Iterator: "<<proxy_array_iterator->current_iterator(depth)<<std::endl;
-                    node = node->child(proxy_array_iterator->current_iterator(depth));
+                    std::cout<<"Iterator: "<<sz_depth_measure.current_iterator(depth)<<std::endl;
+                    node = node->child(sz_depth_measure.current_iterator(depth));
                 }
-                //std::cout<<"Iterator: "<<proxy_array_iterator->seq_iterator(array_depth-1)<<std::endl;
-                result+=node->execute().get<Value_t>();
-            } while (++*proxy_array_iterator.get());
-            proxy_array_iterator->reset_iterator();
+                std::cout<<"Iterator: "<<sz_depth_measure.seq_iterator(array_depth-1)<<std::endl;
+                value_vector.at(sz_depth_measure.seq_iterator(array_depth-1))*=node->execute().get<Value_t>();
+                std::cout<<value_vector.at(sz_depth_measure.seq_iterator(array_depth-1))<<std::endl;
+                if(sz_depth_measure.is_iterable())
+                    ++sz_depth_measure;
+                else break;
+            }
+            sz_depth_measure.reset_all_iterators();
         }
 
+        result = std::accumulate(value_vector.begin(),value_vector.end(),Value_t(0));
         return result;
     }
     else if(check_type_container_nodes(TYPE_VAL::VALUE,node->childs())){
@@ -127,42 +102,27 @@ Result node_function::functions::math::Product(const FunctionNode* node){
                                     std::shared_ptr<ArrayNode>>::type;
         
         Value_t result = 1.;
-        std::unique_ptr<ProxySizeDepthMeasure> proxy_array_iterator;
-    
-        {
-            std::vector<size_t> sz_depth_measure;
-            {
-                if(!::functions::auxiliary::all_numeric(node->childs()))
-                    return std::make_shared<exceptions::IncorrectTypeArrays>("numeric");
+        SizeDepthMeasure sz_depth_measure;
+            if(!::functions::auxiliary::check_sizes_arrays(sz_depth_measure,reinterpret_cast<const T&>(node->childs())))
+                return std::make_shared<exceptions::UnequalSizeArrays>("Sum");
 
-                if(!::functions::auxiliary::check_sizes_arrays(sz_depth_measure,reinterpret_cast<const T&>(node->childs())))
-                    throw exceptions::UnequalSizeArrays("Product");
-            }
-
-            for(auto sz:sz_depth_measure){
-                if(!proxy_array_iterator)
-                    proxy_array_iterator = std::make_unique<ProxySizeDepthMeasure>(sz);
-                else proxy_array_iterator->push(sz);
-            }
-        }
-
-        size_t array_depth = proxy_array_iterator->depth();
-        //std::cout<<"Iterator: "<<proxy_array_iterator->current_iterator(0)<<std::endl;
+        size_t array_depth = sz_depth_measure.dimensions();
 
         for(const std::shared_ptr<Node>& array:node->childs()){
-            do
-            {
+            while(true){
                 std::shared_ptr<Node> node = array;
                 for(size_t depth=0; depth<array_depth;++depth){
                     //std::cout<<"Iterator: "<<proxy_array_iterator->current_iterator(depth)<<std::endl;
-                    node = node->child(proxy_array_iterator->current_iterator(depth));
+                    node = node->child(sz_depth_measure.current_iterator(depth));
                 }
                 //std::cout<<"Iterator: "<<proxy_array_iterator->seq_iterator(array_depth-1)<<std::endl;
                 result*=node->execute().get<Value_t>();
-            } while (++*proxy_array_iterator.get());
-            proxy_array_iterator->reset_iterator();
+                if(sz_depth_measure.is_iterable())
+                    ++sz_depth_measure;
+                else break;
+            }
+            sz_depth_measure.reset_all_iterators();
         }
-
         return result;
     }
     else if(check_type_container_nodes(TYPE_VAL::VALUE,node->childs())){

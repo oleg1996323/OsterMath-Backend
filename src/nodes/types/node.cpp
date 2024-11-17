@@ -133,6 +133,19 @@ bool Node::refer_to(std::string_view var_name) const{
     }
 }
 
+#include "aux_functions.h"
+
+std::set<VariableNode*> Node::refer_to_vars() const{
+    std::set<VariableNode*> vars_;
+    for(const std::shared_ptr<Node>& child:childs_){
+        if(child->type()==NODE_TYPE::VARIABLE)
+            vars_.insert(reinterpret_cast<VariableNode*>(child.get()));
+        else
+            vars_.merge(child->refer_to_vars());
+    }
+    return vars_;
+}
+
 void Node::refresh_parent_links() const{
     if(type()==NODE_TYPE::VARIABLE){
         for(Node* parent:parents_)
@@ -200,7 +213,7 @@ INFO_NODE Node::child(const std::vector<size_t>& indexes){
             info.id = *indexes.begin();
             return info;
         }
-        else throw exceptions::NodeChildDontExists("");
+        else return INFO_NODE();
     else{
         if(has_child(0)){
             if(indexes.size()>1 && child(0)->has_child(*indexes.begin()))
@@ -210,9 +223,9 @@ INFO_NODE Node::child(const std::vector<size_t>& indexes){
                 info.id = *indexes.begin();
                 return info;
             }
-            else throw exceptions::NodeChildDontExists("");
+            else return INFO_NODE();
         }
-        else throw exceptions::NodeChildDontExists("");
+        else return INFO_NODE();
     }
 }
 

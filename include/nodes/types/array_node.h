@@ -34,6 +34,7 @@ class ArrayNode:public Node{
         std::swap(cache_,arr.cache_);
         return *this;
     }
+
     virtual NODE_TYPE type() const override;
     virtual Result execute() const override;
     virtual Result execute(size_t index) const override;

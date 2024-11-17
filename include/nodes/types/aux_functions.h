@@ -26,27 +26,42 @@ namespace functions{
         bool check_arguments(CHECK_VAL check, ARGS&&... args);
 
         //void init_sz_depth_measure(std::vector<size_t>& sz_depth_measure, ArrayNode* array);
-        
+
         template<typename T>
-        void init_sz_depth_measure(std::vector<size_t>& sz_depth_measure, T node);
+        void init_sz_depth_measure(SizeDepthMeasure& sz_depth_measure, T node);
 
         template<template<typename> typename CONT, typename T>
         requires __container_array_node_req__<CONT,T>
-        bool check_sizes_arrays(std::vector<size_t>& sz_depth_measure,CONT<T> nodes, size_t& loc_c);
+        bool check_sizes_arrays(SizeDepthMeasure& sz_depth_measure,CONT<T> nodes, size_t& loc_c);
+
+        bool check_sizes_arrays(SizeDepthMeasure& sz_depth_measure,const std::vector<std::shared_ptr<Node>>& nodes) noexcept;
 
         template<template<typename> typename CONT, typename T>
         requires __container_array_node_req__<CONT,T>
-        bool check_sizes_arrays(std::vector<size_t>& sz_depth_measure,CONT<T> nodes) noexcept;
+        bool check_sizes_arrays(SizeDepthMeasure& sz_depth_measure,CONT<T> nodes) noexcept;
+        bool check_sizes_arrays(const std::vector<std::shared_ptr<Node>>& nodes) noexcept;
 
         bool all_numeric(decltype(std::declval<Node>().childs()) arrays);
         bool all_string(decltype(std::declval<Node>().childs()) arrays);
 
+        std::shared_ptr<Node> first_node_not_var(const std::shared_ptr<Node>& node) noexcept;
+        Node* first_node_not_var(Node* node) noexcept;
+        std::shared_ptr<Node> first_node_not_var_by_ids(const std::shared_ptr<Node>& node, const std::vector<size_t>& seq_iterators) noexcept;
+        Node* first_node_not_var_by_ids(Node* node, const std::vector<size_t>& seq_iterators) noexcept;
+
         bool check_sizes_arrays(const std::vector<Node*>& arrays);
         bool check_sizes_arrays(const std::list<Node*>& arrays);
         bool check_sizes_arrays(const std::deque<Node*>& arrays);
-        bool check_sizes_arrays(const std::vector<std::shared_ptr<Node>>& arrays);
+        //bool check_sizes_arrays(const std::vector<std::shared_ptr<Node>>& arrays);
         bool check_sizes_arrays(const std::list<std::shared_ptr<Node>>& arrays);
         bool check_sizes_arrays(const std::deque<std::shared_ptr<Node>>& arrays);
+
+        //temporary at testing TODO: delete
+        bool check_sizes_arrays(SizeDepthMeasure&,const std::vector<Node*>& arrays);
+        bool check_sizes_arrays(SizeDepthMeasure&,const std::list<Node*>& arrays);
+        bool check_sizes_arrays(SizeDepthMeasure&,const std::deque<Node*>& arrays);
+        bool check_sizes_arrays(SizeDepthMeasure&,const std::list<std::shared_ptr<Node>>& arrays);
+        bool check_sizes_arrays(SizeDepthMeasure&,const std::deque<std::shared_ptr<Node>>& arrays);
 
         std::shared_ptr<ArrayNode> to_array_node(const std::shared_ptr<Node>& node) noexcept;
         std::shared_ptr<ValueNode> to_value_node(const std::shared_ptr<Node>& node) noexcept;
@@ -81,21 +96,28 @@ bool functions::auxiliary::check_type_container_nodes(CHECK_VAL check, CONT<T> a
 }
 
 template<typename T>
-void functions::auxiliary::init_sz_depth_measure(std::vector<size_t>& sz_depth_measure, T array){
-    sz_depth_measure.push_back(array->size());
-    if(array->size()!=0 && array->child(0)->type()==NODE_TYPE::ARRAY){
-        if constexpr (std::is_same_v<std::shared_ptr<ArrayNode>,std::decay_t<T>>)
-            init_sz_depth_measure(sz_depth_measure,reinterpret_cast<const std::decay_t<T>&>(array->child(0)));
-        else if (std::is_same_v<ArrayNode*,std::decay_t<T>>)
-            init_sz_depth_measure(sz_depth_measure,reinterpret_cast<std::decay_t<T>>(array->child(0).get()));
+void functions::auxiliary::init_sz_depth_measure(SizeDepthMeasure& sz_depth_measure, T array){
+    Node* node;
+    if constexpr (std::is_same_v<std::shared_ptr<ArrayNode>,std::decay_t<T>>)
+        node = array.get();
+    else if (std::is_same_v<ArrayNode*,std::decay_t<T>>)
+        node = array;
+    else assert(true);
+    
+    while(node->type()!=NODE_TYPE::ARRAY && node->has_child(0)){
+        node = node->child(0).get();
+    }
+    if(reinterpret_cast<ArrayNode*>(node)->size()!=0 && node->type()==NODE_TYPE::ARRAY){
+        sz_depth_measure.push_depth(reinterpret_cast<ArrayNode*>(node)->size());
+        if(node->has_child(0) && node->child(0)->type()==NODE_TYPE::ARRAY)
+            init_sz_depth_measure(sz_depth_measure,reinterpret_cast<ArrayNode*>(node->child(0).get()));
     }
 }
 
 template<template<typename> typename CONT, typename T>
 requires __container_array_node_req__<CONT,T>
-bool functions::auxiliary::check_sizes_arrays(std::vector<size_t>& sz_depth_measure,CONT<T> nodes, size_t& loc_c){
+bool functions::auxiliary::check_sizes_arrays(SizeDepthMeasure& sz_depth_measure,CONT<T> nodes, size_t& loc_c){
     if(std::all_of(nodes.begin(),nodes.end(),[&sz_depth_measure, &loc_c](const T& array){
-        //происходит дублирование при каждом прохождении последующих массивов после 1-го
         if(std::all_of(array->begin(),array->end(),[](std::shared_ptr<Node>& node){return node->is_array();}))
         {
             std::vector<ArrayNode*> in_arrays;
@@ -103,7 +125,7 @@ bool functions::auxiliary::check_sizes_arrays(std::vector<size_t>& sz_depth_meas
             for(std::shared_ptr<Node> item_array:*array){
                 in_arrays.push_back(reinterpret_cast<ArrayNode*>(item_array.get()));
             }
-            if(array->size()==sz_depth_measure.at(loc_c)){
+            if(array->size()==sz_depth_measure.size(loc_c)){
                 ++loc_c;
                 if(check_sizes_arrays(sz_depth_measure,in_arrays,loc_c)){
                     return true;
@@ -115,7 +137,7 @@ bool functions::auxiliary::check_sizes_arrays(std::vector<size_t>& sz_depth_meas
             else return false;
         }
         else if(!std::any_of(array->begin(),array->end(),[](std::shared_ptr<Node>& node){return node->is_array();}))
-            return array->size()==sz_depth_measure.at(loc_c);
+            return array->size()==sz_depth_measure.size(loc_c);
         else return false;
     })){
         --loc_c;
@@ -127,14 +149,27 @@ bool functions::auxiliary::check_sizes_arrays(std::vector<size_t>& sz_depth_meas
     }
 }
 
+
+bool same_result_type(const Result& first,const Result& second);
+
 template<template<typename> typename CONT, typename T>
 requires __container_array_node_req__<CONT,T>
-bool functions::auxiliary::check_sizes_arrays(std::vector<size_t>& sz_depth_measure,CONT<T> nodes) noexcept{
+bool functions::auxiliary::check_sizes_arrays(SizeDepthMeasure& sz_depth_measure,CONT<T> nodes) noexcept{
     size_t loc_c=0;
-    if(sz_depth_measure.size()==0){
+    if(sz_depth_measure.dimensions()==0){
         if(nodes.size()!=0 && !nodes.front()->empty()){
             loc_c = 0;
-            init_sz_depth_measure(sz_depth_measure,nodes.front());
+            Node* node;
+            if constexpr (std::is_pointer_v<std::decay_t<T>>){
+                node = reinterpret_cast<Node*>(nodes.front());
+            }
+            else if(std::is_same_v<CONT<std::shared_ptr<ArrayNode>>,CONT<T>>){
+                node = reinterpret_cast<Node*>(nodes.front().get());
+            }
+            while(node->cached_result().is_array()){
+                sz_depth_measure.push_depth(node->cached_result().get_array_node()->size());
+                node = node->child(0).get();
+            }
         }
         else loc_c = 0;
     }
@@ -142,8 +177,11 @@ bool functions::auxiliary::check_sizes_arrays(std::vector<size_t>& sz_depth_meas
         using type = std::decay_t<CONT<ArrayNode*>>;
         return check_sizes_arrays<CONT,T>(sz_depth_measure,reinterpret_cast<const type&>(nodes),loc_c);
     }
-    else{
+    else if(std::is_same_v<CONT<std::shared_ptr<ArrayNode>>,CONT<T>>){
         using type = std::decay_t<CONT<std::shared_ptr<ArrayNode>>>;
         return check_sizes_arrays<CONT,T>(sz_depth_measure,reinterpret_cast<const type&>(nodes),loc_c);
+    }
+    else{
+        assert(!(std::is_pointer_v<std::decay_t<T>> || std::is_same_v<CONT<std::shared_ptr<ArrayNode>>,CONT<T>>));
     }
 }

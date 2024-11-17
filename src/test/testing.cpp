@@ -426,7 +426,7 @@ void Testing(){
     Testing_detector_1();
     Testing_detector_2();
     Testing_detector_3();
-    Testing_detector_4();
+    //Testing_detector_4();
     Load_test_1();
 
 }

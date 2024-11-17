@@ -21,7 +21,11 @@ class RangeOperationNode:public Node{
     RangeOperationNode(RANGE_OP op, std::shared_ptr<Node> expr,const std::vector<VariableNode*>& args):
     vars_(args),
     range_expression(expr),
-    operation_(op){}
+    operation_(op){
+        std::set<VariableNode*> nodes = range_expression->refer_to_vars();
+        if(args.size()!=nodes.size())
+            cache_ = std::make_shared<exceptions::InvalidNumberOfArguments>(nodes.size());
+    }
 
     RangeOperationNode(RANGE_OP op, std::shared_ptr<Node> expr,std::vector<VariableNode*>&& args):
     vars_(std::move(args)),

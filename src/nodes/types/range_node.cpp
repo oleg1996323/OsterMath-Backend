@@ -10,19 +10,19 @@ operation_(other.operation_)
 {}
 
 Result RangeOperationNode::execute() const{
-    //range_expression->get_array_childs(const_cast<std::decay_t<decltype(childs_)>&>(childs_));
-    if(operation_==RANGE_OP::SUM)
-        cache_ =  0.;
-    else if(operation_==RANGE_OP::PROD)
-        cache_ = 1.;
-    for(size_t i=0;i<range_size;++i){
-        //std::cout<<"Index: "<<i<<std::endl;
-        if(operation_==RANGE_OP::SUM)
-            result+=execute(i).get<Value_t>();
-        else if(operation_==RANGE_OP::PROD)
-            result*=execute(i).get<Value_t>();
-    }
-    return result;
+    // //range_expression->get_array_childs(const_cast<std::decay_t<decltype(childs_)>&>(childs_));
+    // if(operation_==RANGE_OP::SUM)
+    //     cache_ =  0.;
+    // else if(operation_==RANGE_OP::PROD)
+    //     cache_ = 1.;
+    // for(size_t i=0;i<range_size;++i){
+    //     //std::cout<<"Index: "<<i<<std::endl;
+    //     if(operation_==RANGE_OP::SUM)
+    //         result+=execute(i).get<Value_t>();
+    //     else if(operation_==RANGE_OP::PROD)
+    //         result*=execute(i).get<Value_t>();
+    // }
+    // return result;
 }
 
 Result RangeOperationNode::execute(size_t index) const{
