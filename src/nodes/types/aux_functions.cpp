@@ -174,19 +174,18 @@ bool functions::auxiliary::check_sizes_arrays(const std::vector<std::shared_ptr<
 
     std::shared_ptr<Node> node = first_node_not_var(nodes.front());
     // int32_t depth = -1;
-    std::vector<Node*> seq_node;
+    std::vector<std::shared_ptr<Node>> seq_node;
     std::vector<size_t> seq_iterators;
     seq_node.reserve(30);
     if(node){
-        seq_node.push_back(node.get());
+        seq_node.push_back(node);
         //depth = 0;
     }
     else return false;
-    seq_iterators.push_back(0);
     
-    while(!seq_iterators.empty() || seq_iterators.back()<seq_node.back()->childs().size()){
+    while(!seq_node.empty() || (!seq_iterators.empty() && seq_iterators.back()<seq_node.back()->childs().size())){
         if(std::all_of(nodes.begin()+1,nodes.end(),[&seq_iterators,&seq_node](const std::shared_ptr<Node>& node){
-            std::shared_ptr<Node> seq_node_child = first_node_not_var(seq_node.back()->child(seq_iterators.back()));
+            std::shared_ptr<Node> seq_node_child = first_node_not_var(seq_node.back());
             if(!seq_node_child) //identify childs by sequence index
                 return false;
             std::shared_ptr<Node> other_child_node = first_node_not_var_by_ids(node,seq_iterators);
@@ -203,11 +202,19 @@ bool functions::auxiliary::check_sizes_arrays(const std::vector<std::shared_ptr<
         }))
         {
             if(seq_node.back()->has_childs()){
+                if(!seq_iterators.empty())
+                    ++seq_iterators.back();
                 seq_iterators.push_back(0);
-                seq_node.push_back(seq_node.back()->child(0).get());
+                seq_node.push_back(seq_node.back()->child(0));
             }
             else{
-                ++seq_node.back();
+                if(!seq_iterators.empty() && seq_iterators.back()<seq_node.back()->childs().size())
+                    ++seq_iterators.back();
+                else{
+                    seq_node.pop_back();
+                    if(!seq_iterators.empty())
+                        seq_iterators.pop_back();
+                }
             }
         }
         else return false;
