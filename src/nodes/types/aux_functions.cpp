@@ -167,15 +167,10 @@ bool functions::auxiliary::check_sizes_arrays(const std::vector<std::shared_ptr<
     //Node* node;
     if(nodes.size()<=1)
         return false;
-    // if(std::any_of(nodes.begin(),nodes.end(),[](const std::shared_ptr<Node>& node){
-    //     return node->cached_result().is_error();
-    // }))
-    //     return false;
 
     std::shared_ptr<Node> first_node = first_node_not_var(nodes.front());
-    // int32_t depth = -1;
     std::vector<size_t> seq_iterators;
-    size_t root_iter = 0;
+    std::vector<std::shared_ptr<Node>> ex_nodes;
     if(!first_node)
         return false;
 
@@ -183,43 +178,60 @@ bool functions::auxiliary::check_sizes_arrays(const std::vector<std::shared_ptr<
         return node->childs().size() == first_node->childs().size() && node->type_val() == first_node->type_val();
     ;}))
         return false;
-    size_t count = 0;
-    while(root_iter<nodes.front()->childs().size()){
-        for(size_t iter = 1;iter<nodes.size();++iter){
-            std::shared_ptr<Node> seq_node_child = first_node_not_var_by_ids(nodes.front(),seq_iterators);
-            if(!seq_node_child)
-            {
-                return false;
-            }
-            std::shared_ptr<Node> other_child_node = seq_iterators.empty()?first_node_not_var(nodes.at(iter)):first_node_not_var_by_ids(nodes.at(iter),seq_iterators);
+    else{
+        if(first_node->has_childs())
+            seq_iterators.push_back(0);
+    }
+    if(!seq_iterators.empty()){
+        assert(seq_iterators.size()==1);
+        while(seq_iterators.front()<nodes.front()->childs().size()){
+            for(size_t iter = 1;iter<nodes.size();++iter){
+                std::shared_ptr<Node> seq_node_child = first_node_not_var_by_ids(nodes.front(),seq_iterators);
+                if(!seq_node_child)
+                {
+                    return false;
+                }
+                std::shared_ptr<Node> other_child_node = seq_iterators.empty()?first_node_not_var(nodes.at(iter)):first_node_not_var_by_ids(nodes.at(iter),seq_iterators);
 
-            if(!other_child_node)
-            {
+                if(!other_child_node)
+                {
+                    return false;
+                }
+                if(seq_node_child->type_val() != other_child_node->type_val() || 
+                    other_child_node->childs().size()!=seq_node_child->childs().size())
+                {
+                    //std::cout<<other_child_node->get_text()<<std::endl<<seq_node_child->get_text()<<std::endl;
+                    return false;
+                }
+                //std::cout<<other_child_node->get_text()<<std::endl<<seq_node_child->get_text()<<std::endl;
+            }
+            std::shared_ptr<Node> tmp_node = first_node_not_var_by_ids(nodes.front(),seq_iterators);
+            if(seq_iterators.empty() && nodes.front()->has_childs()){
+                seq_iterators.push_back(0);
+                ex_nodes.push_back(tmp_node);
+            }
+            else if(tmp_node = first_node_not_var_by_ids(nodes.front(),seq_iterators)){
+                if(tmp_node->has_childs()){
+                    seq_iterators.push_back(0);
+                    ex_nodes.push_back(tmp_node);
+                }
+                else{
+                    if(!ex_nodes.empty() && seq_iterators.back()+1<ex_nodes.back()->childs().size()){
+                        ++seq_iterators.back();
+                    }
+                    else{
+                        while(!(ex_nodes.empty() || !(seq_iterators.back()+1>=ex_nodes.back()->childs().size()) || !(seq_iterators.size()>1))){
+                            seq_iterators.pop_back();
+                            ex_nodes.pop_back();
+                        }
+                        ++seq_iterators.back();
+                    }
+                }
+            }
+            else{
                 return false;
             }
-            if(seq_node_child->type_val() != other_child_node->type_val() || 
-                other_child_node->childs().size()!=seq_node_child->childs().size())
-            {
-                std::cout<<other_child_node->get_text()<<std::endl<<seq_node_child->get_text()<<std::endl;
-                return false;
-            }
-            std::cout<<other_child_node->get_text()<<std::endl<<seq_node_child->get_text()<<std::endl;
-            ++count;
-        }
-        std::shared_ptr<Node> tmp_node = first_node_not_var_by_ids(nodes.front(),seq_iterators);
-        if(seq_iterators.empty() && nodes.front()->has_childs())
-            seq_iterators.push_back(root_iter);
-        else if(tmp_node && tmp_node->has_childs())
-            seq_iterators.push_back(seq_iterators.empty()?root_iter:0);
-        else{
-            if(!seq_iterators.empty())
-                seq_iterators.pop_back();
-            if(!seq_iterators.empty())
-                ++seq_iterators.back();
-            if(seq_iterators.empty())
-                ++root_iter;
         }
     }
-    assert(count==nodes.size()*5*3);
     return true;
 }
