@@ -105,8 +105,6 @@ TEST(AuxiliaryFunctions,CompareArrays_UniversalFunction){
             subarr_21->insert_back(subarr_214);
         }
         if(i!=1 && i!=0){
-            arr_1->insert_back(std::make_shared<ValueNode>(i));
-            arr_2->insert_back(std::make_shared<ValueNode>(i));
             subarr_1->insert_back(std::make_shared<ValueNode>(i));
             subarr_2->insert_back(std::make_shared<ValueNode>(i));
         }
@@ -117,17 +115,19 @@ TEST(AuxiliaryFunctions,CompareArrays_UniversalFunction){
             subarr_2->insert_back(subarr_21);
         }
         else{
+            arr_1->insert_back(std::make_shared<ValueNode>(i));
+            arr_2->insert_back(std::make_shared<ValueNode>(i));
             subarr_1->insert_back(subarr_10);
             subarr_2->insert_back(subarr_20);
         }
         subarr_114->insert_back(std::make_shared<ValueNode>(i));
         subarr_214->insert_back(std::make_shared<ValueNode>(i));
     }
-    // nodes.push_back(arr_1);
-    // nodes.push_back(arr_2);
-    nodes.push_back(subarr_114);
-    nodes.push_back(subarr_214);
-    std::cout<<"Array 1: "<<subarr_114->get_text()<<std::endl;
-    std::cout<<"Array 2: "<<subarr_214->get_text()<<std::endl;
+    nodes.push_back(arr_1);
+    nodes.push_back(arr_2);
+    // nodes.push_back(subarr_114);
+    // nodes.push_back(subarr_214);
+    std::cout<<"Array 1: "<<arr_1->get_text()<<std::endl;
+    std::cout<<"Array 2: "<<arr_2->get_text()<<std::endl;
     EXPECT_TRUE(check_sizes_arrays(nodes));
 }
