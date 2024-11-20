@@ -152,73 +152,75 @@ Node* functions::auxiliary::first_node_not_var_by_ids(Node* node, const std::vec
     return nullptr;
 }
 
+//check if array has rectangular morphology (all childs have same sizes in all dimensions)
+bool functions::auxiliary::is_rectangle_array_node(const std::shared_ptr<Node>& node) noexcept{
+    std::shared_ptr<Node> first_node = first_node_not_var(node);
+    if(!first_node)
+        return false;
+    if(first_node->type() != NODE_TYPE::ARRAY)
+        return true;
+    if(first_node->childs().size()==1)
+        return is_rectangle_array_node(first_node->child(0));
+    else if(first_node->childs().size()==0)
+        return true;
 
-bool functions::auxiliary::check_sizes_arrays(SizeDepthMeasure& sz_depth_measure,const std::vector<std::shared_ptr<Node>>& nodes) noexcept{
-    // Node* node;
-
-    // while(){
-
-    // }
-    return true;
+    return std::all_of(node->childs().begin()+1,node->childs().end(),[node](std::shared_ptr<Node> child){
+        return node->child(0)->childs().size() == child->childs().size() && is_rectangle_array_node(child);
+    });
 }
 
-//independent form of array (may not be ideal form (depth and sizes per childs at different depths may variate))
-bool functions::auxiliary::check_sizes_arrays(const std::vector<std::shared_ptr<Node>>& nodes) noexcept{
-    //Node* node;
+//independent form of nodes (compare value types, number childs, number depth)
+//add exclusion of function, range_function nodes
+bool functions::auxiliary::equal_morphology_nodes(const std::vector<std::shared_ptr<Node>>& nodes) noexcept{
     if(nodes.size()<=1)
         return false;
-
     std::shared_ptr<Node> first_node = first_node_not_var(nodes.front());
     std::vector<size_t> seq_iterators;
     std::vector<std::shared_ptr<Node>> ex_nodes;
+    size_t count = 0;
     if(!first_node)
         return false;
-
     if(!std::all_of(nodes.begin()+1,nodes.end(),[first_node](const std::shared_ptr<Node>& node){
-        return node->childs().size() == first_node->childs().size() && node->type_val() == first_node->type_val();
+        std::shared_ptr<Node> cl_node = first_node_not_var(node);
+        if(!cl_node)
+            return false;
+        return cl_node->childs().size() == first_node->childs().size() && cl_node->type_val() == first_node->type_val();
     ;}))
         return false;
-    else{
-        if(first_node->has_childs())
+    else
+        if(first_node->has_childs() && first_node->type_val()&TYPE_VAL::ARRAY)
             seq_iterators.push_back(0);
-    }
-    if(!seq_iterators.empty()){
-        assert(seq_iterators.size()==1);
-        while(seq_iterators.front()<nodes.front()->childs().size()){
+    if(!seq_iterators.empty())
+        while(seq_iterators.front()<first_node->childs().size()){
             for(size_t iter = 1;iter<nodes.size();++iter){
-                std::shared_ptr<Node> seq_node_child = first_node_not_var_by_ids(nodes.front(),seq_iterators);
+                std::shared_ptr<Node> seq_node_child = first_node_not_var_by_ids(first_node,seq_iterators);
                 if(!seq_node_child)
-                {
                     return false;
-                }
-                std::shared_ptr<Node> other_child_node = seq_iterators.empty()?first_node_not_var(nodes.at(iter)):first_node_not_var_by_ids(nodes.at(iter),seq_iterators);
-
+                std::shared_ptr<Node> other_child_node = first_node_not_var_by_ids(nodes.at(iter),seq_iterators);
                 if(!other_child_node)
-                {
+                    return false;
+                if(seq_node_child->type_val() != other_child_node->type_val() || (other_child_node->type_val()&TYPE_VAL::ARRAY &&
+                seq_node_child->type_val()&TYPE_VAL::ARRAY &&
+                    other_child_node->childs().size()!=seq_node_child->childs().size())){
                     return false;
                 }
-                if(seq_node_child->type_val() != other_child_node->type_val() || 
-                    other_child_node->childs().size()!=seq_node_child->childs().size())
-                {
-                    //std::cout<<other_child_node->get_text()<<std::endl<<seq_node_child->get_text()<<std::endl;
-                    return false;
-                }
-                //std::cout<<other_child_node->get_text()<<std::endl<<seq_node_child->get_text()<<std::endl;
+                ++count;
             }
-            std::shared_ptr<Node> tmp_node = first_node_not_var_by_ids(nodes.front(),seq_iterators);
-            if(seq_iterators.empty() && nodes.front()->has_childs()){
+            std::shared_ptr<Node> tmp_node = first_node_not_var_by_ids(first_node,seq_iterators);
+            if(seq_iterators.empty() && first_node->has_childs() && 
+            first_node->type_val()&TYPE_VAL::ARRAY){
                 seq_iterators.push_back(0);
                 ex_nodes.push_back(tmp_node);
             }
-            else if(tmp_node = first_node_not_var_by_ids(nodes.front(),seq_iterators)){
-                if(tmp_node->has_childs()){
+            else if(tmp_node = first_node_not_var_by_ids(first_node,seq_iterators))
+                if(tmp_node->has_childs() && 
+                    tmp_node->type_val()&TYPE_VAL::ARRAY){
                     seq_iterators.push_back(0);
                     ex_nodes.push_back(tmp_node);
                 }
                 else{
-                    if(!ex_nodes.empty() && seq_iterators.back()+1<ex_nodes.back()->childs().size()){
+                    if(!ex_nodes.empty() && seq_iterators.back()+1<ex_nodes.back()->childs().size())
                         ++seq_iterators.back();
-                    }
                     else{
                         while(!(ex_nodes.empty() || !(seq_iterators.back()+1>=ex_nodes.back()->childs().size()) || !(seq_iterators.size()>1))){
                             seq_iterators.pop_back();
@@ -227,11 +229,9 @@ bool functions::auxiliary::check_sizes_arrays(const std::vector<std::shared_ptr<
                         ++seq_iterators.back();
                     }
                 }
-            }
-            else{
+            else
                 return false;
-            }
         }
-    }
+    std::cout<<count<<std::endl;
     return true;
 }

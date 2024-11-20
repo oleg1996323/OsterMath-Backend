@@ -93,7 +93,7 @@ int main(int argc, char **argv){
     // std::cout<<"std::vector<std::shared_ptr<Node>>: "<<sizeof(std::vector<std::shared_ptr<Node>>)<<std::endl;
     ::testing::InitGoogleTest(&argc, argv);
     //LOG_DURATION("Tests");   
-    //Testing();
+    Testing();
 //     DataPool pool("main");
 //     pool.add_data("any");
 //     BaseData* data = pool.get("any");

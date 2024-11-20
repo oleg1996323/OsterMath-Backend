@@ -21,8 +21,8 @@ using Result_t = std::variant<std::monostate,std::string, const Node*, std::shar
 enum TYPE_VAL{
     UNKNOWN = 0x00,
     VALUE = 0x01,
-    STRING = 0x03,
-    ARRAY = 0xF0,
+    STRING = 0x04,
+    ARRAY = 0x08,
     STRING_ARRAY = ARRAY | STRING,
     NUMERIC_ARRAY = ARRAY | VALUE
 };

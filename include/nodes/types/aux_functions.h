@@ -39,7 +39,8 @@ namespace functions{
         template<template<typename> typename CONT, typename T>
         requires __container_array_node_req__<CONT,T>
         bool check_sizes_arrays(SizeDepthMeasure& sz_depth_measure,CONT<T> nodes) noexcept;
-        bool check_sizes_arrays(const std::vector<std::shared_ptr<Node>>& nodes) noexcept;
+        bool is_rectangle_array_node(const std::shared_ptr<Node>& node) noexcept;
+        bool equal_morphology_nodes(const std::vector<std::shared_ptr<Node>>& nodes) noexcept;
 
         bool all_numeric(decltype(std::declval<Node>().childs()) arrays);
         bool all_string(decltype(std::declval<Node>().childs()) arrays);
@@ -70,6 +71,7 @@ namespace functions{
     }
 }
 
+//check if all arguments in have same type value
 template<typename CHECK_VAL,typename... ARGS>
 requires __comparable_check_values_ptr__<CHECK_VAL, ARGS...> || __comparable_check_values_val__<CHECK_VAL, ARGS...>
 bool functions::auxiliary::check_arguments(CHECK_VAL check, ARGS&&... args){
@@ -85,6 +87,7 @@ bool functions::auxiliary::check_arguments(CHECK_VAL check, ARGS&&... args){
     }
 };
 
+//check if values in container have same type value
 template<typename CHECK_VAL,template<typename> typename CONT,typename T>
 requires std::is_same_v<typename std::decay_t<CONT<T>>::value_type,std::shared_ptr<typename T::element_type>> ||
 __comparable_check_values_ptr_t__<CHECK_VAL, T> || 
@@ -96,23 +99,28 @@ bool functions::auxiliary::check_type_container_nodes(CHECK_VAL check, CONT<T> a
 }
 
 template<typename T>
-void functions::auxiliary::init_sz_depth_measure(SizeDepthMeasure& sz_depth_measure, T array){
-    Node* node;
-    if constexpr (std::is_same_v<std::shared_ptr<ArrayNode>,std::decay_t<T>>)
-        node = array.get();
-    else if (std::is_same_v<ArrayNode*,std::decay_t<T>>)
-        node = array;
-    else assert(true);
-    
-    while(node->type()!=NODE_TYPE::ARRAY && node->has_child(0)){
-        node = node->child(0).get();
+SizeDepthMeasure functions::auxiliary::init_sz_depth_measure(T array){
+    SizeDepthMeasure sz_depth_measure;
+    T node = first_node_not_var(array);
+    if(!node)
+        return sz_depth_measure;
+    while(node->type()==NODE_TYPE::ARRAY && node->childs().size()!=0){
+        sz_depth_measure.push_depth(node->childs().size());
+        node = first_node_not_var_by_ids(node,{0});
     }
-    if(reinterpret_cast<ArrayNode*>(node)->size()!=0 && node->type()==NODE_TYPE::ARRAY){
-        sz_depth_measure.push_depth(reinterpret_cast<ArrayNode*>(node)->size());
-        if(node->has_child(0) && node->child(0)->type()==NODE_TYPE::ARRAY)
-            init_sz_depth_measure(sz_depth_measure,reinterpret_cast<ArrayNode*>(node->child(0).get()));
-    }
+    return sz_depth_measure;
 }
+
+// void functions::auxiliary::init_sz_depth_measure(SizeDepthMeasure& sz_depth_measure, std::shared_ptr<Node> array){
+//     std::shared_ptr<Node> node = first_node_not_var(array);
+//     if(!node)
+//         return;
+//     else node = array;
+//     while(node->type()==NODE_TYPE::ARRAY && node->childs().size()!=0){
+//         sz_depth_measure.push_depth(node->childs().size());
+//         node = first_node_not_var_by_ids(node,{0});
+//     }
+// }
 
 template<template<typename> typename CONT, typename T>
 requires __container_array_node_req__<CONT,T>
