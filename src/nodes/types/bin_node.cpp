@@ -115,6 +115,10 @@ Result BinaryNode::execute(size_t index) const{
     return 0.;
 }
 
+Result BinaryNode::execute(size_t index, const std::vector<VariableNode>& variables) const{
+    
+}
+
 void BinaryNode::print_text(std::ostream& stream) const{
     if(has_child(0))
         childs_.at(0)->print_text(stream);

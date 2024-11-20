@@ -5,6 +5,12 @@
 
 class StringNode:public Node{
     std::string cache_;
+    inline virtual Result execute(size_t index, const std::vector<VariableNode>& variables) const override{
+        return cache_;
+    }
+    inline virtual Result execute(size_t index) const override{
+        return cache_;
+    }
     public:
     inline StringNode()=default;
     inline StringNode(Value_t&& value){
@@ -26,9 +32,6 @@ class StringNode:public Node{
         return NODE_TYPE::VALUE;
     }
     inline virtual Result execute() const override{
-        return cache_;
-    }
-    inline virtual Result execute(size_t index) const override{
         return cache_;
     }
     inline virtual Result cached_result() override{

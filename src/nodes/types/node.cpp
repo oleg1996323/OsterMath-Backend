@@ -16,6 +16,26 @@ bool INFO_NODE::has_node() const{
     else return false;
 }
 
+void Node::release_childs(){
+    for(std::shared_ptr<Node>& child:childs_)
+        if(child)
+            child->parents_.erase(this);
+    childs_.clear();
+}
+
+const std::shared_ptr<Node>& Node::child(size_t id) const{
+    if(id<childs_.size())
+        return childs_.at(id);
+    else
+        throw std::invalid_argument("Incorrect child's id");
+}
+std::shared_ptr<Node>& Node::child(size_t id){
+    if(id<childs_.size())
+        return childs_.at(id);
+    else
+        throw std::invalid_argument("Incorrect child's id");
+}
+
 bool INFO_NODE::is_valid() const{
     if(parent && id>-1)
         return true;
@@ -89,6 +109,10 @@ Result Node::execute() const{
 }
 
 Result Node::execute(size_t index) const{
+    return std::monostate();
+}
+
+Result Node::execute(size_t index, const std::vector<VariableNode>& variables) const{
     return std::monostate();
 }
 
@@ -244,6 +268,24 @@ void Node::__insert_back_value_node__(const Value_t& val){
 }
 void Node::__insert_back_value_node__(Value_t&& val){
     insert_back(std::make_shared<ValueNode>(std::move(val)));
+}
+
+Node& Node::operator=(Node&& other){
+    if(&other!=this)
+        childs_.swap(other.childs_);
+    return *this;
+}
+
+Node& Node::operator=(const Node& other){
+    if(&other!=this){
+        release_childs();
+        for(const std::shared_ptr<Node>& child:other.childs_){
+            if(child->type()!=NODE_TYPE::VARIABLE)
+                childs_.push_back(std::make_shared<Node>(*child.get()));
+            else childs_.push_back(child);
+        }
+    }
+    return *this;
 }
 
 /*

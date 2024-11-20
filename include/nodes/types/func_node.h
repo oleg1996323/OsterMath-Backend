@@ -40,6 +40,7 @@ class FunctionNode:public Node{
     virtual void insert_back(std::shared_ptr<Node> node) override;
     virtual Result execute() const override;
     virtual Result execute(size_t index) const override;
+    virtual Result execute(size_t index, const std::vector<VariableNode>& variables) const override;
     virtual void print_text(std::ostream& stream) const override;
     virtual void print_result(std::ostream& stream) const override;
     virtual bool is_numeric() const override;

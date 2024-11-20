@@ -26,6 +26,7 @@ class BinaryNode:public Node{
     }
     virtual Result execute() const override;
     virtual Result execute(size_t index) const override;
+    virtual Result execute(size_t index, const std::vector<VariableNode>& variables) const override;
 
     std::shared_ptr<Node> lhs(){
         return child(0);

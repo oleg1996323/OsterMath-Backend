@@ -18,7 +18,7 @@ class RangeOperationNode:public Node{
     public:
     RangeOperationNode(RANGE_OP op):operation_(op){}
 
-    RangeOperationNode(RANGE_OP op, std::shared_ptr<Node> expr,const std::vector<VariableNode*>& args):
+    RangeOperationNode(RANGE_OP op, std::shared_ptr<Node> expr,const std::vector<VariableNode*>& args, const std::vector<size_t>& order):
     vars_(args),
     range_expression(expr),
     operation_(op){
@@ -41,6 +41,7 @@ class RangeOperationNode:public Node{
 
     virtual Result execute() const override;
     virtual Result execute(size_t index) const override;
+    virtual Result execute(size_t index, const std::vector<VariableNode>& variables) const override;
     inline virtual Result cached_result() override{
         return cache_;
     }

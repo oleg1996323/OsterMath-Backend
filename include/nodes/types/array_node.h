@@ -6,7 +6,7 @@
 
 class ArrayNode:public Node{
     mutable Result cache_;
-    public:
+public:
     using Node::operator=;
     using Node::insert_back;
 
@@ -38,6 +38,7 @@ class ArrayNode:public Node{
     virtual NODE_TYPE type() const override;
     virtual Result execute() const override;
     virtual Result execute(size_t index) const override;
+    virtual Result execute(size_t index, const std::vector<VariableNode>& variables) const override;
     inline virtual Result cached_result(){
         return cache_;
     }

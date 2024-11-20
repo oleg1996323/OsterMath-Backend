@@ -40,36 +40,21 @@ struct INFO_NODE{
 };
 
 class Node{
-    public:
+public:
     Node(size_t sz);
     Node();
     Node(const Node& other){
         *this = other;
     }
 
-    inline Node& operator=(const Node& other);
-    inline Node& operator=(Node&& other);
+    Node& operator=(const Node& other);
+    Node& operator=(Node&& other);
     TYPE_VAL type_val() const;
-    inline const std::shared_ptr<Node>& child(size_t id) const{
-        if(id<childs_.size())
-            return childs_.at(id);
-        else
-            throw std::invalid_argument("Incorrect child's id");
-    }
-    inline std::shared_ptr<Node>& child(size_t id){
-        if(id<childs_.size())
-            return childs_.at(id);
-        else
-            throw std::invalid_argument("Incorrect child's id");
-    }
+    const std::shared_ptr<Node>& child(size_t id) const;
+    std::shared_ptr<Node>& child(size_t id);
     INFO_NODE child(const std::vector<size_t>& indexes);
     INFO_NODE child(const std::vector<size_t>& indexes) const;
-    inline void release_childs(){
-        for(std::shared_ptr<Node>& child:childs_)
-            if(child)
-                child->parents_.erase(this);
-        childs_.clear();
-    }
+    void release_childs();
     inline bool has_childs() const{
         return !childs_.empty();
     }
@@ -80,6 +65,7 @@ class Node{
     virtual NODE_TYPE type() const;
     virtual Result execute() const;
     virtual Result execute(size_t index) const;
+    virtual Result execute(size_t index, const std::vector<VariableNode>& variables) const;
     inline virtual Result cached_result(){
         return std::monostate();
     }
@@ -123,11 +109,11 @@ class Node{
     const std::vector<std::shared_ptr<Node>>& childs() const;
 
     virtual void flush_cache() const{}
-    protected:
+protected:
     mutable std::set<Node*> parents_; //is less memory expensive than unordered_set
     std::vector<std::shared_ptr<Node>> childs_;
     bool caller_ = false;
-    private:
+private:
     template<typename T, typename... U>
     void recursive_function_applied_to_all_childs(std::function<T(const std::shared_ptr<Node>&,U...)> func, Node* root);
     void __insert_back_string_node__(const std::string& string);
@@ -155,24 +141,6 @@ void Node::recursive_function_applied_to_all_childs(std::function<T(const std::s
             func(child);
             child->recursive_function_applied_to_all_childs(func,this);
         }
-}
-
-Node& Node::operator=(Node&& other){
-    if(&other!=this)
-        childs_.swap(other.childs_);
-    return *this;
-}
-
-Node& Node::operator=(const Node& other){
-    if(&other!=this){
-        release_childs();
-        for(const std::shared_ptr<Node>& child:other.childs_){
-            if(child->type()!=NODE_TYPE::VARIABLE)
-                childs_.push_back(std::make_shared<Node>(*child.get()));
-            else childs_.push_back(child);
-        }
-    }
-    return *this;
 }
 
 template<typename T>
