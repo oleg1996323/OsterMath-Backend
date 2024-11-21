@@ -38,11 +38,23 @@ inline bool BinaryNode::IsError(size_t index){
     // return false;
 }
 
-Result BinaryNode::__calculate__() const{
-    return __calculate__(0);
-}
+#include "aux_functions.h"
+Result BinaryNode::execute() const{
+    using namespace functions::auxiliary;    
+    if(check_arguments(TYPE_VAL::NUMERIC_ARRAY,child(0),child(1))){
+        if(std::dynamic_pointer_cast<ArrayNode>(child(0))->size()==
+            std::dynamic_pointer_cast<ArrayNode>(child(1))->size()){
+            Value_t result;
+            for(size_t i = 0;i < std::dynamic_pointer_cast<ArrayNode>(child(0))->size();++i){
+                result =+ execute(i).get_value();
+            }
+        }
+    }
+    else if(functions::auxiliary::check_arguments(TYPE_VAL::VALUE,child(0),child(1)))
+        return execute();
+    else
+        return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric array/value");
 
-Result BinaryNode::__calculate__(size_t index) const{
     flush_cache();
     if(!(has_child(0) && has_child(1) && childs_.size()==2))
         return std::make_shared<exceptions::InvalidNumberOfArguments>(2);
@@ -80,42 +92,7 @@ Result BinaryNode::__calculate__(size_t index) const{
     return Result();
 }
 
-#include "aux_functions.h"
-Result BinaryNode::execute() const{
-    using namespace functions::auxiliary;    
-    if(check_arguments(TYPE_VAL::NUMERIC_ARRAY,child(0),child(1))){
-        if(std::dynamic_pointer_cast<ArrayNode>(child(0))->size()==
-            std::dynamic_pointer_cast<ArrayNode>(child(1))->size()){
-            Value_t result;
-            for(size_t i = 0;i < std::dynamic_pointer_cast<ArrayNode>(child(0))->size();++i){
-                result =+ execute(i).get_value();
-            }
-        }
-    }
-    else if(functions::auxiliary::check_arguments(TYPE_VAL::VALUE,child(0),child(1)))
-        return execute(0);
-    else
-        return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric array/value");
-}
-
-Result BinaryNode::execute(size_t index) const{
-    if(child(0) && child(1)){
-        if(child(0)->caller())
-            child(0)->execute(index);
-        else if(child(1)->caller())
-            child(1)->execute(index);
-        else{
-            child(0)->execute(index);
-            child(1)->execute(index);
-        }
-        return __calculate__(index);
-    }
-    else
-        throw std::runtime_error("Undefined binary operation");
-    return 0.;
-}
-
-Result BinaryNode::execute(size_t index, const std::vector<VariableNode>& variables) const{
+Result BinaryNode::execute(const std::vector<std::shared_ptr<VariableNode>>& variables, const std::vector<size_t>& order) const{
     
 }
 

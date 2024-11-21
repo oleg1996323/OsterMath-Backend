@@ -64,13 +64,9 @@ public:
     }
     virtual NODE_TYPE type() const;
     virtual Result execute() const;
-    virtual Result execute(size_t index) const;
-    virtual Result execute(size_t index, const std::vector<VariableNode>& variables) const;
+    virtual Result execute(const std::vector<std::shared_ptr<VariableNode>>& variables, const std::vector<size_t>& order = std::vector<size_t>()) const;
     inline virtual Result cached_result(){
         return std::monostate();
-    }
-    inline virtual Result cached_result(size_t index){
-        return std::make_shared<exceptions::InvalidTypeOfArgument>(std::to_string(index).c_str());
     }
     virtual bool is_numeric() const;
     virtual bool is_string() const;

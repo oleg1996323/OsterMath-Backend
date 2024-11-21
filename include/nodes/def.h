@@ -14,7 +14,7 @@ class AbstractEvent;
 
 using Value_t = boost::multiprecision::cpp_dec_float_50;//boost::multiprecision::number<boost::multiprecision::cpp_dec_float<10>>;
 using Bound_types = std::variant<std::monostate,Node*>;
-using Result_t = std::variant<std::monostate,std::string, const Node*, std::shared_ptr<AbstractEvent>,Value_t>;
+using Result_t = std::variant<std::monostate,std::string,std::shared_ptr<std::vector<Value_t>>, const Node*, std::shared_ptr<AbstractEvent>,Value_t>;
 
 #define ENUM_NAME(p) #p;
 
@@ -117,6 +117,8 @@ const T& Result::get() const{
 
 #include <memory>
 
+
+
 // class ProxySizeDepthMeasure{
 //     public:
 //     ProxySizeDepthMeasure(size_t new_size);
@@ -163,166 +165,53 @@ struct size_iterator{
     size_iterator(size_t sz):sz_(sz){}
     uint32_t current_iterator_ = 0;
     const uint32_t sz_;
+    bool lock = false;
 
-    size_iterator& operator++(int){
+    inline size_iterator& operator++(int){
         current_iterator_>=sz_-1?current_iterator_ = 0:++current_iterator_;
         return *this;
     }
 
-    size_iterator& operator++(){
+    inline size_iterator& operator++(){
         current_iterator_>=sz_-1?current_iterator_ = 0:++current_iterator_;
         return *this;
     }
 
-    size_iterator& operator--(int){
+    inline size_iterator& operator--(int){
         current_iterator_<1?current_iterator_ = sz_-1:current_iterator_--;
         return *this;
     }
 
-    size_iterator& operator--(){
+    inline size_iterator& operator--(){
         current_iterator_<1?current_iterator_ = sz_-1:current_iterator_--;
         return *this;
     }
 
-    bool is_iterable() const{
+    inline bool is_iterable() const{
         return current_iterator_<sz_-1;
     }
 
-    bool is_decrement_iterable() const{
+    inline bool is_decrement_iterable() const{
         return current_iterator_>=1;
     }
 };
 
 class SizeDepthMeasure: private std::vector<size_iterator>{
     public:
-    void push_depth(size_t new_size){
-        if(new_size>0)
-            std::vector<size_iterator>::emplace_back(new_size);
-        else throw std::invalid_argument("Size cannot be 0");
-    }
-
-    void reset_iterator(size_t depth){
-        if(std::vector<size_iterator>::size()<=depth)
-            throw std::invalid_argument((std::string()+"Depth must be not bigger than "+std::to_string(std::vector<size_iterator>::size())).c_str());
-        at(depth).current_iterator_ = 0;
-    }
-
-    void reset_all_iterators(){
-        for(auto& index:*this)
-            index.current_iterator_ = 0;
-    }
-
-    size_t current_iterator(size_t depth) const{
-        if(std::vector<size_iterator>::size()<=depth)
-            throw std::invalid_argument((std::string()+"Depth must be not bigger than "+std::to_string(std::vector<size_iterator>::size())).c_str());
-        return at(depth).current_iterator_;
-    }
-
+    void push_depth(size_t new_size);
+    void reset_iterator(size_t depth);
+    void reset_all_iterators();
+    size_t current_iterator(size_t depth) const;
+    bool set_iterator(size_t depth, size_t iterator);
     using Index = size_t;
-    SizeDepthMeasure& operator++(int){
-        for(std::vector<size_iterator>::reverse_iterator index = rbegin();
-            index<rend();++index){
-            if(index->is_iterable()){
-                ++(*index);
-                break;
-            }
-            else{
-                index->current_iterator_=0;
-            }
-        }
-        return *this;
-    }
-
-    SizeDepthMeasure& operator++(){
-        for(std::vector<size_iterator>::reverse_iterator index = std::vector<size_iterator>::rbegin();
-            index!=std::vector<size_iterator>::rend();++index){
-            if(index->is_iterable()){
-                ++(*index);
-                break;
-            }
-            else{
-                index->current_iterator_=0;
-            }
-        }
-        return *this;
-    }
-
-    SizeDepthMeasure& operator--(int){
-        for(std::vector<size_iterator>::reverse_iterator index = std::vector<size_iterator>::rbegin();
-            index!=std::vector<size_iterator>::rend();++index){
-            if(index->is_decrement_iterable()){
-                --(*index);
-                break;
-            }
-            else{
-                index->current_iterator_=index->sz_-1;
-            }
-        }
-        return *this;
-    }
-
-    SizeDepthMeasure& operator--(){
-        for(std::vector<size_iterator>::reverse_iterator index = std::vector<size_iterator>::rbegin();
-            index!=std::vector<size_iterator>::rend();++index){
-            if(index->is_decrement_iterable()){
-                --(*index);
-                break;
-            }
-            else{
-                index->current_iterator_=index->sz_-1;
-            }
-        }
-        return *this;
-    }
-
-    bool is_iterable() const{
-        for(std::vector<size_iterator>::const_reverse_iterator index = std::vector<size_iterator>::rbegin();
-            index!=std::vector<size_iterator>::rend();++index){
-            if(index->is_iterable())
-                return true;
-        }
-        return false;
-    }
-
-    bool is_decrement_iterable() const{
-
-        for(std::vector<size_iterator>::const_reverse_iterator index = std::vector<size_iterator>::rbegin();
-            index!=std::vector<size_iterator>::rend();++index){
-            if(index->is_decrement_iterable())
-                return true;
-        }
-        return false;
-    }
-
-    size_t size(size_t depth) const{
-        if(std::vector<size_iterator>::size()<=depth)
-            throw std::invalid_argument((std::string()+"Depth must be not bigger than "+std::to_string(std::vector<size_iterator>::size())).c_str());
-        return at(depth).sz_;
-    }
-
-    size_t dimensions() const{
-        return std::vector<size_iterator>::size();
-    }
-
-    size_t seq_iterator(uint32_t depth = 0) const{
-        size_t result = 0;
-        size_t sz_ex_depths = 1;
-        for(std::vector<size_iterator>::const_reverse_iterator index = std::vector<size_iterator>::rbegin();
-            index<std::vector<size_iterator>::rend()-depth;++index){
-            result+=index->current_iterator_*sz_ex_depths;
-            sz_ex_depths*=index->sz_;
-        }
-        return result;
-    }
-
-    size_t max_seq_iterator(uint32_t depth = 0) const{
-        size_t result = 0;
-        size_t sz_ex_depths = 1;
-        for(std::vector<size_iterator>::const_reverse_iterator index = std::vector<size_iterator>::rbegin();
-            index<std::vector<size_iterator>::rend()-depth;++index){
-            result+=index->sz_*sz_ex_depths;
-            sz_ex_depths*=index->sz_;
-        }
-        return result;
-    }
+    SizeDepthMeasure& operator++(int);
+    SizeDepthMeasure& operator++();
+    SizeDepthMeasure& operator--(int);
+    SizeDepthMeasure& operator--();
+    bool is_iterable() const;
+    bool is_decrement_iterable() const;
+    size_t size(size_t depth) const;
+    size_t dimensions() const;
+    size_t seq_iterator(uint32_t depth = 0) const;
+    size_t max_seq_iterator(uint32_t depth = 0) const;
 };

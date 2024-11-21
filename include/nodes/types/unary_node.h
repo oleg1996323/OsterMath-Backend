@@ -41,8 +41,6 @@ class UnaryNode:public Node{
 
     virtual Result execute() const override;
 
-    virtual Result execute(size_t index) const override;
-
     virtual bool is_numeric() const override;
 
     virtual bool is_string() const override;
@@ -54,8 +52,4 @@ class UnaryNode:public Node{
     virtual void print_text(std::ostream& stream) const override;
 
     virtual void print_result(std::ostream& stream) const override;
-
-    private:
-    Result __calculate__() const;
-    Result __calculate__(size_t index) const;
 };

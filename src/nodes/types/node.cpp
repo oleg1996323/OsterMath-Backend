@@ -108,11 +108,7 @@ Result Node::execute() const{
     return std::monostate();
 }
 
-Result Node::execute(size_t index) const{
-    return std::monostate();
-}
-
-Result Node::execute(size_t index, const std::vector<VariableNode>& variables) const{
+Result Node::execute(const std::vector<std::shared_ptr<VariableNode>>& variables, const std::vector<size_t>& order) const{
     return std::monostate();
 }
 

@@ -1,6 +1,7 @@
 #include "types.h"
 #include "var_node.h"
 #include "events_errors/exception.h"
+#include "aux_functions.h"
 
 VariableNode::VariableNode(VariableBase* variable):Node(),
     var_(variable){}
@@ -24,15 +25,20 @@ Result VariableNode::execute() const{
     else return 0;
 }
 
-Result VariableNode::execute(size_t index) const{
-    if(has_childs())
-        if(!refer_to(var_->name()))
-            return childs_.at(0)->execute(index);
-        else {
-            throw exceptions::CyclicReference(var_->name());
-            return 0;
+Result VariableNode::execute(const std::vector<std::shared_ptr<VariableNode>>& variables, const std::vector<size_t>& order) const{
+    if(std::count(variables.begin(),variables.end(),[this](std::shared_ptr<VariableNode> var){
+        var.get() == this;
+    })!=0){
+        Node* child = nullptr;
+        if((child = functions::auxiliary::first_node_not_var(this))){
+            if(!order.empty() && this->type_val()&TYPE_VAL::ARRAY){
+                if(!child->execute().is_error()){
+
+                }
+            }
         }
-    else return 0;
+    }
+    return ;
 }
 
 inline Result VariableNode::cached_result(){

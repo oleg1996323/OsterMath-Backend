@@ -26,14 +26,7 @@ class ValueNode:public Node{
         return cache_;
     }
 
-    inline virtual Result execute(size_t index) const override{
-        return cache_;
-    }
-
     inline virtual Result cached_result() override{
-        return cache_;
-    }
-    inline virtual Result cached_result(size_t index){
         return cache_;
     }
     

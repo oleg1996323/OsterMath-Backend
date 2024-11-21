@@ -99,6 +99,7 @@ bool functions::auxiliary::check_type_container_nodes(CHECK_VAL check, CONT<T> a
 }
 
 template<typename T>
+requires std::conditional_t<std::is_pointer_v<T>, std::is_base_of_v<Node,std::remove_pointer<T>>,std::is_base_of_v<Node,T::element_type>>
 SizeDepthMeasure functions::auxiliary::init_sz_depth_measure(T array){
     SizeDepthMeasure sz_depth_measure;
     T node = first_node_not_var(array);

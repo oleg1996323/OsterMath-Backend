@@ -31,42 +31,24 @@ void UnaryNode::insert_back(std::shared_ptr<Node> node){
     node->add_parent(this);
 }
 
-Result UnaryNode::__calculate__() const{
-    return __calculate__(0);
-}
-
-Result UnaryNode::__calculate__(size_t index) const{
+Result UnaryNode::execute() const{
     switch (operation_)
         {
         case UNARY_OP::ADD:
-            return childs_.at(0)->execute(index);
+            return childs_.at(0)->execute();
             break;
         case UNARY_OP::SUB:
-            return (-1)*(childs_.at(0)->execute(index).get<Value_t>());
+            return (-1)*(childs_.at(0)->execute().get<Value_t>());
             break;
         case UNARY_OP::PARENS:
-            return childs_.at(0)->execute(index);
+            return childs_.at(0)->execute();
             break;
         case UNARY_OP::NOTHING:
-            return childs_.at(0)->execute(index);
+            return childs_.at(0)->execute();
         default:
             throw std::invalid_argument("Unknown type of unary expression");
             break;
         }
-}
-
-Result UnaryNode::execute() const{
-    return execute(0);
-}
-
-Result UnaryNode::execute(size_t index) const{
-    using namespace boost::multiprecision;
-    if(!childs_.empty()){
-        return __calculate__(index);
-    }
-    else
-        throw std::runtime_error("Undefined unary operation");
-    return 0.;
 }
 
 bool UnaryNode::is_numeric() const{

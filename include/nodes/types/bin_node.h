@@ -25,8 +25,7 @@ class BinaryNode:public Node{
         return NODE_TYPE::BINARY;
     }
     virtual Result execute() const override;
-    virtual Result execute(size_t index) const override;
-    virtual Result execute(size_t index, const std::vector<VariableNode>& variables) const override;
+    virtual Result execute(const std::vector<std::shared_ptr<VariableNode>>& variables, const std::vector<size_t>& order = std::vector<size_t>()) const override;
 
     std::shared_ptr<Node> lhs(){
         return child(0);
@@ -45,9 +44,6 @@ class BinaryNode:public Node{
     virtual Result cached_result() override{
         return execute();
     }
-    inline virtual Result cached_result(size_t index) noexcept override{
-        return execute(index);
-    }
 
     BINARY_OP operation() const{
         return operation_;
@@ -59,7 +55,4 @@ class BinaryNode:public Node{
     virtual void print_result(std::ostream& stream) const override;
     private:
     inline bool IsError(size_t index);
-
-    Result __calculate__() const;
-    Result __calculate__(size_t index) const;
 };

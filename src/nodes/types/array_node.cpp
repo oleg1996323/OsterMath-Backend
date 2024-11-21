@@ -23,12 +23,6 @@ Result ArrayNode::execute() const{
     return cache_;
 }
 
-Result ArrayNode::execute(size_t index) const{
-    if(childs_.size()>index)
-        return childs_.at(index)->execute(index);
-    else throw std::invalid_argument("Invalid index. Prompt: out of range index");
-}
-
 size_t ArrayNode::size() const{
     return childs_.size();
 }

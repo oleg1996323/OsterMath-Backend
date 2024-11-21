@@ -25,12 +25,6 @@ Result RangeOperationNode::execute() const{
     // return result;
 }
 
-Result RangeOperationNode::execute(size_t index) const{
-    if(range_expression)
-        return range_expression->execute(index);
-    else return 0.;
-}
-
 void RangeOperationNode::print_text(std::ostream& stream) const{
     if(operation_==RANGE_OP::PROD)
         stream<<"product_i(";

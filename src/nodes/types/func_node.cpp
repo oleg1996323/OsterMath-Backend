@@ -223,11 +223,6 @@ Result FunctionNode::execute() const{ //TODO add checking for arrays size compar
     return cache_;
 }
 
-Result FunctionNode::execute(size_t index) const{
-    //because function is like a constant
-    return execute();
-}
-
 #include "types.h"
 #include "function_node/print_functions.h"
 

@@ -40,12 +40,8 @@ class RangeOperationNode:public Node{
     }
 
     virtual Result execute() const override;
-    virtual Result execute(size_t index) const override;
-    virtual Result execute(size_t index, const std::vector<VariableNode>& variables) const override;
+    virtual Result execute(const std::vector<std::shared_ptr<VariableNode>>& variables, const std::vector<size_t>& order = std::vector<size_t>()) const override;
     inline virtual Result cached_result() override{
-        return cache_;
-    }
-    inline virtual Result cached_result(size_t index){
         return cache_;
     }
     virtual void insert_back(std::shared_ptr<Node> node) override;
