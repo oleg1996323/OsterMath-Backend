@@ -39,13 +39,12 @@ class FunctionNode:public Node{
     }
     virtual void insert_back(std::shared_ptr<Node> node) override;
     virtual Result execute() const override;
-    virtual Result execute(const std::vector<std::shared_ptr<VariableNode>>& variables, const std::vector<size_t>& order = std::vector<size_t>()) const override;
     virtual void print_text(std::ostream& stream) const override;
     virtual void print_result(std::ostream& stream) const override;
     virtual bool is_numeric() const override;
     virtual bool is_string() const override;
     virtual bool is_array() const override;
-    inline virtual Result cached_result() override{
+    inline virtual Result cached_result() const override{
         return cache_;
     }
     FUNCTION_OP operation() const;

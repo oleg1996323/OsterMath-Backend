@@ -26,7 +26,7 @@ class ValueNode:public Node{
         return cache_;
     }
 
-    inline virtual Result cached_result() override{
+    inline virtual Result cached_result() const override{
         return cache_;
     }
     

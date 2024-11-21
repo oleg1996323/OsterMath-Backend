@@ -12,6 +12,8 @@
 #include <list>
 #include <boost/math/statistics/linear_regression.hpp>
 
+#ifndef AUX_FUNCTIONS
+#define AUX_FUNCTIONS
 class ArrayNode;
 
 namespace functions{
@@ -28,7 +30,7 @@ namespace functions{
         //void init_sz_depth_measure(std::vector<size_t>& sz_depth_measure, ArrayNode* array);
 
         template<typename T>
-        void init_sz_depth_measure(SizeDepthMeasure& sz_depth_measure, T node);
+        SizeDepthMeasure init_sz_depth_measure(T array);
 
         template<template<typename> typename CONT, typename T>
         requires __container_array_node_req__<CONT,T>
@@ -48,7 +50,9 @@ namespace functions{
         std::shared_ptr<Node> first_node_not_var(const std::shared_ptr<Node>& node) noexcept;
         Node* first_node_not_var(Node* node) noexcept;
         std::shared_ptr<Node> first_node_not_var_by_ids(const std::shared_ptr<Node>& node, const std::vector<size_t>& seq_iterators) noexcept;
+        std::shared_ptr<Node> first_node_not_var_by_ids(const std::shared_ptr<Node>& node, const SizeDepthMeasure& seq_iterators) noexcept;
         Node* first_node_not_var_by_ids(Node* node, const std::vector<size_t>& seq_iterators) noexcept;
+        Node* first_node_not_var_by_ids(Node* node, const SizeDepthMeasure& seq_iterators) noexcept;
 
         bool check_sizes_arrays(const std::vector<Node*>& arrays);
         bool check_sizes_arrays(const std::list<Node*>& arrays);
@@ -99,11 +103,10 @@ bool functions::auxiliary::check_type_container_nodes(CHECK_VAL check, CONT<T> a
 }
 
 template<typename T>
-requires std::conditional_t<std::is_pointer_v<T>, std::is_base_of_v<Node,std::remove_pointer<T>>,std::is_base_of_v<Node,T::element_type>>
 SizeDepthMeasure functions::auxiliary::init_sz_depth_measure(T array){
     SizeDepthMeasure sz_depth_measure;
-    T node = first_node_not_var(array);
-    if(!node)
+    auto node = first_node_not_var(array);
+    if(!array)
         return sz_depth_measure;
     while(node->type()==NODE_TYPE::ARRAY && node->childs().size()!=0){
         sz_depth_measure.push_depth(node->childs().size());
@@ -194,3 +197,5 @@ bool functions::auxiliary::check_sizes_arrays(SizeDepthMeasure& sz_depth_measure
         assert(!(std::is_pointer_v<std::decay_t<T>> || std::is_same_v<CONT<std::shared_ptr<ArrayNode>>,CONT<T>>));
     }
 }
+
+#endif

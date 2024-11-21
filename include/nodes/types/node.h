@@ -65,7 +65,7 @@ public:
     virtual NODE_TYPE type() const;
     virtual Result execute() const;
     virtual Result execute(const std::vector<std::shared_ptr<VariableNode>>& variables, const std::vector<size_t>& order = std::vector<size_t>()) const;
-    inline virtual Result cached_result(){
+    inline virtual Result cached_result() const{
         return std::monostate();
     }
     virtual bool is_numeric() const;
@@ -96,7 +96,7 @@ public:
     const std::set<Node*>& parents() const;
     std::set<Node*>& parents();
     bool refer_to(std::string_view var_name) const;
-    std::set<VariableNode*> refer_to_vars() const;
+    std::set<std::shared_ptr<VariableNode>> refer_to_vars() const;
     inline bool caller() const{
         return caller_;
     }

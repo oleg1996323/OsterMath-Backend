@@ -31,7 +31,7 @@ class StringNode:public Node{
     inline virtual Result execute() const override{
         return cache_;
     }
-    inline virtual Result cached_result() override{
+    inline virtual Result cached_result() const override{
         return cache_;
     }
 

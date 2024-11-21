@@ -22,7 +22,7 @@ class RangeOperationNode:public Node{
     vars_(args),
     range_expression(expr),
     operation_(op){
-        std::set<VariableNode*> nodes = range_expression->refer_to_vars();
+        std::set<std::shared_ptr<VariableNode>> nodes = range_expression->refer_to_vars();
         if(args.size()!=nodes.size())
             cache_ = std::make_shared<exceptions::InvalidNumberOfArguments>(nodes.size());
     }
@@ -40,8 +40,7 @@ class RangeOperationNode:public Node{
     }
 
     virtual Result execute() const override;
-    virtual Result execute(const std::vector<std::shared_ptr<VariableNode>>& variables, const std::vector<size_t>& order = std::vector<size_t>()) const override;
-    inline virtual Result cached_result() override{
+    inline virtual Result cached_result() const override{
         return cache_;
     }
     virtual void insert_back(std::shared_ptr<Node> node) override;

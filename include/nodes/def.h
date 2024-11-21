@@ -14,7 +14,7 @@ class AbstractEvent;
 
 using Value_t = boost::multiprecision::cpp_dec_float_50;//boost::multiprecision::number<boost::multiprecision::cpp_dec_float<10>>;
 using Bound_types = std::variant<std::monostate,Node*>;
-using Result_t = std::variant<std::monostate,std::string,std::shared_ptr<std::vector<Value_t>>, const Node*, std::shared_ptr<AbstractEvent>,Value_t>;
+using Result_t = std::variant<std::monostate,std::string,std::shared_ptr<ArrayNode>, const Node*, std::shared_ptr<AbstractEvent>,Value_t>;
 
 #define ENUM_NAME(p) #p;
 
@@ -60,6 +60,13 @@ class Result:public Result_t{
     bool is_event() const;
     bool is_error() const;
     bool is_warning() const;
+    bool is_array_result() const;
+
+    Result operator+(const Result& other);
+    Result operator-(const Result& other);
+    Result operator*(const Result& other);
+    Result operator/(const Result& other);
+    Result operator^(const Result& other);
 
     inline Value_t get_value() noexcept{
         return get<Value_t>();
@@ -82,12 +89,6 @@ class Result:public Result_t{
     inline const ArrayNode* get_array_node() noexcept{
         return reinterpret_cast<const ArrayNode*>(get<const Node*>());
     }
-
-    // //add definition
-    // inline std::vector<Value_t> get_array_values() noexcept{
-
-    // }
-
     inline const Value_t& get_value() const noexcept{
         return get<Value_t>();
     }
@@ -100,8 +101,18 @@ class Result:public Result_t{
     inline const ArrayNode* get_array_node() const noexcept{
         return reinterpret_cast<const ArrayNode*>(get<const Node*>());
     }
+    inline std::shared_ptr<ArrayNode> get_array_result() const noexcept{
+        return get<std::shared_ptr<ArrayNode>>();
+    }
     private:
 };
+
+bool operator==(const Value_t& val, const Result& res);
+bool operator==(const Result& res,const Value_t& val);
+bool operator==(const std::string& val, const Result& res);
+bool operator==(const Result& res,const std::string& val);
+bool operator==(std::shared_ptr<ArrayNode> val, const Result& res);
+bool operator==(const Result& res,std::shared_ptr<ArrayNode> val);
 
 std::ostream& operator<<(std::ostream& os, const Result&);
 
@@ -115,89 +126,53 @@ const T& Result::get() const{
     return std::get<T>(*this);
 }
 
-#include <memory>
-
-
-
-// class ProxySizeDepthMeasure{
-//     public:
-//     ProxySizeDepthMeasure(size_t new_size);
-
-//     ProxySizeDepthMeasure(size_t new_size, ProxySizeDepthMeasure* parent);
-
-//     bool operator++();
-
-//     void push(size_t new_size);
-
-//     size_t depth();
-
-//     void reset_iterator();
-
-//     size_t current_iterator(int32_t depth) const;
-
-//     bool is_iterable() const;
-
-//     size_t size(size_t depth) const;
-
-//     size_t seq_iterator(int32_t depth) const;
-
-//     size_t total_size_childs() const;
-
-//     private:
-//     void depth(size_t& uppper_depth);
-
-//     size_t current_iterator_ref(int32_t& depth) const;
-
-//     size_t size_ref(size_t& depth) const;
-
-//     size_t seq_iterator_ref(int32_t& depth) const;
-
-//     bool increase_iterator();
-
-//     std::unique_ptr<ProxySizeDepthMeasure> next_level_;
-//     ProxySizeDepthMeasure* parent_;
-//     size_t sz_;
-//     mutable size_t total_childs_ = 0;
-//     size_t current_iterator_ = 0;
-// };
-
 struct size_iterator{
     size_iterator(size_t sz):sz_(sz){}
     uint32_t current_iterator_ = 0;
     const uint32_t sz_;
     bool lock = false;
-
-    inline size_iterator& operator++(int){
-        current_iterator_>=sz_-1?current_iterator_ = 0:++current_iterator_;
-        return *this;
-    }
-
-    inline size_iterator& operator++(){
-        current_iterator_>=sz_-1?current_iterator_ = 0:++current_iterator_;
-        return *this;
-    }
-
-    inline size_iterator& operator--(int){
-        current_iterator_<1?current_iterator_ = sz_-1:current_iterator_--;
-        return *this;
-    }
-
-    inline size_iterator& operator--(){
-        current_iterator_<1?current_iterator_ = sz_-1:current_iterator_--;
-        return *this;
-    }
-
-    inline bool is_iterable() const{
-        return current_iterator_<sz_-1;
-    }
-
-    inline bool is_decrement_iterable() const{
-        return current_iterator_>=1;
-    }
+    inline size_iterator& operator++(int);
+    inline size_iterator& operator++();
+    inline size_iterator& operator--(int);
+    inline size_iterator& operator--();
+    inline bool is_iterable() const;
+    inline bool is_decrement_iterable() const;
 };
+
+inline size_iterator& size_iterator::operator++(int){
+    current_iterator_>=sz_-1?current_iterator_ = 0:++current_iterator_;
+    return *this;
+}
+
+inline size_iterator& size_iterator::operator++(){
+    current_iterator_>=sz_-1?current_iterator_ = 0:++current_iterator_;
+    return *this;
+}
+
+inline size_iterator& size_iterator::operator--(int){
+    current_iterator_<1?current_iterator_ = sz_-1:current_iterator_--;
+    return *this;
+}
+
+inline size_iterator& size_iterator::operator--(){
+    current_iterator_<1?current_iterator_ = sz_-1:current_iterator_--;
+    return *this;
+}
+
+inline bool size_iterator::is_iterable() const{
+    return current_iterator_<sz_-1;
+}
+
+inline bool size_iterator::is_decrement_iterable() const{
+    return current_iterator_>=1;
+}
 
 class SizeDepthMeasure: private std::vector<size_iterator>{
     public:
+    using std::vector<size_iterator>::begin;
+    using std::vector<size_iterator>::end;
+    using std::vector<size_iterator>::cend;
+    using std::vector<size_iterator>::cbegin;
     void push_depth(size_t new_size);
     void reset_iterator(size_t depth);
     void reset_all_iterators();
@@ -208,6 +183,8 @@ class SizeDepthMeasure: private std::vector<size_iterator>{
     SizeDepthMeasure& operator++();
     SizeDepthMeasure& operator--(int);
     SizeDepthMeasure& operator--();
+    void lock(size_t depth);
+    void unlock(size_t depth);
     bool is_iterable() const;
     bool is_decrement_iterable() const;
     size_t size(size_t depth) const;

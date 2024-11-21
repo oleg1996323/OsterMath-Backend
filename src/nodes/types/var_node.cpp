@@ -25,36 +25,10 @@ Result VariableNode::execute() const{
     else return 0;
 }
 
-Result VariableNode::execute(const std::vector<std::shared_ptr<VariableNode>>& variables, const std::vector<size_t>& order) const{
-    if(std::count(variables.begin(),variables.end(),[this](std::shared_ptr<VariableNode> var){
-        var.get() == this;
-    })!=0){
-        Node* child = nullptr;
-        if((child = functions::auxiliary::first_node_not_var(this))){
-            if(!order.empty() && this->type_val()&TYPE_VAL::ARRAY){
-                if(!child->execute().is_error()){
-
-                }
-            }
-        }
-    }
-    return ;
-}
-
-inline Result VariableNode::cached_result(){
+inline Result VariableNode::cached_result() const{
     if(has_childs()){
         if(!refer_to(var_->name()))
             return childs_.at(0)->cached_result();
-        else {
-            return std::make_shared<exceptions::CyclicReference>(var_->name());
-        }
-    }
-    else return std::monostate();
-}
-inline Result VariableNode::cached_result(size_t index){
-    if(has_childs()){
-        if(!refer_to(var_->name()))
-            return childs_.at(0)->cached_result(index);
         else {
             return std::make_shared<exceptions::CyclicReference>(var_->name());
         }

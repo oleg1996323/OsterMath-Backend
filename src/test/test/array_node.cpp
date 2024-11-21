@@ -169,8 +169,7 @@ TEST(ArrayNode_test,ExecuteCorrect_id){
     arr->insert_back(std::make_shared<ValueNode>(1));
     arr->insert_back(std::make_shared<ValueNode>(2));
     arr->insert_back(std::make_shared<ValueNode>(100000000));
-    EXPECT_TRUE(arr->execute(2).is_value());
-    EXPECT_EQ(100000000,arr->execute(2).get_value());
+    EXPECT_EQ(100000000,arr->execute().get_array_node()->cached_result());
 }
 TEST(ArrayNode_test,ExecuteError_id){
     std::cout<<"Run test execute with expected error result"<<std::endl;
@@ -180,7 +179,6 @@ TEST(ArrayNode_test,ExecuteError_id){
     arr->insert_back(std::make_shared<BinaryNode>(BINARY_OP::DIV));
     arr->child(2)->insert_back(std::make_shared<ValueNode>(100));
     arr->child(2)->insert_back(std::make_shared<ValueNode>(0));
-    EXPECT_TRUE(arr->execute(2).is_error());
     Result res = arr->execute();
     EXPECT_EQ(exceptions::EXCEPTION_TYPE::DIVISION_ZERO,res.get_exception()->type());
 }
@@ -193,7 +191,8 @@ TEST(ArrayNode_test,Cached_Result_With_Correct){
     arr->child(2)->insert_back(std::make_shared<ValueNode>(100));
     arr->child(2)->insert_back(std::make_shared<ValueNode>(100));
     EXPECT_TRUE(arr->execute().is_node());
-    EXPECT_TRUE(arr->execute(2).is_value());
+    EXPECT_TRUE(arr->execute().is_array());
+    EXPECT_TRUE(arr->cached_result().get_array_node()->child(2)->cached_result().is_value());
     Result res = arr->execute();
     EXPECT_EQ(res,arr->cached_result());
     std::cout<<arr->cached_result()<<std::endl;
@@ -207,7 +206,7 @@ TEST(ArrayNode_test,Cached_Result_With_Error){
     arr->insert_back(std::make_shared<BinaryNode>(BINARY_OP::DIV));
     arr->child(2)->insert_back(std::make_shared<ValueNode>(100));
     arr->child(2)->insert_back(std::make_shared<ValueNode>(0));
-    EXPECT_TRUE(arr->execute(2).is_error());
+    EXPECT_TRUE(arr->child(2)->cached_result().is_error());
     EXPECT_TRUE(arr->execute().is_error());
     Result res = arr->execute();
     EXPECT_EQ(res,arr->cached_result());
@@ -222,7 +221,7 @@ TEST(ArrayNode_test,Cached_Result_id){
     arr->insert_back(std::make_shared<BinaryNode>(BINARY_OP::DIV));
     arr->child(2)->insert_back(std::make_shared<ValueNode>(100));
     arr->child(2)->insert_back(std::make_shared<ValueNode>(100));
-    EXPECT_TRUE(arr->execute(2).is_value());
+    EXPECT_TRUE(arr->child(2)->cached_result().is_value());
     Result res = arr->execute();
     EXPECT_EQ(res,arr->cached_result());
 }

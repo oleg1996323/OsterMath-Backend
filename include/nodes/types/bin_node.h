@@ -25,23 +25,16 @@ class BinaryNode:public Node{
         return NODE_TYPE::BINARY;
     }
     virtual Result execute() const override;
-    virtual Result execute(const std::vector<std::shared_ptr<VariableNode>>& variables, const std::vector<size_t>& order = std::vector<size_t>()) const override;
 
-    std::shared_ptr<Node> lhs(){
+    std::shared_ptr<Node> lhs() const{
         return child(0);
     }
-    std::shared_ptr<Node> rhs(){
-        return child(1);
-    }
-    const std::shared_ptr<Node> lhs() const {
-        return child(0);
-    }
-    const std::shared_ptr<Node> rhs() const {
+    std::shared_ptr<Node> rhs() const{
         return child(1);
     }
     virtual void insert_back(std::shared_ptr<Node> node) override;
 
-    virtual Result cached_result() override{
+    virtual Result cached_result() const override{
         return execute();
     }
 

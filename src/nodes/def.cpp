@@ -46,6 +46,98 @@ bool Result::is_warning() const{
     return is_event()?(dynamic_cast<warnings::Warning*>(get<std::shared_ptr<AbstractEvent>>().get())?true:false):false;
 }
 
+bool Result::is_array_result() const{
+    return std::holds_alternative<std::shared_ptr<ArrayNode>>(*this);
+}
+
+Result Result::operator+(const Result& other){
+    if(is_error())
+        return this->get_exception();
+    if(other.is_error())
+        return other.get_exception();
+    if(is_value() && other.is_value())
+        return get_value()+other.get_value();
+    else return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric value");
+}
+Result Result::operator-(const Result& other){
+    if(is_error())
+        return this->get_exception();
+    if(other.is_error())
+        return other.get_exception();
+    if(is_value() && other.is_value())
+        return get_value()-other.get_value();
+    else return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric value");
+}
+Result Result::operator*(const Result& other){
+    if(is_error())
+        return this->get_exception();
+    if(other.is_error())
+        return other.get_exception();
+    if(is_value() && other.is_value())
+        return get_value()*other.get_value();
+    else return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric value");
+}
+#include "aux_functions.h"
+
+bool operator==(const Value_t& val, const Result& res){
+    return res.is_value() && val == res.get_value();
+}
+bool operator==(const Result& res,const Value_t& val){
+    return res.is_value() && val == res.get_value();
+}
+bool operator==(const std::string& val, const Result& res){
+    return res.is_string() && val == res.get_string();
+}
+bool operator==(const Result& res,const std::string& val){
+    return res.is_string() && val == res.get_string();
+}
+bool operator==(std::shared_ptr<ArrayNode> val, const Result& res){
+    return res.is_array_result() && ::functions::auxiliary::equal_morphology_nodes(std::vector<std::shared_ptr<Node>>{val,res.get_array_result()});
+}
+bool operator==(const Result& res,std::shared_ptr<ArrayNode> val){
+    return res.is_array_result() && ::functions::auxiliary::equal_morphology_nodes(std::vector<std::shared_ptr<Node>>{val,res.get_array_result()});
+}
+/*
+using namespace functions::auxiliary;    
+    if(check_arguments(TYPE_VAL::NUMERIC_ARRAY,child(0),child(1))){
+        if(std::dynamic_pointer_cast<ArrayNode>(child(0))->size()==
+            std::dynamic_pointer_cast<ArrayNode>(child(1))->size()){
+            Value_t result;
+            for(size_t i = 0;i < std::dynamic_pointer_cast<ArrayNode>(child(0))->size();++i){
+                result =+ execute(i).get_value();
+            }
+        }
+    }
+    else if(functions::auxiliary::check_arguments(TYPE_VAL::VALUE,child(0),child(1)))
+        return execute();
+    else
+        return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric array/value");
+*/
+Result Result::operator/(const Result& other){
+    if(is_error())
+        return this->get_exception();
+    if(other.is_error())
+        return other.get_exception();
+    if(is_value() && other.is_value()){
+        if(other.get_value()==0.)
+            return std::make_shared<exceptions::DivisionZero>();
+        return get_value()/other.get_value();
+    }
+    else return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric value");
+}
+Result Result::operator^(const Result& other){
+    using namespace boost::multiprecision;
+    using namespace std;
+    if(is_error())
+        return this->get_exception();
+    if(other.is_error())
+        return other.get_exception();
+    if(is_value() && other.is_value()){
+        return pow(get_value(),other.get_value());
+    }
+    else return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric value");
+}
+
 std::ostream& Result::operator<<(std::ostream& os)
 {
     std::visit([this,&os](auto&& arg) {
@@ -60,7 +152,9 @@ std::ostream& Result::operator<<(std::ostream& os)
 
 std::ostream& operator<<(std::ostream& os, const Result& res){
     if(res.is_node())
-        res.get<const Node*>()->print_result(os);
+        res.get_node()->print_result(os);
+    else if (res.is_array_result())
+        res.get_array_result()->print_result(os);
     else std::visit([&os](auto&& arg) {
         os << arg;
     },res);
@@ -100,6 +194,17 @@ bool SizeDepthMeasure::set_iterator(size_t depth, size_t iterator){
         at(depth).current_iterator_ = iterator;
         return true;
     }
+}
+
+void SizeDepthMeasure::lock(size_t depth){
+    if(depth-1>=dimensions())
+        throw std::invalid_argument("depth have to be less than dimensions size");
+    else at(depth).lock = true;
+}
+void SizeDepthMeasure::unlock(size_t depth){
+    if(depth-1>=dimensions())
+        throw std::invalid_argument("depth have to be less than dimensions size");
+    else at(depth).lock = false;
 }
 
 SizeDepthMeasure& SizeDepthMeasure::operator++(int){

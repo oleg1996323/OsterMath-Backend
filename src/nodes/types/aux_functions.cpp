@@ -151,6 +151,37 @@ Node* functions::auxiliary::first_node_not_var_by_ids(Node* node, const std::vec
     }
     return nullptr;
 }
+std::shared_ptr<Node> functions::auxiliary::first_node_not_var_by_ids(const std::shared_ptr<Node>& node, const SizeDepthMeasure& seq_iterators) noexcept{
+    std::shared_ptr<Node> child = first_node_not_var(node);
+    if(child){
+        for(const size_iterator& i:seq_iterators){
+            if(child->has_child(i.current_iterator_))
+                child = child->child(i.current_iterator_);
+            else return std::shared_ptr<Node>();
+            child = first_node_not_var(child);
+            if(!child)
+                return std::shared_ptr<Node>();
+        }
+        return child;
+    }
+    return nullptr;
+}
+
+Node* functions::auxiliary::first_node_not_var_by_ids(Node* node, const SizeDepthMeasure& seq_iterators) noexcept{
+    Node* child = first_node_not_var(node);
+    if(child){
+        for(const size_iterator& i:seq_iterators){
+            if(child->has_child(i.current_iterator_))
+                child = child->child(i.current_iterator_).get();
+            else return nullptr;
+            child = first_node_not_var(child);
+            if(!child)
+                return nullptr;
+        }
+        return child;
+    }
+    return nullptr;
+}
 
 //check if array has rectangular morphology (all childs have same sizes in all dimensions)
 bool functions::auxiliary::is_rectangle_array_node(const std::shared_ptr<Node>& node) noexcept{

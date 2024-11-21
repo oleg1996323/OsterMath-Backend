@@ -155,11 +155,11 @@ bool Node::refer_to(std::string_view var_name) const{
 
 #include "aux_functions.h"
 
-std::set<VariableNode*> Node::refer_to_vars() const{
-    std::set<VariableNode*> vars_;
+std::set<std::shared_ptr<VariableNode>> Node::refer_to_vars() const{
+    std::set<std::shared_ptr<VariableNode>> vars_;
     for(const std::shared_ptr<Node>& child:childs_){
         if(child->type()==NODE_TYPE::VARIABLE)
-            vars_.insert(reinterpret_cast<VariableNode*>(child.get()));
+            vars_.insert(std::dynamic_pointer_cast<VariableNode>(child));
         else
             vars_.merge(child->refer_to_vars());
     }
@@ -173,14 +173,6 @@ void Node::refresh_parent_links() const{
                 parents_.erase(parent);
     }
 }
-
-// void Node::get_array_childs(std::vector<std::shared_ptr<Node>>& childs) const{
-//     for(auto child:childs_){
-//         if(child->type()==NODE_TYPE::ARRAY)
-//             childs.push_back(child);
-//         else child->get_array_childs(childs);
-//     }
-// }
 
 const std::set<Node*>& Node::parents() const{
     return parents();
