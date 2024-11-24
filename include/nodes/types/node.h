@@ -5,7 +5,9 @@
 #include <functional>
 #include <string>
 #include <set>
-#include "nodes/def.h"
+#include <unordered_set>
+#include "def.h"
+#include "range_node/def.h"
 
 class Node;
 class UnaryNode;
@@ -64,7 +66,7 @@ public:
     }
     virtual NODE_TYPE type() const;
     virtual Result execute() const;
-    virtual Result execute(const std::vector<std::shared_ptr<VariableNode>>& variables, const std::vector<size_t>& order = std::vector<size_t>()) const;
+    virtual Result execute_for_array_variables(const RangeNodeExecuteStruct& variables) const;
     inline virtual Result cached_result() const{
         return std::monostate();
     }
@@ -97,6 +99,7 @@ public:
     std::set<Node*>& parents();
     bool refer_to(std::string_view var_name) const;
     std::set<std::shared_ptr<VariableNode>> refer_to_vars() const;
+    std::set<std::shared_ptr<Node>> refer_to_node_of_type(NODE_TYPE) const;
     inline bool caller() const{
         return caller_;
     }
@@ -106,9 +109,11 @@ public:
 
     virtual void flush_cache() const{}
 protected:
+    //friend class RangeOperationNode;
     mutable std::set<Node*> parents_; //is less memory expensive than unordered_set
     std::vector<std::shared_ptr<Node>> childs_;
     bool caller_ = false;
+    
 private:
     template<typename T, typename... U>
     void recursive_function_applied_to_all_childs(std::function<T(const std::shared_ptr<Node>&,U...)> func, Node* root);

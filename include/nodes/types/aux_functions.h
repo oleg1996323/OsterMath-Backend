@@ -48,11 +48,11 @@ namespace functions{
         bool all_string(decltype(std::declval<Node>().childs()) arrays);
 
         std::shared_ptr<Node> first_node_not_var(const std::shared_ptr<Node>& node) noexcept;
-        Node* first_node_not_var(Node* node) noexcept;
+        const Node* first_node_not_var(const Node* node) noexcept;
         std::shared_ptr<Node> first_node_not_var_by_ids(const std::shared_ptr<Node>& node, const std::vector<size_t>& seq_iterators) noexcept;
         std::shared_ptr<Node> first_node_not_var_by_ids(const std::shared_ptr<Node>& node, const SizeDepthMeasure& seq_iterators) noexcept;
-        Node* first_node_not_var_by_ids(Node* node, const std::vector<size_t>& seq_iterators) noexcept;
-        Node* first_node_not_var_by_ids(Node* node, const SizeDepthMeasure& seq_iterators) noexcept;
+        const Node* first_node_not_var_by_ids(const Node* node, const std::vector<size_t>& seq_iterators) noexcept;
+        const Node* first_node_not_var_by_ids(const Node* node, const SizeDepthMeasure& seq_iterators) noexcept;
 
         bool check_sizes_arrays(const std::vector<Node*>& arrays);
         bool check_sizes_arrays(const std::list<Node*>& arrays);

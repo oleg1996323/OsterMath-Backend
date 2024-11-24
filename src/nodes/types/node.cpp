@@ -108,8 +108,8 @@ Result Node::execute() const{
     return std::monostate();
 }
 
-Result Node::execute(const std::vector<std::shared_ptr<VariableNode>>& variables, const std::vector<size_t>& order) const{
-    return std::monostate();
+Result Node::execute_for_array_variables(const RangeNodeExecuteStruct& variables) const{
+    return std::make_shared<exceptions::InvalidTypeOfArgument>("objective numeric-result node");
 }
 
 std::string Node::get_result() const{
@@ -164,6 +164,17 @@ std::set<std::shared_ptr<VariableNode>> Node::refer_to_vars() const{
             vars_.merge(child->refer_to_vars());
     }
     return vars_;
+}
+
+std::set<std::shared_ptr<Node>> Node::refer_to_node_of_type(NODE_TYPE t) const{
+    std::set<std::shared_ptr<Node>> nodes_;
+    for(const std::shared_ptr<Node>& child:childs_){
+        if(child->type()==t)
+            nodes_.insert(child);
+        else
+            nodes_.merge(child->refer_to_node_of_type(t));
+    }
+    return nodes_;
 }
 
 void Node::refresh_parent_links() const{
@@ -275,42 +286,3 @@ Node& Node::operator=(const Node& other){
     }
     return *this;
 }
-
-/*
-INFO_NODE Node::child(const std::vector<size_t>& indexes, const Node* caller) const{
-    return child(indexes, this);
-}
-
-INFO_NODE Node::child(const std::vector<size_t>& indexes, Node* caller){
-    INFO_NODE info;
-    if(type()!=NODE_TYPE::VARIABLE)
-        if(indexes.size()>1 && has_child(*indexes.begin())){
-            std::shared_ptr<INFO_NODE> this_info = std::make_shared<INFO_NODE>(caller,std::shared_ptr<INFO_NODE>(),*indexes.begin());
-            INFO_NODE res = child(*indexes.begin())->child(std::vector<size_t>(indexes.cbegin()+1,indexes.cend()));
-            res.parent_info = std::move(this_info);
-            return res;
-        }
-        else if(indexes.size()==1 && has_child(*indexes.begin())){
-            info.parent = this;
-            info.id = *indexes.begin();
-            return info;
-        }
-        else throw exceptions::NodeChildDontExists("");
-    else{
-        if(has_child(0)){
-            if(indexes.size()>1 && child(0)->has_child(*indexes.begin())){
-                std::shared_ptr<INFO_NODE> this_info = std::make_shared<INFO_NODE>(caller,std::shared_ptr<INFO_NODE>(),*indexes.begin());
-                INFO_NODE res = child(0)->child(*indexes.begin())->child(std::vector<size_t>(indexes.cbegin()+1,indexes.cend()));
-                res.parent_info = std::move(this_info);
-                return res;
-            }
-            else if(indexes.size()==1 && child(0)->has_child(*indexes.begin())){
-                info.parent = child(0).get();
-                info.id = *indexes.begin();
-                return info;
-            }
-            else throw exceptions::NodeChildDontExists("");
-        }
-        else throw exceptions::NodeChildDontExists("");
-    }
-}*/

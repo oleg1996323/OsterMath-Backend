@@ -66,3 +66,23 @@ bool UnaryNode::is_array() const{
 UNARY_OP UnaryNode::operation() const{
     return operation_;
 }
+
+Result UnaryNode::execute_for_array_variables(const RangeNodeExecuteStruct& variables) const{
+    switch (operation_)
+        {
+        case UNARY_OP::ADD:
+            return child()->execute_for_array_variables(variables);
+            break;
+        case UNARY_OP::SUB:
+            return (-1)*child()->execute_for_array_variables(variables);
+            break;
+        case UNARY_OP::PARENS:
+            return child()->execute_for_array_variables(variables);
+            break;
+        case UNARY_OP::NOTHING:
+            return child()->execute_for_array_variables(variables);
+        default:
+            throw std::invalid_argument("Unknown type of unary expression");
+            break;
+        }
+}

@@ -42,6 +42,38 @@ Result BinaryNode::execute() const{
     return Result();
 }
 
+Result BinaryNode::execute_for_array_variables(const RangeNodeExecuteStruct& variables) const{
+    if(!(has_child(0) && has_child(1) && childs_.size()==2))
+        return std::make_shared<exceptions::InvalidNumberOfArguments>(2);
+    switch (operation_)
+    {
+        case BINARY_OP::ADD:
+            return child(0)->execute_for_array_variables(variables)+
+                child(1)->execute_for_array_variables(variables);
+            break;
+        case BINARY_OP::SUB:
+            return child(0)->execute_for_array_variables(variables)-
+                child(1)->execute_for_array_variables(variables);
+            break;
+        case BINARY_OP::MUL:
+            return child(0)->execute_for_array_variables(variables)*
+                child(1)->execute_for_array_variables(variables);
+            break;
+        case BINARY_OP::DIV:
+            return child(0)->execute_for_array_variables(variables)/
+                child(1)->execute_for_array_variables(variables);
+            break;
+        case BINARY_OP::POW:
+            return child(0)->execute_for_array_variables(variables)^
+                child(1)->execute_for_array_variables(variables);
+            break;
+        default:
+            throw std::invalid_argument("Unknown type of binary expression");
+            break;
+    }
+    return Result();
+}
+
 void BinaryNode::print_text(std::ostream& stream) const{
     if(has_child(0))
         childs_.at(0)->print_text(stream);

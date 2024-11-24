@@ -138,6 +138,27 @@ Result Result::operator^(const Result& other){
     else return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric value");
 }
 
+Result& Result::operator+=(const Result& other){
+    *this = *this+other;
+    return *this;
+}
+Result& Result::operator-=(const Result& other){
+    *this = *this-other;
+    return *this;
+}
+Result& Result::operator*=(const Result& other){
+    *this = *this*other;
+    return *this;
+}
+Result& Result::operator/=(const Result& other){
+    *this = *this/other;
+    return *this;
+}
+Result& Result::operator^=(const Result& other){
+    *this = *this^other;
+    return *this;
+}
+
 std::ostream& Result::operator<<(std::ostream& os)
 {
     std::visit([this,&os](auto&& arg) {

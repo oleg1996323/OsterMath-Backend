@@ -68,6 +68,12 @@ class Result:public Result_t{
     Result operator/(const Result& other);
     Result operator^(const Result& other);
 
+    Result& operator+=(const Result& other);
+    Result& operator-=(const Result& other);
+    Result& operator*=(const Result& other);
+    Result& operator/=(const Result& other);
+    Result& operator^=(const Result& other);
+
     inline Value_t get_value() noexcept{
         return get<Value_t>();
     }
@@ -114,6 +120,114 @@ bool operator==(const Result& res,const std::string& val);
 bool operator==(std::shared_ptr<ArrayNode> val, const Result& res);
 bool operator==(const Result& res,std::shared_ptr<ArrayNode> val);
 
+// template<typename T_1, typename T_2>
+// concept __result_and_fundamental_numeric_type__ = requires{
+//     ;
+// };
+
+template<typename T_1, typename T_2>
+requires (std::is_same_v<std::decay_t<T_1>,Result> && std::is_fundamental_v<T_2>) || 
+    (std::is_same_v<std::decay_t<T_2>,Result> && std::is_fundamental_v<T_1>)
+Result operator+(T_1&& lhs, T_2&& rhs){
+    if constexpr (std::is_same_v<std::decay_t<T_1>,Result>){
+        if(lhs.is_error())
+            return lhs;
+        else if(!lhs.is_value())
+            return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric value");
+        else return lhs.get_value()+rhs;
+    }
+    else{
+        if(rhs.is_error())
+            return rhs;
+        else if(!rhs.is_value())
+            return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric value");
+        else return rhs.get_value()+lhs;
+    }
+}
+template<typename T_1, typename T_2>
+requires (std::is_same_v<std::decay_t<T_1>,Result> && std::is_fundamental_v<T_2>) || 
+    (std::is_same_v<std::decay_t<T_2>,Result> && std::is_fundamental_v<T_1>)
+Result operator-(T_1&& lhs, T_2&& rhs){
+    if constexpr (std::is_same_v<std::decay_t<T_1>,Result>){
+        if(lhs.is_error())
+            return lhs;
+        else if(!lhs.is_value())
+            return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric value");
+        else return lhs.get_value()-rhs;
+    }
+    else{
+        if(rhs.is_error())
+            return rhs;
+        else if(!rhs.is_value())
+            return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric value");
+        else return lhs-rhs.get_value();
+    }
+}
+template<typename T_1, typename T_2>
+requires (std::is_same_v<std::decay_t<T_1>,Result> && std::is_fundamental_v<T_2>) || 
+    (std::is_same_v<std::decay_t<T_2>,Result> && std::is_fundamental_v<T_1>)
+Result operator*(T_1&& lhs, T_2&& rhs){
+    if constexpr (std::is_same_v<std::decay_t<T_1>,Result>){
+        if(lhs.is_error())
+            return lhs;
+        else if(!lhs.is_value())
+            return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric value");
+        else return lhs.get_value()*rhs;
+    }
+    else{
+        if(rhs.is_error())
+            return rhs;
+        else if(!rhs.is_value())
+            return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric value");
+        else return rhs.get_value()*lhs;
+    }
+}
+template<typename T_1, typename T_2>
+requires (std::is_same_v<std::decay_t<T_1>,Result> && std::is_fundamental_v<T_2>) || 
+    (std::is_same_v<std::decay_t<T_2>,Result> && std::is_fundamental_v<T_1>)
+Result operator/(T_1&& lhs, T_2&& rhs){
+    if constexpr (std::is_same_v<std::decay_t<T_1>,Result>){
+        if(lhs.is_error())
+            return lhs;
+        else if(!lhs.is_value())
+            return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric value");
+        else{
+            if(rhs==0.)
+                return std::make_shared<exceptions::DivisionZero>();
+            return lhs.get_value()/rhs;
+        }
+    }
+    else{
+        if(rhs.is_error())
+            return rhs;
+        else if(!rhs.is_value())
+            return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric value");
+        else{
+            if(rhs.get_value()==0.)
+                return std::make_shared<exceptions::DivisionZero>();
+            return lhs/rhs.get_value();
+        }
+    }
+}
+template<typename T_1, typename T_2>
+requires (std::is_same_v<std::decay_t<T_1>,Result> && std::is_fundamental_v<T_2>) || 
+    (std::is_same_v<std::decay_t<T_2>,Result> && std::is_fundamental_v<T_1>)
+Result operator^(T_1&& lhs, T_2&& rhs){
+    if constexpr (std::is_same_v<std::decay_t<T_1>,Result>){
+        if(lhs.is_error())
+            return lhs;
+        else if(!lhs.is_value())
+            return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric value");
+        else return boost::math::pow(lhs.get_value(),rhs);
+    }
+    else{
+        if(rhs.is_error())
+            return rhs;
+        else if(!rhs.is_value())
+            return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric value");
+        else return boost::math::pow(lhs,rhs.get_value());
+    }
+}
 std::ostream& operator<<(std::ostream& os, const Result&);
 
 template<typename T>

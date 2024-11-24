@@ -1,6 +1,8 @@
 #pragma once
-#include "include/nodes/def.h"
+#include "nodes/def.h"
 #include "node.h"
+#include "range_node/def.h"
+#include <unordered_set>
 
 enum class BINARY_OP{
     ADD='+',
@@ -47,5 +49,5 @@ class BinaryNode:public Node{
     virtual void print_text(std::ostream& stream) const override;
     virtual void print_result(std::ostream& stream) const override;
     private:
-    inline bool IsError(size_t index);
+    virtual Result execute_for_array_variables(const RangeNodeExecuteStruct& variables) const override;
 };

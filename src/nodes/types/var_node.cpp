@@ -80,3 +80,20 @@ void VariableNode::insert_back(std::shared_ptr<Node> node){
         }
     }
 }
+
+Result VariableNode::execute_for_array_variables(const RangeNodeExecuteStruct& range_node_execute_struct) const{
+    using namespace ::functions::auxiliary;
+    auto this_search = range_node_execute_struct.variables.find(this);
+    if(check_arguments(TYPE_VAL::NUMERIC_ARRAY,this) && this_search==range_node_execute_struct.variables.end())
+        throw std::runtime_error("Undefined range order for array-type variable");
+    else{
+        if(!this_search->sz_depth_measure)
+            throw std::runtime_error(std::string("Undefined size measure for array type variable ")+this->var_->name());
+        const Node* found_node = first_node_not_var_by_ids(this,*this_search->sz_depth_measure.get());
+        if(!found_node)
+            throw std::runtime_error(std::string("Not found child node in array type variable ")+this->var_->name());
+        if(!check_arguments(TYPE_VAL::VALUE,found_node))
+            throw std::runtime_error(std::string("Invalid type value of returned child node in array type variable ")+this->var_->name());
+        return found_node->execute();
+    }
+}

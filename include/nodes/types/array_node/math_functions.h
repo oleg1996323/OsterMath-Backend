@@ -5,7 +5,7 @@
 namespace node_array::functions{
     namespace math{
         //permits to extract indexed submatrix from major matrix
-        std::shared_ptr<ArrayNode> extract_from_matrix(size_t index, const std::shared_ptr<ArrayNode>& array, size_t dimension){
+        std::shared_ptr<ArrayNode> extract_from_matrix(size_t index, const std::shared_ptr<ArrayNode>& array, size_t dimension) noexcept{
             if(array && 
                 array->type_val()&TYPE_VAL::NUMERIC_ARRAY &&
                 ::functions::auxiliary::is_rectangle_array_node(array))

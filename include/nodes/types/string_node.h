@@ -2,12 +2,10 @@
 #include <iostream>
 #include "def.h"
 #include "node.h"
+#include "range_node/def.h"
 
 class StringNode:public Node{
     std::string cache_;
-    inline virtual Result execute(const std::vector<std::shared_ptr<VariableNode>>& variables, const std::vector<size_t>& order = std::vector<size_t>()) const override{
-        return cache_;
-    }
     public:
     inline StringNode()=default;
     inline StringNode(Value_t&& value){
@@ -34,11 +32,14 @@ class StringNode:public Node{
     inline virtual Result cached_result() const override{
         return cache_;
     }
-
     virtual bool is_numeric() const override;
     virtual bool is_string() const override;
     virtual bool is_array() const override;
     virtual void insert_back(std::shared_ptr<Node> node) override;
     virtual void print_text(std::ostream& stream) const override;
     virtual void print_result(std::ostream& stream) const override;
+    private:
+    inline virtual Result execute_for_array_variables(const RangeNodeExecuteStruct& variables) const override{
+        return cache_;
+    }
 };

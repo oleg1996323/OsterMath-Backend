@@ -4,6 +4,7 @@
 #include "def.h"
 #include "node.h"
 #include "function_node/def.h"
+#include "range_node/def.h"
 
 
 class FunctionNode:public Node{
@@ -52,4 +53,7 @@ class FunctionNode:public Node{
         cache_ = std::monostate();
     }
     private:
+    inline virtual Result execute_for_array_variables(const RangeNodeExecuteStruct& variables) const override{
+        return execute();
+    }
 };

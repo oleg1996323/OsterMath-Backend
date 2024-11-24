@@ -102,7 +102,7 @@ std::shared_ptr<Node> functions::auxiliary::first_node_not_var(const std::shared
     }
     return std::shared_ptr<Node>();
 }
-Node* functions::auxiliary::first_node_not_var(Node* node) noexcept{
+const Node* functions::auxiliary::first_node_not_var(const Node* node) noexcept{
     if(node){
         if(node->type()!=NODE_TYPE::VARIABLE)
             return node;
@@ -136,8 +136,8 @@ std::shared_ptr<Node> functions::auxiliary::first_node_not_var_by_ids(const std:
     }
     return nullptr;
 }
-Node* functions::auxiliary::first_node_not_var_by_ids(Node* node, const std::vector<size_t>& seq_iterators) noexcept{
-    Node* child = first_node_not_var(node);
+const Node* functions::auxiliary::first_node_not_var_by_ids(const Node* node, const std::vector<size_t>& seq_iterators) noexcept{
+    const Node* child = first_node_not_var(node);
     if(child){
         for(size_t i:seq_iterators){
             if(child->has_child(i))
@@ -167,8 +167,8 @@ std::shared_ptr<Node> functions::auxiliary::first_node_not_var_by_ids(const std:
     return nullptr;
 }
 
-Node* functions::auxiliary::first_node_not_var_by_ids(Node* node, const SizeDepthMeasure& seq_iterators) noexcept{
-    Node* child = first_node_not_var(node);
+const Node* functions::auxiliary::first_node_not_var_by_ids(const Node* node, const SizeDepthMeasure& seq_iterators) noexcept{
+    const Node* child = first_node_not_var(node);
     if(child){
         for(const size_iterator& i:seq_iterators){
             if(child->has_child(i.current_iterator_))
