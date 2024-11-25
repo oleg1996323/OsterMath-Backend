@@ -67,7 +67,8 @@ bool RangeOperationNode::is_array() const{
     return false;
 }
 
-std::set<std::shared_ptr<VariableNode>> RangeOperationNode::define_range_node_variables() const{
+#include "aux_functions.h"
+std::set<std::shared_ptr<VariableNode>> RangeOperationNode::define_range_node_array_type_variables() const{
     std::set<std::shared_ptr<VariableNode>> ref_vars = range_expression->refer_to_vars();
     { //filtering this range node variables
         std::set<std::shared_ptr<Node>> ref_range_nodes = range_expression->refer_to_node_of_type(NODE_TYPE::RANGEOP);
@@ -84,7 +85,15 @@ std::set<std::shared_ptr<VariableNode>> RangeOperationNode::define_range_node_va
                                 std::inserter(diff,diff.end()),
                                 [](const std::shared_ptr<VariableNode>& lhs,const std::shared_ptr<VariableNode>& rhs)
                                 {return lhs.get()<rhs.get();});
+            std::erase_if(diff,[](const std::shared_ptr<VariableNode>& var){
+                return ::functions::auxiliary::check_arguments(TYPE_VAL::VALUE,var);
+            });
             ref_vars=diff;
+        }
+        else{
+            std::erase_if(ref_vars,[](const std::shared_ptr<VariableNode>& var){
+                return ::functions::auxiliary::check_arguments(TYPE_VAL::VALUE,var);
+            });
         }
     }
     return ref_vars;
@@ -98,44 +107,42 @@ Result RangeOperationNode::execute_for_array_variables(const RangeNodeExecuteStr
     ++range_node_execute_struct.range_operators_called;
     if(!range_expression)
         throw std::runtime_error("Missing expression at range node");
-    std::set<std::shared_ptr<VariableNode>> ref_vars = define_range_node_variables();
+    std::set<std::shared_ptr<VariableNode>> ref_vars = define_range_node_array_type_variables();
 
     //complete and check overriding of order indexes
     for(std::shared_ptr<VariableNode> var:ref_vars){
-        if(check_arguments(TYPE_VAL::NUMERIC_ARRAY,var)){
-            if(!range_node_execute_struct.variables.contains(var.get())){
-                VariableNodeIndexInRangeOperation tmp;
-                tmp.var_node = std::dynamic_pointer_cast<VariableNode>(var);
-                tmp.sz_depth_measure = std::make_shared<SizeDepthMeasure>(init_sz_depth_measure(var));
-                for(size_t order_checker = 0;order_checker<tmp.sz_depth_measure->dimensions();++order_checker)
-                    tmp.order_id.push_back(order_checker);
-                range_node_execute_struct.variables.insert(tmp);
-            }
-            else if(range_node_execute_struct.variables.find(var.get())->order_id.size()<
-                    range_node_execute_struct.variables.find(var.get())->sz_depth_measure->dimensions())
-            {
-                std::vector<size_t> missing_orders;
-                size_t dims = range_node_execute_struct.variables.find(var.get())->sz_depth_measure->dimensions();
-                std::vector<size_t>& order_id = range_node_execute_struct.variables.find(var.get())->order_id;
-                //std::vector<size_t>& this_order_id = this->vars_.find(var.get())->order_id;
-                missing_orders.reserve(dims-order_id.size());
-                for(size_t order_checker = 0;order_checker<dims;++order_checker){
-                    size_t count = std::count(order_id.begin(),order_id.end(),order_checker);
-                    if(count == 0)
-                        missing_orders.push_back(order_checker);
-                    else if(count == 1)
-                        continue;
-                    else return std::make_shared<exceptions::Exception>("Double defined variable index in range function");
-                }
-                order_id.insert(order_id.end(),missing_orders.begin(),missing_orders.end());
-            }
-            else if(range_node_execute_struct.variables.find(var.get())->order_id.size()>
-                    range_node_execute_struct.variables.find(var.get())->sz_depth_measure->dimensions()){
-                return std::make_shared<exceptions::InvalidNumberOfArguments>(
-                        range_node_execute_struct.variables.find(var.get())->sz_depth_measure->dimensions());
-            }
-            else continue;
+        if(!range_node_execute_struct.variables.contains(var.get())){
+            VariableNodeIndexInRangeOperation tmp;
+            tmp.var_node = std::dynamic_pointer_cast<VariableNode>(var);
+            tmp.sz_depth_measure = std::make_shared<SizeDepthMeasure>(init_sz_depth_measure(var));
+            for(size_t order_checker = 0;order_checker<tmp.sz_depth_measure->dimensions();++order_checker)
+                tmp.order_id.push_back(order_checker);
+            range_node_execute_struct.variables.insert(tmp);
         }
+        else if(range_node_execute_struct.variables.find(var.get())->order_id.size()<
+                range_node_execute_struct.variables.find(var.get())->sz_depth_measure->dimensions())
+        {
+            std::vector<size_t> missing_orders;
+            size_t dims = range_node_execute_struct.variables.find(var.get())->sz_depth_measure->dimensions();
+            std::vector<size_t>& order_id = range_node_execute_struct.variables.find(var.get())->order_id;
+            //std::vector<size_t>& this_order_id = this->vars_.find(var.get())->order_id;
+            missing_orders.reserve(dims-order_id.size());
+            for(size_t order_checker = 0;order_checker<dims;++order_checker){
+                size_t count = std::count(order_id.begin(),order_id.end(),order_checker);
+                if(count == 0)
+                    missing_orders.push_back(order_checker);
+                else if(count == 1)
+                    continue;
+                else return std::make_shared<exceptions::Exception>("Double defined variable index in range function");
+            }
+            order_id.insert(order_id.end(),missing_orders.begin(),missing_orders.end());
+        }
+        else if(range_node_execute_struct.variables.find(var.get())->order_id.size()>
+                range_node_execute_struct.variables.find(var.get())->sz_depth_measure->dimensions()){
+            return std::make_shared<exceptions::InvalidNumberOfArguments>(
+                    range_node_execute_struct.variables.find(var.get())->sz_depth_measure->dimensions());
+        }
+        else continue;
     }
     //check if there is not repetitions of variables with order overriding at extension
     for(const VariableNodeIndexInRangeOperation& iter:range_node_execute_struct.variables)
@@ -163,12 +170,18 @@ Result RangeOperationNode::execute_for_array_variables(const RangeNodeExecuteStr
                                                     "and mustn't override previously defined indexes");
             }
         }
+        else
+            vars_.insert(iter);
     }
-
-    //adding
-    for(const auto& iter:vars_){
-        if(!range_node_execute_struct.variables.count(iter))
-            range_node_execute_struct.variables.insert(iter);
+    {
+        decltype(vars_) res;
+        std::set_intersection(vars_.begin(),vars_.end(),
+                range_node_execute_struct.variables.begin(),
+                range_node_execute_struct.variables.end(),
+                std::inserter(res,res.end()),
+                [](const VariableNodeIndexInRangeOperation& lhs,const VariableNodeIndexInRangeOperation& rhs)
+                {return lhs.var_node.get()<rhs.var_node.get();});
+        vars_ = res;
     }
     
     //check variables by size and square array
@@ -179,33 +192,37 @@ Result RangeOperationNode::execute_for_array_variables(const RangeNodeExecuteStr
     
     std::for_each(range_node_execute_struct.variables.begin(),range_node_execute_struct.variables.end(),[&range_node_execute_struct](const VariableNodeIndexInRangeOperation& v){
         if(range_node_execute_struct.range_operators_called<v.sz_depth_measure->dimensions())
-            v.sz_depth_measure->lock(range_node_execute_struct.range_operators_called);
+            v.sz_depth_measure->lock(range_node_execute_struct.range_operators_called-1);
+            //lock at order index (not the call rangenode order)
     });
-    while(std::any_of(range_node_execute_struct.variables.begin(),range_node_execute_struct.variables.end(),[](const VariableNodeIndexInRangeOperation& v){
-        return v.sz_depth_measure->is_iterable();
-    })){
+    while(true)
+    {
         if(operation_==RANGE_OP::SUM)
             cache_ += range_expression->execute_for_array_variables(range_node_execute_struct);
         else if(operation_==RANGE_OP::PROD)
             cache_ *= range_expression->execute_for_array_variables(range_node_execute_struct);
-
         if(cache_.is_error()){
             return cache_;
         }
-
-        std::for_each(range_node_execute_struct.variables.begin(),range_node_execute_struct.variables.end(),[&range_node_execute_struct](const VariableNodeIndexInRangeOperation& v){
+        
+        if(!std::all_of(range_node_execute_struct.variables.begin(),
+        range_node_execute_struct.variables.end(),
+        [&range_node_execute_struct](const VariableNodeIndexInRangeOperation& v){
+            bool iterable = v.sz_depth_measure->is_iterable();
             if(range_node_execute_struct.range_operators_called<=v.sz_depth_measure->dimensions())
                 ++(*v.sz_depth_measure.get());
-        });
+            return iterable;
+        }))
+            break;
     }
     std::for_each(range_node_execute_struct.variables.begin(),range_node_execute_struct.variables.end(),[&range_node_execute_struct](const VariableNodeIndexInRangeOperation& v){
-        if(range_node_execute_struct.range_operators_called<=v.sz_depth_measure->dimensions())
+        if(range_node_execute_struct.range_operators_called<v.sz_depth_measure->dimensions())
             v.sz_depth_measure->unlock(range_node_execute_struct.range_operators_called-1);
     });
 
     #ifdef DEBUG
-        assert(std::all_of(range_node_execute_struct.variables.begin(),range_node_execute_struct.variables.end(),[](const VariableNodeIndexInRangeOperation& v){
-            return !v.sz_depth_measure->is_iterable();
+        assert(!std::all_of(range_node_execute_struct.variables.begin(),range_node_execute_struct.variables.end(),[](const VariableNodeIndexInRangeOperation& v){
+            return v.sz_depth_measure->is_iterable();
         }));
     #endif
     return cache_;

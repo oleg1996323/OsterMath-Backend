@@ -14,7 +14,7 @@ enum class RANGE_OP{
 //Childs should be only numeric variable-arrays and have same length
 class RangeOperationNode:public Node{
     mutable Result cache_;
-    std::set<VariableNodeIndexInRangeOperation,VariableNodeIndexInRangeOperation::Comparator> vars_;
+    mutable std::set<VariableNodeIndexInRangeOperation,VariableNodeIndexInRangeOperation::Comparator> vars_;
     std::shared_ptr<Node> range_expression;
     RANGE_OP operation_;
     public:
@@ -53,11 +53,25 @@ class RangeOperationNode:public Node{
     virtual bool is_numeric() const override;
     virtual bool is_string() const override;
     virtual bool is_array() const override;
-    void set_expression(std::shared_ptr<Node> expr){
+    inline void set_expression(std::shared_ptr<Node> expr){
         range_expression = expr;
     }
-    std::shared_ptr<Node> get_expression() const{
+    inline std::shared_ptr<Node> get_expression() const{
         return range_expression;
+    }
+    void set_variable_node_order_execute(std::shared_ptr<VariableNode> var,size_t id){
+        VariableNodeIndexInRangeOperation tmp;
+        tmp.var_node = var;
+        tmp.order_id = id;
+        vars_.insert(tmp);
+    }
+
+    inline std::optional<size_t> get_variable_node_order_execute(std::shared_ptr<VariableNode> var) const{
+        if(var){
+            auto found = vars_.find(var.get());
+            return found !=vars_.end()?found->order_id:std::optional<size_t>();
+        }
+        else throw std::invalid_argument("Variable not defined");
     }
 
     RANGE_OP operation() const;
@@ -67,13 +81,12 @@ class RangeOperationNode:public Node{
     }
 
     protected:
-
-    virtual Result execute_for_array_variables(const RangeNodeExecuteStruct& through_struct) const override;
+    virtual Result execute_for_array_variables(RangeNodeExecuteStruct& through_struct) const override;
     private:
     virtual void insert_back(std::shared_ptr<Node> node) override{
         range_expression = node;
         node->add_parent(this);
     }
-    std::set<std::shared_ptr<VariableNode>> define_range_node_variables() const;
-    
+    std::set<std::shared_ptr<VariableNode>> define_range_node_array_type_variables() const;
+    std::set<std::shared_ptr<VariableNode>> define_array_type_variables() const;
 };
