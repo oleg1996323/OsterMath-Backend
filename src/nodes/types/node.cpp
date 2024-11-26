@@ -108,7 +108,7 @@ Result Node::execute() const{
     return std::monostate();
 }
 
-Result Node::execute_for_array_variables(const RangeNodeExecuteStruct& variables) const{
+Result Node::execute_for_array_variables(const std::vector<size_t>& variables) const{
     return std::make_shared<exceptions::InvalidTypeOfArgument>("objective numeric-result node");
 }
 

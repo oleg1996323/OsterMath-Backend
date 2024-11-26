@@ -206,7 +206,7 @@ size_t SizeDepthMeasure::current_iterator(size_t depth) const{
 }
 
 bool SizeDepthMeasure::set_iterator(size_t depth, size_t iterator){
-    if(depth-1>=dimensions())
+    if(depth>=dimensions())
         return false;
     else {
         if(iterator>=at(depth).sz_){
@@ -218,12 +218,12 @@ bool SizeDepthMeasure::set_iterator(size_t depth, size_t iterator){
 }
 
 void SizeDepthMeasure::lock(size_t depth){
-    if(depth-1>=dimensions())
+    if(depth>=dimensions())
         throw std::invalid_argument("depth have to be less than dimensions size");
     else at(depth).lock = true;
 }
 void SizeDepthMeasure::unlock(size_t depth){
-    if(depth-1>=dimensions())
+    if(depth>=dimensions())
         throw std::invalid_argument("depth have to be less than dimensions size");
     else at(depth).lock = false;
 }

@@ -100,7 +100,7 @@ void SerialData::serialize_header(DataPool* pool){
                             props.operation = (uint8_t)std::dynamic_pointer_cast<UnaryNode>(node)->operation();
                             break;
                         case NODE_TYPE::VALUE:
-                            props.cache = std::dynamic_pointer_cast<UnaryNode>(node)->execute();
+                            props.cache = node->execute();
                             break;
                         case NODE_TYPE::VARIABLE:
                             break;

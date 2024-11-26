@@ -38,5 +38,5 @@ class VariableNode:public Node{
     inline virtual Result cached_result() const override;
 
     private:
-    virtual Result execute_for_array_variables(const RangeNodeExecuteStruct& variables) const override;
+    virtual Result execute_for_array_variables(const std::vector<size_t>& variables) const override;
 };

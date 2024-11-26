@@ -67,7 +67,7 @@ UNARY_OP UnaryNode::operation() const{
     return operation_;
 }
 
-Result UnaryNode::execute_for_array_variables(const RangeNodeExecuteStruct& variables) const{
+Result UnaryNode::execute_for_array_variables(const std::vector<size_t>& variables) const{
     switch (operation_)
         {
         case UNARY_OP::ADD:

@@ -66,7 +66,7 @@ public:
     }
     virtual NODE_TYPE type() const;
     virtual Result execute() const;
-    virtual Result execute_for_array_variables(const RangeNodeExecuteStruct& variables) const;
+    virtual Result execute_for_array_variables(const std::vector<size_t>& variables) const;
     inline virtual Result cached_result() const{
         return std::monostate();
     }

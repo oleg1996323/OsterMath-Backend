@@ -45,5 +45,5 @@ class UnaryNode:public Node{
     virtual void print_text(std::ostream& stream) const override;
     virtual void print_result(std::ostream& stream) const override;
     private:
-    virtual Result execute_for_array_variables(const RangeNodeExecuteStruct& variables) const override;
+    virtual Result execute_for_array_variables(const std::vector<size_t>& variables) const override;
 };

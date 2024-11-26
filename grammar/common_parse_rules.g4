@@ -1,5 +1,5 @@
 parser grammar common_parse_rules;
-
+options {tokenVocab=main_lexics;}
 
 node_access:
     WS* ('('  WS*  ')') | ('(' WS* UINT WS*  ')') | ('('  WS* UINT WS* (';' WS* UINT)* WS*  ')') WS*
@@ -66,7 +66,7 @@ multiargfunction
 rangefunction
     :
     WS* SUM_I '('  WS* expr WS*  ')' WS*
-    | WS* PRODUCT_I '('  WS* expr WS*  ')' WS*
+    | WS* PRODUCT_I '('  WS* expr WS* (';' WS* variable (WS* ';' UINT WS*)+ WS*)*  ')' WS*
     ;
 
 string

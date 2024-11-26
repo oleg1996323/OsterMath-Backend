@@ -14,25 +14,13 @@ enum class RANGE_OP{
 //Childs should be only numeric variable-arrays and have same length
 class RangeOperationNode:public Node{
     mutable Result cache_;
-    mutable std::set<VariableNodeIndexInRangeOperation,VariableNodeIndexInRangeOperation::Comparator> vars_;
     std::shared_ptr<Node> range_expression;
+    mutable size_t sz_iteration = 0;
     RANGE_OP operation_;
     public:
     RangeOperationNode(RANGE_OP op):operation_(op){}
 
-    RangeOperationNode(RANGE_OP op, std::shared_ptr<Node> expr,
-        const std::set<VariableNodeIndexInRangeOperation,VariableNodeIndexInRangeOperation::Comparator>& args = {}):
-    vars_(args),
-    range_expression(expr),
-    operation_(op){
-        std::set<std::shared_ptr<VariableNode>> nodes = range_expression->refer_to_vars();
-        if(args.size()!=nodes.size())
-            cache_ = std::make_shared<exceptions::InvalidNumberOfArguments>(nodes.size());
-    }
-
-    RangeOperationNode(RANGE_OP op, std::shared_ptr<Node> expr,
-        std::set<VariableNodeIndexInRangeOperation,VariableNodeIndexInRangeOperation::Comparator>&& args):
-    vars_(std::move(args)),
+    RangeOperationNode(RANGE_OP op, std::shared_ptr<Node> expr):
     range_expression(expr),
     operation_(op){}
     
@@ -59,20 +47,6 @@ class RangeOperationNode:public Node{
     inline std::shared_ptr<Node> get_expression() const{
         return range_expression;
     }
-    void set_variable_node_order_execute(std::shared_ptr<VariableNode> var,size_t id){
-        VariableNodeIndexInRangeOperation tmp;
-        tmp.var_node = var;
-        tmp.order_id = id;
-        vars_.insert(tmp);
-    }
-
-    inline std::optional<size_t> get_variable_node_order_execute(std::shared_ptr<VariableNode> var) const{
-        if(var){
-            auto found = vars_.find(var.get());
-            return found !=vars_.end()?found->order_id:std::optional<size_t>();
-        }
-        else throw std::invalid_argument("Variable not defined");
-    }
 
     RANGE_OP operation() const;
 
@@ -81,12 +55,14 @@ class RangeOperationNode:public Node{
     }
 
     protected:
-    virtual Result execute_for_array_variables(RangeNodeExecuteStruct& through_struct) const override;
+    virtual Result execute_for_array_variables(const std::vector<size_t>& through_struct) const override;
     private:
     virtual void insert_back(std::shared_ptr<Node> node) override{
         range_expression = node;
         node->add_parent(this);
     }
+    bool check_variables_sizes_and_define_size_iteration(size_t depth) const;
+    std::set<std::shared_ptr<Node>> define_range_node_range_nodes() const;
     std::set<std::shared_ptr<VariableNode>> define_range_node_array_type_variables() const;
     std::set<std::shared_ptr<VariableNode>> define_array_type_variables() const;
 };

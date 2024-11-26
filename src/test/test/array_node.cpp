@@ -169,7 +169,7 @@ TEST(ArrayNode_test,ExecuteCorrect_id){
     arr->insert_back(std::make_shared<ValueNode>(1));
     arr->insert_back(std::make_shared<ValueNode>(2));
     arr->insert_back(std::make_shared<ValueNode>(100000000));
-    EXPECT_EQ(100000000,arr->execute().get_array_node()->cached_result());
+    EXPECT_EQ(100000000,arr->execute().get_array_node()->child(2)->cached_result().get_value());
 }
 TEST(ArrayNode_test,ExecuteError_id){
     std::cout<<"Run test execute with expected error result"<<std::endl;

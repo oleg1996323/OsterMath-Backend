@@ -337,6 +337,12 @@ public:
     std::vector<antlr4::tree::TerminalNode *> WS();
     antlr4::tree::TerminalNode* WS(size_t i);
     antlr4::tree::TerminalNode *PRODUCT_I();
+    std::vector<antlr4::tree::TerminalNode *> SEPAR();
+    antlr4::tree::TerminalNode* SEPAR(size_t i);
+    std::vector<VariableContext *> variable();
+    VariableContext* variable(size_t i);
+    std::vector<antlr4::tree::TerminalNode *> UINT();
+    antlr4::tree::TerminalNode* UINT(size_t i);
 
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
     virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;

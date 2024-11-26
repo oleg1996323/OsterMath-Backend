@@ -35,7 +35,7 @@ class ValueNode:public Node{
     virtual void print_text(std::ostream& stream) const override;
     virtual void print_result(std::ostream& stream) const override;
     private:
-    inline virtual Result execute_for_array_variables(const RangeNodeExecuteStruct& variables) const override{
+    inline virtual Result execute_for_array_variables(const std::vector<size_t>& variables) const override{
         return cache_;
     }
 };
