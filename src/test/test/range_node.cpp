@@ -11,33 +11,52 @@
 #include "bin_node.h"
 #include "range_node.h"
 #include "aux_functions.h"
+#include "types.h"
+#include "data.h"
 
 using namespace functions::auxiliary;
 
-TEST(RangeFunctionNode_test,Insert_Back){
+TEST(RangeFunctionNode_test,SetExpression){
+    //SUM_I(PROD_I(#A*10+10^2;1);#A;2)
     std::cout<<"Run test insert back"<<std::endl;
-    std::shared_ptr<RangeOperationNode> r_func = std::make_shared<RangeOperationNode>(RANGE_OP::SUM);
-    std::vector<Value_t> values(10);
-    r_func->insert_back(std::make_shared<BinaryNode>(BINARY_OP::ADD));
-    std::shared_ptr<BinaryNode> bin_node = std::dynamic_pointer_cast<BinaryNode>(r_func->get_range_expression());
-    bin_node->insert_back(std::make_shared<BinaryNode>(BINARY_OP::MUL));
-    bin_node->insert_back(std::make_shared<BinaryNode>(BINARY_OP::MUL));
+    std::shared_ptr<RangeOperationNode> sum_func = std::make_shared<RangeOperationNode>(RANGE_OP::SUM);
+    std::shared_ptr<RangeOperationNode> prod_func = std::make_shared<RangeOperationNode>(RANGE_OP::PROD);
     
+    sum_func->set_expression(prod_func);
+    
+    std::shared_ptr<BinaryNode> adding = std::make_shared<BinaryNode>(BINARY_OP::ADD);
+    std::shared_ptr<BinaryNode> multiplication = std::make_shared<BinaryNode>(BINARY_OP::MUL);
+    std::shared_ptr<BinaryNode> power = std::make_shared<BinaryNode>(BINARY_OP::POW);
+
+    prod_func->set_expression(adding);
+
+    adding->insert_back(multiplication);
+    adding->insert_back(power);
+    
+    std::vector<Value_t> values(10);
     std::iota(values.begin(),values.end(),0);
+    std::shared_ptr<BaseData> bd = std::make_shared<BaseData>("BD");
+    std::shared_ptr<VariableBase> A_var = bd->add_variable("A");
+
+    //setting reversed order
+    sum_func->set_variable_order(A_var->node(),2);
+    prod_func->set_variable_order(A_var->node(),1);
+
+    multiplication->insert_back(A_var->node());
+    multiplication->insert_back(std::make_shared<ValueNode>(10));
+
+    power->insert_back(std::make_shared<ValueNode>(10));
+    power->insert_back(std::make_shared<ValueNode>(2));
+
     std::shared_ptr<ArrayNode> arr_1 = std::make_shared<ArrayNode>(10);
     std::shared_ptr<ArrayNode> arr_2 = std::make_shared<ArrayNode>(10);
     for(const auto& val:values){
-        arr_1->insert_back(std::make_shared<ValueNode>(val));
+        arr_1->insert_back(arr_2); //same_values
         arr_2->insert_back(std::make_shared<ValueNode>(val));
     }
-    bin_node->child(0)->insert_back(arr_1);
-    bin_node->child(0)->insert_back(arr_2);
-    bin_node->child(1)->insert_back(arr_1);
-    bin_node->child(1)->insert_back(arr_2);
-    bin_node->insert_back(arr_1);
-    bin_node->insert_back(arr_2);
-    std::cout<<bin_node->execute()<<std::endl;
-    std::cout<<r_func->execute()<<std::endl;
+    A_var->node()->insert_back(arr_1);
+    sum_func->execute();
+    std::cout<<sum_func->get_result()<<std::endl;
 }
 // TEST(RangeFunctionNode_test,Insert){
 //     std::cout<<"Run test insert at position"<<std::endl;

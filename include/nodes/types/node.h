@@ -57,12 +57,8 @@ public:
     INFO_NODE child(const std::vector<size_t>& indexes);
     INFO_NODE child(const std::vector<size_t>& indexes) const;
     void release_childs();
-    inline bool has_childs() const{
-        return !childs_.empty();
-    }
-
-    inline bool has_child(size_t id) const{
-        return childs_.size()>id;
+    inline virtual bool has_childs() const{
+        return false;
     }
     virtual NODE_TYPE type() const;
     virtual Result execute() const;
@@ -111,7 +107,6 @@ public:
 protected:
     //friend class RangeOperationNode;
     mutable std::set<Node*> parents_; //is less memory expensive than unordered_set
-    std::vector<std::shared_ptr<Node>> childs_;
     bool caller_ = false;
     
 private:

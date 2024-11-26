@@ -1,5 +1,6 @@
 #include "range_node.h"
 #include "def.h"
+#include <memory>
 
 RangeOperationNode::RangeOperationNode(const RangeOperationNode& other):
 Node(other),
@@ -75,14 +76,35 @@ bool RangeOperationNode::is_array() const{
 bool RangeOperationNode::check_variables_sizes_and_define_size_iteration(size_t depth) const{
     using namespace functions::auxiliary;
     std::set<std::shared_ptr<VariableNode>> arr_vars = define_range_node_array_type_variables();
-    if(arr_vars.empty())
+    if(arr_vars.empty() && define_array_type_variables().empty())
         return false;
     if(!std::all_of(arr_vars.begin(),arr_vars.end(),[](const std::shared_ptr<VariableNode>& var){
         return is_rectangle_array_node(var);
     }) || !equal_morphology_nodes(std::vector<std::shared_ptr<Node>>(arr_vars.begin(),arr_vars.end())))
         return false;
     else{
-        sz_iteration = init_sz_depth_measure(*arr_vars.begin()).size(depth);
+        auto found = this->var_ids_.find(*arr_vars.begin());
+        std::optional<size_t> sz_tmp;
+        if(found->order_id.has_value())
+            sz_tmp = init_sz_depth_measure(*arr_vars.begin()).size(found->order_id.value());
+        if(std::all_of(arr_vars.begin(),arr_vars.end(),[](const std::shared_ptr<VariableNode>& var){
+            return init_sz_depth_measure(var).dimensions()==1;
+        }))
+            sz_iteration = init_sz_depth_measure(*arr_vars.begin()).size(depth);
+        else if(std::all_of(arr_vars.begin(),arr_vars.end(),[this,&sz_tmp](const std::shared_ptr<VariableNode>& var){
+            if(!this->var_ids_.contains(var))
+                return false;
+            else{
+                if(!sz_tmp.has_value())
+                    return false;
+                return  sz_tmp.value()==init_sz_depth_measure(var).size(this->var_ids_.find(var)->order_id.value());
+            }
+        })){
+            sz_iteration = sz_tmp.value();
+        }
+        else{
+            return false;
+        }
     }
     std::set<std::shared_ptr<Node>> range_nodes = define_range_node_range_nodes();
     if(range_nodes.empty())

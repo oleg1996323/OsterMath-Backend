@@ -6,6 +6,7 @@
 
 class ArrayNode:public Node{
     mutable Result cache_;
+    std::vector<std::shared_ptr<Node>> childs_;
 public:
     using Node::operator=;
     using Node::insert_back;
@@ -35,6 +36,12 @@ public:
         return *this;
     }
 
+    inline virtual bool has_childs() const override{
+        return !childs_.empty();
+    }
+    inline bool has_child(size_t id) const{
+        return childs_.size()>id;
+    }
     virtual NODE_TYPE type() const override;
     virtual Result execute() const override;
     inline virtual Result cached_result() const override{

@@ -15,6 +15,7 @@ enum class RANGE_OP{
 class RangeOperationNode:public Node{
     mutable Result cache_;
     std::shared_ptr<Node> range_expression;
+    std::set<node_range_operation::VariableNodeIndex, node_range_operation::VariableNodeIndex::Comparator> var_ids_;
     mutable size_t sz_iteration = 0;
     RANGE_OP operation_;
     public:
@@ -52,6 +53,20 @@ class RangeOperationNode:public Node{
 
     virtual void flush_cache() const override{
         cache_ = std::monostate();
+    }
+
+    inline void set_variable_order(const std::shared_ptr<VariableNode>& var,size_t order){
+        node_range_operation::VariableNodeIndex tmp;
+        tmp.order_id.emplace(order);
+        tmp.var_node = var;
+        var_ids_.insert(tmp);  
+    }
+
+    inline std::optional<size_t> set_variable_order(const std::shared_ptr<VariableNode>& var){
+        if(var_ids_.contains(var)){
+            return var_ids_.find(var)->order_id;
+        }
+        return std::nullopt;
     }
 
     protected:
