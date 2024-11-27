@@ -5,16 +5,17 @@
 RangeOperationNode::RangeOperationNode(const RangeOperationNode& other):
 Node(other),
 cache_(other.cache_),
-range_expression(other.range_expression),
 sz_iteration(other.sz_iteration),
 operation_(other.operation_)
-{}
+{
+    set_expression(other.get_expression());
+}
 
 #include "types.h"
 
 Result RangeOperationNode::execute() const{
     using namespace ::functions::auxiliary;
-    if(!range_expression)
+    if(!has_expression())
         throw std::runtime_error("Missing expression at range node");
     std::set<std::shared_ptr<VariableNode>> ref_vars = define_array_type_variables();
     
@@ -38,8 +39,8 @@ void RangeOperationNode::print_text(std::ostream& stream) const{
         stream<<"sum_i(";
     else stream<<"";
 
-    if(has_childs())
-        range_expression->print_text(stream);
+    if(has_expression())
+        get_expression()->print_text(stream);
     else {
         Node node;
         node.print_text(stream);
@@ -56,14 +57,14 @@ void RangeOperationNode::print_result(std::ostream& stream) const{
 }
 
 bool RangeOperationNode::is_numeric() const{
-    if(range_expression)
-        return range_expression->is_numeric();
+    if(has_expression())
+        return get_expression()->is_numeric();
     else return false;
 }
 
 bool RangeOperationNode::is_string() const{
-    if(range_expression)
-        return range_expression->is_string();
+    if(has_expression())
+        return get_expression()->is_string();
     else return false;
 }
 
@@ -117,9 +118,9 @@ bool RangeOperationNode::check_variables_sizes_and_define_size_iteration(size_t 
 }
 
 std::set<std::shared_ptr<VariableNode>> RangeOperationNode::define_range_node_array_type_variables() const{
-    std::set<std::shared_ptr<VariableNode>> ref_vars = range_expression->refer_to_vars();
+    std::set<std::shared_ptr<VariableNode>> ref_vars = get_expression()->refer_to_vars();
     { //filtering this range node variables
-        std::set<std::shared_ptr<Node>> ref_range_nodes = range_expression->refer_to_node_of_type(NODE_TYPE::RANGEOP);
+        std::set<std::shared_ptr<Node>> ref_range_nodes = get_expression()->refer_to_node_of_type(NODE_TYPE::RANGEOP);
         if(!ref_range_nodes.empty())
         {
             std::set<std::shared_ptr<VariableNode>> all_refered_vars_by_child_range_node;
@@ -150,14 +151,14 @@ std::set<std::shared_ptr<VariableNode>> RangeOperationNode::define_range_node_ar
 std::set<std::shared_ptr<Node>> RangeOperationNode::define_range_node_range_nodes() const{
     std::set<std::shared_ptr<Node>> result;
     { //filtering this range node variables
-        std::set<std::shared_ptr<Node>> ref_range_nodes = range_expression->refer_to_node_of_type(NODE_TYPE::RANGEOP);
+        std::set<std::shared_ptr<Node>> ref_range_nodes = get_expression()->refer_to_node_of_type(NODE_TYPE::RANGEOP);
         if(!ref_range_nodes.empty())
         {
             std::set<std::shared_ptr<Node>> all_refered_range_nodes_by_child_range_node;
             std::set<std::shared_ptr<Node>> diff;
             for(const auto& range_node:ref_range_nodes)
                 all_refered_range_nodes_by_child_range_node.merge(std::dynamic_pointer_cast<RangeOperationNode>(range_node)->
-                                                    range_expression->refer_to_node_of_type(NODE_TYPE::RANGEOP));
+                                                    get_expression()->refer_to_node_of_type(NODE_TYPE::RANGEOP));
             std::set_difference(all_refered_range_nodes_by_child_range_node.begin(),
                                 all_refered_range_nodes_by_child_range_node.end(),
                                 ref_range_nodes.begin(),
@@ -172,7 +173,7 @@ std::set<std::shared_ptr<Node>> RangeOperationNode::define_range_node_range_node
 }
 
 std::set<std::shared_ptr<VariableNode>> RangeOperationNode::define_array_type_variables() const{
-    std::set<std::shared_ptr<VariableNode>> ref_vars = range_expression->refer_to_vars();
+    std::set<std::shared_ptr<VariableNode>> ref_vars = get_expression()->refer_to_vars();
     std::erase_if(ref_vars,[](const std::shared_ptr<VariableNode>& var){
                 return ::functions::auxiliary::check_arguments(TYPE_VAL::VALUE,var);
     });
@@ -192,9 +193,9 @@ Result RangeOperationNode::execute_for_array_variables(const std::vector<size_t>
     for(;indexes.back()<sz_iteration;++indexes.back()) //add defined size of dimension size variable
     {
         if(operation_==RANGE_OP::SUM)
-            cache_ += range_expression->execute_for_array_variables(indexes);
+            cache_ += get_expression()->execute_for_array_variables(indexes);
         else if(operation_==RANGE_OP::PROD)
-            cache_ *= range_expression->execute_for_array_variables(indexes);
+            cache_ *= get_expression()->execute_for_array_variables(indexes);
         if(cache_.is_error()){
             return cache_;
         }

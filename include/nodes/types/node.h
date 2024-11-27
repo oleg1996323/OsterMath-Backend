@@ -57,9 +57,6 @@ public:
     INFO_NODE child(const std::vector<size_t>& indexes);
     INFO_NODE child(const std::vector<size_t>& indexes) const;
     void release_childs();
-    inline virtual bool has_childs() const{
-        return false;
-    }
     virtual NODE_TYPE type() const;
     virtual Result execute() const;
     virtual Result execute_for_array_variables(const std::vector<size_t>& variables) const;
@@ -99,6 +96,12 @@ public:
     inline bool caller() const{
         return caller_;
     }
+    inline virtual bool has_childs() const{
+        return !childs_.empty();
+    }
+    inline bool has_child(size_t id) const{
+        return childs_.size()>id;
+    }
     template<typename T, typename... U>
     void recursive_function_applied_to_all_childs(std::function<T(const std::shared_ptr<Node>&,U...)> func);
     const std::vector<std::shared_ptr<Node>>& childs() const;
@@ -107,6 +110,7 @@ public:
 protected:
     //friend class RangeOperationNode;
     mutable std::set<Node*> parents_; //is less memory expensive than unordered_set
+    std::vector<std::shared_ptr<Node>> childs_;
     bool caller_ = false;
     
 private:

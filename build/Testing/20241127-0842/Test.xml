@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Site BuildName="(empty)"
+	BuildStamp="20241127-0842-Experimental"
+	Name="(empty)"
+	Generator="ctest-3.22.1"
+	CompilerName=""
+	CompilerVersion=""
+	OSName="Linux"
+	Hostname="oster-ASUS-TUF-Gaming-A15-FA506NF-FA506NF"
+	OSRelease="6.8.0-49-generic"
+	OSVersion="#49~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Wed Nov  6 17:42:15 UTC 2"
+	OSPlatform="x86_64"
+	Is64Bits="1"
+	VendorString="AuthenticAMD"
+	VendorID="Advanced Micro Devices"
+	FamilyID="25"
+	ModelID="68"
+	ProcessorCacheSize="512"
+	NumberOfLogicalCPU="12"
+	NumberOfPhysicalCPU="6"
+	TotalVirtualMemory="2047"
+	TotalPhysicalMemory="15305"
+	LogicalProcessorsPerPhysical="2"
+	ProcessorClockFrequency="4399.82"
+	>
+	<Testing>
+		<StartDateTime>Nov 27 11:42 MSK</StartDateTime>
+		<StartTestTime>1732696948</StartTestTime>
+		<TestList/>
+		<EndDateTime>Nov 27 11:42 MSK</EndDateTime>
+		<EndTestTime>1732696948</EndTestTime>
+		<ElapsedMinutes>0</ElapsedMinutes>
+	</Testing>
+</Site>

@@ -14,7 +14,6 @@ enum class RANGE_OP{
 //Childs should be only numeric variable-arrays and have same length
 class RangeOperationNode:public Node{
     mutable Result cache_;
-    std::shared_ptr<Node> range_expression;
     std::set<node_range_operation::VariableNodeIndex, node_range_operation::VariableNodeIndex::Comparator> var_ids_;
     mutable size_t sz_iteration = 0;
     RANGE_OP operation_;
@@ -22,8 +21,9 @@ class RangeOperationNode:public Node{
     RangeOperationNode(RANGE_OP op):operation_(op){}
 
     RangeOperationNode(RANGE_OP op, std::shared_ptr<Node> expr):
-    range_expression(expr),
-    operation_(op){}
+    operation_(op){
+        set_expression(expr);
+    }
     
     RangeOperationNode(const RangeOperationNode& other);
     RangeOperationNode(RangeOperationNode&&) = delete;
@@ -43,10 +43,15 @@ class RangeOperationNode:public Node{
     virtual bool is_string() const override;
     virtual bool is_array() const override;
     inline void set_expression(std::shared_ptr<Node> expr){
-        range_expression = expr;
+        insert_back(expr);
+    }
+    inline bool has_expression() const{
+        return has_child(0) && child(0);
     }
     inline std::shared_ptr<Node> get_expression() const{
-        return range_expression;
+        if(has_child(0))
+            return child(0);
+        else return std::shared_ptr<Node>();
     }
 
     RANGE_OP operation() const;
@@ -73,7 +78,9 @@ class RangeOperationNode:public Node{
     virtual Result execute_for_array_variables(const std::vector<size_t>& through_struct) const override;
     private:
     virtual void insert_back(std::shared_ptr<Node> node) override{
-        range_expression = node;
+        if(has_child(0))
+            childs_.at(0) = node;
+        else childs_.push_back(node);
         node->add_parent(this);
     }
     bool check_variables_sizes_and_define_size_iteration(size_t depth) const;
