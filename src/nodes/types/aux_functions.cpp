@@ -195,16 +195,22 @@ bool functions::auxiliary::is_rectangle_array_node(const std::shared_ptr<Node>& 
     else if(first_node->childs().size()==0)
         return true;
 
-    return std::all_of(node->childs().begin()+1,node->childs().end(),[node](std::shared_ptr<Node> child){
-        return node->child(0)->childs().size() == child->childs().size() && is_rectangle_array_node(child);
-    });
+    if(std::all_of(first_node->childs().begin()+1,first_node->childs().end(),[first_node](std::shared_ptr<Node> child){
+        if(!(first_node->child(0)->childs().size() == child->childs().size() && is_rectangle_array_node(child)))
+            return false;
+        return true;
+    }))
+        return true;
+    else return false;
 }
 
 //independent form of nodes (compare value types, number childs, number depth)
 //add exclusion of function, range_function nodes
 bool functions::auxiliary::equal_morphology_nodes(const std::vector<std::shared_ptr<Node>>& nodes) noexcept{
-    if(nodes.size()<=1)
+    if(nodes.size()==0)
         return false;
+    if(nodes.size()==1)
+        return true;
     std::shared_ptr<Node> first_node = first_node_not_var(nodes.front());
     std::vector<size_t> seq_iterators;
     std::vector<std::shared_ptr<Node>> ex_nodes;

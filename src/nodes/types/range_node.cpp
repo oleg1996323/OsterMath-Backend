@@ -53,7 +53,7 @@ RANGE_OP RangeOperationNode::operation() const{
 }
 
 void RangeOperationNode::print_result(std::ostream& stream) const{
-    stream<<const_cast<RangeOperationNode*>(this)->execute();
+    stream<<cached_result();
 }
 
 bool RangeOperationNode::is_numeric() const{
@@ -87,7 +87,7 @@ bool RangeOperationNode::check_variables_sizes_and_define_size_iteration(size_t 
         auto found = this->var_ids_.find(*arr_vars.begin());
         std::optional<size_t> sz_tmp;
         if(found->order_id.has_value())
-            sz_tmp = init_sz_depth_measure(*arr_vars.begin()).size(found->order_id.value());
+            sz_tmp = init_sz_depth_measure(*arr_vars.begin()).size(found->order_id.value()-1);
         if(std::all_of(arr_vars.begin(),arr_vars.end(),[](const std::shared_ptr<VariableNode>& var){
             return init_sz_depth_measure(var).dimensions()==1;
         }))
@@ -98,7 +98,7 @@ bool RangeOperationNode::check_variables_sizes_and_define_size_iteration(size_t 
             else{
                 if(!sz_tmp.has_value())
                     return false;
-                return  sz_tmp.value()==init_sz_depth_measure(var).size(this->var_ids_.find(var)->order_id.value());
+                return  sz_tmp.value()==init_sz_depth_measure(var).size(this->var_ids_.find(var)->order_id.value()-1);
             }
         })){
             sz_iteration = sz_tmp.value();
@@ -151,22 +151,20 @@ std::set<std::shared_ptr<VariableNode>> RangeOperationNode::define_range_node_ar
 std::set<std::shared_ptr<Node>> RangeOperationNode::define_range_node_range_nodes() const{
     std::set<std::shared_ptr<Node>> result;
     { //filtering this range node variables
-        std::set<std::shared_ptr<Node>> ref_range_nodes = get_expression()->refer_to_node_of_type(NODE_TYPE::RANGEOP);
+        std::set<std::shared_ptr<Node>> ref_range_nodes = refer_to_node_of_type(NODE_TYPE::RANGEOP);
         if(!ref_range_nodes.empty())
         {
             std::set<std::shared_ptr<Node>> all_refered_range_nodes_by_child_range_node;
             std::set<std::shared_ptr<Node>> diff;
             for(const auto& range_node:ref_range_nodes)
                 all_refered_range_nodes_by_child_range_node.merge(std::dynamic_pointer_cast<RangeOperationNode>(range_node)->
-                                                    get_expression()->refer_to_node_of_type(NODE_TYPE::RANGEOP));
-            std::set_difference(all_refered_range_nodes_by_child_range_node.begin(),
-                                all_refered_range_nodes_by_child_range_node.end(),
-                                ref_range_nodes.begin(),
+                                                    refer_to_node_of_type(NODE_TYPE::RANGEOP));
+            std::set_difference(ref_range_nodes.begin(),
                                 ref_range_nodes.end(),
-                                std::inserter(diff,diff.end()),
-                                [](const std::shared_ptr<Node>& lhs,const std::shared_ptr<Node>& rhs)
-                                {return lhs.get()<rhs.get();});
-            result=diff;
+                                all_refered_range_nodes_by_child_range_node.begin(),
+                                all_refered_range_nodes_by_child_range_node.end(),
+                                std::inserter(diff,diff.end()));
+            result.insert(diff.begin(),diff.end());
         }
     }
     return result;
