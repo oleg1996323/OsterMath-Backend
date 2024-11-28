@@ -16,7 +16,7 @@
 
 using namespace functions::auxiliary;
 
-TEST(RangeFunctionNode_test,SetExpression){
+TEST(RangeFunctionNode_test,Example_1){
     //SUM_I(PROD_I(#A*10+10^2;#A;1);#A;2)
     std::cout<<"Run test insert back"<<std::endl;
     std::shared_ptr<RangeOperationNode> sum_func = std::make_shared<RangeOperationNode>(RANGE_OP::SUM);
@@ -39,8 +39,6 @@ TEST(RangeFunctionNode_test,SetExpression){
     std::shared_ptr<VariableBase> A_var = bd->add_variable("A");
 
     //setting reversed order
-    //sum_func->set_variable_order(A_var->node(),2);
-    //prod_func->set_variable_order(A_var->node(),1);
 
     multiplication->insert_back(A_var->node());
     multiplication->insert_back(std::make_shared<ValueNode>(10));
@@ -60,6 +58,8 @@ TEST(RangeFunctionNode_test,SetExpression){
     A_var->node()->insert_back(arr_1);
     EXPECT_TRUE(sum_func->execute().is_error());
 
+    sum_func->set_variable_order(A_var->node(),2);
+    prod_func->set_variable_order(A_var->node(),1);
     prod_func->set_expression(adding);
     EXPECT_TRUE(sum_func->execute().is_value());
     std::cout<<"Range_Node result: "<<sum_func->get_result()<<std::endl;
@@ -75,6 +75,62 @@ TEST(RangeFunctionNode_test,SetExpression){
     if(sum_func->cached_result().is_error())
         std::cout<<sum_func->cached_result().get_exception()->get_prompt()<<std::endl;
     EXPECT_EQ(sum_func->cached_result(),result_1);
+}
+TEST(RangeFunctionNode_test,Example_2){
+    //SUM_I(#B+PROD_I(#A*1;#A;1);#A;2;#B;1)
+    std::cout<<"Run test insert back"<<std::endl;
+    std::shared_ptr<RangeOperationNode> sum_func = std::make_shared<RangeOperationNode>(RANGE_OP::SUM);
+    std::shared_ptr<RangeOperationNode> prod_func = std::make_shared<RangeOperationNode>(RANGE_OP::PROD);
+    
+    std::shared_ptr<BinaryNode> adding = std::make_shared<BinaryNode>(BINARY_OP::ADD);
+    std::shared_ptr<BinaryNode> multiplication = std::make_shared<BinaryNode>(BINARY_OP::MUL);
+    
+    std::vector<Value_t> values(10);
+    std::iota(values.begin(),values.end(),0);
+    std::shared_ptr<BaseData> bd = std::make_shared<BaseData>("BD");
+    std::shared_ptr<VariableBase> A_var = bd->add_variable("A");
+    std::shared_ptr<VariableBase> B_var = bd->add_variable("B");
+    
+    adding->insert_back(B_var->node());
+    adding->insert_back(prod_func);
+    sum_func->set_expression(adding);
+
+    multiplication->insert_back(A_var->node());
+    multiplication->insert_back(std::make_shared<ValueNode>(1));
+
+    std::shared_ptr<ArrayNode> arr_1 = std::make_shared<ArrayNode>(10);
+    std::shared_ptr<ArrayNode> arr_2 = std::make_shared<ArrayNode>(10);
+    int count = 0;
+    for(const auto& val:values){
+        arr_1->insert_back(arr_2); //same_values
+        //if(count<5)
+            arr_2->insert_back(std::make_shared<ValueNode>(val));
+        ++count;
+    }
+    A_var->node()->insert_back(arr_1);
+    B_var->node()->insert_back(arr_1);
+    EXPECT_TRUE(sum_func->execute().is_error());
+    
+    sum_func->set_variable_order(A_var->node(),2);
+    prod_func->set_variable_order(A_var->node(),1);
+    prod_func->set_expression(multiplication);
+    EXPECT_TRUE(sum_func->execute().is_error());
+    sum_func->set_variable_order(B_var->node(),1);
+    EXPECT_TRUE(sum_func->execute().is_value());
+    std::cout<<"Range_Node result: "<<sum_func->get_result()<<std::endl;
+    Value_t result_1=0;
+    Value_t result_2=1;
+    for(int i=0; i<10;++i){
+        for(int j=0;j<10;++j){
+            result_2*= Value_t(i)*1;
+        }
+        result_1+=(result_2+Value_t(i));
+        result_2=1;
+    }
+    if(sum_func->cached_result().is_error())
+        std::cout<<sum_func->cached_result().get_exception()->get_prompt()<<std::endl;
+
+    EXPECT_NEAR(sum_func->cached_result().get_value().convert_to<double>(),result_1.convert_to<double>(),1);
 }
 // TEST(RangeFunctionNode_test,Insert){
 //     std::cout<<"Run test insert at position"<<std::endl;

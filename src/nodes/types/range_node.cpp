@@ -30,7 +30,6 @@ Result RangeOperationNode::execute() const{
     }
     std::set<ThroughVarStruct,ThroughVarStruct::Comparator> structure;
     if(!check_variables_sizes_and_define_size_iteration(0,structure)){
-        cache_ = std::make_shared<exceptions::Exception>("Invalid arguments");
         return cache_;
     }
     std::vector<size_t> range_node_execute_struct;
@@ -83,43 +82,93 @@ bool RangeOperationNode::check_variables_sizes_and_define_size_iteration(size_t 
                                 std::set<ThroughVarStruct,ThroughVarStruct::Comparator>& structure) const{
     using namespace functions::auxiliary;
     std::set<std::shared_ptr<VariableNode>> arr_vars = define_range_node_array_type_variables();
-    if(arr_vars.empty() && define_array_type_variables().empty())
+    if(arr_vars.empty() || define_array_type_variables().empty()){
+        cache_ = std::make_shared<exceptions::InvalidTypeOfArgument>("at least 1 rectangle numeric array-type or value-type variable");
         return false;
+    }
     if(!std::all_of(arr_vars.begin(),arr_vars.end(),[](const std::shared_ptr<VariableNode>& var){
         return is_rectangle_array_node(var);
-    }))
+    })){
+        cache_ = std::make_shared<exceptions::InvalidTypeOfArgument>("rectangle numeric array-type or value-type variable");
         return false;
+    }
     else{
-        auto found = this->var_ids_.find(*arr_vars.begin());
         std::optional<size_t> sz_tmp;
-        if(found->order_id.has_value())
-            sz_tmp = init_sz_depth_measure(*arr_vars.begin()).size(found->order_id.value()-1);
+        {
+            auto found = this->var_ids_.find(*arr_vars.begin());
+            if(found->order_id.has_value())
+                sz_tmp = init_sz_depth_measure(*arr_vars.begin()).size(found->order_id.value()-1);
+        }
         if(std::all_of(arr_vars.begin(),arr_vars.end(),[](const std::shared_ptr<VariableNode>& var){
             return init_sz_depth_measure(var).dimensions()==1;
         }) && equal_morphology_nodes(arr_vars)){
             std::for_each(arr_vars.begin(),arr_vars.end(),[&structure, &arr_vars,depth,this](const std::shared_ptr<VariableNode>& var){
                 if(structure.contains(var))
                     structure.find(var)->sz_depth_measure = init_sz_depth_measure(*arr_vars.begin());
-                else structure.insert(ThroughVarStruct({init_sz_depth_measure(*arr_vars.begin()), var}));
+                else structure.insert(ThroughVarStruct({init_sz_depth_measure(*arr_vars.begin()), var,{}}));
             });
             //order_id may not contains value
             sz_iteration = structure.begin()->sz_depth_measure.size(0);
         }
-        else if(std::all_of(arr_vars.begin(),arr_vars.end(),[this,&sz_tmp](const std::shared_ptr<VariableNode>& var){
-            if(!this->var_ids_.contains(var))
+        else if(std::all_of(arr_vars.begin(),arr_vars.end(),[this,&sz_tmp, &structure,&arr_vars, depth](const std::shared_ptr<VariableNode>& var){
+            if(!this->var_ids_.contains(var)){
+                cache_ = std::make_shared<exceptions::Exception>(std::string("Not defined indexes for variable ")+var->variable()->name()+".");
                 return false;
-            else{
-                if(!sz_tmp.has_value())
+            }
+            else{//check indexes repetition std::count()==1 && structure.find(var)->order.size()>depth && 
+                    //structure.find(var)->order.at(depth)==this->var_ids_.find(var)->order_id.value()-1
+                std::set<VariableNodeIndex, VariableNodeIndex::Comparator>::iterator found_var_id = this->var_ids_.find(var);
+                if(!sz_tmp.has_value()){
+                    cache_ = std::make_shared<exceptions::Exception>(std::string("Not defined index for variable ")+(*arr_vars.begin())->variable()->name()+
+                                                                        "\nat "+std::to_string(depth+1)+" range operator.");
                     return false;
-                return  sz_tmp.value()==init_sz_depth_measure(var).size(this->var_ids_.find(var)->order_id.value()-1);
+                }
+                else if(!found_var_id->order_id.has_value()){
+                    cache_ = std::make_shared<exceptions::Exception>(std::string("Not defined index for variable ")+var->variable()->name()+
+                                                                        "\nat "+std::to_string(depth+1)+" range operator.");
+                    return false;
+                }
+                else{
+                    std::set<ThroughVarStruct, ThroughVarStruct::Comparator>::iterator found_structure;
+                    if(structure.contains(var)){
+                        found_structure = structure.find(var);
+                        found_structure->sz_depth_measure = init_sz_depth_measure(*arr_vars.begin());
+                    }
+                    else found_structure = structure.insert(ThroughVarStruct({init_sz_depth_measure(*arr_vars.begin()), var,{}})).first;
+                    if(sz_tmp.value()==found_structure->sz_depth_measure.size(found_var_id->order_id.value()-1)){
+                        //check indexes repetition 
+                        auto found_structure = structure.find(var);
+                        size_t cnt = std::count(found_structure->order.begin(),found_structure->order.end(),found_var_id->order_id.value()-1);
+                        if(cnt==1){
+                            if(found_structure->order.size()>depth && 
+                                found_structure->order.at(depth)==found_var_id->order_id.value()-1)
+                                return true;
+                            else{
+                                this->cache_ = std::make_shared<exceptions::Exception>(std::string("Redefinition of index ")+
+                                    std::to_string(found_var_id->order_id.value()-1)+" for variable "+var->variable()->name());
+                                return false;
+                            }
+                        }
+                        else if(cnt == 0){
+                            found_structure->order.push_back(found_var_id->order_id.value()-1);
+                        }
+                        else return false;
+                        return true;
+                    }
+                    else{
+                        cache_ = std::make_shared<exceptions::InvalidTypeOfArgument>(std::string("Not equal array sizes of variables."));
+                        return false;
+                    }
+                }
             }
         })){
-            std::for_each(arr_vars.begin(),arr_vars.end(),[&structure, &arr_vars,depth,this](const std::shared_ptr<VariableNode>& var){
-                if(structure.contains(var))
-                    structure.find(var)->sz_depth_measure = init_sz_depth_measure(*arr_vars.begin());
-                else structure.insert(ThroughVarStruct({init_sz_depth_measure(*arr_vars.begin()), var}));
-            });
-            sz_iteration = sz_tmp.value();
+            if(!sz_tmp.has_value()){
+                cache_ = std::make_shared<exceptions::Exception>(std::string("Not defined index for variable ")+(*arr_vars.begin())->variable()->name()+
+                                                                    "\nat "+std::to_string(depth+1)+" range operator.");
+                return false;
+            }
+            else 
+                sz_iteration = sz_tmp.value();
         }
         else{
             return false;
