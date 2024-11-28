@@ -43,6 +43,7 @@ namespace functions{
         bool check_sizes_arrays(SizeDepthMeasure& sz_depth_measure,CONT<T> nodes) noexcept;
         bool is_rectangle_array_node(const std::shared_ptr<Node>& node) noexcept;
         bool equal_morphology_nodes(const std::vector<std::shared_ptr<Node>>& nodes) noexcept;
+        bool equal_morphology_nodes(const std::set<std::shared_ptr<Node>>& nodes) noexcept;
 
         bool all_numeric(decltype(std::declval<Node>().childs()) arrays);
         bool all_string(decltype(std::declval<Node>().childs()) arrays);
@@ -196,6 +197,14 @@ bool functions::auxiliary::check_sizes_arrays(SizeDepthMeasure& sz_depth_measure
     else{
         assert(!(std::is_pointer_v<std::decay_t<T>> || std::is_same_v<CONT<std::shared_ptr<ArrayNode>>,CONT<T>>));
     }
+}
+
+template<typename T>
+requires std::is_base_of_v<Node,T> || std::is_same_v<Node,T>
+bool functions::auxiliary::equal_morphology_nodes(const std::set<std::shared_ptr<T>>& nodes) noexcept{
+    std::vector<std::shared_ptr<Node>> tmp;
+    std::copy(nodes.begin(),nodes.end(),std::back_inserter(tmp));
+    return equal_morphology_nodes(tmp);
 }
 
 #endif

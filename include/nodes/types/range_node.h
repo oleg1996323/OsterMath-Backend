@@ -10,6 +10,7 @@ enum class RANGE_OP{
 };
 
 #include "aux_functions.h"
+using namespace node_range_operation;
 //calculate some expressions by range of input values.
 //Childs should be only numeric variable-arrays and have same length
 class RangeOperationNode:public Node{
@@ -75,7 +76,8 @@ class RangeOperationNode:public Node{
     }
 
     protected:
-    virtual Result execute_for_array_variables(const std::vector<size_t>& through_struct) const override;
+    virtual Result execute_for_array_variables(const std::vector<size_t>&,
+                                const std::set<ThroughVarStruct,ThroughVarStruct::Comparator>&) const override;
     private:
     virtual void insert_back(std::shared_ptr<Node> node) override{
         if(has_child(0))
@@ -83,7 +85,8 @@ class RangeOperationNode:public Node{
         else childs_.push_back(node);
         node->add_parent(this);
     }
-    bool check_variables_sizes_and_define_size_iteration(size_t depth) const;
+    bool check_variables_sizes_and_define_size_iteration(size_t, 
+                std::set<ThroughVarStruct,ThroughVarStruct::Comparator>&) const;
     std::set<std::shared_ptr<Node>> define_range_node_range_nodes() const;
     std::set<std::shared_ptr<VariableNode>> define_range_node_array_type_variables() const;
     std::set<std::shared_ptr<VariableNode>> define_array_type_variables() const;

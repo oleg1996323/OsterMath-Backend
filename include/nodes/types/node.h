@@ -40,7 +40,7 @@ struct INFO_NODE{
     bool has_node() const;
     bool is_valid() const;
 };
-
+using namespace node_range_operation;
 class Node{
 public:
     Node(size_t sz);
@@ -59,7 +59,8 @@ public:
     void release_childs();
     virtual NODE_TYPE type() const;
     virtual Result execute() const;
-    virtual Result execute_for_array_variables(const std::vector<size_t>& variables) const;
+    virtual Result execute_for_array_variables(const std::vector<size_t>&,
+                        const std::set<ThroughVarStruct,ThroughVarStruct::Comparator>&) const;
     inline virtual Result cached_result() const{
         return std::monostate();
     }

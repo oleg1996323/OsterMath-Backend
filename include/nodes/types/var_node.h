@@ -3,7 +3,7 @@
 #include "node.h"
 
 class VariableBase;
-
+using namespace node_range_operation;
 class VariableNode:public Node{
     VariableBase* var_;
     public:
@@ -38,5 +38,6 @@ class VariableNode:public Node{
     inline virtual Result cached_result() const override;
 
     private:
-    virtual Result execute_for_array_variables(const std::vector<size_t>& variables) const override;
+    virtual Result execute_for_array_variables(const std::vector<size_t>&,
+                        const std::set<ThroughVarStruct,ThroughVarStruct::Comparator>&) const override;
 };

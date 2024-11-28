@@ -50,7 +50,7 @@ class Result:public Result_t{
     template<typename T>
     const T& get() const;
 
-    std::ostream& operator<<(std::ostream& os);
+    std::ostream& operator<<(std::ostream& os) const;
 
     bool is_value() const;
     bool is_string() const;
@@ -283,6 +283,19 @@ inline bool size_iterator::is_decrement_iterable() const{
 
 class SizeDepthMeasure: private std::vector<size_iterator>{
     public:
+    // SizeDepthMeasure()=default;
+    // SizeDepthMeasure(const SizeDepthMeasure& other):std::vector<size_iterator>(other){}
+    // SizeDepthMeasure(SizeDepthMeasure&& other):std::vector<size_iterator>(other){}
+    // SizeDepthMeasure& operator=(const SizeDepthMeasure& other){
+    //     if(&other!=this)
+    //         std::vector<size_iterator>::operator=(other);
+    //     return *this;
+    // }
+    // SizeDepthMeasure& operator=(SizeDepthMeasure&& other){
+    //     if(&other!=this)
+    //         std::vector<size_iterator>::operator=(other);
+    //     return *this;
+    // }
     using std::vector<size_iterator>::begin;
     using std::vector<size_iterator>::end;
     using std::vector<size_iterator>::cend;

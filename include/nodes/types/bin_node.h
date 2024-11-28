@@ -12,6 +12,7 @@ enum class BINARY_OP{
     POW='^'
 };
 
+using namespace node_range_operation;
 class BinaryNode:public Node{
     BINARY_OP operation_;
     friend UnaryNode;
@@ -49,5 +50,6 @@ class BinaryNode:public Node{
     virtual void print_text(std::ostream& stream) const override;
     virtual void print_result(std::ostream& stream) const override;
     private:
-    virtual Result execute_for_array_variables(const std::vector<size_t>& variables) const override;
+    virtual Result execute_for_array_variables(const std::vector<size_t>& variables,
+                            const std::set<ThroughVarStruct,ThroughVarStruct::Comparator>& struct_) const override;
 };

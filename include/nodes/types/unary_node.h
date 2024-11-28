@@ -16,6 +16,7 @@ class BinaryNode;
 class ValueNode;
 class VariableNode;
 
+using namespace node_range_operation;
 class UnaryNode:public Node{
     UNARY_OP operation_;
     friend MultiArgumentNode;
@@ -45,5 +46,6 @@ class UnaryNode:public Node{
     virtual void print_text(std::ostream& stream) const override;
     virtual void print_result(std::ostream& stream) const override;
     private:
-    virtual Result execute_for_array_variables(const std::vector<size_t>& variables) const override;
+    virtual Result execute_for_array_variables(const std::vector<size_t>&,
+                        const std::set<ThroughVarStruct,ThroughVarStruct::Comparator>&) const override;
 };

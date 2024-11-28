@@ -108,7 +108,8 @@ Result Node::execute() const{
     return std::monostate();
 }
 
-Result Node::execute_for_array_variables(const std::vector<size_t>& variables) const{
+Result Node::execute_for_array_variables(const std::vector<size_t>& variables,
+                const std::set<ThroughVarStruct,ThroughVarStruct::Comparator>& structure) const{
     return std::make_shared<exceptions::InvalidTypeOfArgument>("objective numeric-result node");
 }
 

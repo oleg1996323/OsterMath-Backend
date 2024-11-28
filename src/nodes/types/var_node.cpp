@@ -81,14 +81,16 @@ void VariableNode::insert_back(std::shared_ptr<Node> node){
     }
 }
 
-Result VariableNode::execute_for_array_variables(const std::vector<size_t>& range_node_execute_struct) const{
+Result VariableNode::execute_for_array_variables(const std::vector<size_t>& variables,
+                        const std::set<ThroughVarStruct,ThroughVarStruct::Comparator>& structure) const{
     using namespace ::functions::auxiliary;
     if(check_arguments(TYPE_VAL::NUMERIC_ARRAY,this)){
-        const Node* found_node = first_node_not_var_by_ids(this,range_node_execute_struct);
+        const Node* found_node = first_node_not_var_by_ids(this,structure.find(this)->sz_depth_measure);
         if(!found_node)
             throw std::runtime_error(std::string("Not found child node in array type variable ")+this->var_->name());
         if(!check_arguments(TYPE_VAL::VALUE,found_node))
             throw std::runtime_error(std::string("Invalid type value of returned child node in array type variable ")+this->var_->name());
+        std::cout<<"Var value: "<<found_node->execute()<<std::endl;
         return found_node->execute();
     }
     else if(check_arguments(TYPE_VAL::VALUE,this))

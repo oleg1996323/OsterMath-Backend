@@ -51,6 +51,10 @@ class Exception: public std::runtime_error, public AbstractEvent{
     virtual std::string __get_title__() const override;
     virtual size_t __type__() const override;
     virtual std::string __get_prompt__() const override;
+    inline std::ostream& operator<<(std::ostream& stream) const{
+        stream<<error_abbr();
+        return stream;
+    }
 };
 
 class ParsingError : public Exception {
@@ -161,4 +165,15 @@ class NodeChildDontExists:public Exception{
 };
 
 std::string get_except_abbr(EXCEPTION_TYPE);
+}
+
+#include <iostream>
+#include <memory>
+inline std::ostream& operator<<(std::ostream& stream,const exceptions::Exception& exception){
+    stream<<exception.error_abbr();
+    return stream;
+}
+inline std::ostream& operator<<(std::ostream& stream,std::shared_ptr<exceptions::Exception> exception){
+    stream<<exception->error_abbr();
+    return stream;
 }

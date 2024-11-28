@@ -67,20 +67,21 @@ UNARY_OP UnaryNode::operation() const{
     return operation_;
 }
 
-Result UnaryNode::execute_for_array_variables(const std::vector<size_t>& variables) const{
+Result UnaryNode::execute_for_array_variables(const std::vector<size_t>& variables,
+                const std::set<ThroughVarStruct,ThroughVarStruct::Comparator>& structure) const{
     switch (operation_)
         {
         case UNARY_OP::ADD:
-            return child()->execute_for_array_variables(variables);
+            return child()->execute_for_array_variables(variables, structure);
             break;
         case UNARY_OP::SUB:
-            return (-1)*child()->execute_for_array_variables(variables);
+            return (-1)*child()->execute_for_array_variables(variables, structure);
             break;
         case UNARY_OP::PARENS:
-            return child()->execute_for_array_variables(variables);
+            return child()->execute_for_array_variables(variables, structure);
             break;
         case UNARY_OP::NOTHING:
-            return child()->execute_for_array_variables(variables);
+            return child()->execute_for_array_variables(variables, structure);
         default:
             throw std::invalid_argument("Unknown type of unary expression");
             break;

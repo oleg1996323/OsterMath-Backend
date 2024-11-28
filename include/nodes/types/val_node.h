@@ -4,6 +4,7 @@
 #include "range_node/def.h"
 #include <unordered_set>
 
+using namespace node_range_operation;
 class ValueNode:public Node{
     Value_t cache_;
     public:
@@ -35,7 +36,8 @@ class ValueNode:public Node{
     virtual void print_text(std::ostream& stream) const override;
     virtual void print_result(std::ostream& stream) const override;
     private:
-    inline virtual Result execute_for_array_variables(const std::vector<size_t>& variables) const override{
+    inline virtual Result execute_for_array_variables(const std::vector<size_t>&,
+                    const std::set<ThroughVarStruct,ThroughVarStruct::Comparator>&) const override{
         return cache_;
     }
 };

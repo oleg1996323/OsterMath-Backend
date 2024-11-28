@@ -6,7 +6,7 @@
 #include "function_node/def.h"
 #include "range_node/def.h"
 
-
+using namespace node_range_operation;
 class FunctionNode:public Node{
     mutable Result cache_;
     FUNCTION_OP operation_;
@@ -53,7 +53,8 @@ class FunctionNode:public Node{
         cache_ = std::monostate();
     }
     private:
-    inline virtual Result execute_for_array_variables(const std::vector<size_t>& variables) const override{
+    inline virtual Result execute_for_array_variables(const std::vector<size_t>&,
+                                const std::set<ThroughVarStruct,ThroughVarStruct::Comparator>&) const override{
         return execute();
     }
 };

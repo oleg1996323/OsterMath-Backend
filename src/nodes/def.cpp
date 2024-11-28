@@ -159,27 +159,25 @@ Result& Result::operator^=(const Result& other){
     return *this;
 }
 
-std::ostream& Result::operator<<(std::ostream& os)
+std::ostream& Result::operator<<(std::ostream& os) const
 {
-    std::visit([this,&os](auto&& arg) {
+    std::visit([this,&os](auto arg) {
         if(this->is_node())
             this->get_node()->print_result(os);
         else if(this->is_array())
             this->get_array_node()->print_result(os);
-        os << arg;
+        else if(!this->has_value())
+            os << "#NaN!";
+        else if(this->is_error())
+            os << this->get_exception()->error_abbr();
+        else
+            os << arg;
     }, *this);
     return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const Result& res){
-    if(res.is_node())
-        res.get_node()->print_result(os);
-    else if (res.is_array_result())
-        res.get_array_result()->print_result(os);
-    else std::visit([&os](auto&& arg) {
-        os << arg;
-    },res);
-    return os;
+    return res.operator<<(os);
 }
 
 void SizeDepthMeasure::push_depth(size_t new_size){

@@ -11,7 +11,7 @@ class VariableNode;
 namespace node_range_operation{
 
 struct ThroughVarStruct{
-    mutable std::vector<size_t> order_id;
+    mutable SizeDepthMeasure sz_depth_measure;
     std::shared_ptr<VariableNode> var_node;
 
     inline bool operator<(const ThroughVarStruct& v) noexcept{
