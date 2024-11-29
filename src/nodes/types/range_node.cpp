@@ -32,6 +32,16 @@ Result RangeOperationNode::execute() const{
     if(!check_variables_sizes_and_define_size_iteration(0,structure)){
         return cache_;
     }
+    if(structure.empty() || !std::all_of(structure.begin(),structure.end(),[this](const ThroughVarStruct& str){
+        if(str.sz_depth_measure.dimensions() != str.order.size()){
+            cache_ = std::make_shared<exceptions::Exception>(std::string("Variable's \"")+str.var_node->variable()->name()+"\" array has "+
+                std::to_string(str.sz_depth_measure.dimensions())+" dimension size. Expected: "+std::to_string(str.order.size()));
+            return false;
+        }
+        return true;
+    }))
+        return false;
+        
     std::vector<size_t> range_node_execute_struct;
     return execute_for_array_variables(range_node_execute_struct,structure);
 }
@@ -81,8 +91,12 @@ bool RangeOperationNode::is_array() const{
 bool RangeOperationNode::check_variables_sizes_and_define_size_iteration(size_t depth,
                                 std::set<ThroughVarStruct,ThroughVarStruct::Comparator>& structure) const{
     using namespace functions::auxiliary;
-    std::set<std::shared_ptr<VariableNode>> arr_vars = define_range_node_array_type_variables();
-    if(arr_vars.empty() || define_array_type_variables().empty()){
+    if(!has_expression()){
+        cache_ =  std::make_shared<exceptions::Exception>("Missing expression at range node");
+        return false;
+    }
+    std::set<std::shared_ptr<VariableNode>> arr_vars = define_array_type_variables();
+    if(arr_vars.empty()){
         cache_ = std::make_shared<exceptions::InvalidTypeOfArgument>("at least 1 rectangle numeric array-type or value-type variable");
         return false;
     }
@@ -101,14 +115,20 @@ bool RangeOperationNode::check_variables_sizes_and_define_size_iteration(size_t 
         }
         if(std::all_of(arr_vars.begin(),arr_vars.end(),[](const std::shared_ptr<VariableNode>& var){
             return init_sz_depth_measure(var).dimensions()==1;
-        }) && equal_morphology_nodes(arr_vars)){
-            std::for_each(arr_vars.begin(),arr_vars.end(),[&structure, &arr_vars,depth,this](const std::shared_ptr<VariableNode>& var){
-                if(structure.contains(var))
-                    structure.find(var)->sz_depth_measure = init_sz_depth_measure(*arr_vars.begin());
-                else structure.insert(ThroughVarStruct({init_sz_depth_measure(*arr_vars.begin()), var,{}}));
-            });
-            //order_id may not contains value
-            sz_iteration = structure.begin()->sz_depth_measure.size(0);
+        })){
+            if(equal_morphology_nodes(arr_vars)){
+                std::for_each(arr_vars.begin(),arr_vars.end(),[&structure, &arr_vars,depth,this](const std::shared_ptr<VariableNode>& var){
+                    if(structure.contains(var))
+                        structure.find(var)->sz_depth_measure = init_sz_depth_measure(*arr_vars.begin());
+                    else structure.insert(ThroughVarStruct({init_sz_depth_measure(*arr_vars.begin()), var,{}}));
+                });
+                //order_id may not contains value
+                sz_iteration = structure.begin()->sz_depth_measure.size(0);
+            }
+            else{
+                cache_=std::make_shared<exceptions::InvalidTypeOfArgument>("equal-size arrays at same indexes");
+                return false;
+            }
         }
         else if(std::all_of(arr_vars.begin(),arr_vars.end(),[this,&sz_tmp, &structure,&arr_vars, depth](const std::shared_ptr<VariableNode>& var){
             if(!this->var_ids_.contains(var)){
@@ -132,9 +152,9 @@ bool RangeOperationNode::check_variables_sizes_and_define_size_iteration(size_t 
                     std::set<ThroughVarStruct, ThroughVarStruct::Comparator>::iterator found_structure;
                     if(structure.contains(var)){
                         found_structure = structure.find(var);
-                        found_structure->sz_depth_measure = init_sz_depth_measure(*arr_vars.begin());
+                        found_structure->sz_depth_measure = init_sz_depth_measure(var);
                     }
-                    else found_structure = structure.insert(ThroughVarStruct({init_sz_depth_measure(*arr_vars.begin()), var,{}})).first;
+                    else found_structure = structure.insert(ThroughVarStruct({init_sz_depth_measure(var), var,{}})).first;
                     if(sz_tmp.value()==found_structure->sz_depth_measure.size(found_var_id->order_id.value()-1)){
                         //check indexes repetition 
                         auto found_structure = structure.find(var);
@@ -177,10 +197,20 @@ bool RangeOperationNode::check_variables_sizes_and_define_size_iteration(size_t 
     std::set<std::shared_ptr<Node>> range_nodes = define_range_node_range_nodes();
     if(range_nodes.empty())
         return true;
-    else return std::all_of(range_nodes.begin(),range_nodes.end(),[&structure,depth](const std::shared_ptr<Node>& node){
-        return std::dynamic_pointer_cast<RangeOperationNode>(node)->
-        check_variables_sizes_and_define_size_iteration(depth+1,structure);
-    });
+    else{
+        if(!std::all_of(range_nodes.begin(),range_nodes.end(),[&structure,depth](const std::shared_ptr<Node>& node){
+            return std::dynamic_pointer_cast<RangeOperationNode>(node)->
+            check_variables_sizes_and_define_size_iteration(depth+1,structure);
+        })){
+            auto found = std::find_if(range_nodes.begin(),range_nodes.end(),[](std::shared_ptr<Node> node)->bool
+            {
+                return node->cached_result().is_error();
+            });
+            if(found!=range_nodes.end())
+                cache_ = (*found)->cached_result();
+            return false;
+        }
+    }
 
     return true;
 }
@@ -195,10 +225,10 @@ std::set<std::shared_ptr<VariableNode>> RangeOperationNode::define_range_node_ar
             std::set<std::shared_ptr<VariableNode>> diff;
             for(const auto& range_node:ref_range_nodes)
                 all_refered_vars_by_child_range_node.merge(range_node->refer_to_vars());
-            std::set_difference(all_refered_vars_by_child_range_node.begin(),
-                                all_refered_vars_by_child_range_node.end(),
-                                ref_vars.begin(),
+            std::set_difference(ref_vars.begin(),
                                 ref_vars.end(),
+                                all_refered_vars_by_child_range_node.begin(),
+                                all_refered_vars_by_child_range_node.end(),
                                 std::inserter(diff,diff.end()),
                                 [](const std::shared_ptr<VariableNode>& lhs,const std::shared_ptr<VariableNode>& rhs)
                                 {return lhs.get()<rhs.get();});
@@ -258,29 +288,32 @@ Result RangeOperationNode::execute_for_array_variables(const std::vector<size_t>
     indexes.push_back(0);
 
     for(;indexes.back()<sz_iteration;++indexes.back(), 
-        std::for_each(structure.begin(),structure.end(),[this](const ThroughVarStruct& id){
-            ++id.sz_depth_measure;
+        std::for_each(var_ids_.begin(),var_ids_.end(),[this,&structure](const VariableNodeIndex& id){
+            ++structure.find(id.var_node)->sz_depth_measure;
         })) //add defined size of dimension size variable
     {
         std::for_each(structure.begin(),structure.end(),[this](const ThroughVarStruct& id){
             id.sz_depth_measure.lock(var_ids_.find(id.var_node)->order_id.value()-1);
-            std::cout<<"At depth 0: "<<id.sz_depth_measure.current_iterator(0)<<std::endl;
-            std::cout<<"At depth 1: "<<id.sz_depth_measure.current_iterator(1)<<std::endl;
+            std::cout<<"Locked var \""<< id.var_node->variable()->name()<<"\" at "<<var_ids_.find(id.var_node)->order_id.value()-1<<std::endl;
+            std::cout<<"Iterator at depth 0 for var \""<< id.var_node->variable()->name()<<"\": "<<id.sz_depth_measure.current_iterator(0)<<std::endl;
+            if(id.sz_depth_measure.dimensions()==2)
+                std::cout<<"Iterator at depth 1 for var \""<< id.var_node->variable()->name()<<"\": "<<id.sz_depth_measure.current_iterator(1)<<std::endl;
         });
         if(operation_==RANGE_OP::SUM)
             cache_ += get_expression()->execute_for_array_variables(indexes,structure);
         else if(operation_==RANGE_OP::PROD)
             cache_ *= get_expression()->execute_for_array_variables(indexes,structure);
+
+        std::cout<<"Cache: "<<cache_<<std::endl;
         if(cache_.is_error()){
             return cache_;
         }
-        std::cout<<cache_<<std::endl;
         std::for_each(structure.begin(),structure.end(),[this](const ThroughVarStruct& id){
             id.sz_depth_measure.unlock(var_ids_.find(id.var_node)->order_id.value()-1);
         });
     }
-    std::for_each(structure.begin(),structure.end(),[this](const ThroughVarStruct& id){
-        id.sz_depth_measure.reset_iterator(var_ids_.find(id.var_node)->order_id.value()-1);
+    std::for_each(var_ids_.begin(),var_ids_.end(),[this, &structure](const VariableNodeIndex& id){
+        structure.find(id.var_node)->sz_depth_measure.reset_iterator(id.order_id.value()-1);
     });
     return cache_;
 }

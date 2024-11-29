@@ -90,7 +90,7 @@ Result VariableNode::execute_for_array_variables(const std::vector<size_t>& vari
             throw std::runtime_error(std::string("Not found child node in array type variable ")+this->var_->name());
         if(!check_arguments(TYPE_VAL::VALUE,found_node))
             throw std::runtime_error(std::string("Invalid type value of returned child node in array type variable ")+this->var_->name());
-        std::cout<<"Var value: "<<found_node->execute()<<std::endl;
+        std::cout<<"Var \""<< variable()->name()<<"\" value: "<<found_node->execute()<<std::endl;
         return found_node->execute();
     }
     else if(check_arguments(TYPE_VAL::VALUE,this))

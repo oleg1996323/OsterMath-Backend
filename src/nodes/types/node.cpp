@@ -187,7 +187,7 @@ void Node::refresh_parent_links() const{
 }
 
 const std::set<Node*>& Node::parents() const{
-    return parents();
+    return parents_;
 }
 
 std::set<Node*>& Node::parents(){
