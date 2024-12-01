@@ -31,13 +31,9 @@ namespace functions{
 
         template<typename T>
         SizeDepthMeasure init_sz_depth_measure(T array);
-
-        template<template<typename> typename CONT, typename T>
-        requires __container_array_node_req__<CONT,T>
-        bool check_sizes_arrays(SizeDepthMeasure& sz_depth_measure,CONT<T> nodes, size_t& loc_c);
-
         bool check_sizes_arrays(SizeDepthMeasure& sz_depth_measure,const std::vector<std::shared_ptr<Node>>& nodes) noexcept;
-
+        bool is_filled_array_node(const std::shared_ptr<Node>& node) noexcept;
+        bool is_filled_rectangle_array_node_of_type(TYPE_VAL,const std::shared_ptr<Node>& node) noexcept;
         template<template<typename> typename CONT, typename T>
         requires __container_array_node_req__<CONT,T>
         bool check_sizes_arrays(SizeDepthMeasure& sz_depth_measure,CONT<T> nodes) noexcept;
@@ -127,77 +123,7 @@ SizeDepthMeasure functions::auxiliary::init_sz_depth_measure(T array){
 //     }
 // }
 
-template<template<typename> typename CONT, typename T>
-requires __container_array_node_req__<CONT,T>
-bool functions::auxiliary::check_sizes_arrays(SizeDepthMeasure& sz_depth_measure,CONT<T> nodes, size_t& loc_c){
-    if(std::all_of(nodes.begin(),nodes.end(),[&sz_depth_measure, &loc_c](const T& array){
-        if(std::all_of(array->begin(),array->end(),[](std::shared_ptr<Node>& node){return node->is_array();}))
-        {
-            std::vector<ArrayNode*> in_arrays;
-            in_arrays.reserve(array->size());
-            for(std::shared_ptr<Node> item_array:*array){
-                in_arrays.push_back(reinterpret_cast<ArrayNode*>(item_array.get()));
-            }
-            if(array->size()==sz_depth_measure.size(loc_c)){
-                ++loc_c;
-                if(check_sizes_arrays(sz_depth_measure,in_arrays,loc_c)){
-                    return true;
-                }
-                else{
-                    return false;
-                }
-            }
-            else return false;
-        }
-        else if(!std::any_of(array->begin(),array->end(),[](std::shared_ptr<Node>& node){return node->is_array();}))
-            return array->size()==sz_depth_measure.size(loc_c);
-        else return false;
-    })){
-        --loc_c;
-        return true;
-    }
-    else{
-        --loc_c;
-        return false;
-    }
-}
-
-
 bool same_result_type(const Result& first,const Result& second);
-
-template<template<typename> typename CONT, typename T>
-requires __container_array_node_req__<CONT,T>
-bool functions::auxiliary::check_sizes_arrays(SizeDepthMeasure& sz_depth_measure,CONT<T> nodes) noexcept{
-    size_t loc_c=0;
-    if(sz_depth_measure.dimensions()==0){
-        if(nodes.size()!=0 && !nodes.front()->empty()){
-            loc_c = 0;
-            Node* node;
-            if constexpr (std::is_pointer_v<std::decay_t<T>>){
-                node = reinterpret_cast<Node*>(nodes.front());
-            }
-            else if(std::is_same_v<CONT<std::shared_ptr<ArrayNode>>,CONT<T>>){
-                node = reinterpret_cast<Node*>(nodes.front().get());
-            }
-            while(node->cached_result().is_array()){
-                sz_depth_measure.push_depth(node->cached_result().get_array_node()->size());
-                node = node->child(0).get();
-            }
-        }
-        else loc_c = 0;
-    }
-    if constexpr (std::is_pointer_v<std::decay_t<T>>){
-        using type = std::decay_t<CONT<ArrayNode*>>;
-        return check_sizes_arrays<CONT,T>(sz_depth_measure,reinterpret_cast<const type&>(nodes),loc_c);
-    }
-    else if(std::is_same_v<CONT<std::shared_ptr<ArrayNode>>,CONT<T>>){
-        using type = std::decay_t<CONT<std::shared_ptr<ArrayNode>>>;
-        return check_sizes_arrays<CONT,T>(sz_depth_measure,reinterpret_cast<const type&>(nodes),loc_c);
-    }
-    else{
-        assert(!(std::is_pointer_v<std::decay_t<T>> || std::is_same_v<CONT<std::shared_ptr<ArrayNode>>,CONT<T>>));
-    }
-}
 
 template<typename T>
 requires std::is_base_of_v<Node,T> || std::is_same_v<Node,T>

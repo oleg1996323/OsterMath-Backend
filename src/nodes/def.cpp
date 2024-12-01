@@ -6,6 +6,10 @@
 #include "events_errors/exception.h"
 #include <string>
 
+TYPE_VAL operator|(TYPE_VAL lhs,TYPE_VAL rhs){
+    return static_cast<TYPE_VAL>(static_cast<int>(lhs) | static_cast<int>(rhs));
+}
+
 Result_t& Result::get(){
     return *this;
 }
@@ -77,42 +81,7 @@ Result Result::operator*(const Result& other){
         return get_value()*other.get_value();
     else return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric value");
 }
-#include "aux_functions.h"
 
-bool operator==(const Value_t& val, const Result& res){
-    return res.is_value() && val == res.get_value();
-}
-bool operator==(const Result& res,const Value_t& val){
-    return res.is_value() && val == res.get_value();
-}
-bool operator==(const std::string& val, const Result& res){
-    return res.is_string() && val == res.get_string();
-}
-bool operator==(const Result& res,const std::string& val){
-    return res.is_string() && val == res.get_string();
-}
-bool operator==(std::shared_ptr<ArrayNode> val, const Result& res){
-    return res.is_array_result() && ::functions::auxiliary::equal_morphology_nodes(std::vector<std::shared_ptr<Node>>{val,res.get_array_result()});
-}
-bool operator==(const Result& res,std::shared_ptr<ArrayNode> val){
-    return res.is_array_result() && ::functions::auxiliary::equal_morphology_nodes(std::vector<std::shared_ptr<Node>>{val,res.get_array_result()});
-}
-/*
-using namespace functions::auxiliary;    
-    if(check_arguments(TYPE_VAL::NUMERIC_ARRAY,child(0),child(1))){
-        if(std::dynamic_pointer_cast<ArrayNode>(child(0))->size()==
-            std::dynamic_pointer_cast<ArrayNode>(child(1))->size()){
-            Value_t result;
-            for(size_t i = 0;i < std::dynamic_pointer_cast<ArrayNode>(child(0))->size();++i){
-                result =+ execute(i).get_value();
-            }
-        }
-    }
-    else if(functions::auxiliary::check_arguments(TYPE_VAL::VALUE,child(0),child(1)))
-        return execute();
-    else
-        return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric array/value");
-*/
 Result Result::operator/(const Result& other){
     if(is_error())
         return this->get_exception();
@@ -157,6 +126,76 @@ Result& Result::operator/=(const Result& other){
 Result& Result::operator^=(const Result& other){
     *this = *this^other;
     return *this;
+}
+
+Result operator+(const Result& lhs, const Result& rhs){
+    if(lhs.is_error())
+        return lhs.get_exception();
+    if(rhs.is_error())
+        return rhs.get_exception();
+    if(lhs.is_value() && rhs.is_value())
+        return lhs.get_value()+rhs.get_value();
+    else return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric value");
+}
+Result operator-(const Result& lhs, const Result& rhs){
+    if(lhs.is_error())
+        return lhs.get_exception();
+    if(rhs.is_error())
+        return rhs.get_exception();
+    if(lhs.is_value() && rhs.is_value())
+        return lhs.get_value()-rhs.get_value();
+    else return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric value");
+}
+Result operator*(const Result& lhs, const Result& rhs){
+    if(lhs.is_error())
+        return lhs.get_exception();
+    if(rhs.is_error())
+        return rhs.get_exception();
+    if(lhs.is_value() && rhs.is_value())
+        return lhs.get_value()*rhs.get_value();
+    else return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric value");
+}
+Result operator/(const Result& lhs, const Result& rhs){
+    if(lhs.is_error())
+        return lhs.get_exception();
+    if(rhs.is_error())
+        return rhs.get_exception();
+    if(lhs.is_value() && rhs.is_value()){
+        if(rhs.get_value()==0.)
+            return std::make_shared<exceptions::DivisionZero>();
+        return lhs.get_value()/rhs.get_value();
+    }
+    else return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric value");
+}
+Result operator^(const Result& lhs, const Result& rhs){
+    if(lhs.is_error())
+        return lhs.get_exception();
+    if(rhs.is_error())
+        return rhs.get_exception();
+    if(lhs.is_value() && rhs.is_value())
+        return pow(lhs.get_value(),rhs.get_value());
+    else return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric value");
+}
+
+#include "aux_functions.h"
+
+bool operator==(const Value_t& val, const Result& res){
+    return res.is_value() && val == res.get_value();
+}
+bool operator==(const Result& res,const Value_t& val){
+    return res.is_value() && val == res.get_value();
+}
+bool operator==(const std::string& val, const Result& res){
+    return res.is_string() && val == res.get_string();
+}
+bool operator==(const Result& res,const std::string& val){
+    return res.is_string() && val == res.get_string();
+}
+bool operator==(std::shared_ptr<ArrayNode> val, const Result& res){
+    return res.is_array_result() && ::functions::auxiliary::equal_morphology_nodes(std::vector<std::shared_ptr<Node>>{val,res.get_array_result()});
+}
+bool operator==(const Result& res,std::shared_ptr<ArrayNode> val){
+    return res.is_array_result() && ::functions::auxiliary::equal_morphology_nodes(std::vector<std::shared_ptr<Node>>{val,res.get_array_result()});
 }
 
 std::ostream& Result::operator<<(std::ostream& os) const

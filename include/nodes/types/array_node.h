@@ -6,6 +6,8 @@
 
 class ArrayNode:public Node{
     mutable Result cache_;
+    mutable std::optional<TYPE_VAL> type_val_;
+    mutable std::optional<bool> rectangle_;
 public:
     using Node::operator=;
     using Node::insert_back;
@@ -54,10 +56,17 @@ public:
     virtual bool is_numeric() const override;
     virtual bool is_string() const override;
     virtual bool is_array() const override;
+    virtual TYPE_VAL type_val() const override;
     virtual void print_text(std::ostream& stream) const override;
     virtual void print_result(std::ostream& stream) const override;
     virtual void flush_cache() const override{
         cache_ = std::monostate();
+    }
+    bool is_rectangle() const;
+    private:
+    inline virtual void __invalidate_type_val__() const override{
+        type_val_.reset();
+        Node::__invalidate_type_val__();
     }
 };
 

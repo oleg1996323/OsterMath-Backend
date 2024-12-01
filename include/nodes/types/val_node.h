@@ -6,7 +6,7 @@
 
 using namespace node_range_operation;
 class ValueNode:public Node{
-    Value_t cache_;
+    Result cache_;
     public:
     inline ValueNode()=default;
     inline ValueNode(Value_t&& value){
@@ -23,6 +23,9 @@ class ValueNode:public Node{
     inline virtual NODE_TYPE type() const override{
         return NODE_TYPE::VALUE;
     }
+    inline virtual TYPE_VAL type_val() const override{
+        return TYPE_VAL::VALUE;
+    }
     inline virtual Result execute() const override{
         return cache_;
     }
@@ -36,8 +39,7 @@ class ValueNode:public Node{
     virtual void print_text(std::ostream& stream) const override;
     virtual void print_result(std::ostream& stream) const override;
     private:
-    inline virtual Result execute_for_array_variables(const std::vector<size_t>&,
-                    const std::set<ThroughVarStruct,ThroughVarStruct::Comparator>&) const override{
+    inline virtual Result execute_for_array_variables(const execute_for_array_variables_t&) const override{
         return cache_;
     }
 };

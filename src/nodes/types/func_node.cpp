@@ -41,7 +41,9 @@ using namespace functions::auxiliary;
 
 Result FunctionNode::execute() const{ //TODO add checking for arrays size comparision
     using namespace boost::math::policies;
-    cache_ = std::monostate();
+    flush_cache();
+    if(is_not_cycled())
+        cache_=std::make_shared<exceptions::CyclicReference>("");
     if(NUMBER_OF_ARGUMENT[(size_t)operation_]!=-1 && childs_.size()!=(size_t)NUMBER_OF_ARGUMENT[(size_t)operation_]){
         cache_ = std::make_shared<exceptions::InvalidNumberOfArguments>(childs_.size());
         return cache_;
@@ -236,6 +238,8 @@ void FunctionNode::print_result(std::ostream& stream) const{
 }
 
 void FunctionNode::insert_back(std::shared_ptr<Node> node){
+    flush_cache();
+    __invalidate_type_val__();
     if(childs_.size()<childs_.capacity()){
         childs_.push_back(node);
         node->add_parent(this);

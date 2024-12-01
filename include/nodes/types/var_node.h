@@ -5,6 +5,7 @@
 class VariableBase;
 using namespace node_range_operation;
 class VariableNode:public Node{
+    mutable std::shared_ptr<exceptions::Exception> cache_;
     VariableBase* var_;
     public:
     VariableNode(VariableBase* variable);
@@ -14,7 +15,6 @@ class VariableNode:public Node{
     virtual NODE_TYPE type() const override{
         return NODE_TYPE::VARIABLE;
     }
-
     ~VariableNode(){}
 
     const VariableBase* variable() const noexcept;
@@ -28,16 +28,14 @@ class VariableNode:public Node{
     virtual void print_text(std::ostream& stream) const override;
 
     virtual void print_result(std::ostream& stream) const override;
-
+    virtual bool is_empty() const override;
     virtual bool is_numeric() const override;
-
     virtual bool is_string() const override;
-
     virtual bool is_array() const override;
+    virtual void flush_cache() const override;
 
     inline virtual Result cached_result() const override;
 
     private:
-    virtual Result execute_for_array_variables(const std::vector<size_t>&,
-                        const std::set<ThroughVarStruct,ThroughVarStruct::Comparator>&) const override;
+    virtual Result execute_for_array_variables(const execute_for_array_variables_t&) const override;
 };

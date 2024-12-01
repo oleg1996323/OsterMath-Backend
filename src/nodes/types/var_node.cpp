@@ -15,25 +15,29 @@ VariableBase* VariableNode::variable() noexcept{
 }
 
 Result VariableNode::execute() const{
+    flush_cache();
+    if(!is_not_cycled())
+        cache_=std::make_shared<exceptions::CyclicReference>(var_->name());
     if(has_childs())
-        if(!refer_to(var_->name()))
-            return childs_.at(0)->execute();
-        else {
-            throw exceptions::CyclicReference(var_->name());
-            return 0;
-        }
-    else return 0;
+        return childs_.at(0)->execute();
+    else return Node::execute();
 }
 
 inline Result VariableNode::cached_result() const{
+    if(!is_not_cycled())
+        cache_=std::make_shared<exceptions::CyclicReference>(var_->name());
     if(has_childs()){
-        if(!refer_to(var_->name()))
-            return childs_.at(0)->cached_result();
-        else {
-            return std::make_shared<exceptions::CyclicReference>(var_->name());
-        }
+        return childs_.at(0)->cached_result();
     }
-    else return std::monostate();
+    else return Node::execute();
+}
+
+void VariableNode::flush_cache() const{
+    cache_.reset();
+}
+
+bool VariableNode::is_empty() const{
+    return childs_.size()==0;
 }
 
 bool VariableNode::is_numeric() const{
@@ -81,20 +85,23 @@ void VariableNode::insert_back(std::shared_ptr<Node> node){
     }
 }
 
-Result VariableNode::execute_for_array_variables(const std::vector<size_t>& variables,
-                        const std::set<ThroughVarStruct,ThroughVarStruct::Comparator>& structure) const{
+#include "test/log_duration.h"
+Result VariableNode::execute_for_array_variables(const execute_for_array_variables_t& structure) const{
+    //LOG_DURATION("get variable value");
     using namespace ::functions::auxiliary;
-    if(check_arguments(TYPE_VAL::NUMERIC_ARRAY,this)){
-        const Node* found_node = first_node_not_var_by_ids(this,structure.find(this)->sz_depth_measure);
-        if(!found_node)
-            throw std::runtime_error(std::string("Not found child node in array type variable ")+this->var_->name());
-        if(!check_arguments(TYPE_VAL::VALUE,found_node))
-            throw std::runtime_error(std::string("Invalid type value of returned child node in array type variable ")+this->var_->name());
-        std::cout<<"Var \""<< variable()->name()<<"\" value: "<<found_node->execute()<<std::endl;
+    if(structure.contains(this)){
+        const Node* found_node;
+        {
+            //LOG_DURATION("first_node_not_var_by_ids");
+            found_node = first_node_not_var_by_ids(this,structure.at(this).sz_depth_measure);
+        }
+        // if(!found_node)
+        //     throw std::runtime_error(std::string("Not found child node in array type variable ")+this->var_->name());
+        // if(found_node->type_val()!=TYPE_VAL::VALUE)
+        //     throw std::runtime_error(std::string("Invalid type value of returned child node in array type variable ")+this->var_->name());
+        //std::cout<<"Var \""<< variable()->name()<<"\" value: "<<found_node->execute()<<std::endl;
         return found_node->execute();
     }
-    else if(check_arguments(TYPE_VAL::VALUE,this))
-        return execute();
     else
-        return std::make_shared<exceptions::InvalidTypeOfArgument>("numeric value/array");
+        return execute();
 }

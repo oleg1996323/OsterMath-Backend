@@ -24,7 +24,7 @@ class StringNode:public Node{
     StringNode(StringNode&&) = delete;
 
     inline virtual NODE_TYPE type() const override{
-        return NODE_TYPE::VALUE;
+        return NODE_TYPE::STRING;
     }
     inline virtual Result execute() const override{
         return cache_;
@@ -38,9 +38,4 @@ class StringNode:public Node{
     virtual void insert_back(std::shared_ptr<Node> node) override;
     virtual void print_text(std::ostream& stream) const override;
     virtual void print_result(std::ostream& stream) const override;
-    private:
-    inline virtual Result execute_for_array_variables(const std::vector<size_t>&,
-                            const std::set<ThroughVarStruct,ThroughVarStruct::Comparator>&) const override{
-        return cache_;
-    }
 };

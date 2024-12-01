@@ -206,7 +206,7 @@ TEST(ArrayNode_test,Cached_Result_With_Error){
     arr->insert_back(std::make_shared<BinaryNode>(BINARY_OP::DIV));
     arr->child(2)->insert_back(std::make_shared<ValueNode>(100));
     arr->child(2)->insert_back(std::make_shared<ValueNode>(0));
-    EXPECT_TRUE(arr->child(2)->cached_result().is_error());
+    EXPECT_TRUE(arr->child(2)->execute().is_error());
     EXPECT_TRUE(arr->execute().is_error());
     Result res = arr->execute();
     EXPECT_EQ(res,arr->cached_result());

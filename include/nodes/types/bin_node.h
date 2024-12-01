@@ -40,7 +40,7 @@ class BinaryNode:public Node{
     virtual Result cached_result() const override{
         return execute();
     }
-
+    virtual TYPE_VAL type_val() const override;
     BINARY_OP operation() const{
         return operation_;
     }
@@ -50,6 +50,5 @@ class BinaryNode:public Node{
     virtual void print_text(std::ostream& stream) const override;
     virtual void print_result(std::ostream& stream) const override;
     private:
-    virtual Result execute_for_array_variables(const std::vector<size_t>& variables,
-                            const std::set<ThroughVarStruct,ThroughVarStruct::Comparator>& struct_) const override;
+    virtual Result execute_for_array_variables(const execute_for_array_variables_t& struct_) const override;
 };

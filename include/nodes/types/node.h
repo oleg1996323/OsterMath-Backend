@@ -31,9 +31,9 @@ enum class NODE_TYPE{
     CUSTOM
 };
 
+#include <optional>
 struct INFO_NODE{
     Node* parent = nullptr;
-    //std::shared_ptr<INFO_NODE> parent_info;
     int id = -1;
 
     std::shared_ptr<Node> node() const;
@@ -51,7 +51,7 @@ public:
 
     Node& operator=(const Node& other);
     Node& operator=(Node&& other);
-    TYPE_VAL type_val() const;
+    virtual TYPE_VAL type_val() const;
     const std::shared_ptr<Node>& child(size_t id) const;
     std::shared_ptr<Node>& child(size_t id);
     INFO_NODE child(const std::vector<size_t>& indexes);
@@ -59,8 +59,7 @@ public:
     void release_childs();
     virtual NODE_TYPE type() const;
     virtual Result execute() const;
-    virtual Result execute_for_array_variables(const std::vector<size_t>&,
-                        const std::set<ThroughVarStruct,ThroughVarStruct::Comparator>&) const;
+    virtual Result execute_for_array_variables(const execute_for_array_variables_t&) const;
     inline virtual Result cached_result() const{
         return std::monostate();
     }
@@ -72,7 +71,6 @@ public:
     template<typename T>
     requires (std::is_same_v<T,std::string> || std::is_same_v<T,Value_t> || std::is_convertible_v<std::decay_t<T>,Value_t>)
     void insert_back(T&& arg);
-
     virtual void insert_back(std::shared_ptr<Node>);
     //insert before value at id
     virtual std::shared_ptr<Node> insert(size_t,std::shared_ptr<Node>);
@@ -92,6 +90,7 @@ public:
     const std::set<Node*>& parents() const;
     std::set<Node*>& parents();
     bool refer_to(std::string_view var_name) const;
+    bool is_not_cycled() const;
     std::set<std::shared_ptr<VariableNode>> refer_to_vars() const;
     std::set<std::shared_ptr<Node>> refer_to_node_of_type(NODE_TYPE) const;
     inline bool caller() const{
@@ -106,15 +105,16 @@ public:
     template<typename T, typename... U>
     void recursive_function_applied_to_all_childs(std::function<T(const std::shared_ptr<Node>&,U...)> func);
     const std::vector<std::shared_ptr<Node>>& childs() const;
-
+    void cache_type_value() const;
     virtual void flush_cache() const{}
 protected:
     //friend class RangeOperationNode;
     mutable std::set<Node*> parents_; //is less memory expensive than unordered_set
     std::vector<std::shared_ptr<Node>> childs_;
     bool caller_ = false;
-    
+    virtual void __invalidate_type_val__() const;
 private:
+    bool __is_not_cycled__(const Node*) const;
     template<typename T, typename... U>
     void recursive_function_applied_to_all_childs(std::function<T(const std::shared_ptr<Node>&,U...)> func, Node* root);
     void __insert_back_string_node__(const std::string& string);

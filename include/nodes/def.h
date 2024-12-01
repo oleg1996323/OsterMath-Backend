@@ -27,6 +27,8 @@ enum TYPE_VAL{
     NUMERIC_ARRAY = ARRAY | VALUE
 };
 
+TYPE_VAL operator|(TYPE_VAL lhs,TYPE_VAL rhs);
+
 constexpr const char* NAMES_OF_ARGUMENT[6] = {
     {"Unknown"},
     {"Value"},
@@ -120,10 +122,11 @@ bool operator==(const Result& res,const std::string& val);
 bool operator==(std::shared_ptr<ArrayNode> val, const Result& res);
 bool operator==(const Result& res,std::shared_ptr<ArrayNode> val);
 
-// template<typename T_1, typename T_2>
-// concept __result_and_fundamental_numeric_type__ = requires{
-//     ;
-// };
+Result operator+(const Result& lhs, const Result& rhs);
+Result operator-(const Result& lhs, const Result& rhs);
+Result operator*(const Result& lhs, const Result& rhs);
+Result operator/(const Result& lhs, const Result& rhs);
+Result operator^(const Result& lhs, const Result& rhs);
 
 template<typename T_1, typename T_2>
 requires (std::is_same_v<std::decay_t<T_1>,Result> && std::is_fundamental_v<T_2>) || 

@@ -8,23 +8,23 @@ bool Domain::is() const{
         switch (type_)
         {
         case COMP_T::LARGER_OR_EQUAL:
-            if(lhs_->execute().get<Value_t>()=rhs_->execute().get<Value_t>())
+            if(lhs_->cached_result().get_value()>=rhs_->cached_result().get_value())
                 return true;
             break;
         case COMP_T::LARGER:
-            if(lhs_->execute().get<Value_t>()>rhs_->execute().get<Value_t>())
+            if(lhs_->cached_result().get_value()>rhs_->cached_result().get_value())
                 return true;
             break;
         case COMP_T::EQUAL:
-            if(lhs_->execute().get<Value_t>()==rhs_->execute().get<Value_t>())
+            if(lhs_->cached_result().get_value()==rhs_->cached_result().get_value())
                 return true;
             break;
         case COMP_T::LESS:
-            if(lhs_->execute().get<Value_t>()<rhs_->execute().get<Value_t>())
+            if(lhs_->cached_result().get_value()<rhs_->cached_result().get_value())
                 return true;
             break;
         case COMP_T::LESS_OR_EQUAL:
-            if(lhs_->execute().get<Value_t>()<=rhs_->execute().get<Value_t>())
+            if(lhs_->cached_result().get_value()<=rhs_->cached_result().get_value())
                 return true;
             break;
         default:

@@ -38,52 +38,6 @@ std::shared_ptr<ValueNode> functions::auxiliary::to_value_node(const std::shared
     return reinterpret_cast<const std::shared_ptr<ValueNode>&>(node);
 }
 
-bool functions::auxiliary::check_sizes_arrays(const std::vector<Node*>& arrays){
-    SizeDepthMeasure sz_depth_measure;
-    return check_sizes_arrays(sz_depth_measure,
-                            reinterpret_cast<const std::vector<ArrayNode*>&>(arrays));
-}
-
-bool functions::auxiliary::check_sizes_arrays(const std::list<Node*>& arrays){
-    SizeDepthMeasure sz_depth_measure;
-    return check_sizes_arrays(sz_depth_measure,
-                            reinterpret_cast<const std::list<ArrayNode*>&>(arrays));
-}
-
-bool functions::auxiliary::check_sizes_arrays(const std::deque<Node*>& arrays){
-    SizeDepthMeasure sz_depth_measure;
-    return check_sizes_arrays(sz_depth_measure,
-                            reinterpret_cast<const std::deque<ArrayNode*>&>(arrays));
-}
-
-// bool functions::auxiliary::check_sizes_arrays(const std::vector<std::shared_ptr<Node>>& arrays){
-//     SizeDepthMeasure sz_depth_measure;
-//     return check_sizes_arrays(sz_depth_measure,
-//                             reinterpret_cast<const std::vector<std::shared_ptr<ArrayNode>>&>(arrays));
-// }
-
-bool functions::auxiliary::check_sizes_arrays(const std::list<std::shared_ptr<Node>>& arrays){
-    SizeDepthMeasure sz_depth_measure;
-    return check_sizes_arrays(sz_depth_measure,
-                            reinterpret_cast<const std::list<std::shared_ptr<ArrayNode>>&>(arrays));
-}
-
-bool functions::auxiliary::check_sizes_arrays(const std::deque<std::shared_ptr<Node>>& arrays){
-    SizeDepthMeasure sz_depth_measure;
-    return check_sizes_arrays(sz_depth_measure,
-                            reinterpret_cast<const std::deque<std::shared_ptr<ArrayNode>>&>(arrays));
-}
-
-bool same_result_type(const Result& first,const Result& second){
-    return first.index() == second.index();
-}
-
-bool functions::auxiliary::check_sizes_arrays(SizeDepthMeasure&,const std::vector<Node*>& arrays){return true;}
-bool functions::auxiliary::check_sizes_arrays(SizeDepthMeasure&,const std::list<Node*>& arrays){return true;}
-bool functions::auxiliary::check_sizes_arrays(SizeDepthMeasure&,const std::deque<Node*>& arrays){return true;}
-bool functions::auxiliary::check_sizes_arrays(SizeDepthMeasure&,const std::list<std::shared_ptr<Node>>& arrays){return true;}
-bool functions::auxiliary::check_sizes_arrays(SizeDepthMeasure&,const std::deque<std::shared_ptr<Node>>& arrays){return true;}
-
 std::shared_ptr<Node> functions::auxiliary::first_node_not_var(const std::shared_ptr<Node>& node) noexcept{
     if(node){
         if(node->type()!=NODE_TYPE::VARIABLE)
@@ -183,25 +137,53 @@ const Node* functions::auxiliary::first_node_not_var_by_ids(const Node* node, co
     return nullptr;
 }
 
+#include "test/log_duration.h"
 //check if array has rectangular morphology (all childs have same sizes in all dimensions)
 bool functions::auxiliary::is_rectangle_array_node(const std::shared_ptr<Node>& node) noexcept{
     std::shared_ptr<Node> first_node = first_node_not_var(node);
     if(!first_node)
         return false;
-    if(first_node->type() != NODE_TYPE::ARRAY)
-        return true;
-    if(first_node->childs().size()==1)
-        return is_rectangle_array_node(first_node->child(0));
-    else if(first_node->childs().size()==0)
+    if(first_node->type()!=NODE_TYPE::ARRAY || first_node->childs().size()==0)
         return true;
 
-    if(std::all_of(first_node->childs().begin()+1,first_node->childs().end(),[first_node](std::shared_ptr<Node> child){
-        if(!(first_node->child(0)->childs().size() == child->childs().size() && is_rectangle_array_node(child)))
+    return std::all_of(first_node->childs().begin(),first_node->childs().end(),[first_node](std::shared_ptr<Node> child){
+        if(first_node->child(0)->childs().size() == child->childs().size() && is_rectangle_array_node(child))
+            return true;
+        return false;
+    });
+}
+
+bool functions::auxiliary::is_filled_array_node(const std::shared_ptr<Node>& node) noexcept{
+    std::shared_ptr<Node> first_node = first_node_not_var(node);
+    if(!first_node)
+        return false;
+    if(first_node->type()!=NODE_TYPE::ARRAY)
+        return true;
+    else{
+        if(first_node->childs().size()==0)
             return false;
+        else{
+            return std::all_of(first_node->childs().begin(),first_node->childs().end(),[first_node](std::shared_ptr<Node> child){
+                return is_filled_array_node(child);
+            });
+        }
+    }
+}
+bool functions::auxiliary::is_filled_rectangle_array_node_of_type(TYPE_VAL type_value,const std::shared_ptr<Node>& node) noexcept{
+    std::shared_ptr<Node> first_node = first_node_not_var(node);
+    if(!first_node)
+        return false;
+    if(first_node->type()!=NODE_TYPE::ARRAY)
         return true;
-    }))
-        return true;
-    else return false;
+    else{
+        if(first_node->childs().size()==0)
+            return false;
+        else{
+            return std::all_of(first_node->childs().begin(),first_node->childs().end(),[first_node, type_value](std::shared_ptr<Node> child){
+                return first_node->child(0)->childs().size() == child->childs().size() && type_value&child->type_val() && is_filled_rectangle_array_node_of_type(type_value,child);
+            });
+        }
+    }
 }
 
 //independent form of nodes (compare value types, number childs, number depth)

@@ -52,14 +52,20 @@ Result UnaryNode::execute() const{
 }
 
 bool UnaryNode::is_numeric() const{
+    if(!has_child(0))
+        return false;
     return childs_.at(0)->is_numeric();
 }
 
 bool UnaryNode::is_string() const{
+    if(!has_child(0))
+        return false;
     return childs_.at(0)->is_string();
 }
 
 bool UnaryNode::is_array() const{
+    if(!has_child(0))
+        return false;
     return childs_.at(0)->is_array();
 }
 
@@ -67,23 +73,38 @@ UNARY_OP UnaryNode::operation() const{
     return operation_;
 }
 
-Result UnaryNode::execute_for_array_variables(const std::vector<size_t>& variables,
-                const std::set<ThroughVarStruct,ThroughVarStruct::Comparator>& structure) const{
+Result UnaryNode::execute_for_array_variables(const execute_for_array_variables_t& structure) const{
     switch (operation_)
-        {
-        case UNARY_OP::ADD:
-            return child()->execute_for_array_variables(variables, structure);
-            break;
-        case UNARY_OP::SUB:
-            return (-1)*child()->execute_for_array_variables(variables, structure);
-            break;
-        case UNARY_OP::PARENS:
-            return child()->execute_for_array_variables(variables, structure);
-            break;
-        case UNARY_OP::NOTHING:
-            return child()->execute_for_array_variables(variables, structure);
-        default:
-            throw std::invalid_argument("Unknown type of unary expression");
-            break;
-        }
+    {
+    case UNARY_OP::ADD:
+        return child()->execute_for_array_variables(structure);
+        break;
+    case UNARY_OP::SUB:
+        return (-1)*child()->execute_for_array_variables(structure);
+        break;
+    case UNARY_OP::PARENS:
+        return child()->execute_for_array_variables(structure);
+        break;
+    case UNARY_OP::NOTHING:
+        return child()->execute_for_array_variables(structure);
+    default:
+        throw std::invalid_argument("Unknown type of unary expression");
+        break;
+    }
+}
+
+TYPE_VAL UnaryNode::type_val() const{
+    if(is_numeric()){
+        if(is_array()) return TYPE_VAL::NUMERIC_ARRAY;   
+        else return TYPE_VAL::VALUE;
+    }
+    else if(is_string()){
+        if(is_array()) return TYPE_VAL::STRING_ARRAY;
+        else return TYPE_VAL::STRING;
+    }
+    else if(is_array()){
+        if(is_array()) return TYPE_VAL::ARRAY;
+        else return TYPE_VAL::UNKNOWN;
+    }
+    else return TYPE_VAL::UNKNOWN;
 }

@@ -53,8 +53,7 @@ class FunctionNode:public Node{
         cache_ = std::monostate();
     }
     private:
-    inline virtual Result execute_for_array_variables(const std::vector<size_t>&,
-                                const std::set<ThroughVarStruct,ThroughVarStruct::Comparator>&) const override{
+    inline virtual Result execute_for_array_variables(const execute_for_array_variables_t&) const override{
         return execute();
     }
 };

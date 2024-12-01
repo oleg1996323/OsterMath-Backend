@@ -86,8 +86,7 @@ const std::vector<std::shared_ptr<Node>>& Node::childs() const{
 
 TYPE_VAL Node::type_val() const{
     if(is_numeric()){
-        if(is_array())
-            return TYPE_VAL::NUMERIC_ARRAY;
+        if(is_array()) return TYPE_VAL::NUMERIC_ARRAY;   
         else return TYPE_VAL::VALUE;
     }
     else if(is_string()){
@@ -100,16 +99,14 @@ TYPE_VAL Node::type_val() const{
             return TYPE_VAL::ARRAY;
         else return TYPE_VAL::UNKNOWN;
     }
-    else
-        return TYPE_VAL::UNKNOWN;
+    else return TYPE_VAL::UNKNOWN;
 }
 
 Result Node::execute() const{
     return std::monostate();
 }
 
-Result Node::execute_for_array_variables(const std::vector<size_t>& variables,
-                const std::set<ThroughVarStruct,ThroughVarStruct::Comparator>& structure) const{
+Result Node::execute_for_array_variables(const execute_for_array_variables_t& structure) const{
     return std::make_shared<exceptions::InvalidTypeOfArgument>("objective numeric-result node");
 }
 
@@ -150,6 +147,30 @@ bool Node::refer_to(std::string_view var_name) const{
                 std::dynamic_pointer_cast<VariableNode>(child)->variable()->name()==var_name)
                 return true;
             else return child->refer_to(var_name);
+        });
+    }
+}
+
+bool Node::is_not_cycled() const{
+    if(childs_.empty()){
+        return false;
+    }
+    else {
+        return std::any_of(parents_.begin(),parents_.end(),[this](Node* parent){
+            return parent->__is_not_cycled__(this);
+        });
+    }
+}
+
+bool Node::__is_not_cycled__(const Node* node_cycled_search) const{
+    if(this == node_cycled_search)
+        return false;
+    if(parents_.empty()){
+        return true;
+    }
+    else {
+        return std::any_of(parents_.begin(),parents_.end(),[node_cycled_search](Node* parent){
+            return parent->__is_not_cycled__(node_cycled_search);
         });
     }
 }
@@ -195,6 +216,8 @@ std::set<Node*>& Node::parents(){
 }
 
 void Node::replace_move_child_to(Node* node_target,size_t id, size_t at_pos){
+    flush_cache();
+    __invalidate_type_val__();
     if(node_target!=this && this->has_child(id)){
         this->child(id)->parents_.erase(this);
         this->child(id)->add_parent(node_target);
@@ -204,6 +227,8 @@ void Node::replace_move_child_to(Node* node_target,size_t id, size_t at_pos){
 }
 
 void Node::replace_copy_child_to(Node* node_target,size_t id, size_t at_pos){
+    flush_cache();
+    __invalidate_type_val__();
     if(node_target!=this && this->has_child(id)){
         node_target->insert(at_pos,std::make_shared<Node>(*child(id).get()));
     }
@@ -286,4 +311,10 @@ Node& Node::operator=(const Node& other){
         }
     }
     return *this;
+}
+
+void Node::__invalidate_type_val__() const{
+    for(auto& parent:parents_){
+        parent->__invalidate_type_val__();
+    }
 }
