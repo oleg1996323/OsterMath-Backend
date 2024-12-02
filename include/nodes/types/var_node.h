@@ -8,6 +8,8 @@ class VariableNode:public Node{
     mutable std::shared_ptr<exceptions::Exception> cache_;
     VariableBase* var_;
     public:
+    using Node::operator=;
+    using Node::insert_back;
     VariableNode(VariableBase* variable);
     VariableNode(const VariableNode& other);
     VariableNode(VariableNode&&) = delete;

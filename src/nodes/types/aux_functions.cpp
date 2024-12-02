@@ -186,6 +186,30 @@ bool functions::auxiliary::is_filled_rectangle_array_node_of_type(TYPE_VAL type_
     }
 }
 
+bool functions::auxiliary::has_cyclic_references(const std::shared_ptr<Node>& node) noexcept{
+    if(node->is_not_cycled()){
+        for(const std::shared_ptr<Node>& child: node->childs()){
+            if(has_cyclic_references(child))
+                return true;
+        };
+        return false;
+    }
+    else return true;
+}
+
+bool functions::auxiliary::has_cyclic_references(const Node* node) noexcept{
+    if(!node)
+        return false;
+    if(node->is_not_cycled()){
+        for(const std::shared_ptr<Node>& child: node->childs()){
+            if(has_cyclic_references(child))
+                return true;
+        };
+        return false;
+    }
+    else return true;
+}
+
 //independent form of nodes (compare value types, number childs, number depth)
 //add exclusion of function, range_function nodes
 bool functions::auxiliary::equal_morphology_nodes(const std::vector<std::shared_ptr<Node>>& nodes) noexcept{

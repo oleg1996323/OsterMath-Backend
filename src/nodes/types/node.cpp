@@ -152,11 +152,11 @@ bool Node::refer_to(std::string_view var_name) const{
 }
 
 bool Node::is_not_cycled() const{
-    if(childs_.empty()){
-        return false;
+    if(parents_.empty()){
+        return true;
     }
     else {
-        return std::any_of(parents_.begin(),parents_.end(),[this](Node* parent){
+        return std::all_of(parents_.begin(),parents_.end(),[this](Node* parent){
             return parent->__is_not_cycled__(this);
         });
     }
@@ -169,7 +169,7 @@ bool Node::__is_not_cycled__(const Node* node_cycled_search) const{
         return true;
     }
     else {
-        return std::any_of(parents_.begin(),parents_.end(),[node_cycled_search](Node* parent){
+        return std::all_of(parents_.begin(),parents_.end(),[node_cycled_search](Node* parent){
             return parent->__is_not_cycled__(node_cycled_search);
         });
     }

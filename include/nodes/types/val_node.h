@@ -39,6 +39,9 @@ class ValueNode:public Node{
     virtual void print_text(std::ostream& stream) const override;
     virtual void print_result(std::ostream& stream) const override;
     private:
+    inline virtual bool __is_not_cycled__(const Node*) const override{
+        return true;
+    }
     inline virtual Result execute_for_array_variables(const execute_for_array_variables_t&) const override{
         return cache_;
     }

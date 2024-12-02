@@ -43,7 +43,8 @@ namespace functions{
 
         bool all_numeric(decltype(std::declval<Node>().childs()) arrays);
         bool all_string(decltype(std::declval<Node>().childs()) arrays);
-
+        bool has_cyclic_references(const std::shared_ptr<Node>& checked) noexcept;
+        bool has_cyclic_references(const Node* node) noexcept;
         std::shared_ptr<Node> first_node_not_var(const std::shared_ptr<Node>& node) noexcept;
         const Node* first_node_not_var(const Node* node) noexcept;
         std::shared_ptr<Node> first_node_not_var_by_ids(const std::shared_ptr<Node>& node, const std::vector<size_t>& seq_iterators) noexcept;

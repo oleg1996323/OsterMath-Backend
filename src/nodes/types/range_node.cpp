@@ -21,7 +21,7 @@ Result RangeOperationNode::execute() const{
         cache_ =  std::make_shared<exceptions::Exception>("Missing expression at range node");
         return cache_;
     }
-    if(is_not_cycled()){
+    if(has_cyclic_references(this)){
         cache_=std::make_shared<exceptions::CyclicReference>("");
         return cache_;
     }
@@ -107,7 +107,8 @@ bool RangeOperationNode::check_variables_sizes_and_define_size_iteration(size_t 
     }
     std::set<std::shared_ptr<VariableNode>> arr_vars = define_array_type_variables();
     if(arr_vars.empty()){
-        cache_ = std::make_shared<exceptions::InvalidTypeOfArgument>("at least 1 rectangle numeric array-type or value-type variable");
+        cache_ = std::make_shared<exceptions::InvalidTypeOfArgument>(std::string("at least 1 rectangle numeric array-type or value-type variable ")+
+                                    "at range operator "+std::to_string(depth+1));
         return false;
     }
     for(const std::shared_ptr<VariableNode>& var:arr_vars){
@@ -143,84 +144,56 @@ bool RangeOperationNode::check_variables_sizes_and_define_size_iteration(size_t 
             return false;
         }
     }
-    if(std::all_of(arr_vars.begin(),arr_vars.end(),[](const std::shared_ptr<VariableNode>& var){
-        return init_sz_depth_measure(var).dimensions()==1;
-    })){
-        if(equal_morphology_nodes(arr_vars)){
-            for(const std::shared_ptr<VariableNode>& var:arr_vars){
-                if(!var_ids_.contains(var.get())){
-                    var_ids_[var.get()].emplace(0);
-                }
-                else{
-                    if(!var_ids_.at(var.get()).has_value())
-                        var_ids_.at(var.get()).emplace(0);
-                    else{
-                        if(var_ids_.at(var.get()).value()!=0)
-                            cache_ = std::make_shared<exceptions::Exception>(std::string("Variable's ")+var->variable()->name()+
-                            " array dimension is lesser than indicated index "+
-                            std::to_string(var_ids_.at(var.get()).value()));
-                    }
-                }
-                structure[var.get()] = ThroughVarStruct({init_sz_depth_measure(*arr_vars.begin()),{0}});
-            }
-        }
-        else{
-            cache_=std::make_shared<exceptions::InvalidTypeOfArgument>("equal-size arrays at same indexes");
+    for(const std::shared_ptr<VariableNode>& var:arr_vars){
+        if(!this->var_ids_.contains(var.get())){
+            cache_ = std::make_shared<exceptions::Exception>(std::string("Not defined indexes for variable ")+var->variable()->name()+".");
             return false;
         }
-    }
-    else {
-        for(const std::shared_ptr<VariableNode>& var:arr_vars){
-            if(!this->var_ids_.contains(var.get())){
-                cache_ = std::make_shared<exceptions::Exception>(std::string("Not defined indexes for variable ")+var->variable()->name()+".");
+        else{//check indexes repetition std::count()==1 && structure.find(var)->order.size()>depth && 
+                //structure.find(var)->order.at(depth)==this->var_ids_.find(var)->order_id.value()-1
+            if(!var_ids_.at(var.get()).has_value()){
+                cache_ = std::make_shared<exceptions::Exception>(std::string("Not defined index for variable ")+var->variable()->name()+
+                                                                    "\nat "+std::to_string(depth+1)+" range operator.");
                 return false;
             }
-            else{//check indexes repetition std::count()==1 && structure.find(var)->order.size()>depth && 
-                    //structure.find(var)->order.at(depth)==this->var_ids_.find(var)->order_id.value()-1
-                if(!var_ids_.at(var.get()).has_value()){
-                    cache_ = std::make_shared<exceptions::Exception>(std::string("Not defined index for variable ")+var->variable()->name()+
-                                                                        "\nat "+std::to_string(depth+1)+" range operator.");
+            else{
+                if(structure.contains(var.get()))
+                    structure.at(var.get()).sz_depth_measure = init_sz_depth_measure(var.get());
+                else structure[var.get()] = ThroughVarStruct({init_sz_depth_measure(var.get()), {}});
+                if(structure.at(var.get()).sz_depth_measure.dimensions()<=var_ids_.at(var.get()).value()-1)
+                {
+                    if(structure.at(var.get()).sz_depth_measure.dimensions()==0)
+                        cache_ = std::make_shared<exceptions::Exception>("Variable's "+var->variable()->name()+" array is empty.");
+                    else
+                        cache_ = std::make_shared<exceptions::Exception>(std::string("Variable's ")+var->variable()->name()+" array dimension is lesser than indicated index "+
+                                            std::to_string(var_ids_.at(var.get()).value()));
                     return false;
                 }
+                if(sz_tmp.value()==structure.at(var.get()).sz_depth_measure.size(var_ids_.at(var.get()).value()-1)){
+                    //check indexes repetition 
+                    size_t cnt = std::count(structure.at(var.get()).order.begin(),structure.at(var.get()).order.end(),var_ids_.at(var.get()).value()-1);
+                    if(cnt==1){
+                        if(!(structure.at(var.get()).order.size()>depth || 
+                            structure.at(var.get()).order.at(depth)==var_ids_.at(var.get()).value()-1))
+                        {
+                            this->cache_ = std::make_shared<exceptions::Exception>(std::string("Redefinition of index ")+
+                                std::to_string(var_ids_.at(var.get()).value()-1)+" for variable "+var->variable()->name());
+                            return false;
+                        }
+                    }
+                    else if(cnt == 0){
+                        structure.at(var.get()).order.push_back(var_ids_.at(var.get()).value()-1);
+                    }
+                    else return false;
+                }
                 else{
-                    if(structure.contains(var.get()))
-                        structure.at(var.get()).sz_depth_measure = init_sz_depth_measure(var.get());
-                    else structure[var.get()] = ThroughVarStruct({init_sz_depth_measure(var.get()), {}});
-                    if(structure.at(var.get()).sz_depth_measure.dimensions()<=var_ids_.at(var.get()).value()-1)
-                    {
-                        if(structure.at(var.get()).sz_depth_measure.dimensions()==0)
-                            cache_ = std::make_shared<exceptions::Exception>("Variable's "+var->variable()->name()+" array is empty.");
-                        else
-                            cache_ = std::make_shared<exceptions::Exception>(std::string("Variable's ")+var->variable()->name()+" array dimension is lesser than indicated index "+
-                                                std::to_string(var_ids_.at(var.get()).value()));
-                        return false;
-                    }
-                    if(sz_tmp.value()==structure.at(var.get()).sz_depth_measure.size(var_ids_.at(var.get()).value()-1)){
-                        //check indexes repetition 
-                        size_t cnt = std::count(structure.at(var.get()).order.begin(),structure.at(var.get()).order.end(),var_ids_.at(var.get()).value()-1);
-                        if(cnt==1){
-                            if(!(structure.at(var.get()).order.size()>depth || 
-                                structure.at(var.get()).order.at(depth)==var_ids_.at(var.get()).value()-1))
-                            {
-                                this->cache_ = std::make_shared<exceptions::Exception>(std::string("Redefinition of index ")+
-                                    std::to_string(var_ids_.at(var.get()).value()-1)+" for variable "+var->variable()->name());
-                                return false;
-                            }
-                        }
-                        else if(cnt == 0){
-                            structure.at(var.get()).order.push_back(var_ids_.at(var.get()).value()-1);
-                        }
-                        else return false;
-                    }
-                    else{
-                        cache_ = std::make_shared<exceptions::InvalidTypeOfArgument>(std::string("Not equal array sizes of variables."));
-                        return false;
-                    }
+                    cache_ = std::make_shared<exceptions::InvalidTypeOfArgument>(std::string("Not equal array sizes of variables."));
+                    return false;
                 }
             }
         }
-        sz_iteration = sz_tmp.value();
     }
+    sz_iteration = sz_tmp.value();
     std::set<std::shared_ptr<Node>> range_nodes = define_range_node_range_nodes();
     if(range_nodes.empty())
         return true;

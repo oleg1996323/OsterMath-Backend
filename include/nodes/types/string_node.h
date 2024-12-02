@@ -38,4 +38,8 @@ class StringNode:public Node{
     virtual void insert_back(std::shared_ptr<Node> node) override;
     virtual void print_text(std::ostream& stream) const override;
     virtual void print_result(std::ostream& stream) const override;
+    private:
+    inline virtual bool __is_not_cycled__(const Node*) const override{
+        return true;
+    }
 };

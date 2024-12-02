@@ -113,8 +113,8 @@ protected:
     std::vector<std::shared_ptr<Node>> childs_;
     bool caller_ = false;
     virtual void __invalidate_type_val__() const;
+    virtual bool __is_not_cycled__(const Node*) const;
 private:
-    bool __is_not_cycled__(const Node*) const;
     template<typename T, typename... U>
     void recursive_function_applied_to_all_childs(std::function<T(const std::shared_ptr<Node>&,U...)> func, Node* root);
     void __insert_back_string_node__(const std::string& string);
