@@ -191,7 +191,7 @@ bool functions::auxiliary::has_cyclic_references(const std::shared_ptr<Node>& no
         for(const std::shared_ptr<Node>& child: node->childs()){
             if(has_cyclic_references(child))
                 return true;
-        };
+        }
         return false;
     }
     else return true;
@@ -204,7 +204,7 @@ bool functions::auxiliary::has_cyclic_references(const Node* node) noexcept{
         for(const std::shared_ptr<Node>& child: node->childs()){
             if(has_cyclic_references(child))
                 return true;
-        };
+        }
         return false;
     }
     else return true;

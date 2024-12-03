@@ -43,8 +43,7 @@ struct INFO_NODE{
 using namespace node_range_operation;
 class Node{
 public:
-    Node(size_t sz);
-    Node();
+    Node()=default;
     Node(const Node& other){
         *this = other;
     }
@@ -96,10 +95,10 @@ public:
     inline bool caller() const{
         return caller_;
     }
-    inline virtual bool has_childs() const{
+    inline bool has_childs() const noexcept{
         return !childs_.empty();
     }
-    inline bool has_child(size_t id) const{
+    inline bool has_child(size_t id) const noexcept{
         return childs_.size()>id;
     }
     template<typename T, typename... U>
@@ -112,6 +111,7 @@ protected:
     mutable std::set<Node*> parents_; //is less memory expensive than unordered_set
     std::vector<std::shared_ptr<Node>> childs_;
     bool caller_ = false;
+    Node(size_t sz);
     virtual void __invalidate_type_val__() const;
     virtual bool __is_not_cycled__(const Node*) const;
 private:

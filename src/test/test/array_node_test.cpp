@@ -275,3 +275,12 @@ TEST(ArrayNode_test,Print_Result){
     arr->print_result(std::cout);
     EXPECT_EQ("[\"1\"; \"2\"; 2]",arr->get_result());
 }
+TEST(ArrayNode_test,StringRectangleF){
+    std::cout<<"Run test print text"<<std::endl;
+    std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(3);
+    arr->insert_back(std::string("1"));
+    arr->insert_back(std::string("2"));
+    arr->insert_back(Value_t("2"));
+    arr->print_result(std::cout);
+    EXPECT_EQ("[\"1\"; \"2\"; 2]",arr->get_result());
+}

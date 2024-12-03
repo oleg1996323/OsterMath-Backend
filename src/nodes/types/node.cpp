@@ -60,9 +60,6 @@ Node::Node(size_t sz):
                     vector.reserve(sz);
                     return vector;}()){}
 
-Node::Node()=default;
-
-
 void Node::refresh(){
     execute();
     refresh_parent_links();
@@ -296,8 +293,11 @@ void Node::__insert_back_value_node__(Value_t&& val){
 }
 
 Node& Node::operator=(Node&& other){
-    if(&other!=this)
+    if(&other!=this){
         childs_.swap(other.childs_);
+        parents_.swap(other.parents_);
+        std::swap(caller_,other.caller_);
+    }
     return *this;
 }
 
