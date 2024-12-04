@@ -64,7 +64,7 @@ void ArrayNode::insert_back(std::shared_ptr<Node> node){
             type_val_.emplace(node->type_val() | TYPE_VAL::ARRAY);
         }
         childs_.push_back(node);
-        node->add_parent(this);
+        node->add_parent(this, childs_.size()-1);
     }
 }
 
@@ -78,7 +78,7 @@ std::shared_ptr<Node> ArrayNode::insert(size_t id,std::shared_ptr<Node> node){
         if(!(id<childs_.size()))
             childs_.resize(id+1);
         childs_.insert(childs_.begin()+id,node);
-        childs_[id]->add_parent(this);
+        childs_[id]->add_parent(this, id);
         return node;
     }
     else return std::make_shared<Node>();
@@ -94,7 +94,7 @@ std::shared_ptr<Node> ArrayNode::replace(size_t id,std::shared_ptr<Node> node){
         if(!(id<childs_.size()))
             childs_.resize(id+1);
         childs_[id].swap(node);
-        childs_[id]->add_parent(this);
+        childs_[id]->add_parent(this,id);
         return node;
     }
     else return std::make_shared<Node>();

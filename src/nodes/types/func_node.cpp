@@ -242,7 +242,7 @@ void FunctionNode::insert_back(std::shared_ptr<Node> node){
     __invalidate_type_val__();
     if(childs_.size()<childs_.capacity()){
         childs_.push_back(node);
-        node->add_parent(this);
+        node->add_parent(this, childs_.size()-1);
     }
     else throw std::logic_error("Invalid inserting. Prompt: Unvalailable to insert node to full defined function node");
 }

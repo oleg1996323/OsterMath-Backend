@@ -74,13 +74,13 @@ void VariableNode::insert_back(std::shared_ptr<Node> node){
     if(node){
         if(childs_.size()<1){
             childs_.push_back(node);
-            node->add_parent(this);
+            node->add_parent(this,0);
         }
         else {
             if(node->type()!=NODE_TYPE::VARIABLE)
                 node->parents().clear();
             childs_.at(0)=node;
-            node->add_parent(this);
+            node->add_parent(this,0);
         }
     }
 }

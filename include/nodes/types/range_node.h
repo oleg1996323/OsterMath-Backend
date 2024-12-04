@@ -79,7 +79,7 @@ class RangeOperationNode:public Node{
         if(has_child(0))
             childs_.at(0) = node;
         else childs_.push_back(node);
-        node->add_parent(this);
+        node->add_parent(this, childs_.size()-1);
     }
     bool check_variables_sizes_and_define_size_iteration(size_t, 
                 execute_for_array_variables_t&) const;

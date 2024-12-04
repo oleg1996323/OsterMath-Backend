@@ -28,7 +28,7 @@ void UnaryNode::print_result(std::ostream& stream) const{
 void UnaryNode::insert_back(std::shared_ptr<Node> node){
     assert(childs_.size()==0);
     childs_.push_back(node);
-    node->add_parent(this);
+    node->add_parent(this,childs_.size()-1);
 }
 
 Result UnaryNode::execute() const{

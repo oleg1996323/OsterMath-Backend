@@ -39,7 +39,20 @@ struct INFO_NODE{
     std::shared_ptr<Node> node() const;
     bool has_node() const;
     bool is_valid() const;
+
+    bool operator<(const INFO_NODE& v) const noexcept;
+    bool operator==(const INFO_NODE& other) const noexcept;
+    bool operator<(Node* v) const noexcept;
+    bool operator==(Node* other) const noexcept;
 };
+
+struct INFO_NODE_Comparator{
+    using is_transparent = std::true_type;
+    bool operator()(const INFO_NODE& lhs,const INFO_NODE& rhs) const noexcept;
+    bool operator()(const Node* lhs, const INFO_NODE& rhs) const noexcept;
+    bool operator()(const INFO_NODE& lhs,const Node* rhs) const noexcept;
+};
+
 using namespace node_range_operation;
 class Node{
 public:
@@ -79,15 +92,15 @@ public:
     std::string get_result() const;
     std::string get_text() const;
     virtual ~Node();
-    void add_parent(Node*);
+    void add_parent(Node*, int);
     bool has_parents() const;
     //virtual void get_array_childs(std::vector<std::shared_ptr<Node>>& childs) const;
     void replace_move_child_to(Node*,size_t,size_t);
     void replace_copy_child_to(Node*,size_t,size_t);
-    void refresh_parent_links() const;
+    void refresh_parent_links();
     void refresh();
-    const std::set<Node*>& parents() const;
-    std::set<Node*>& parents();
+    const std::set<INFO_NODE,INFO_NODE_Comparator>& parents() const;
+    std::set<INFO_NODE,INFO_NODE_Comparator>& parents();
     bool refer_to(std::string_view var_name) const;
     bool is_not_cycled() const;
     std::set<std::shared_ptr<VariableNode>> refer_to_vars() const;
@@ -108,7 +121,7 @@ public:
     virtual void flush_cache() const{}
 protected:
     //friend class RangeOperationNode;
-    mutable std::set<Node*> parents_; //is less memory expensive than unordered_set
+    mutable std::set<INFO_NODE,INFO_NODE_Comparator> parents_; //is less memory expensive than unordered_set
     std::vector<std::shared_ptr<Node>> childs_;
     bool caller_ = false;
     Node(size_t sz);

@@ -16,10 +16,43 @@ bool INFO_NODE::has_node() const{
     else return false;
 }
 
+bool INFO_NODE::operator<(const INFO_NODE& v) const noexcept{
+    return parent<v.parent;
+}
+
+bool INFO_NODE::operator==(const INFO_NODE& other) const noexcept{
+    return parent == other.parent;
+}
+
+bool INFO_NODE::operator<(Node* v) const noexcept{
+    return parent<v;
+}
+
+bool INFO_NODE::operator==(Node* other) const noexcept{
+    return parent == other;
+}
+
+bool INFO_NODE_Comparator::operator()(const INFO_NODE& lhs,const INFO_NODE& rhs) const noexcept{
+    return lhs.parent < rhs.parent;
+}
+
+bool INFO_NODE_Comparator::operator()(const Node* lhs, const INFO_NODE& rhs) const noexcept
+{
+    return lhs < rhs.parent;
+}
+
+bool INFO_NODE_Comparator::operator()(const INFO_NODE& lhs,const Node* rhs) const noexcept
+{
+    return lhs.parent < rhs;
+}
+
 void Node::release_childs(){
     for(std::shared_ptr<Node>& child:childs_)
-        if(child)
-            child->parents_.erase(this);
+        if(child){
+            auto found = child->parents_.find(this);
+            if(found!=child->parents_.end())
+                child->parents_.erase(found);
+        }
     childs_.clear();
 }
 
@@ -47,8 +80,8 @@ NODE_TYPE Node::type() const{
 }
 
 Node::~Node(){
-    for(Node* parent:parents_){
-        for(std::shared_ptr<Node>& child:parent->childs_)
+    for(const INFO_NODE& parent:parents_){
+        for(std::shared_ptr<Node>& child:parent.parent->childs_)
             if(child.get()==this)
                 child.reset();
     }
@@ -65,12 +98,12 @@ void Node::refresh(){
     refresh_parent_links();
     caller_ = true;
     for(auto parent:parents_)
-        parent->refresh();
+        parent.parent->refresh();
     caller_ = false;
 }
 
-void Node::add_parent(Node* parent){
-    parents_.insert(parent);
+void Node::add_parent(Node* parent, int id){
+    parents_.insert({parent,id});
 }
 
 bool Node::has_parents() const{
@@ -153,8 +186,8 @@ bool Node::is_not_cycled() const{
         return true;
     }
     else {
-        return std::all_of(parents_.begin(),parents_.end(),[this](Node* parent){
-            return parent->__is_not_cycled__(this);
+        return std::all_of(parents_.begin(),parents_.end(),[this](const INFO_NODE& parent){
+            return parent.parent->__is_not_cycled__(this);
         });
     }
 }
@@ -166,8 +199,8 @@ bool Node::__is_not_cycled__(const Node* node_cycled_search) const{
         return true;
     }
     else {
-        return std::all_of(parents_.begin(),parents_.end(),[node_cycled_search](Node* parent){
-            return parent->__is_not_cycled__(node_cycled_search);
+        return std::all_of(parents_.begin(),parents_.end(),[node_cycled_search](const INFO_NODE& parent){
+            return parent.parent->__is_not_cycled__(node_cycled_search);
         });
     }
 }
@@ -196,28 +229,31 @@ std::set<std::shared_ptr<Node>> Node::refer_to_node_of_type(NODE_TYPE t) const{
     return nodes_;
 }
 
-void Node::refresh_parent_links() const{
+void Node::refresh_parent_links(){
     if(type()==NODE_TYPE::VARIABLE){
-        for(Node* parent:parents_)
-            if(!parent || parent->type()==NODE_TYPE::UNDEF)
+        for(const INFO_NODE& parent:parents_)
+            if(!parent.parent || parent.parent->type()==NODE_TYPE::UNDEF)
                 parents_.erase(parent);
     }
 }
 
-const std::set<Node*>& Node::parents() const{
+const std::set<INFO_NODE,INFO_NODE_Comparator>& Node::parents() const{
     return parents_;
 }
 
-std::set<Node*>& Node::parents(){
+std::set<INFO_NODE,INFO_NODE_Comparator>& Node::parents(){
     return parents_;
 }
+// , childs_.size()-1
 
 void Node::replace_move_child_to(Node* node_target,size_t id, size_t at_pos){
     flush_cache();
     __invalidate_type_val__();
     if(node_target!=this && this->has_child(id)){
-        this->child(id)->parents_.erase(this);
-        this->child(id)->add_parent(node_target);
+        auto found = child(id)->parents_.find(this);
+        if(found!=child(id)->parents_.end())
+            this->child(id)->parents_.erase(found);
+        this->child(id)->add_parent(node_target,id);
         node_target->insert(at_pos,std::move(this->child(id)));
         this->childs_.erase(childs_.begin()+id);
     }
@@ -295,6 +331,8 @@ void Node::__insert_back_value_node__(Value_t&& val){
 Node& Node::operator=(Node&& other){
     if(&other!=this){
         childs_.swap(other.childs_);
+        for(auto& parent:parents_) //TODO: need swapping 
+            parent.parent->childs_.erase(childs_.begin()+parent.id);
         parents_.swap(other.parents_);
         std::swap(caller_,other.caller_);
     }
@@ -303,6 +341,10 @@ Node& Node::operator=(Node&& other){
 
 Node& Node::operator=(const Node& other){
     if(&other!=this){
+        auto tmp = parents_;
+        for(auto& parent:parents_)
+            parent.parent->childs_.erase(childs_.begin()+parent.id);
+        parents_ = other.parents_;
         release_childs();
         for(const std::shared_ptr<Node>& child:other.childs_){
             if(child->type()!=NODE_TYPE::VARIABLE)
@@ -315,6 +357,6 @@ Node& Node::operator=(const Node& other){
 
 void Node::__invalidate_type_val__() const{
     for(auto& parent:parents_){
-        parent->__invalidate_type_val__();
+        parent.parent->__invalidate_type_val__();
     }
 }

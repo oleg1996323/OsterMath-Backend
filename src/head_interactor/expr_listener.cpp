@@ -46,7 +46,7 @@ void BaseListener::__insert_to_prec_node__(MODE mode_assert_check){
         if(anonymous_node_.top()->type()==NODE_TYPE::VARIABLE)
             anonymous_node_.top()->insert_back(node);
         else{
-            info->parent->replace(info->id,node)->parents().erase(info->parent);
+            info->parent->replace(info->id,node)->parents().erase(*info.get());
         }
     }
     else anonymous_node_.top()->insert_back(node);
