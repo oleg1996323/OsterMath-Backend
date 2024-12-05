@@ -26,6 +26,11 @@ class RangeOperationNode:public Node{
         set_expression(expr);
     }
     
+    template<typename T>
+    inline RangeOperationNode(T&& other):Node(std::forward<T>(other)){
+        *this = std::forward_as_tuple(other.cache_,other.var_ids_,other.sz_iteration,other.operation_);
+    }
+
     RangeOperationNode(const RangeOperationNode& other);
     RangeOperationNode(RangeOperationNode&&) = delete;
 

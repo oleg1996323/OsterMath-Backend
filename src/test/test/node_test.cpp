@@ -52,7 +52,7 @@ TEST(Node_test,TestCopyConstruct){
                 node_2->insert_back(values_2.at(i));
             }
             
-            *node_1.get()=*node_2.get();
+            node_1=std::make_shared<ArrayNode>(*node_2);
         }
         EXPECT_TRUE(&node_1);
         for(size_t i=0;i<values_2.size();++i){

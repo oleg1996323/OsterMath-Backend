@@ -14,32 +14,38 @@ public:
 
     typedef std::shared_ptr<Node> value_type;
     ArrayNode(size_t sz);
-    template<typename T>
-    requires std::is_same_v<typename std::decay_t<T>,ArrayNode>
-    inline ArrayNode(T&& other):Node(std::forward<T>(other)){
-        *this = other;
-    }
 
-    template<typename SMART_PTR>
-    requires (std::is_base_of_v<Node,typename std::decay_t<SMART_PTR>::element_type> && 
-    !std::is_same_v<typename std::decay_t<SMART_PTR>::element_type,ArrayNode>)
-    inline ArrayNode(SMART_PTR&& val);
-
-    inline ArrayNode& operator=(const ArrayNode& arr){
+    inline ArrayNode(const ArrayNode& arr):Node(arr){
         if(this!=&arr){
             Node::operator=(arr);
             cache_ = arr.cache_;
+            type_val_ = arr.type_val_;
+            rectangle_ = arr.rectangle_;
         }
-        return *this;
     }
 
-    inline ArrayNode& operator=(ArrayNode&& arr){
+    inline ArrayNode(ArrayNode&& arr):Node(arr){
         if(this!=&arr){
             Node::operator=(std::move(arr));
             std::swap(cache_,arr.cache_);
+            type_val_ = arr.type_val_;
+            rectangle_ = arr.rectangle_;
         }
-        return *this;
     }
+
+    template<typename SMART_PTR>
+    requires std::is_base_of_v<Node,typename std::decay_t<SMART_PTR>::element_type>
+    static inline std::shared_ptr<ArrayNode> return_from(SMART_PTR&& val){
+        std::shared_ptr<ArrayNode> result = std::make_shared<ArrayNode>(0);
+        if(val)
+            if(val->type()==NODE_TYPE::ARRAY)
+                return std::dynamic_pointer_cast<ArrayNode>(val);
+            else
+                insert_back(std::forward<SMART_PTR>(val));
+        else
+            return result;
+    }
+
     virtual NODE_TYPE type() const override;
     virtual Result execute() const override;
     inline virtual Result cached_result() const override{
@@ -73,11 +79,3 @@ public:
         Node::__invalidate_type_val__();
     }
 };
-
-template<typename SMART_PTR>
-requires (std::is_base_of_v<Node,typename std::decay_t<SMART_PTR>::element_type> && 
-!std::is_same_v<typename std::decay_t<SMART_PTR>::element_type,ArrayNode>)
-inline ArrayNode::ArrayNode(SMART_PTR&& val){
-    childs_.resize(0);
-    insert_back(std::forward<SMART_PTR>(val));
-}

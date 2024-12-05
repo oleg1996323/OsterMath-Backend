@@ -298,6 +298,9 @@ Node& Node::operator=(Node&& other){
 }
 
 #include "func_node.h"
+#include "bin_node.h"
+#include "range_node.h"
+#include "unary_node.h"
 Node& Node::operator=(const Node& other){
     if(&other!=this){
         std::shared_ptr<Node> this_node_tmp;
@@ -309,23 +312,23 @@ Node& Node::operator=(const Node& other){
         for(const std::shared_ptr<Node>& child:other.childs_){
             switch(child->type()){
                 case NODE_TYPE::ARRAY:{
-                    childs_.push_back(std::make_shared<ArrayNode>(*child.get())); //need to check
+                    childs_.push_back(std::make_shared<ArrayNode>((*child))); //need to check
                     break;
                 }
                 case NODE_TYPE::BINARY :{
-                    childs_.push_back(std::make_shared<BinaryNode>(*child.get())); //need to check
+                    childs_.push_back(std::make_shared<BinaryNode>((*child))); //need to check
                     break;                        
                 }
                 case NODE_TYPE::RANGEOP :{
-                    childs_.push_back(std::make_shared<RangeOperationNode>(*child.get())); //need to check
+                    childs_.push_back(std::make_shared<RangeOperationNode>(*child)); //need to check
                     break;                        
                 }
                 case NODE_TYPE::FUNCTION :{
-                    childs_.push_back(std::make_shared<FunctionNode>(*child.get())); //need to check
+                    childs_.push_back(std::make_shared<FunctionNode>(*child)); //need to check
                     break;                        
                 }
                 case NODE_TYPE::STRING :{
-                    childs_.push_back(std::make_shared<StringNode>(*child.get())); //need to check
+                    childs_.push_back(std::make_shared<StringNode>(*child)); //need to check
                     break;                        
                 }
                 case NODE_TYPE::UNARY :{
@@ -347,8 +350,9 @@ Node& Node::operator=(const Node& other){
                 }
                 case NODE_TYPE::VARIABLE:{
                     childs_.push_back(child);
+                    break;
                 }
-                default{
+                default:{
                     childs_.push_back(std::make_shared<Node>(*child.get())); //need to check
                     break;
                 }

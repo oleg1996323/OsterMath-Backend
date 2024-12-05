@@ -105,7 +105,7 @@ TEST(ArrayNode_test,Operator_Eq_copy){
     std::shared_ptr<ArrayNode> arr_2 = std::make_shared<ArrayNode>(2);
     arr_2->insert_back(std::make_shared<ValueNode>(2));
     arr_2->insert_back(std::make_shared<ValueNode>(3));
-    *arr_1.get() = *arr_2.get();
+    arr_1 = ArrayNode::return_from(arr_2);
     EXPECT_EQ(arr_1->size(),2);
     EXPECT_EQ(arr_1->childs().capacity(),2);
     //EXPECT_EQ(arr_1->child(0)->execute().get_value(),2);
@@ -116,10 +116,10 @@ TEST(ArrayNode_test,Operator_Eq_move){
     std::shared_ptr<ArrayNode> arr_1 = std::make_shared<ArrayNode>(1);
     arr_1->insert_back(std::make_shared<ValueNode>(1));
     arr_1->insert_back(std::make_shared<ValueNode>(2));
-    ArrayNode arr_2(std::make_shared<ValueNode>(2));
-    size_t sz = arr_2.size();
-    size_t cap = arr_2.childs().capacity();
-    *arr_1.get() = std::move(arr_2);
+    std::shared_ptr<ArrayNode> arr_2 = ArrayNode::return_from(std::make_shared<ValueNode>(2));
+    size_t sz = arr_2->size();
+    size_t cap = arr_2->childs().capacity();
+    arr_1 = ArrayNode::return_from(arr_2);
     //EXPECT_EQ(arr_1->child(0)->execute().get_value(),2);
     EXPECT_EQ(arr_1->size(),sz);
     EXPECT_EQ(arr_1->childs().capacity(),cap);

@@ -9,13 +9,21 @@ class ValueNode:public Node{
     Result cache_;
     public:
     inline ValueNode()=default;
-    inline ValueNode(Value_t&& value){
+
+    template<typename T>
+    requires std::is_base_of_v<Node,typename std::decay_t<T>>
+    inline ValueNode(T&& other):Node(std::forward<T>(other)){
+        if constexpr (!std::is_same_v<std::decay_t<T>,Node>)
+            cache_ = std::forward_as_tuple(other.cache_);
+    }
+
+    inline ValueNode(Value_t&& value):Node(){
         cache_ = std::move(value);
     }
-    inline ValueNode(const Value_t& value){
+    inline ValueNode(const Value_t& value):Node(){
         cache_ = value;
     }
-    inline ValueNode(std::string&& value){
+    inline ValueNode(std::string&& value):Node(){
         cache_ = Value_t(value);
     }
     inline ValueNode(const ValueNode& other);
