@@ -26,14 +26,18 @@ public:
     inline ArrayNode(SMART_PTR&& val);
 
     inline ArrayNode& operator=(const ArrayNode& arr){
-        Node::operator=(arr);
-        cache_ = arr.cache_;
+        if(this!=&arr){
+            Node::operator=(arr);
+            cache_ = arr.cache_;
+        }
         return *this;
     }
 
     inline ArrayNode& operator=(ArrayNode&& arr){
-        Node::operator=(std::move(arr));
-        std::swap(cache_,arr.cache_);
+        if(this!=&arr){
+            Node::operator=(std::move(arr));
+            std::swap(cache_,arr.cache_);
+        }
         return *this;
     }
     virtual NODE_TYPE type() const override;

@@ -4,48 +4,6 @@
 #include "events_errors/exception.h"
 #include "string_node.h"
 
-std::shared_ptr<Node> INFO_NODE::node() const{
-    if(has_node())
-        return parent->child(id);
-    else return std::shared_ptr<Node>();
-}
-
-bool INFO_NODE::has_node() const{
-    if(is_valid() && parent->has_child(id))
-        return true;
-    else return false;
-}
-
-bool INFO_NODE::operator<(const INFO_NODE& v) const noexcept{
-    return parent<v.parent;
-}
-
-bool INFO_NODE::operator==(const INFO_NODE& other) const noexcept{
-    return parent == other.parent;
-}
-
-bool INFO_NODE::operator<(Node* v) const noexcept{
-    return parent<v;
-}
-
-bool INFO_NODE::operator==(Node* other) const noexcept{
-    return parent == other;
-}
-
-bool INFO_NODE_Comparator::operator()(const INFO_NODE& lhs,const INFO_NODE& rhs) const noexcept{
-    return lhs.parent < rhs.parent;
-}
-
-bool INFO_NODE_Comparator::operator()(const Node* lhs, const INFO_NODE& rhs) const noexcept
-{
-    return lhs < rhs.parent;
-}
-
-bool INFO_NODE_Comparator::operator()(const INFO_NODE& lhs,const Node* rhs) const noexcept
-{
-    return lhs.parent < rhs;
-}
-
 void Node::release_childs(){
     for(std::shared_ptr<Node>& child:childs_)
         if(child){
@@ -339,17 +297,62 @@ Node& Node::operator=(Node&& other){
     return *this;
 }
 
+#include "func_node.h"
 Node& Node::operator=(const Node& other){
     if(&other!=this){
-        auto tmp = parents_;
+        std::shared_ptr<Node> this_node_tmp;
+        if(!parents_.empty())
+            this_node_tmp = parents_.begin()->node();
         for(auto& parent:parents_)
-            parent.parent->childs_.erase(childs_.begin()+parent.id);
-        parents_ = other.parents_;
+            parent.parent->childs_.erase(parent.parent->childs_.begin()+parent.id);
         release_childs();
         for(const std::shared_ptr<Node>& child:other.childs_){
-            if(child->type()!=NODE_TYPE::VARIABLE)
-                childs_.push_back(std::make_shared<Node>(*child.get()));
-            else childs_.push_back(child);
+            switch(child->type()){
+                case NODE_TYPE::ARRAY:{
+                    childs_.push_back(std::make_shared<ArrayNode>(*child.get())); //need to check
+                    break;
+                }
+                case NODE_TYPE::BINARY :{
+                    childs_.push_back(std::make_shared<BinaryNode>(*child.get())); //need to check
+                    break;                        
+                }
+                case NODE_TYPE::RANGEOP :{
+                    childs_.push_back(std::make_shared<RangeOperationNode>(*child.get())); //need to check
+                    break;                        
+                }
+                case NODE_TYPE::FUNCTION :{
+                    childs_.push_back(std::make_shared<FunctionNode>(*child.get())); //need to check
+                    break;                        
+                }
+                case NODE_TYPE::STRING :{
+                    childs_.push_back(std::make_shared<StringNode>(*child.get())); //need to check
+                    break;                        
+                }
+                case NODE_TYPE::UNARY :{
+                    childs_.push_back(std::make_shared<UnaryNode>(*child.get())); //need to check
+                    break;                        
+                }
+                case NODE_TYPE::UNDEF :{
+                    childs_.push_back(std::make_shared<Node>(*child.get())); //need to check
+                    break;
+                }
+                case NODE_TYPE::VALUE :{
+                    childs_.push_back(std::make_shared<ValueNode>(*child.get())); //need to check
+                    break;
+                }
+                case NODE_TYPE::CUSTOM :{
+                    //TODO: integrate further
+                    assert(true);
+                    break;
+                }
+                case NODE_TYPE::VARIABLE:{
+                    childs_.push_back(child);
+                }
+                default{
+                    childs_.push_back(std::make_shared<Node>(*child.get())); //need to check
+                    break;
+                }
+            }
         }
     }
     return *this;
