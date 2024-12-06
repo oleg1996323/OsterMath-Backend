@@ -20,7 +20,9 @@ class StringNode:public Node{
     inline StringNode(std::string&& str){
         cache_ = str;
     }
-    inline StringNode(const StringNode& other);
+    inline StringNode(const StringNode& other):Node(other){
+        cache_ = other.cache_;
+    }
     StringNode(StringNode&&) = delete;
 
     inline virtual NODE_TYPE type() const override{

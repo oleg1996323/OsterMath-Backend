@@ -312,35 +312,31 @@ Node& Node::operator=(const Node& other){
         for(const std::shared_ptr<Node>& child:other.childs_){
             switch(child->type()){
                 case NODE_TYPE::ARRAY:{
-                    childs_.push_back(std::make_shared<ArrayNode>((*child))); //need to check
+                    insert_back(std::make_shared<ArrayNode>(*std::dynamic_pointer_cast<ArrayNode>(child))); //need to check
                     break;
                 }
                 case NODE_TYPE::BINARY :{
-                    childs_.push_back(std::make_shared<BinaryNode>((*child))); //need to check
+                    childs_.push_back(std::make_shared<BinaryNode>(*std::dynamic_pointer_cast<BinaryNode>(child))); //need to check
                     break;                        
                 }
                 case NODE_TYPE::RANGEOP :{
-                    childs_.push_back(std::make_shared<RangeOperationNode>(*child)); //need to check
+                    childs_.push_back(std::make_shared<RangeOperationNode>(*std::dynamic_pointer_cast<RangeOperationNode>(child))); //need to check
                     break;                        
                 }
                 case NODE_TYPE::FUNCTION :{
-                    childs_.push_back(std::make_shared<FunctionNode>(*child)); //need to check
+                    childs_.push_back(std::make_shared<FunctionNode>(*std::dynamic_pointer_cast<FunctionNode>(child))); //need to check
                     break;                        
                 }
                 case NODE_TYPE::STRING :{
-                    childs_.push_back(std::make_shared<StringNode>(*child)); //need to check
+                    childs_.push_back(std::make_shared<StringNode>(*std::dynamic_pointer_cast<StringNode>(child))); //need to check
                     break;                        
                 }
                 case NODE_TYPE::UNARY :{
-                    childs_.push_back(std::make_shared<UnaryNode>(*child.get())); //need to check
+                    childs_.push_back(std::make_shared<UnaryNode>(*std::dynamic_pointer_cast<UnaryNode>(child))); //need to check
                     break;                        
                 }
-                case NODE_TYPE::UNDEF :{
-                    childs_.push_back(std::make_shared<Node>(*child.get())); //need to check
-                    break;
-                }
                 case NODE_TYPE::VALUE :{
-                    childs_.push_back(std::make_shared<ValueNode>(*child.get())); //need to check
+                    childs_.push_back(std::make_shared<ValueNode>(*std::dynamic_pointer_cast<ValueNode>(child))); //need to check
                     break;
                 }
                 case NODE_TYPE::CUSTOM :{

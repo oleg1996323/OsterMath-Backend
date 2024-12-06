@@ -64,7 +64,7 @@ TEST(Node_test,TestCopyConstruct){
             }
         }
         EXPECT_EQ(node_1->parents().size(),1);
-        EXPECT_EQ(*node_1->parents().begin(),bd->get("B")->node().get());
+        EXPECT_EQ(*node_1->parents().begin()->parent,bd->get("B")->node().get());
         EXPECT_EQ(bd->get("A")->node()->child(0).get(),nullptr);
     }
 }

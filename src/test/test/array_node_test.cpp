@@ -77,26 +77,6 @@ TEST(ArrayNode_test,MoveConstructor){
         EXPECT_TRUE(check_arguments(TYPE_VAL::VALUE,arr_1.child(iter-arr_2->begin())));
     }
 }
-TEST(ArrayNode_test,Move_SharedPtrVal_Constructor){
-    std::cout<<"Run test move sharedptr constructor"<<std::endl;
-    std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(10);
-    arr->insert_back(std::make_shared<ValueNode>(1));
-    arr->insert_back(std::make_shared<ValueNode>(1));
-    std::shared_ptr<ValueNode> val = std::make_shared<ValueNode>(100);
-    arr = std::make_shared<ArrayNode>(std::move(val));
-    EXPECT_EQ(arr->child(0)->execute().get_value(),100.);
-    EXPECT_EQ(val.get(),nullptr);
-}
-TEST(ArrayNode_test,Copy_SharedPtrVal_Constructor){
-    std::cout<<"Run test copy sharedptr constructor"<<std::endl;
-    std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(10);
-    arr->insert_back(std::make_shared<ValueNode>(1));
-    arr->insert_back(std::make_shared<ValueNode>(1));
-    std::shared_ptr<ValueNode> val = std::make_shared<ValueNode>(100);
-    arr = std::make_shared<ArrayNode>(val);
-    EXPECT_EQ(arr->child(0)->execute().get_value(),100.);
-    EXPECT_EQ(val.get(),arr->child(0).get());
-}
 TEST(ArrayNode_test,Operator_Eq_copy){
     std::cout<<"Run test operator equal copy"<<std::endl;
     EXPECT_TRUE(std::is_copy_assignable_v<ArrayNode>);

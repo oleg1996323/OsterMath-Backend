@@ -37,13 +37,13 @@ public:
     requires std::is_base_of_v<Node,typename std::decay_t<SMART_PTR>::element_type>
     static inline std::shared_ptr<ArrayNode> return_from(SMART_PTR&& val){
         std::shared_ptr<ArrayNode> result = std::make_shared<ArrayNode>(0);
-        if(val)
+        if(val){
             if(val->type()==NODE_TYPE::ARRAY)
                 return std::dynamic_pointer_cast<ArrayNode>(val);
             else
-                insert_back(std::forward<SMART_PTR>(val));
-        else
-            return result;
+                result->insert_back(std::forward<SMART_PTR>(val));
+        }
+        return result;   
     }
 
     virtual NODE_TYPE type() const override;

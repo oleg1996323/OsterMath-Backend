@@ -25,7 +25,9 @@ class UnaryNode:public Node{
     friend VariableNode;
     public:
     UnaryNode(UNARY_OP op):operation_(op){}
-    UnaryNode(const UnaryNode& other);
+    inline UnaryNode(const UnaryNode& other):Node(other){
+        operation_ = other.operation_;
+    }
     UnaryNode(UnaryNode&&) = delete;
 
     inline virtual NODE_TYPE type() const override{

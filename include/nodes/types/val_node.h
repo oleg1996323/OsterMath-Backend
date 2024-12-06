@@ -10,13 +10,6 @@ class ValueNode:public Node{
     public:
     inline ValueNode()=default;
 
-    template<typename T>
-    requires std::is_base_of_v<Node,typename std::decay_t<T>>
-    inline ValueNode(T&& other):Node(std::forward<T>(other)){
-        if constexpr (!std::is_same_v<std::decay_t<T>,Node>)
-            cache_ = std::forward_as_tuple(other.cache_);
-    }
-
     inline ValueNode(Value_t&& value):Node(){
         cache_ = std::move(value);
     }
@@ -26,7 +19,9 @@ class ValueNode:public Node{
     inline ValueNode(std::string&& value):Node(){
         cache_ = Value_t(value);
     }
-    inline ValueNode(const ValueNode& other);
+    inline ValueNode(const ValueNode& other):Node(other){
+        cache_ = other.cache_;
+    }
     ValueNode(ValueNode&&) = delete;
     inline virtual NODE_TYPE type() const override{
         return NODE_TYPE::VALUE;
