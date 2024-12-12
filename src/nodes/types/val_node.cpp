@@ -24,15 +24,3 @@ bool ValueNode::is_array() const{
 void ValueNode::insert_back(std::shared_ptr<Node> node){
     throw std::logic_error("Invalid inserting back. Prompt: Unvalailable to insert_back node to finite node Value");
 }
-
-ValueNode& ValueNode::operator=(const ValueNode& val){
-    Node::operator=(val);
-    cache_ = val.cache_;
-    return *this;
-}
-
-ValueNode& ValueNode::operator=(ValueNode&& val){
-    Node::operator=(std::move(val));
-    std::swap(cache_,val.cache_);
-    return *this;
-}

@@ -268,10 +268,12 @@ TEST(AuxiliaryFunctions,Find_first_node_not_variable_by_ids){
         arr_2->insert_back(std::make_shared<ValueNode>(i));
     }
     var_3->insert_back(std::make_shared<ValueNode>(1));
-    auto node = first_node_not_var_by_ids(var_1,{0,0}); //arr_1(initial node) -> arr_2(0) -> arr_2(0) value
+    std::vector<size_t> tmp_1{0,0};
+    auto node = first_node_not_var_by_ids(var_1,tmp_1.begin(),tmp_1.end()); //arr_1(initial node) -> arr_2(0) -> arr_2(0) value
     EXPECT_TRUE(node);
     EXPECT_TRUE(node->type()==NODE_TYPE::VALUE);
-    node = first_node_not_var_by_ids(var_1,{4}); //arr_1(initial node) -> arr_2(4) value
+    tmp_1 = {4};
+    node = first_node_not_var_by_ids(var_1,tmp_1.begin(),tmp_1.end()); //arr_1(initial node) -> arr_2(4) value
     EXPECT_TRUE(node);
     EXPECT_TRUE(node->type()==NODE_TYPE::VALUE);
 }

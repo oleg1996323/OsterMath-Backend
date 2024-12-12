@@ -18,6 +18,8 @@ namespace serialization{
     class SerialData;
 }
 
+#include "relation_manager.h"
+
 class BaseData{
     public:
     BaseData(std::string_view);
@@ -77,6 +79,29 @@ class BaseData{
 
     uint16_t id() const;
 
+    template<typename T>
+    static std::shared_ptr<T> make_node(T&& node_val,const RelationManager& rel_mng);
+
+    template<typename T>
+    static std::shared_ptr<T> make_node(T&& node_val,const BaseData& bd){
+        node_val.set_relation_manager(&bd.rel_mng_);
+        return std::shared_ptr<T>(std::forward<T>(node_val));
+    }
+
+    template<typename T>
+    std::shared_ptr<T> make_node(T&& node_val) const{
+        node_val.set_relation_manager(this->rel_mng_);
+        return std::shared_ptr<T>(std::forward<T>(node_val));
+    }
+
+    static RelationManager* get_anonymous_relation_manager(){
+        return &anonymous_nodes;
+    }
+
+    RelationManager* relation_manager() const{
+        return &rel_mng_;
+    }
+
     private:
     std::unordered_set<std::string> var_names_;
     std::unordered_map<std::string_view,std::shared_ptr<VariableBase>> vars_;
@@ -85,8 +110,11 @@ class BaseData{
     mutable std::shared_ptr<VariableBase> buffer_;
     DataPool* pool_;
     std::string generate_hash_name();
-    static uint16_t counter;
     uint16_t data_count;
+    mutable RelationManager rel_mng_;
+    
+    static RelationManager anonymous_nodes;
+    static uint16_t counter;
 };
 
 class DataPool{

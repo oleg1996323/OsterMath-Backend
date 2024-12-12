@@ -7,6 +7,7 @@
 using namespace std::string_literals;
 
 uint16_t BaseData::counter = 0;
+RelationManager BaseData::anonymous_nodes{};
 
 BaseData::BaseData(std::string_view name):name_(name), buffer_(std::make_shared<VariableBase>("buffer",this)), data_count(counter++){}
 

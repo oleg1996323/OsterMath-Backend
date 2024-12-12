@@ -16,21 +16,31 @@ public:
     ArrayNode(size_t sz);
 
     inline ArrayNode(const ArrayNode& arr):Node(arr){
+        ArrayNode::operator=(arr);
+    }
+
+    inline ArrayNode(ArrayNode&& arr):Node(arr){
+        ArrayNode::operator=(arr);
+    }
+
+    inline ArrayNode& operator=(const ArrayNode& arr){
         if(this!=&arr){
             Node::operator=(arr);
             cache_ = arr.cache_;
             type_val_ = arr.type_val_;
             rectangle_ = arr.rectangle_;
         }
+        return *this;
     }
 
-    inline ArrayNode(ArrayNode&& arr):Node(arr){
+    inline ArrayNode& operator=(ArrayNode&& arr){
         if(this!=&arr){
-            Node::operator=(std::move(arr));
+            Node::operator=(arr);
             std::swap(cache_,arr.cache_);
             type_val_ = arr.type_val_;
             rectangle_ = arr.rectangle_;
         }
+        return *this;
     }
 
     template<typename SMART_PTR>
@@ -58,9 +68,7 @@ public:
     size_t size() const;
     bool empty() const;
     std::vector<std::shared_ptr<Node>>::const_iterator begin() const;
-    std::vector<std::shared_ptr<Node>>::iterator begin();
     std::vector<std::shared_ptr<Node>>::const_iterator end() const;
-    std::vector<std::shared_ptr<Node>>::iterator end();
     std::vector<std::shared_ptr<Node>>::const_iterator cbegin() const;
     std::vector<std::shared_ptr<Node>>::const_iterator cend() const;
     virtual bool is_numeric() const override;

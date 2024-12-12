@@ -15,13 +15,13 @@ operation_(other.operation_),
 array_type_function(other.array_type_function){}
 
 bool FunctionNode::is_numeric() const{
-    return std::all_of(childs_.begin(),childs_.end(),[](std::shared_ptr<Node> child){
+    return std::all_of(childs().begin(),childs().end(),[](std::shared_ptr<Node> child){
         return child->is_numeric();
     });
 }
 
 bool FunctionNode::is_string() const{
-    return std::all_of(childs_.begin(),childs_.end(),[](std::shared_ptr<Node> child){
+    return std::all_of(childs().begin(),childs().end(),[](std::shared_ptr<Node> child){
         return child->is_string();
     });
 }
@@ -44,18 +44,18 @@ Result FunctionNode::execute() const{ //TODO add checking for arrays size compar
     flush_cache();
     if(is_not_cycled())
         cache_=std::make_shared<exceptions::CyclicReference>("");
-    if(NUMBER_OF_ARGUMENT[(size_t)operation_]!=-1 && childs_.size()!=(size_t)NUMBER_OF_ARGUMENT[(size_t)operation_]){
-        cache_ = std::make_shared<exceptions::InvalidNumberOfArguments>(childs_.size());
+    if(NUMBER_OF_ARGUMENT[(size_t)operation_]!=-1 && childs().size()!=(size_t)NUMBER_OF_ARGUMENT[(size_t)operation_]){
+        cache_ = std::make_shared<exceptions::InvalidNumberOfArguments>(childs().size());
         return cache_;
     }
-    for(size_t child_i = 0;child_i<childs_.size();++child_i){
-        cache_ = childs_.at(child_i)->execute();
+    for(size_t child_i = 0;child_i<childs().size();++child_i){
+        cache_ = childs().at(child_i)->execute();
         if(cache_.is_error()){
             return cache_;
         }
         cache_ = std::monostate();
-        if(NUMBER_OF_ARGUMENT[(size_t)operation_]!=-1 && !(childs_[child_i]->type_val()&TYPE_OF_ARGUMENTS[(size_t)operation_].ARGS_[child_i])){
-            cache_ = std::make_shared<exceptions::InvalidTypeOfArgument>(NAMES_OF_ARGUMENT[childs_[child_i]->type_val()]);
+        if(NUMBER_OF_ARGUMENT[(size_t)operation_]!=-1 && !(childs()[child_i]->type_val()&TYPE_OF_ARGUMENTS[(size_t)operation_].ARGS_[child_i])){
+            cache_ = std::make_shared<exceptions::InvalidTypeOfArgument>(NAMES_OF_ARGUMENT[childs()[child_i]->type_val()]);
             return cache_;
         }
     }
@@ -227,6 +227,7 @@ Result FunctionNode::execute() const{ //TODO add checking for arrays size compar
 
 #include "types.h"
 #include "function_node/print_functions.h"
+#include "relation_manager.h"
 
 void FunctionNode::print_text(std::ostream& stream) const{
     node_function::functions::print::print_text(this,stream);
@@ -240,9 +241,9 @@ void FunctionNode::print_result(std::ostream& stream) const{
 void FunctionNode::insert_back(std::shared_ptr<Node> node){
     flush_cache();
     __invalidate_type_val__();
-    if(childs_.size()<childs_.capacity()){
-        childs_.push_back(node);
-        node->add_parent(this, childs_.size()-1);
+    if(childs().size()<childs().capacity()){
+        rel_mng_->childs(this).push_back(node);
+        rel_mng_->add_parent(node.get(),this, childs().size()-1);
     }
     else throw std::logic_error("Invalid inserting. Prompt: Unvalailable to insert node to full defined function node");
 }

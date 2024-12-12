@@ -3,6 +3,7 @@
 #include "types.h"
 #include <vector>
 #include <memory>
+#include "relation_manager.h"
 
 ArrayNode::ArrayNode(size_t sz):
     Node(sz)
@@ -14,7 +15,7 @@ NODE_TYPE ArrayNode::type() const{
 
 Result ArrayNode::execute() const{
     flush_cache();
-    for(auto child:childs_){
+    for(auto child:childs()){
         if(child->execute().is_error()){
             cache_ = child->cached_result();
             return cache_;
@@ -25,27 +26,19 @@ Result ArrayNode::execute() const{
 }
 
 size_t ArrayNode::size() const{
-    return childs_.size();
+    return childs().size();
 }
 
 bool ArrayNode::empty() const{
-    return childs_.empty();
+    return childs().empty();
 }
 
 std::vector<std::shared_ptr<Node>>::const_iterator ArrayNode::begin() const{
-    return childs_.begin();
-}
-
-std::vector<std::shared_ptr<Node>>::iterator ArrayNode::begin(){
-    return childs_.begin();
+    return childs().begin();
 }
 
 std::vector<std::shared_ptr<Node>>::const_iterator ArrayNode::end() const{
-    return childs_.end();
-}
-
-std::vector<std::shared_ptr<Node>>::iterator ArrayNode::end(){
-    return childs_.end();
+    return childs().end();
 }
 
 std::vector<std::shared_ptr<Node>>::const_iterator ArrayNode::cbegin() const{
@@ -63,8 +56,7 @@ void ArrayNode::insert_back(std::shared_ptr<Node> node){
         else{
             type_val_.emplace(node->type_val() | TYPE_VAL::ARRAY);
         }
-        childs_.push_back(node);
-        node->add_parent(this, childs_.size()-1);
+        rel_mng_->insert_back(this,node);
     }
 }
 
@@ -75,10 +67,10 @@ std::shared_ptr<Node> ArrayNode::insert(size_t id,std::shared_ptr<Node> node){
             __invalidate_type_val__();
         else
             type_val_.emplace(node->type_val() | TYPE_VAL::ARRAY);
-        if(!(id<childs_.size()))
-            childs_.resize(id+1);
-        childs_.insert(childs_.begin()+id,node);
-        childs_[id]->add_parent(this, id);
+        if(!(id<childs().size()))
+            rel_mng_->childs(this).resize(id+1);
+        rel_mng_->childs(this).insert(childs().begin()+id,node);
+        rel_mng_->add_parent(childs()[id].get(),this, id);
         return node;
     }
     else return std::make_shared<Node>();
@@ -91,10 +83,10 @@ std::shared_ptr<Node> ArrayNode::replace(size_t id,std::shared_ptr<Node> node){
             __invalidate_type_val__();
         else
             type_val_.emplace(node->type_val() | TYPE_VAL::ARRAY);
-        if(!(id<childs_.size()))
-            childs_.resize(id+1);
-        childs_[id].swap(node);
-        childs_[id]->add_parent(this,id);
+        if(!(id<childs().size()))
+            rel_mng_->childs(this).resize(id+1);
+        rel_mng_->childs(this)[id].swap(node);
+        rel_mng_->add_parent(childs()[id].get(),this,id);
         return node;
     }
     else return std::make_shared<Node>();
@@ -103,7 +95,7 @@ std::shared_ptr<Node> ArrayNode::replace(size_t id,std::shared_ptr<Node> node){
 bool ArrayNode::is_numeric() const{
     if(type_val_.has_value() && type_val_.value()&TYPE_VAL::NUMERIC_ARRAY)
         return true;
-    if(!childs_.empty() && std::all_of(childs_.begin(),childs_.end(),[](std::shared_ptr<Node> child){
+    if(!childs().empty() && std::all_of(childs().begin(),childs().end(),[](std::shared_ptr<Node> child){
         return child->is_numeric();
     })){
         type_val_.emplace(TYPE_VAL::NUMERIC_ARRAY);
@@ -115,7 +107,7 @@ bool ArrayNode::is_numeric() const{
 bool ArrayNode::is_string() const{
     if(type_val_.has_value() && type_val_.value()&TYPE_VAL::STRING_ARRAY)
         return true;
-    if(!childs_.empty() && std::all_of(childs_.begin(),childs_.end(),[](std::shared_ptr<Node> child){
+    if(!childs().empty() && std::all_of(childs().begin(),childs().end(),[](std::shared_ptr<Node> child){
         return child->is_string();
     })){
         type_val_.emplace(TYPE_VAL::STRING_ARRAY);
@@ -133,8 +125,8 @@ void ArrayNode::print_text(std::ostream& stream) const{
     //     print_text(std::cout);
     bool first = true;
     stream<<'[';
-    if(!childs_.empty()){
-        for(auto child:childs_){
+    if(!childs().empty()){
+        for(auto child:childs()){
             if(first)
                 first = false;
             else
@@ -150,8 +142,8 @@ void ArrayNode::print_result(std::ostream& stream) const{
     //     print_result(std::cout);
     bool first = true;
     stream<<'[';
-    if(!childs_.empty()){
-        for(auto child:childs_){
+    if(!childs().empty()){
+        for(auto child:childs()){
             if(first)
                 first = false;
             else

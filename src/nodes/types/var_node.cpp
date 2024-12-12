@@ -19,7 +19,7 @@ Result VariableNode::execute() const{
     if(!is_not_cycled())
         cache_=std::make_shared<exceptions::CyclicReference>(var_->name());
     if(has_childs())
-        return childs_.at(0)->execute();
+        return childs().at(0)->execute();
     else return Node::execute();
 }
 
@@ -27,7 +27,7 @@ inline Result VariableNode::cached_result() const{
     if(!is_not_cycled())
         cache_=std::make_shared<exceptions::CyclicReference>(var_->name());
     if(has_childs()){
-        return childs_.at(0)->cached_result();
+        return childs().at(0)->cached_result();
     }
     else return Node::execute();
 }
@@ -37,26 +37,26 @@ void VariableNode::flush_cache() const{
 }
 
 bool VariableNode::is_empty() const{
-    return childs_.size()==0;
+    return childs().size()==0;
 }
 
 bool VariableNode::is_numeric() const{
-    if(childs_.size()==1){
-        return childs_.at(0)->is_numeric();
+    if(childs().size()==1){
+        return childs().at(0)->is_numeric();
     }
     else return false;
 }
 
 bool VariableNode::is_string() const{
-    if(childs_.size()==1){
-        return childs_.at(0)->is_string();
+    if(childs().size()==1){
+        return childs().at(0)->is_string();
     }
     else return false;
 }
 
 bool VariableNode::is_array() const{
-    if(childs_.size()==1){
-        return childs_.at(0)->is_array();
+    if(childs().size()==1){
+        return childs().at(0)->is_array();
     }
     else return false;
 }
@@ -66,22 +66,18 @@ void VariableNode::print_text(std::ostream& stream) const{
 }
 
 void VariableNode::print_result(std::ostream& stream) const{
-    if(childs_.size()==1)
-        childs_.at(0)->print_result(stream);
+    if(childs().size()==1)
+        childs().at(0)->print_result(stream);
 }
 
+#include "relation_manager.h"
 void VariableNode::insert_back(std::shared_ptr<Node> node){
     if(node){
-        if(childs_.size()<1){
-            childs_.push_back(node);
-            node->add_parent(this,0);
-        }
-        else {
-            if(node->type()!=NODE_TYPE::VARIABLE)
-                node->parents().clear();
-            childs_.at(0)=node;
-            node->add_parent(this,0);
-        }
+        if(childs().size()<1)
+            rel_mng_->insert_back(this,node);
+        else
+            rel_mng_->child(this,0)=node;
+        rel_mng_->add_parent(node.get(),this,0);
     }
 }
 

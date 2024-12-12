@@ -41,15 +41,15 @@ namespace functions{
         bool equal_morphology_nodes(const std::vector<std::shared_ptr<Node>>& nodes) noexcept;
         bool equal_morphology_nodes(const std::set<std::shared_ptr<Node>>& nodes) noexcept;
 
-        bool all_numeric(decltype(std::declval<Node>().childs()) arrays);
-        bool all_string(decltype(std::declval<Node>().childs()) arrays);
+        bool all_numeric(decltype(std::declval<const Node>().childs()) arrays);
+        bool all_string(decltype(std::declval<const Node>().childs()) arrays);
         bool has_cyclic_references(const std::shared_ptr<Node>& checked) noexcept;
         bool has_cyclic_references(const Node* node) noexcept;
         std::shared_ptr<Node> first_node_not_var(const std::shared_ptr<Node>& node) noexcept;
         const Node* first_node_not_var(const Node* node) noexcept;
-        std::shared_ptr<Node> first_node_not_var_by_ids(const std::shared_ptr<Node>& node, const std::vector<size_t>& seq_iterators) noexcept;
+        std::shared_ptr<Node> first_node_not_var_by_ids(const std::shared_ptr<Node>& node, const std::vector<size_t>::const_iterator& first,const std::vector<size_t>::const_iterator& last) noexcept;
         std::shared_ptr<Node> first_node_not_var_by_ids(const std::shared_ptr<Node>& node, const SizeDepthMeasure& seq_iterators) noexcept;
-        const Node* first_node_not_var_by_ids(const Node* node, const std::vector<size_t>& seq_iterators) noexcept;
+        const Node* first_node_not_var_by_ids(const Node* node, const std::vector<size_t>::const_iterator& first,const std::vector<size_t>::const_iterator& last) noexcept;
         const Node* first_node_not_var_by_ids(const Node* node, const SizeDepthMeasure& seq_iterators) noexcept;
 
         bool check_sizes_arrays(const std::vector<Node*>& arrays);
@@ -108,7 +108,8 @@ SizeDepthMeasure functions::auxiliary::init_sz_depth_measure(T array){
         return sz_depth_measure;
     while(node->type()==NODE_TYPE::ARRAY && node->childs().size()!=0){
         sz_depth_measure.push_depth(node->childs().size());
-        node = first_node_not_var_by_ids(node,{0});
+        std::vector<size_t> tmp{0};
+        node = first_node_not_var_by_ids(node,tmp.begin(),tmp.end());
     }
     return sz_depth_measure;
 }

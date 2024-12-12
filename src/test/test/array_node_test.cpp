@@ -79,7 +79,7 @@ TEST(ArrayNode_test,MoveConstructor){
 }
 TEST(ArrayNode_test,Operator_Eq_copy){
     std::cout<<"Run test operator equal copy"<<std::endl;
-    EXPECT_TRUE(std::is_copy_assignable_v<ArrayNode>);
+    EXPECT_TRUE(std::is_copy_constructible_v<ArrayNode>);
     std::shared_ptr<ArrayNode> arr_1 = std::make_shared<ArrayNode>(1);
     arr_1->insert_back(std::make_shared<ValueNode>(1));
     std::shared_ptr<ArrayNode> arr_2 = std::make_shared<ArrayNode>(2);
@@ -92,7 +92,7 @@ TEST(ArrayNode_test,Operator_Eq_copy){
 }
 TEST(ArrayNode_test,Operator_Eq_move){
     std::cout<<"Run test operator equal"<<std::endl;
-    EXPECT_TRUE(std::is_move_assignable_v<ArrayNode>);
+    EXPECT_TRUE(std::is_move_constructible_v<ArrayNode>);
     std::shared_ptr<ArrayNode> arr_1 = std::make_shared<ArrayNode>(1);
     arr_1->insert_back(std::make_shared<ValueNode>(1));
     arr_1->insert_back(std::make_shared<ValueNode>(2));

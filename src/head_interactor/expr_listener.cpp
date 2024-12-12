@@ -3,6 +3,7 @@
 #include "arithmetic_types.h"
 #include "expr_listener.h"
 #include "exception.h"
+#include "relation_manager.h"
 
 using namespace std::string_view_literals;
 
@@ -46,7 +47,8 @@ void BaseListener::__insert_to_prec_node__(MODE mode_assert_check){
         if(anonymous_node_.top()->type()==NODE_TYPE::VARIABLE)
             anonymous_node_.top()->insert_back(node);
         else{
-            info->parent->replace(info->id,node)->parents().erase(*info.get());
+            Node* tmp_node = info->parent->replace(info->id,node).get();
+            tmp_node->relation_manager()->erase_parent(tmp_node, info->parent);
         }
     }
     else anonymous_node_.top()->insert_back(node);
@@ -102,7 +104,7 @@ void BaseListener::enterVariable(head_interactor::VariableContext *ctx) {
             }
             
             if(db_tmp->exists(ctx->VARIABLE()->getText())){
-                std::vector<size_t> ids;
+                std::vector<int> ids;
                 ids.reserve(node_ctx->UINT().size());
                 for(auto id : node_ctx->UINT()){
                     std::stringstream sstream(id->getText());
@@ -110,7 +112,7 @@ void BaseListener::enterVariable(head_interactor::VariableContext *ctx) {
                     sstream >> result;
                     ids.push_back(result);
                 }
-                info = std::make_unique<INFO_NODE>(db_tmp->get(ctx->VARIABLE()->getText())->node()->child({ids}));
+                info = std::make_unique<INFO_NODE>(db_tmp->get(ctx->VARIABLE()->getText())->node()->child(ids.begin(),ids.end()));
                 if(!info || !info->parent || info->id==-1 || !info->parent->has_child(info->id) || !info->parent->child(info->id)){
                     exceptions::NodeChildDontExists(ctx->getText());
                     return;
@@ -459,7 +461,7 @@ void BaseListener::enterVardefinition(head_interactor::VardefinitionContext * ct
             }
             
             if(db_tmp->exists(ctx->VARIABLE()->getText())){
-                std::vector<size_t> ids;
+                std::vector<int> ids;
                 ids.reserve(node_ctx->UINT().size());
                 for(auto id : node_ctx->UINT()){
                     if(id){
@@ -469,7 +471,7 @@ void BaseListener::enterVardefinition(head_interactor::VardefinitionContext * ct
                         ids.push_back(result);
                     }
                 }
-                info = std::make_unique<INFO_NODE>(db_tmp->get(ctx->VARIABLE()->getText())->node()->child({ids}));
+                info = std::make_unique<INFO_NODE>(db_tmp->get(ctx->VARIABLE()->getText())->node()->child(ids.begin(),ids.end()));
                 if(!info || !info->parent || info->id==-1 || !info->parent->has_child(info->id) || !info->parent->child(info->id)){
                     exceptions::NodeChildDontExists(ctx->getText());
                     return;

@@ -1,24 +1,21 @@
 #include "bin_node.h"
 #include "def.h"
 #include "events_errors/exception.h"
-
-BinaryNode::BinaryNode(const BinaryNode& other):
-Node(other),
-operation_(other.operation_){}
+#include "relation_manager.h"
 
 void BinaryNode::insert_back(std::shared_ptr<Node> node){
     flush_cache();
     __invalidate_type_val__();
-    if(childs_.size()<2){
-        childs_.push_back(node);
-        node->add_parent(this, childs_.size()-1);
+    if(childs().size()<2){
+        rel_mng_->childs(this).push_back(node);
+        rel_mng_->add_parent(node.get(),this, childs().size()-1);
     }
     else std::logic_error("Invalid inserting. Prompt: Unvalailable to insert more than 2 nodes to binary node");
 }
 
 #include "aux_functions.h"
 Result BinaryNode::execute() const{
-    if(!(has_child(0) && has_child(1) && childs_.size()==2))
+    if(!(has_child(0) && has_child(1) && childs().size()==2))
         return std::make_shared<exceptions::InvalidNumberOfArguments>(2);
     switch (operation_)
     {
@@ -48,7 +45,7 @@ Result BinaryNode::execute() const{
 
 Result BinaryNode::execute_for_array_variables(const execute_for_array_variables_t& structure) const{
     //LOG_DURATION("Binary. Example 2");
-    if(!(has_child(0) && has_child(1) && childs_.size()==2))
+    if(!(has_child(0) && has_child(1) && childs().size()==2))
         return std::make_shared<exceptions::InvalidNumberOfArguments>(2);
     switch (operation_)
     {
@@ -81,14 +78,14 @@ Result BinaryNode::execute_for_array_variables(const execute_for_array_variables
 
 void BinaryNode::print_text(std::ostream& stream) const{
     if(has_child(0))
-        childs_.at(0)->print_text(stream);
+        childs().at(0)->print_text(stream);
     else{
         Node node;
         node.print_text(stream);
     }
     stream<<(char)operation_;
     if(has_child(1))
-        childs_.at(1)->print_text(stream);
+        childs().at(1)->print_text(stream);
     else {
         Node node;
         node.print_text(stream);
@@ -102,19 +99,19 @@ void BinaryNode::print_result(std::ostream& stream) const{
 bool BinaryNode::is_numeric() const{
     if(!has_child(0) && !has_child(1))
         return false;
-    return childs_.at(0)->is_numeric() && childs_.at(1)->is_numeric();
+    return childs().at(0)->is_numeric() && childs().at(1)->is_numeric();
 }
 
 bool BinaryNode::is_string() const{
     if(!has_child(0) && !has_child(1))
         return false;
-    return childs_.at(0)->is_string() && childs_.at(1)->is_string();
+    return childs().at(0)->is_string() && childs().at(1)->is_string();
 }
 
 bool BinaryNode::is_array() const{
     if(!has_child(0) && !has_child(1))
         return false;
-    return childs_.at(0)->is_array() && childs_.at(1)->is_array();
+    return childs().at(0)->is_array() && childs().at(1)->is_array();
 }
 
 TYPE_VAL BinaryNode::type_val() const{

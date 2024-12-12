@@ -20,14 +20,9 @@ class BinaryNode:public Node{
     friend ValueNode;
     friend VariableNode;
     public:
-    BinaryNode(BINARY_OP op):operation_(op){}
-
-    template<typename T>
-    inline BinaryNode(const T& other):Node(other),operation_(other.operation_){
-        *this = Node::operator=(other);
-    }
-    BinaryNode(const BinaryNode& other);
-    BinaryNode(BinaryNode&&) =delete;
+    inline BinaryNode(BINARY_OP op):operation_(op){}
+    inline BinaryNode(const BinaryNode& other):Node(other),operation_(other.operation_){}
+    inline BinaryNode(BinaryNode&& other):Node(other),operation_(other.operation_){}
 
     virtual NODE_TYPE type() const override{
         return NODE_TYPE::BINARY;

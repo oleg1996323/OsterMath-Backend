@@ -19,13 +19,13 @@ size_t pow(size_t base, size_t pow){
     else return 1;    
 }
 
-bool functions::auxiliary::all_numeric(decltype(std::declval<Node>().childs()) arrays){
+bool functions::auxiliary::all_numeric(decltype(std::declval<const Node>().childs()) arrays){
     return std::all_of(arrays.begin(),arrays.end(),[](const std::decay_t<decltype(std::declval<Node>().childs())>::value_type& node){
         return node->is_numeric();
     });
 }
 
-bool functions::auxiliary::all_string(decltype(std::declval<Node>().childs()) arrays){
+bool functions::auxiliary::all_string(decltype(std::declval<const Node>().childs()) arrays){
     return std::all_of(arrays.begin(),arrays.end(),[](const std::decay_t<decltype(std::declval<Node>().childs())>::value_type& node){
         return node->is_string();
     });
@@ -75,12 +75,12 @@ const Node* functions::auxiliary::first_node_not_var(const Node* node) noexcept{
     return nullptr;
 }
 
-std::shared_ptr<Node> functions::auxiliary::first_node_not_var_by_ids(const std::shared_ptr<Node>& node, const std::vector<size_t>& seq_iterators) noexcept{
+std::shared_ptr<Node> functions::auxiliary::first_node_not_var_by_ids(const std::shared_ptr<Node>& node, const std::vector<size_t>::const_iterator& first,const std::vector<size_t>::const_iterator& last) noexcept{
     std::shared_ptr<Node> child = first_node_not_var(node);
     if(child){
-        for(size_t i:seq_iterators){
-            if(child->has_child(i))
-                child = child->child(i);
+        for(auto i = first;i<last;++i){
+            if(child->has_child(*i))
+                child = child->child(*i);
             else return std::shared_ptr<Node>();
             child = first_node_not_var(child);
             if(!child)
@@ -90,12 +90,13 @@ std::shared_ptr<Node> functions::auxiliary::first_node_not_var_by_ids(const std:
     }
     return nullptr;
 }
-const Node* functions::auxiliary::first_node_not_var_by_ids(const Node* node, const std::vector<size_t>& seq_iterators) noexcept{
+#include <ranges>
+const Node* functions::auxiliary::first_node_not_var_by_ids(const Node* node, const std::vector<size_t>::const_iterator& first,const std::vector<size_t>::const_iterator& last) noexcept{
     const Node* child = first_node_not_var(node);
     if(child){
-        for(size_t i:seq_iterators){
-            if(child->has_child(i))
-                child = child->child(i).get();
+        for(auto i = first;i<last;++i){
+            if(child->has_child(*i))
+                child = child->child(*i).get();
             else return nullptr;
             child = first_node_not_var(child);
             if(!child)
@@ -236,10 +237,10 @@ bool functions::auxiliary::equal_morphology_nodes(const std::vector<std::shared_
     if(!seq_iterators.empty())
         while(seq_iterators.front()<first_node->childs().size()){
             for(size_t iter = 1;iter<nodes.size();++iter){
-                std::shared_ptr<Node> seq_node_child = first_node_not_var_by_ids(first_node,seq_iterators);
+                std::shared_ptr<Node> seq_node_child = first_node_not_var_by_ids(first_node,seq_iterators.begin(),seq_iterators.end());
                 if(!seq_node_child)
                     return false;
-                std::shared_ptr<Node> other_child_node = first_node_not_var_by_ids(nodes.at(iter),seq_iterators);
+                std::shared_ptr<Node> other_child_node = first_node_not_var_by_ids(nodes.at(iter),seq_iterators.begin(),seq_iterators.end());
                 if(!other_child_node)
                     return false;
                 if(seq_node_child->type_val() != other_child_node->type_val() || (other_child_node->type_val()&TYPE_VAL::ARRAY &&
@@ -249,13 +250,13 @@ bool functions::auxiliary::equal_morphology_nodes(const std::vector<std::shared_
                 }
                 ++count;
             }
-            std::shared_ptr<Node> tmp_node = first_node_not_var_by_ids(first_node,seq_iterators);
+            std::shared_ptr<Node> tmp_node = first_node_not_var_by_ids(first_node,seq_iterators.begin(),seq_iterators.end());
             if(seq_iterators.empty() && first_node->has_childs() && 
             first_node->type_val()&TYPE_VAL::ARRAY){
                 seq_iterators.push_back(0);
                 ex_nodes.push_back(tmp_node);
             }
-            else if(tmp_node = first_node_not_var_by_ids(first_node,seq_iterators))
+            else if(tmp_node = first_node_not_var_by_ids(first_node,seq_iterators.begin(),seq_iterators.end()))
                 if(tmp_node->has_childs() && 
                     tmp_node->type_val()&TYPE_VAL::ARRAY){
                     seq_iterators.push_back(0);

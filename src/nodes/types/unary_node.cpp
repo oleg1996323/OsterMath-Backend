@@ -4,19 +4,19 @@
 void UnaryNode::print_text(std::ostream& stream) const{
     if(operation_==UNARY_OP::ADD){
         stream<<"+";
-        childs_.at(0)->print_text(stream);
+        childs().at(0)->print_text(stream);
     }
     else if(operation_==UNARY_OP::SUB){
         stream<<"-";
-        childs_.at(0)->print_text(stream);
+        childs().at(0)->print_text(stream);
     }
     else if(operation_==UNARY_OP::PARENS){
         stream<<"(";
-        childs_.at(0)->print_text(stream);
+        childs().at(0)->print_text(stream);
         stream<<")";
     }
     else if(operation_==UNARY_OP::NOTHING){
-        childs_.at(0)->print_text(stream);
+        childs().at(0)->print_text(stream);
     }
     else stream<<"";
 }
@@ -25,26 +25,27 @@ void UnaryNode::print_result(std::ostream& stream) const{
     stream<<const_cast<UnaryNode*>(this)->execute();
 }
 
+#include "relation_manager.h"
 void UnaryNode::insert_back(std::shared_ptr<Node> node){
-    assert(childs_.size()==0);
-    childs_.push_back(node);
-    node->add_parent(this,childs_.size()-1);
+    assert(childs().size()==0);
+    rel_mng_->insert_back(this,node);
+    rel_mng_->add_parent(node.get(),this,childs().size()-1);
 }
 
 Result UnaryNode::execute() const{
     switch (operation_)
         {
         case UNARY_OP::ADD:
-            return childs_.at(0)->execute();
+            return childs().at(0)->execute();
             break;
         case UNARY_OP::SUB:
-            return (-1)*(childs_.at(0)->execute().get<Value_t>());
+            return (-1)*(childs().at(0)->execute().get<Value_t>());
             break;
         case UNARY_OP::PARENS:
-            return childs_.at(0)->execute();
+            return childs().at(0)->execute();
             break;
         case UNARY_OP::NOTHING:
-            return childs_.at(0)->execute();
+            return childs().at(0)->execute();
         default:
             throw std::invalid_argument("Unknown type of unary expression");
             break;
@@ -54,19 +55,19 @@ Result UnaryNode::execute() const{
 bool UnaryNode::is_numeric() const{
     if(!has_child(0))
         return false;
-    return childs_.at(0)->is_numeric();
+    return childs().at(0)->is_numeric();
 }
 
 bool UnaryNode::is_string() const{
     if(!has_child(0))
         return false;
-    return childs_.at(0)->is_string();
+    return childs().at(0)->is_string();
 }
 
 bool UnaryNode::is_array() const{
     if(!has_child(0))
         return false;
-    return childs_.at(0)->is_array();
+    return childs().at(0)->is_array();
 }
 
 UNARY_OP UnaryNode::operation() const{

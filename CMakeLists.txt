@@ -42,12 +42,26 @@ file(GLOB_RECURSE head_interactor_SOURCES
 
 set(OSTERMATH_BE_INCLUDE_DIR
                             ${CMAKE_CURRENT_LIST_DIR}/include
+                            ${CMAKE_CURRENT_LIST_DIR}/include/core
                             ${CMAKE_CURRENT_LIST_DIR}/include/nodes
                             ${CMAKE_CURRENT_LIST_DIR}/include/nodes/types
                             ${CMAKE_CURRENT_LIST_DIR}/include/head_interactor)
 set(OSTERMATH_BE_INCLUDE_DIR_PRIVATE 
                             ${CMAKE_CURRENT_LIST_DIR}/include/events_errors)
 set(OSTERMATH_BE_LIBRARY_DIR ${CMAKE_CURRENT_LIST_DIR}/lib)
+
+file(GLOB_RECURSE core_sources
+    ${CMAKE_CURRENT_LIST_DIR}/src/core/**.cpp
+)
+
+add_library(
+    core STATIC
+    ${core_sources}
+)
+
+target_include_directories(core
+                    PRIVATE
+                        ${CMAKE_CURRENT_LIST_DIR}/include/core)
 
 add_library(
     bailerror INTERFACE
@@ -64,6 +78,7 @@ add_library(
     ${CMAKE_CURRENT_LIST_DIR}/src/events_errors/abstract_event.cpp
 )
 
+#TYPE is a build choice between shared and static library
 get_target_property(abstract_event_type abstract_event TYPE)
 if(${abstract_event_type} STREQUAL SHARED_LIBRARY)
     message(STATUS ${abstract_event_type})
@@ -147,7 +162,7 @@ add_library(
     ${ostermath_be_SOURCES}
 )
 
-target_link_libraries(ostermath_be PUBLIC head_interactor)
+target_link_libraries(ostermath_be PUBLIC head_interactor PRIVATE core)
 target_compile_definitions(ostermath_be PUBLIC $<$<CONFIG:Debug>:DEBUG>)
 
 target_include_directories(ostermath_be
@@ -159,9 +174,9 @@ target_include_directories(ostermath_be
 
 set_directory_properties(PROPERTIES VS_STARTUP_PROJECT ostermath_be)
 
-file(GLOB_RECURSE detector_SOURCES
-    ${CMAKE_CURRENT_LIST_DIR}/src/detector/**.cpp
-)
+# file(GLOB_RECURSE detector_SOURCES
+#     ${CMAKE_CURRENT_LIST_DIR}/src/detector/**.cpp
+# )
 
 set_target_properties(ostermath_be
         PROPERTIES
@@ -169,7 +184,7 @@ set_target_properties(ostermath_be
 )
 
 if(NOT USER_INTERFACE)
-    set_target_properties(ostermath_be exceptions warnings
+    set_target_properties(ostermath_be exceptions warnings core
         PROPERTIES
         ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_LIST_DIR}/lib/Debug/uiless"
         LIBRARY_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_LIST_DIR}/shared/Debug/uiless"
@@ -179,7 +194,7 @@ if(NOT USER_INTERFACE)
         RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_LIST_DIR}/bin/Release/uiless"
     )
 else()
-    set_target_properties(ostermath_be exceptions warnings
+    set_target_properties(ostermath_be exceptions warnings core
         PROPERTIES
         ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_LIST_DIR}/lib/Debug/ui"
         LIBRARY_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_LIST_DIR}/shared/Debug/ui"
@@ -214,8 +229,6 @@ add_executable(nodes_test ${test_SOURCE})
 target_link_libraries(nodes_test PUBLIC GTest::gtest ostermath_be detector head_interactor exceptions warnings)
 target_include_directories(nodes_test INTERFACE ${OSTERMATH_BE_INCLUDE_DIR} ${DETECTOR_INCLUDE_DIR})
 target_compile_definitions(nodes_test PUBLIC $<$<CONFIG:Debug>:DEBUG>)
-
-
 
 set_target_properties(nodes_test
     PROPERTIES

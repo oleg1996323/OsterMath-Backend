@@ -3,6 +3,7 @@
 #include "var_node.h"
 #include "array_node.h"
 #include "range_node/def.h"
+#include "relation_manager.h"
 
 enum class RANGE_OP{
     SUM,
@@ -77,9 +78,9 @@ class RangeOperationNode:public Node{
     private:
     virtual void insert_back(std::shared_ptr<Node> node) override{
         if(has_child(0))
-            childs_.at(0) = node;
-        else childs_.push_back(node);
-        node->add_parent(this, childs_.size()-1);
+            rel_mng_->child(this,0) = node;
+        else rel_mng_->insert_back(this,node);
+        rel_mng_->add_parent(node.get(),this, childs().size()-1);
     }
     bool check_variables_sizes_and_define_size_iteration(size_t, 
                 execute_for_array_variables_t&) const;

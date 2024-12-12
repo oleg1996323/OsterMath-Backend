@@ -27,8 +27,8 @@ void SerialData::insert_var(uint64_t var_id, const std::shared_ptr<VariableNode>
     if(node)
         nodes_[var_id]=node;
 
-    for(auto parent:node->parents()){
-        add_dependency((uint64_t)parent.parent,var_id);
+    for(auto& [parent,ids]:node->parents()){
+        add_dependency((uint64_t)parent,var_id);
     }
     if(node->childs().size()>0)
         nodes_dependencies_[var_id].reserve(node->childs().size());

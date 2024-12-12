@@ -69,9 +69,14 @@ exceptions::EXCEPTION_TYPE exception_handler(std::function<void()> function){
 
 #include <gtest/gtest.h>
 #include "string_node.h"
+#include "core/settings.h"
+#include "core/system.h"
 
 int main(int argc, char **argv){
     //std::cout<<sizeof(char)<<std::endl;
+    std::cout<<"Multimap size : "<<sizeof(std::map<Node*,std::vector<int>>)<<std::endl;
+    std::cout<<"Current set size : "<<sizeof(std::set<INFO_NODE,INFO_NODE_Comparator>)<<std::endl;
+    std::cout<<"Maximum cores accessible: "<<kernel::System::get_accessible_cores()<<std::endl;
     std::cout<<"SizeDepthMeasure: "<<sizeof(SizeDepthMeasure)<<std::endl;
     std::cout<<"Value_t: "<<sizeof(Value_t)<<std::endl;
     std::cout<<"std::string: "<<sizeof(std::string)<<std::endl;

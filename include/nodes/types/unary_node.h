@@ -28,16 +28,15 @@ class UnaryNode:public Node{
     inline UnaryNode(const UnaryNode& other):Node(other){
         operation_ = other.operation_;
     }
-    UnaryNode(UnaryNode&&) = delete;
+    inline UnaryNode(UnaryNode&& other):Node(other){
+        operation_ = other.operation_;
+    }
 
     inline virtual NODE_TYPE type() const override{
         return NODE_TYPE::UNARY;
     }
-    inline std::shared_ptr<Node>& child(){
-        return childs_.at(0);
-    }
     inline const std::shared_ptr<Node>& child() const{
-        return childs_.at(0);
+        return childs().at(0);
     }
     virtual void insert_back(std::shared_ptr<Node> node) override;
     virtual Result execute() const override;

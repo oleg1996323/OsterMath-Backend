@@ -10,6 +10,12 @@ class ValueNode:public Node{
     public:
     inline ValueNode()=default;
 
+    inline ValueNode(const ValueNode& value):Node(value){
+        cache_ = value.cache_;
+    }
+    inline ValueNode(ValueNode&& value):Node(value){
+        cache_ = std::move(value.cache_);
+    }
     inline ValueNode(Value_t&& value):Node(){
         cache_ = std::move(value);
     }
@@ -19,10 +25,6 @@ class ValueNode:public Node{
     inline ValueNode(std::string&& value):Node(){
         cache_ = Value_t(value);
     }
-    inline ValueNode(const ValueNode& other):Node(other){
-        cache_ = other.cache_;
-    }
-    ValueNode(ValueNode&&) = delete;
     inline virtual NODE_TYPE type() const override{
         return NODE_TYPE::VALUE;
     }
@@ -41,8 +43,6 @@ class ValueNode:public Node{
     virtual void insert_back(std::shared_ptr<Node> node) override;
     virtual void print_text(std::ostream& stream) const override;
     virtual void print_result(std::ostream& stream) const override;
-    ValueNode& operator=(const ValueNode&);
-    ValueNode& operator=(ValueNode&&);
     private:
     inline virtual bool __is_not_cycled__(const Node*) const override{
         return true;
