@@ -242,7 +242,7 @@ void FunctionNode::insert_back(std::shared_ptr<Node> node){
     flush_cache();
     __invalidate_type_val__();
     if(childs().size()<childs().capacity()){
-        rel_mng_->childs(this).push_back(node);
+        rel_mng_->insert_back(this,node);
         rel_mng_->add_parent(node.get(),this, childs().size()-1);
     }
     else throw std::logic_error("Invalid inserting. Prompt: Unvalailable to insert node to full defined function node");

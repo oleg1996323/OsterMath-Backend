@@ -2,6 +2,8 @@
 #include "core/settings.h"
 #include "node.h"
 
+const std::vector<std::shared_ptr<Node>> RelationManager::empty_childs_{};
+
 void RelationManager::reserve_childs(const Node* node,size_t size){
     childs_[node].reserve(size);
 }
@@ -62,7 +64,7 @@ INFO_NODE RelationManager::child(const Node* node,const std::vector<int>::const_
         return node->child(first,last);
     else return INFO_NODE();
 }
-void RelationManager::insert_back(const Node* node,std::shared_ptr<Node> new_child) noexcept{
+void RelationManager::insert_back(const Node* node,std::shared_ptr<Node> new_child){
     switch (node->type())
     {
     case NODE_TYPE::UNDEF:
@@ -77,26 +79,70 @@ void RelationManager::insert_back(const Node* node,std::shared_ptr<Node> new_chi
         break;
     }
 }
+
+/*std::shared_ptr<Node> ArrayNode::insert(size_t id,std::shared_ptr<Node> node){
+    if(node){
+        flush_cache();
+        if(type_val_.has_value() && !(type_val_.value()&node->type_val()))
+            __invalidate_type_val__();
+        else
+            type_val_.emplace(node->type_val() | TYPE_VAL::ARRAY);
+        if(!(id<childs().size()))
+            rel_mng_->childs(this).resize(id+1);
+        rel_mng_->childs(this).insert(childs().begin()+id,node);
+        rel_mng_->add_parent(childs()[id].get(),this, id);
+        return node;
+    }
+    else return std::make_shared<Node>();
+}
+
+std::shared_ptr<Node> ArrayNode::replace(size_t id,std::shared_ptr<Node> node){
+    if(node){
+        flush_cache();
+        if(type_val_.has_value() && !(type_val_.value()&node->type_val()))
+            __invalidate_type_val__();
+        else
+            type_val_.emplace(node->type_val() | TYPE_VAL::ARRAY);
+        if(!(id<childs().size()))
+            rel_mng_->childs(this).resize(id+1);
+        rel_mng_->childs(this)[id].swap(node);
+        rel_mng_->add_parent(childs()[id].get(),this,id);
+        return node;
+    }
+    else return std::make_shared<Node>();
+}*/
+
 //insert before value at id
 std::shared_ptr<Node> RelationManager::insert(const Node* node,size_t id,std::shared_ptr<Node> new_child) noexcept{
+    if(!(id<childs(node).size()))
+        childs_.at(node).resize(id+1);
     throw std::logic_error("Invalid inserting. Prompt: Unvalailable to insert child to this type of node");
 }
 std::shared_ptr<Node> RelationManager::replace(const Node* node, size_t id,std::shared_ptr<Node> new_child) noexcept{
     throw std::logic_error("Invalid inserting. Prompt: Unvalailable to replace child to this type of node");
 }
-void RelationManager::add_parent(const Node* node_to_add, const Node* parent, int index) noexcept{
-    if(owner(node_to_add).parent)
-        referent_parents_[node_to_add][parent].push_back(index);
-    else{
+bool RelationManager::__add_parent__(const Node* node_to_add, const Node* parent, int index) noexcept{
+    //variable type cannot has owner (only BaseData class object)
+    assert(node_to_add);
+    if(!owner(node_to_add).parent && node_to_add->type()!=NODE_TYPE::VARIABLE){
         INFO_NODE info;
         info.parent = const_cast<Node*>(parent);
         info.id = index;
-        owners_[node_to_add] = info;
-        referent_parents_[node_to_add][parent].push_back(index);
+        owner_[node_to_add] = info;
+        references_[node_to_add][parent].push_back(index);
+        return true;
     }
+    else return false;
+}
+bool RelationManager::__add_reference__(const Node* node_to_add, const ReferenceNode* parent, int index) noexcept{
+    assert(node_to_add);
+    references_[node_to_add][parent].push_back(index);
 }
 bool RelationManager::has_parents(const Node* node) const noexcept{
-    referent_parents_.contains(node);
+    references_.contains(node);
+}
+bool RelationManager::has_owner(const Node* node) const noexcept{
+    ow
 }
 void RelationManager::refresh_parent_links(Node* node) noexcept{
 
@@ -114,7 +160,7 @@ bool RelationManager::has_child(const Node* node, size_t id) const noexcept{
     return childs_.size()>id;
 }
 void RelationManager::release_childs(Node* node) noexcept{
-    for(std::shared_ptr<Node>& child:childs(node))
+    for(std::shared_ptr<Node>& child:childs_.at(node))
         if(child){
             erase_parent(child.get(),node);
             INFO_NODE child_infonode = owner(child.get());
@@ -128,37 +174,44 @@ const Parents_t& RelationManager::parents(const Node* node) const noexcept{
 }
 
 void RelationManager::erase_parent(const Node* node, const Node* parent){
-    referent_parents_.at(node).erase(parent);
+    references_.at(node).erase(parent);
     INFO_NODE info = owner(node);
     if(info.parent == parent && info.has_node())
         info.parent->erase_child(info.id);
 }
 void RelationManager::erase_child(const Node* node, size_t id){
-
+    if(childs_.contains(node)){
+        if(childs_.at(node).size()>id)
+            childs_.at(node).erase(childs_.at(node).begin()+id);
+        else throw std::invalid_argument("Invalid id at deletion");
+    }
+    else throw std::invalid_argument("Node doesn't exists");
 }
 
 void RelationManager::delete_node(const Node* node){
     owners_.erase(node);
     //release also childs with deletion but without make_shared
-    if(referent_parents_.contains(node))
-        for(auto& [reference,ids]:referent_parents_.at(node))
+    if(references_.contains(node)){
+        for(auto& [reference,ids]:references_.at(node))
             for(int id:ids)
                 reference->relation_manager()->erase_child(reference,id);
+        references_.erase(node);
+    }
 }
 
 #include "arithmetic_types.h"
 
 // void RelationManager::swap_parents(const Node* lhs, const Node* rhs){
-//     if(referent_parents_.contains(lhs))
-//         if(referent_parents_.contains(rhs))
-//             referent_parents_.at(lhs).swap(referent_parents_.at(rhs));
+//     if(references_.contains(lhs))
+//         if(references_.contains(rhs))
+//             references_.at(lhs).swap(references_.at(rhs));
 //         else{
-//             referent_parents_.at(lhs).swap(referent_parents_[rhs]);
-//             referent_parents_.erase(lhs);
+//             references_.at(lhs).swap(references_[rhs]);
+//             references_.erase(lhs);
 //             //erase owner also
 //         }
 //     else{
-//         if(referent_parents_.contains(rhs))
+//         if(references_.contains(rhs))
 //     }
 // }
 void RelationManager::swap_childs(const Node* lhs, const Node* rhs){
@@ -170,11 +223,11 @@ void RelationManager::swap_childs(const Node* lhs, const Node* rhs){
         }
         else{
             childs_.at(lhs).swap(childs_[rhs]);
-            referent_parents_.erase(lhs);
+            references_.erase(lhs);
             //erase owner also
         }
     else{
-        //if(referent_parents_.contains(rhs))
+        //if(references_.contains(rhs))
     }
 }
 // void RelationManager::copy_parents(const Node* node, const Parents_t& parents){

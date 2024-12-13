@@ -67,9 +67,7 @@ std::shared_ptr<Node> ArrayNode::insert(size_t id,std::shared_ptr<Node> node){
             __invalidate_type_val__();
         else
             type_val_.emplace(node->type_val() | TYPE_VAL::ARRAY);
-        if(!(id<childs().size()))
-            rel_mng_->childs(this).resize(id+1);
-        rel_mng_->childs(this).insert(childs().begin()+id,node);
+        rel_mng_->insert(this,id,node);
         rel_mng_->add_parent(childs()[id].get(),this, id);
         return node;
     }
@@ -83,9 +81,7 @@ std::shared_ptr<Node> ArrayNode::replace(size_t id,std::shared_ptr<Node> node){
             __invalidate_type_val__();
         else
             type_val_.emplace(node->type_val() | TYPE_VAL::ARRAY);
-        if(!(id<childs().size()))
-            rel_mng_->childs(this).resize(id+1);
-        rel_mng_->childs(this)[id].swap(node);
+        rel_mng_->swap_childs(this,node.get());
         rel_mng_->add_parent(childs()[id].get(),this,id);
         return node;
     }
@@ -125,14 +121,12 @@ void ArrayNode::print_text(std::ostream& stream) const{
     //     print_text(std::cout);
     bool first = true;
     stream<<'[';
-    if(!childs().empty()){
-        for(auto child:childs()){
-            if(first)
-                first = false;
-            else
-                stream<<"; ";
-            child->print_text(stream);  
-        }
+    for(auto child:childs()){
+        if(first)
+            first = false;
+        else
+            stream<<"; ";
+        child->print_text(stream);  
     }
     stream<<']';
 }
