@@ -37,7 +37,7 @@ void VariableBase::set_data_base(BaseData* data_base){
     data_base_=data_base;
 }
 
-BaseData* VariableBase::get_data_base() const{
+const BaseData* VariableBase::get_data_base() const{
     return data_base_;
 }
 

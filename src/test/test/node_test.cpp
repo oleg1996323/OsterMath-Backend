@@ -19,7 +19,7 @@ using namespace functions::auxiliary;
 
 TEST(Node_test,TestDefaultConstruct){
     //Node()=default;
-    Node node;
+    EmptyNode node;
     EXPECT_TRUE(&node);
 }
 TEST(Node_test,TestCopyConstruct){
@@ -31,7 +31,7 @@ TEST(Node_test,TestCopyConstruct){
         std::shared_ptr<VariableBase> var_A = bd->add_variable("A");
         std::shared_ptr<VariableBase> var_B = bd->add_variable("B");
         std::shared_ptr<ArrayNode> node_1 = std::make_shared<ArrayNode>(10);
-        std::shared_ptr<Node> tmp_node_1;
+        std::shared_ptr<AbstractNode> tmp_node_1;
         std::vector<std::shared_ptr<ValueNode>> values_1;
         std::vector<std::shared_ptr<ValueNode>> values_2;
         var_A->node()->insert_back(node_1);
@@ -62,16 +62,16 @@ TEST(Node_test,TestCopyConstruct){
                 std::cout<<node_1->child(i)->get_result()<<std::endl;
             }
         }
-        EXPECT_EQ(node_1->parents().size(),0);
+        EXPECT_EQ(node_1->references().size(),0);
         EXPECT_EQ(node_1->childs().size(),values_2.size());
-        EXPECT_EQ(tmp_node_1->parents().size(),1);
-        EXPECT_EQ(tmp_node_1->parents().begin()->first,bd->get("A")->node().get());
+        EXPECT_EQ(tmp_node_1->references().size(),1);
+        EXPECT_EQ(tmp_node_1->references().begin()->first,bd->get("A")->node().get());
         EXPECT_EQ(bd->get("A")->node()->child(0).get(),tmp_node_1.get());
     }
 }
 TEST(Node_test,TestGetTypeVal){
     //virtual TYPE_VAL type_val() const;
-    Node node;
+    EmptyNode node;
     EXPECT_TRUE(node.type_val()==TYPE_VAL::UNKNOWN);
 }
 #include "unary_node.h"
@@ -159,27 +159,27 @@ TEST(NodeTest,TestReleaseChilds){
     var_F->node()->insert_back(value_1);
     array->insert_back(value_2);
     array->insert_back(value_3);
-    EXPECT_TRUE(var_A->node()->parents().contains(array.get()));
-    EXPECT_TRUE(var_B->node()->parents().contains(array.get()));
-    EXPECT_TRUE(var_C->node()->parents().contains(array.get()));
-    EXPECT_TRUE(var_D->node()->parents().contains(array.get()));
-    EXPECT_TRUE(var_E->node()->parents().contains(array.get()));
-    EXPECT_TRUE(var_F->node()->parents().contains(var_E->node().get()));
-    EXPECT_TRUE(value_1->parents().contains(var_F->node().get()));
-    EXPECT_TRUE(value_2->parents().contains(array.get()));
-    EXPECT_TRUE(value_3->parents().contains(array.get()));
+    EXPECT_TRUE(var_A->node()->references().contains(array.get()));
+    EXPECT_TRUE(var_B->node()->references().contains(array.get()));
+    EXPECT_TRUE(var_C->node()->references().contains(array.get()));
+    EXPECT_TRUE(var_D->node()->references().contains(array.get()));
+    EXPECT_TRUE(var_E->node()->references().contains(array.get()));
+    EXPECT_TRUE(var_F->node()->references().contains(var_E->node().get()));
+    EXPECT_TRUE(value_1->references().contains(var_F->node().get()));
+    EXPECT_TRUE(value_2->references().contains(array.get()));
+    EXPECT_TRUE(value_3->references().contains(array.get()));
     EXPECT_EQ(array->size(),7);
-    array->release_childs();
+    array->relation_manager()->release_childs(array.get());
     EXPECT_EQ(array->size(),0);
-    EXPECT_FALSE(var_A->node()->parents().contains(array.get()));
-    EXPECT_FALSE(var_B->node()->parents().contains(array.get()));
-    EXPECT_FALSE(var_C->node()->parents().contains(array.get()));
-    EXPECT_FALSE(var_D->node()->parents().contains(array.get()));
-    EXPECT_FALSE(var_E->node()->parents().contains(array.get()));
-    EXPECT_TRUE(var_F->node()->parents().contains(var_E->node().get()));
-    EXPECT_TRUE(value_1->parents().contains(var_F->node().get()));
-    EXPECT_FALSE(value_2->parents().contains(array.get()));
-    EXPECT_FALSE(value_3->parents().contains(array.get()));
+    EXPECT_FALSE(var_A->node()->references().contains(array.get()));
+    EXPECT_FALSE(var_B->node()->references().contains(array.get()));
+    EXPECT_FALSE(var_C->node()->references().contains(array.get()));
+    EXPECT_FALSE(var_D->node()->references().contains(array.get()));
+    EXPECT_FALSE(var_E->node()->references().contains(array.get()));
+    EXPECT_TRUE(var_F->node()->references().contains(var_E->node().get()));
+    EXPECT_TRUE(value_1->references().contains(var_F->node().get()));
+    EXPECT_FALSE(value_2->references().contains(array.get()));
+    EXPECT_FALSE(value_3->references().contains(array.get()));
 }
 // TEST(NodeTest,TestNodeType){
 //     //virtual NODE_TYPE type() const;
@@ -265,7 +265,7 @@ TEST(NodeTest,TestReleaseChilds){
 //     EXPECT_TRUE(false);
 // }
 // TEST(NodeTest,TestHasParents){
-//     //bool has_parents() const;
+//     //bool has_references() const;
 //     EXPECT_TRUE(false);
 // }
 // TEST(NodeTest,TestReplaceMoveChildTo){
@@ -285,11 +285,11 @@ TEST(NodeTest,TestReleaseChilds){
 //     EXPECT_TRUE(false);
 // }
 // TEST(NodeTest,TestParentsConst){
-//     //const std::set<Node*>& parents() const;
+//     //const std::set<Node*>& references() const;
 //     EXPECT_TRUE(false);
 // }
 // TEST(NodeTest,TestParents){
-//     //std::set<Node*>& parents();
+//     //std::set<Node*>& references();
 //     EXPECT_TRUE(false);
 // }
 // TEST(NodeTest,TestReferTo){

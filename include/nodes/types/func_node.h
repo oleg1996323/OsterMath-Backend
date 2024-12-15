@@ -2,18 +2,18 @@
 #include <vector>
 #include <memory>
 #include "def.h"
-#include "node.h"
+#include "abstract_node.h"
 #include "function_node/def.h"
 #include "range_node/def.h"
 
 using namespace node_range_operation;
-class FunctionNode:public Node{
+class FunctionNode:public AbstractNode{
     mutable Result cache_;
     FUNCTION_OP operation_;
     bool array_type_function;
     public:
     inline FunctionNode(FUNCTION_OP op):
-    Node((int)NUMBER_OF_ARGUMENT[(int)op]),
+    AbstractNode((int)NUMBER_OF_ARGUMENT[(int)op]),
     operation_(op),
     array_type_function(ARRAY_TYPE_FUNCTION[int(op)])
     {
@@ -22,7 +22,7 @@ class FunctionNode:public Node{
         //std::cout<<(int)NUMBER_OF_ARGUMENT[(int)op]<<std::endl;
     }
     inline FunctionNode(FUNCTION_OP op, size_t arr_sz):
-    Node(arr_sz),
+    AbstractNode(arr_sz),
     operation_(op),
     array_type_function(ARRAY_TYPE_FUNCTION[int(op)])
     {
@@ -32,19 +32,21 @@ class FunctionNode:public Node{
     }
     FunctionNode(const FunctionNode& other);
     FunctionNode(FunctionNode&&) = delete;
-    inline virtual NODE_TYPE type() const override{
+    ~FunctionNode();
+    virtual NODE_TYPE type() const override{
         return NODE_TYPE::FUNCTION;
     }
-    inline bool is_array_function() const{
+    bool is_array_function() const{
         return array_type_function;
     }
-    virtual void insert_back(std::shared_ptr<Node> node) override;
+    //virtual void insert_back(std::shared_ptr<Node> node) override;
     virtual Result execute() const override;
     virtual void print_text(std::ostream& stream) const override;
     virtual void print_result(std::ostream& stream) const override;
     virtual bool is_numeric() const override;
     virtual bool is_string() const override;
     virtual bool is_array() const override;
+    virtual bool is_empty() const override;
     inline virtual Result cached_result() const override{
         return cache_;
     }

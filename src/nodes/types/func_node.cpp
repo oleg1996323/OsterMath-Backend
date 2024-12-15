@@ -10,23 +10,31 @@
 #include <boost/math/special_functions/gamma.hpp>
 
 FunctionNode::FunctionNode(const FunctionNode& other):
-Node(other),
+AbstractNode(other),
 operation_(other.operation_),
 array_type_function(other.array_type_function){}
 
+FunctionNode::~FunctionNode(){
+    rel_mng_->delete_node(this);
+}
+
 bool FunctionNode::is_numeric() const{
-    return std::all_of(childs().begin(),childs().end(),[](std::shared_ptr<Node> child){
+    return std::all_of(childs().begin(),childs().end(),[](std::shared_ptr<AbstractNode> child){
         return child->is_numeric();
     });
 }
 
 bool FunctionNode::is_string() const{
-    return std::all_of(childs().begin(),childs().end(),[](std::shared_ptr<Node> child){
+    return std::all_of(childs().begin(),childs().end(),[](std::shared_ptr<AbstractNode> child){
         return child->is_string();
     });
 }
 
 bool FunctionNode::is_array() const{
+    return false;
+}
+
+bool FunctionNode::is_empty() const{
     return false;
 }
 
@@ -236,14 +244,4 @@ void FunctionNode::print_text(std::ostream& stream) const{
 void FunctionNode::print_result(std::ostream& stream) const{
     using namespace functions::auxiliary;
     stream<<const_cast<FunctionNode*>(this)->execute();
-}
-
-void FunctionNode::insert_back(std::shared_ptr<Node> node){
-    flush_cache();
-    __invalidate_type_val__();
-    if(childs().size()<childs().capacity()){
-        rel_mng_->insert_back(this,node);
-        rel_mng_->add_parent(node.get(),this, childs().size()-1);
-    }
-    else throw std::logic_error("Invalid inserting. Prompt: Unvalailable to insert node to full defined function node");
 }

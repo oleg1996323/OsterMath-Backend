@@ -17,13 +17,13 @@ enum class COMP_T{
 };
 
 struct Domain{
-    mutable std::shared_ptr<Node> lhs_;
-    mutable std::shared_ptr<Node> rhs_;
-    std::shared_ptr<Node> value_if_true_ = std::make_shared<ValueNode>(0);
+    mutable std::shared_ptr<AbstractNode> lhs_;
+    mutable std::shared_ptr<AbstractNode> rhs_;
+    std::shared_ptr<AbstractNode> value_if_true_ = std::make_shared<ValueNode>(0);
     COMP_T type_;
 
     bool is() const;
-    void set_expression_if_true(std::shared_ptr<Node> value_if_true);
+    void set_expression_if_true(std::shared_ptr<AbstractNode> value_if_true);
     void print_text(std::ostream&) const;
 };
 

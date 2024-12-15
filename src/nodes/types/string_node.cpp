@@ -1,5 +1,10 @@
 #include "string_node.h"
 #include "array_node.h"
+#include "relation_manager.h"
+
+StringNode::~StringNode(){
+    rel_mng_->delete_node(this);
+}
 
 void StringNode::print_text(std::ostream& stream) const{
     stream<<"\""<<cache_<<"\"";
@@ -21,6 +26,6 @@ bool StringNode::is_array() const{
     return false;
 }
 
-void StringNode::insert_back(std::shared_ptr<Node> node){
-    throw std::logic_error("Invalid inserting back. Prompt: Unvalailable to insert_back node to finite node String");
+bool StringNode::is_empty() const{
+    return false;
 }

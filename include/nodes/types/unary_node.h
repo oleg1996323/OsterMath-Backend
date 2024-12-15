@@ -1,6 +1,6 @@
 #pragma once
 #include "def.h"
-#include "node.h"
+#include "abstract_node.h"
 #include "range_node/def.h"
 #include <unordered_set>
 
@@ -17,7 +17,7 @@ class ValueNode;
 class VariableNode;
 
 using namespace node_range_operation;
-class UnaryNode:public Node{
+class UnaryNode:public AbstractNode{
     UNARY_OP operation_;
     friend MultiArgumentNode;
     friend BinaryNode;
@@ -25,24 +25,31 @@ class UnaryNode:public Node{
     friend VariableNode;
     public:
     UnaryNode(UNARY_OP op):operation_(op){}
-    inline UnaryNode(const UnaryNode& other):Node(other){
+    UnaryNode(const UnaryNode& other):AbstractNode(other){
         operation_ = other.operation_;
     }
-    inline UnaryNode(UnaryNode&& other):Node(other){
+    UnaryNode(UnaryNode&& other):AbstractNode(other){
         operation_ = other.operation_;
     }
+    ~UnaryNode();
 
-    inline virtual NODE_TYPE type() const override{
+    virtual NODE_TYPE type() const override{
         return NODE_TYPE::UNARY;
     }
-    inline const std::shared_ptr<Node>& child() const{
+    const std::shared_ptr<AbstractNode>& child() const{
         return childs().at(0);
     }
-    virtual void insert_back(std::shared_ptr<Node> node) override;
+    //virtual void insert_back(std::shared_ptr<Node> node) override;
     virtual Result execute() const override;
+    virtual Result cached_result() const override{
+        if(has_child(0))
+            return child()->execute();
+        else std::runtime_error("Unexpected error: not completely identified unary node");
+    }
     virtual bool is_numeric() const override;
     virtual bool is_string() const override;
     virtual bool is_array() const override;
+    virtual bool is_empty() const override;
     virtual TYPE_VAL type_val() const override;
     UNARY_OP operation() const;
     virtual void print_text(std::ostream& stream) const override;

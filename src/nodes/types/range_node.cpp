@@ -3,7 +3,7 @@
 #include <memory>
 
 RangeOperationNode::RangeOperationNode(const RangeOperationNode& other):
-Node(other),
+AbstractNode(other),
 cache_(other.cache_),
 sz_iteration(other.sz_iteration),
 operation_(other.operation_)
@@ -66,7 +66,7 @@ void RangeOperationNode::print_text(std::ostream& stream) const{
     if(has_expression())
         get_expression()->print_text(stream);
     else {
-        Node node;
+        EmptyNode node;
         node.print_text(stream);
     }
     stream<<")";
@@ -93,6 +93,10 @@ bool RangeOperationNode::is_string() const{
 }
 
 bool RangeOperationNode::is_array() const{
+    return false;
+}
+
+bool RangeOperationNode::is_empty() const{
     return false;
 }
 
@@ -194,15 +198,15 @@ bool RangeOperationNode::check_variables_sizes_and_define_size_iteration(size_t 
         }
     }
     sz_iteration = sz_tmp.value();
-    std::set<std::shared_ptr<Node>> range_nodes = define_range_node_range_nodes();
+    std::set<std::shared_ptr<AbstractNode>> range_nodes = define_range_node_range_nodes();
     if(range_nodes.empty())
         return true;
     else{
-        if(!std::all_of(range_nodes.begin(),range_nodes.end(),[&structure,depth](const std::shared_ptr<Node>& node){
+        if(!std::all_of(range_nodes.begin(),range_nodes.end(),[&structure,depth](const std::shared_ptr<AbstractNode>& node){
             return std::dynamic_pointer_cast<RangeOperationNode>(node)->
             check_variables_sizes_and_define_size_iteration(depth+1,structure);
         })){
-            auto found = std::find_if(range_nodes.begin(),range_nodes.end(),[](std::shared_ptr<Node> node)->bool
+            auto found = std::find_if(range_nodes.begin(),range_nodes.end(),[](std::shared_ptr<AbstractNode> node)->bool
             {
                 return node->cached_result().is_error();
             });
@@ -217,7 +221,7 @@ bool RangeOperationNode::check_variables_sizes_and_define_size_iteration(size_t 
 std::set<std::shared_ptr<VariableNode>> RangeOperationNode::define_range_node_array_type_variables() const{
     std::set<std::shared_ptr<VariableNode>> ref_vars = get_expression()->refer_to_vars();
     { //filtering this range node variables
-        std::set<std::shared_ptr<Node>> ref_range_nodes = get_expression()->refer_to_node_of_type(NODE_TYPE::RANGEOP);
+        std::set<std::shared_ptr<AbstractNode>> ref_range_nodes = get_expression()->refer_to_node_of_type(NODE_TYPE::RANGEOP);
         if(!ref_range_nodes.empty())
         {
             std::set<std::shared_ptr<VariableNode>> all_refered_vars_by_child_range_node;
@@ -245,14 +249,14 @@ std::set<std::shared_ptr<VariableNode>> RangeOperationNode::define_range_node_ar
     return ref_vars;
 }
 
-std::set<std::shared_ptr<Node>> RangeOperationNode::define_range_node_range_nodes() const{
-    std::set<std::shared_ptr<Node>> result;
+std::set<std::shared_ptr<AbstractNode>> RangeOperationNode::define_range_node_range_nodes() const{
+    std::set<std::shared_ptr<AbstractNode>> result;
     { //filtering this range node variables
-        std::set<std::shared_ptr<Node>> ref_range_nodes = refer_to_node_of_type(NODE_TYPE::RANGEOP);
+        std::set<std::shared_ptr<AbstractNode>> ref_range_nodes = refer_to_node_of_type(NODE_TYPE::RANGEOP);
         if(!ref_range_nodes.empty())
         {
-            std::set<std::shared_ptr<Node>> all_refered_range_nodes_by_child_range_node;
-            std::set<std::shared_ptr<Node>> diff;
+            std::set<std::shared_ptr<AbstractNode>> all_refered_range_nodes_by_child_range_node;
+            std::set<std::shared_ptr<AbstractNode>> diff;
             for(const auto& range_node:ref_range_nodes)
                 all_refered_range_nodes_by_child_range_node.merge(std::dynamic_pointer_cast<RangeOperationNode>(range_node)->
                                                     refer_to_node_of_type(NODE_TYPE::RANGEOP));

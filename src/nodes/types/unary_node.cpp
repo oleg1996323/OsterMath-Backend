@@ -1,5 +1,10 @@
 #include "unary_node.h"
 #include "def.h"
+#include "relation_manager.h"
+
+UnaryNode::~UnaryNode(){
+    rel_mng_->delete_node(this);
+}
 
 void UnaryNode::print_text(std::ostream& stream) const{
     if(operation_==UNARY_OP::ADD){
@@ -23,13 +28,6 @@ void UnaryNode::print_text(std::ostream& stream) const{
 
 void UnaryNode::print_result(std::ostream& stream) const{
     stream<<const_cast<UnaryNode*>(this)->execute();
-}
-
-#include "relation_manager.h"
-void UnaryNode::insert_back(std::shared_ptr<Node> node){
-    assert(childs().size()==0);
-    rel_mng_->insert_back(this,node);
-    rel_mng_->add_parent(node.get(),this,childs().size()-1);
 }
 
 Result UnaryNode::execute() const{
@@ -68,6 +66,10 @@ bool UnaryNode::is_array() const{
     if(!has_child(0))
         return false;
     return childs().at(0)->is_array();
+}
+
+bool UnaryNode::is_empty() const{
+    return false;
 }
 
 UNARY_OP UnaryNode::operation() const{

@@ -3,7 +3,7 @@
 
 template<typename... ARGS>
 concept NodeRequirements = requires(ARGS... args){
-    ((std::is_base_of_v<std::decay_t<ARGS>,Node>) && ...);
+    ((std::is_base_of_v<AbstractNode,std::decay_t<ARGS>>) && ...);
     requires (((args.type_val()) && ...) || ((args->type_val()) && ...));
 };
 

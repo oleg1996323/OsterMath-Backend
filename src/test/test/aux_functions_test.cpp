@@ -104,17 +104,17 @@ public:
         }
     }
 
-    std::shared_ptr<Node> node_2(){
+    std::shared_ptr<AbstractNode> node_2(){
         return node_2_;
     }
 
-    std::shared_ptr<Node> node_2_with_vars(){
+    std::shared_ptr<AbstractNode> node_2_with_vars(){
         return node_2_with_vars_;
     }
 
 private:
-    std::shared_ptr<Node> node_2_;
-    std::shared_ptr<Node> node_2_with_vars_;
+    std::shared_ptr<AbstractNode> node_2_;
+    std::shared_ptr<AbstractNode> node_2_with_vars_;
     std::shared_ptr<BaseData> bd;
 };
 
@@ -148,17 +148,17 @@ public:
         }
     }
 
-    std::shared_ptr<Node> rect_array(){
+    std::shared_ptr<AbstractNode> rect_array(){
         return rect_node;
     }
 
-    std::shared_ptr<Node> not_rect_array(){
+    std::shared_ptr<AbstractNode> not_rect_array(){
         return not_rect_node;
     }
 
 private:
-    std::shared_ptr<Node> rect_node;
-    std::shared_ptr<Node> not_rect_node;
+    std::shared_ptr<AbstractNode> rect_node;
+    std::shared_ptr<AbstractNode> not_rect_node;
     std::shared_ptr<BaseData> bd;
 };
 
@@ -279,7 +279,7 @@ TEST(AuxiliaryFunctions,Find_first_node_not_variable_by_ids){
 }
 
 TEST_F(ComplexNode_1,CompareArrays_UniversalFunction_1){
-    std::vector<std::shared_ptr<Node>> nodes;
+    std::vector<std::shared_ptr<AbstractNode>> nodes;
     nodes.push_back(node_2_.node_2());
     nodes.push_back(node_2_.node_2_with_vars());
     EXPECT_TRUE(equal_morphology_nodes(nodes));

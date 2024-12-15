@@ -22,7 +22,7 @@ namespace node_function::functions{
         Result Concatenate(const ArrayNode* arr){
             using namespace ::functions::auxiliary;
             std::string result;
-            for(const std::shared_ptr<Node>& child:arr->childs()){
+            for(const std::shared_ptr<AbstractNode>& child:arr->childs()){
                 if(!child->execute().is_error()){
                     if(check_arguments(TYPE_VAL::STRING_ARRAY,child) && child->cached_result().is_array())
                         result+=Concatenate(child->cached_result().get_array_node()).get<std::string>();
@@ -37,10 +37,10 @@ namespace node_function::functions{
             return result;
         }
 
-        Result Concatenate(const std::vector<std::shared_ptr<Node>>& nodes){
+        Result Concatenate(const std::vector<std::shared_ptr<AbstractNode>>& nodes){
             using namespace ::functions::auxiliary;
             std::string result;
-            for(const std::shared_ptr<Node>& node:nodes){
+            for(const std::shared_ptr<AbstractNode>& node:nodes){
                 if(!node->execute().is_error()){
                     if(check_arguments(TYPE_VAL::STRING_ARRAY,node)){
                         Result tmp = Concatenate(dynamic_cast<const ArrayNode*>(node.get()));

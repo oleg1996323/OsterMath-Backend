@@ -1,31 +1,32 @@
 #pragma once
 #include "def.h"
-#include "node.h"
+#include "abstract_node.h"
 #include "range_node/def.h"
 #include <unordered_set>
 
 using namespace node_range_operation;
-class ValueNode:public Node{
+class ValueNode:public AbstractNode{
     Result cache_;
     public:
-    inline ValueNode()=default;
+    ValueNode()=default;
 
-    inline ValueNode(const ValueNode& value):Node(value){
+    ValueNode(const ValueNode& value):AbstractNode(value){
         cache_ = value.cache_;
     }
-    inline ValueNode(ValueNode&& value):Node(value){
+    ValueNode(ValueNode&& value):AbstractNode(value){
         cache_ = std::move(value.cache_);
     }
-    inline ValueNode(Value_t&& value):Node(){
+    ValueNode(Value_t&& value):AbstractNode(){
         cache_ = std::move(value);
     }
-    inline ValueNode(const Value_t& value):Node(){
+    ValueNode(const Value_t& value):AbstractNode(){
         cache_ = value;
     }
-    inline ValueNode(std::string&& value):Node(){
+    ValueNode(std::string&& value):AbstractNode(){
         cache_ = Value_t(value);
     }
-    inline virtual NODE_TYPE type() const override{
+    ~ValueNode();
+    virtual NODE_TYPE type() const override{
         return NODE_TYPE::VALUE;
     }
     inline virtual TYPE_VAL type_val() const override{
@@ -40,11 +41,12 @@ class ValueNode:public Node{
     virtual bool is_numeric() const override;
     virtual bool is_string() const override;
     virtual bool is_array() const override;
-    virtual void insert_back(std::shared_ptr<Node> node) override;
+    virtual bool is_empty() const override;
+    //virtual void insert_back(std::shared_ptr<Node> node) override;
     virtual void print_text(std::ostream& stream) const override;
     virtual void print_result(std::ostream& stream) const override;
     private:
-    inline virtual bool __is_not_cycled__(const Node*) const override{
+    inline virtual bool __is_not_cycled__(const AbstractNode*) const override{
         return true;
     }
     inline virtual Result execute_for_array_variables(const execute_for_array_variables_t&) const override{

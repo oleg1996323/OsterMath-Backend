@@ -1,6 +1,7 @@
 #pragma once
 #include "nodes/def.h"
-#include "node.h"
+#include "def.h"
+#include "abstract_node.h"
 #include "range_node/def.h"
 #include <unordered_set>
 
@@ -13,29 +14,28 @@ enum class BINARY_OP{
 };
 
 using namespace node_range_operation;
-class BinaryNode:public Node{
+class BinaryNode:public AbstractNode{
     BINARY_OP operation_;
     friend UnaryNode;
     friend MultiArgumentNode;
     friend ValueNode;
     friend VariableNode;
     public:
-    inline BinaryNode(BINARY_OP op):operation_(op){}
-    inline BinaryNode(const BinaryNode& other):Node(other),operation_(other.operation_){}
-    inline BinaryNode(BinaryNode&& other):Node(other),operation_(other.operation_){}
-
+    BinaryNode(BINARY_OP op):operation_(op){}
+    BinaryNode(const BinaryNode& other):AbstractNode(other),operation_(other.operation_){}
+    BinaryNode(BinaryNode&& other):AbstractNode(other),operation_(other.operation_){}
+    ~BinaryNode();
     virtual NODE_TYPE type() const override{
         return NODE_TYPE::BINARY;
     }
     virtual Result execute() const override;
 
-    std::shared_ptr<Node> lhs() const{
+    std::shared_ptr<AbstractNode> lhs() const{
         return child(0);
     }
-    std::shared_ptr<Node> rhs() const{
+    std::shared_ptr<AbstractNode> rhs() const{
         return child(1);
     }
-    virtual void insert_back(std::shared_ptr<Node> node) override;
 
     virtual Result cached_result() const override{
         return execute();
@@ -47,6 +47,7 @@ class BinaryNode:public Node{
     virtual bool is_numeric() const override;
     virtual bool is_string() const override;
     virtual bool is_array() const override;
+    virtual bool is_empty() const override;
     virtual void print_text(std::ostream& stream) const override;
     virtual void print_result(std::ostream& stream) const override;
     private:

@@ -31,7 +31,7 @@ bool BaseListener::is_array_definition() const{
     return !mode_.empty() && mode_.top()==MODE::ARRAY_DEFINITION;
 }
 
-bool BaseListener::is__array_item_definition() const{
+bool BaseListener::is_array_item_definition() const{
     return !mode_.empty() && mode_.top()==MODE::ARRAY_ITEM_DEFINITION;
 }
 
@@ -47,8 +47,8 @@ void BaseListener::__insert_to_prec_node__(MODE mode_assert_check){
         if(anonymous_node_.top()->type()==NODE_TYPE::VARIABLE)
             anonymous_node_.top()->insert_back(node);
         else{
-            Node* tmp_node = info->parent->replace(info->id,node).get();
-            tmp_node->relation_manager()->erase_parent(tmp_node, info->parent);
+            //Node* tmp_node = info->parent->replace(info->id,node).get();
+            //tmp_node->relation_manager()->erase_parent(tmp_node, info->parent);
         }
     }
     else anonymous_node_.top()->insert_back(node);
@@ -444,9 +444,9 @@ void BaseListener::enterVardefinition(head_interactor::VardefinitionContext * ct
                 db_tmp = __insert_new_data_base__(ctx->DATABASE()->getText());
             else db_tmp = data_base_;
             current_node_ = db_tmp->add_variable(ctx->VARIABLE()->getText())->node();
-            current_node_->release_childs();
+            current_node_->relation_manager()->release_childs(current_node_.get());
             if(!ctx->value_type())
-                current_node_->insert_back(std::make_shared<Node>());
+                current_node_->insert_back(std::make_shared<EmptyNode>());
             anonymous_node_.push(current_node_);
         }
         else{
@@ -484,7 +484,7 @@ void BaseListener::enterVardefinition(head_interactor::VardefinitionContext * ct
                 if(ctx->value_type())
                     anonymous_node_.push(info->parent->child(info->id));
                 else {
-                    info->parent->replace(info->id,std::make_shared<Node>());
+                    info->parent->replace(info->id,std::make_shared<EmptyNode>());
                     anonymous_node_.push(info->parent->child(info->id));
                 }
             }
@@ -498,9 +498,9 @@ void BaseListener::enterVardefinition(head_interactor::VardefinitionContext * ct
                 db_tmp = __insert_new_data_base__(ctx->DATABASE()->getText());
         else db_tmp = data_base_;
         current_node_ = db_tmp->add_variable(ctx->VARIABLE()->getText())->node();
-        current_node_->release_childs();
+        current_node_->relation_manager()->release_childs(current_node_.get());
         if(!ctx->value_type())
-            current_node_->insert_back(std::make_shared<Node>());
+            current_node_->insert_back(std::make_shared<EmptyNode>());
         anonymous_node_.push(current_node_);
     }
 }

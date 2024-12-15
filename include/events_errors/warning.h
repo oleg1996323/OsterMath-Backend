@@ -6,7 +6,8 @@ namespace warnings{
 
 enum WARNING_TYPE{
     NOWARNING,
-    INFINITE
+    INFINITE,
+    UNDEF_REF
 };
 
 //rename folder to events
@@ -27,6 +28,14 @@ class Warning: public AbstractEvent{
 };
 
 class Infinite final: public Warning {
+    public:
+    static std::string warning_abbr();
+    virtual std::string get_warning() const override;
+    virtual WARNING_TYPE type() const override;
+    virtual std::string get_prompt() const;
+};
+
+class UndefinedRef final: public Warning {
     public:
     static std::string warning_abbr();
     virtual std::string get_warning() const override;

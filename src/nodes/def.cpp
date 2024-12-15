@@ -27,11 +27,11 @@ bool Result::is_string() const{
 }
 
 bool Result::is_node() const{
-    return std::holds_alternative<const Node*>(*this);
+    return std::holds_alternative<const AbstractNode*>(*this);
 }
 
 bool Result::is_array() const{
-    return is_node() && get<const Node*>()->is_array();
+    return is_node() && get<const AbstractNode*>()->is_array();
 }
 
 bool Result::has_value() const{
@@ -192,10 +192,10 @@ bool operator==(const Result& res,const std::string& val){
     return res.is_string() && val == res.get_string();
 }
 bool operator==(std::shared_ptr<ArrayNode> val, const Result& res){
-    return res.is_array_result() && ::functions::auxiliary::equal_morphology_nodes(std::vector<std::shared_ptr<Node>>{val,res.get_array_result()});
+    return res.is_array_result() && ::functions::auxiliary::equal_morphology_nodes(std::vector<std::shared_ptr<AbstractNode>>{val,res.get_array_result()});
 }
 bool operator==(const Result& res,std::shared_ptr<ArrayNode> val){
-    return res.is_array_result() && ::functions::auxiliary::equal_morphology_nodes(std::vector<std::shared_ptr<Node>>{val,res.get_array_result()});
+    return res.is_array_result() && ::functions::auxiliary::equal_morphology_nodes(std::vector<std::shared_ptr<AbstractNode>>{val,res.get_array_result()});
 }
 
 std::ostream& Result::operator<<(std::ostream& os) const

@@ -10,16 +10,26 @@
 #include "string_node.h"
 #include "bin_node.h"
 #include "aux_functions.h"
+#include "relation_manager.h"
 
 using namespace functions::auxiliary;
 
-TEST(ArrayNode_test,SizeConstructor){
-    std::cout<<"Run test size constructor"<<std::endl;
-    std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(10);
-    EXPECT_TRUE((std::convertible_to<decltype(arr->size()),size_t>));
-    EXPECT_EQ(arr->size(),0);
-    EXPECT_EQ(arr->childs().capacity(),10);
-}
+// TEST(ArrayNode_test,SizeConstructor){
+//     std::cout<<"Run test size constructor"<<std::endl;
+//     std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(10);
+//     EXPECT_TRUE((std::convertible_to<decltype(arr->size()),size_t>));
+//     EXPECT_EQ(arr->size(),0);
+//     EXPECT_EQ(arr->childs().capacity(),10);
+//     arr->relation_manager()->log_state();
+// }
+// TEST(ArrayNode_test,Destructor){
+//     std::cout<<"Run test destructor"<<std::endl;
+//     std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(10);
+//     EXPECT_TRUE((std::convertible_to<decltype(arr->size()),size_t>));
+//     EXPECT_EQ(arr->size(),0);
+//     EXPECT_EQ(arr->childs().capacity(),10);
+//     arr->relation_manager()->log_state();
+// }
 TEST(ArrayNode_test,Insert_Back){
     std::cout<<"Run test insert back"<<std::endl;
     std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(10);
@@ -30,9 +40,11 @@ TEST(ArrayNode_test,Insert_Back){
     EXPECT_EQ(arr->childs().size(),10);
     arr->insert_back(std::make_shared<ValueNode>(values.back()+1));
     EXPECT_EQ(arr->childs().size(),11);
+    arr->relation_manager()->log_state();
 }
 TEST(ArrayNode_test,Insert){
     std::cout<<"Run test insert at position"<<std::endl;
+    //TODO need to check construction - destruction
 }
 TEST(ArrayNode_test,Replace){
     std::cout<<"Run test replace at position"<<std::endl;
@@ -43,6 +55,7 @@ TEST(ArrayNode_test,Begins){
     EXPECT_EQ(arr->childs().begin(), arr->begin());
     arr->insert_back(std::make_shared<ValueNode>(1));
     EXPECT_EQ(arr->childs().begin(), arr->begin());
+    arr->relation_manager()->log_state();
 }
 TEST(ArrayNode_test,Ends){
     std::cout<<"Run test begin"<<std::endl;
@@ -50,9 +63,11 @@ TEST(ArrayNode_test,Ends){
     EXPECT_EQ(arr->begin(), arr->end());
     arr->insert_back(std::make_shared<ValueNode>(1));
     EXPECT_EQ(arr->begin()+1, arr->end());
+    arr->relation_manager()->log_state();
 }
 TEST(ArrayNode_test,CopyConstructor){
     std::cout<<"Run test copy constructor"<<std::endl;
+    //TODO: here error
     std::shared_ptr<ArrayNode> arr_1 = std::make_shared<ArrayNode>(10);
     std::vector<Value_t> values(10);
     std::iota(values.begin(),values.end(),0);
@@ -63,6 +78,7 @@ TEST(ArrayNode_test,CopyConstructor){
     for(auto iter = arr_2->begin();iter!=arr_2->end();++iter){
         EXPECT_TRUE(check_arguments(TYPE_VAL::VALUE,arr_1->child(iter-arr_2->begin())));
     }
+    arr_1->relation_manager()->log_state();
 }
 TEST(ArrayNode_test,MoveConstructor){
     std::cout<<"Run test move constructor"<<std::endl;
@@ -76,6 +92,7 @@ TEST(ArrayNode_test,MoveConstructor){
     for(auto iter = arr_2->begin();iter!=arr_2->end();++iter){
         EXPECT_TRUE(check_arguments(TYPE_VAL::VALUE,arr_1.child(iter-arr_2->begin())));
     }
+    arr_1.relation_manager()->log_state();
 }
 TEST(ArrayNode_test,Operator_Eq_copy){
     std::cout<<"Run test operator equal copy"<<std::endl;

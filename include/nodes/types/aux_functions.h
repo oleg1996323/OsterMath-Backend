@@ -31,43 +31,43 @@ namespace functions{
 
         template<typename T>
         SizeDepthMeasure init_sz_depth_measure(T array);
-        bool check_sizes_arrays(SizeDepthMeasure& sz_depth_measure,const std::vector<std::shared_ptr<Node>>& nodes) noexcept;
-        bool is_filled_array_node(const std::shared_ptr<Node>& node) noexcept;
-        bool is_filled_rectangle_array_node_of_type(TYPE_VAL,const std::shared_ptr<Node>& node) noexcept;
+        bool check_sizes_arrays(SizeDepthMeasure& sz_depth_measure,const std::vector<std::shared_ptr<AbstractNode>>& nodes) noexcept;
+        bool is_filled_array_node(const std::shared_ptr<AbstractNode>& node) noexcept;
+        bool is_filled_rectangle_array_node_of_type(TYPE_VAL,const std::shared_ptr<AbstractNode>& node) noexcept;
         template<template<typename> typename CONT, typename T>
         requires __container_array_node_req__<CONT,T>
         bool check_sizes_arrays(SizeDepthMeasure& sz_depth_measure,CONT<T> nodes) noexcept;
-        bool is_rectangle_array_node(const std::shared_ptr<Node>& node) noexcept;
-        bool equal_morphology_nodes(const std::vector<std::shared_ptr<Node>>& nodes) noexcept;
-        bool equal_morphology_nodes(const std::set<std::shared_ptr<Node>>& nodes) noexcept;
+        bool is_rectangle_array_node(const std::shared_ptr<AbstractNode>& node) noexcept;
+        bool equal_morphology_nodes(const std::vector<std::shared_ptr<AbstractNode>>& nodes) noexcept;
+        bool equal_morphology_nodes(const std::set<std::shared_ptr<AbstractNode>>& nodes) noexcept;
 
-        bool all_numeric(decltype(std::declval<const Node>().childs()) arrays);
-        bool all_string(decltype(std::declval<const Node>().childs()) arrays);
-        bool has_cyclic_references(const std::shared_ptr<Node>& checked) noexcept;
-        bool has_cyclic_references(const Node* node) noexcept;
-        std::shared_ptr<Node> first_node_not_var(const std::shared_ptr<Node>& node) noexcept;
-        const Node* first_node_not_var(const Node* node) noexcept;
-        std::shared_ptr<Node> first_node_not_var_by_ids(const std::shared_ptr<Node>& node, const std::vector<size_t>::const_iterator& first,const std::vector<size_t>::const_iterator& last) noexcept;
-        std::shared_ptr<Node> first_node_not_var_by_ids(const std::shared_ptr<Node>& node, const SizeDepthMeasure& seq_iterators) noexcept;
-        const Node* first_node_not_var_by_ids(const Node* node, const std::vector<size_t>::const_iterator& first,const std::vector<size_t>::const_iterator& last) noexcept;
-        const Node* first_node_not_var_by_ids(const Node* node, const SizeDepthMeasure& seq_iterators) noexcept;
+        bool all_numeric(decltype(std::declval<const AbstractNode>().childs()) arrays);
+        bool all_string(decltype(std::declval<const AbstractNode>().childs()) arrays);
+        bool has_cyclic_references(const std::shared_ptr<AbstractNode>& checked) noexcept;
+        bool has_cyclic_references(const AbstractNode* node) noexcept;
+        std::shared_ptr<AbstractNode> first_node_not_var(const std::shared_ptr<AbstractNode>& node) noexcept;
+        const AbstractNode* first_node_not_var(const AbstractNode* node) noexcept;
+        std::shared_ptr<AbstractNode> first_node_not_var_by_ids(const std::shared_ptr<AbstractNode>& node, const std::vector<size_t>::const_iterator& first,const std::vector<size_t>::const_iterator& last) noexcept;
+        std::shared_ptr<AbstractNode> first_node_not_var_by_ids(const std::shared_ptr<AbstractNode>& node, const SizeDepthMeasure& seq_iterators) noexcept;
+        const AbstractNode* first_node_not_var_by_ids(const AbstractNode* node, const std::vector<size_t>::const_iterator& first,const std::vector<size_t>::const_iterator& last) noexcept;
+        const AbstractNode* first_node_not_var_by_ids(const AbstractNode* node, const SizeDepthMeasure& seq_iterators) noexcept;
 
-        bool check_sizes_arrays(const std::vector<Node*>& arrays);
-        bool check_sizes_arrays(const std::list<Node*>& arrays);
-        bool check_sizes_arrays(const std::deque<Node*>& arrays);
-        //bool check_sizes_arrays(const std::vector<std::shared_ptr<Node>>& arrays);
-        bool check_sizes_arrays(const std::list<std::shared_ptr<Node>>& arrays);
-        bool check_sizes_arrays(const std::deque<std::shared_ptr<Node>>& arrays);
+        bool check_sizes_arrays(const std::vector<AbstractNode*>& arrays);
+        bool check_sizes_arrays(const std::list<AbstractNode*>& arrays);
+        bool check_sizes_arrays(const std::deque<AbstractNode*>& arrays);
+        //bool check_sizes_arrays(const std::vector<std::shared_ptr<AbstractNode>>& arrays);
+        bool check_sizes_arrays(const std::list<std::shared_ptr<AbstractNode>>& arrays);
+        bool check_sizes_arrays(const std::deque<std::shared_ptr<AbstractNode>>& arrays);
 
         //temporary at testing TODO: delete
-        bool check_sizes_arrays(SizeDepthMeasure&,const std::vector<Node*>& arrays);
-        bool check_sizes_arrays(SizeDepthMeasure&,const std::list<Node*>& arrays);
-        bool check_sizes_arrays(SizeDepthMeasure&,const std::deque<Node*>& arrays);
-        bool check_sizes_arrays(SizeDepthMeasure&,const std::list<std::shared_ptr<Node>>& arrays);
-        bool check_sizes_arrays(SizeDepthMeasure&,const std::deque<std::shared_ptr<Node>>& arrays);
+        bool check_sizes_arrays(SizeDepthMeasure&,const std::vector<AbstractNode*>& arrays);
+        bool check_sizes_arrays(SizeDepthMeasure&,const std::list<AbstractNode*>& arrays);
+        bool check_sizes_arrays(SizeDepthMeasure&,const std::deque<AbstractNode*>& arrays);
+        bool check_sizes_arrays(SizeDepthMeasure&,const std::list<std::shared_ptr<AbstractNode>>& arrays);
+        bool check_sizes_arrays(SizeDepthMeasure&,const std::deque<std::shared_ptr<AbstractNode>>& arrays);
 
-        std::shared_ptr<ArrayNode> to_array_node(const std::shared_ptr<Node>& node) noexcept;
-        std::shared_ptr<ValueNode> to_value_node(const std::shared_ptr<Node>& node) noexcept;
+        std::shared_ptr<ArrayNode> to_array_node(const std::shared_ptr<AbstractNode>& node) noexcept;
+        std::shared_ptr<ValueNode> to_value_node(const std::shared_ptr<AbstractNode>& node) noexcept;
         //TODO: StringNode* to_string_node(const std::shared_ptr<Node>& node);
 
     }
@@ -128,9 +128,9 @@ SizeDepthMeasure functions::auxiliary::init_sz_depth_measure(T array){
 bool same_result_type(const Result& first,const Result& second);
 
 template<typename T>
-requires std::is_base_of_v<Node,T> || std::is_same_v<Node,T>
+requires std::is_base_of_v<AbstractNode,T>
 bool functions::auxiliary::equal_morphology_nodes(const std::set<std::shared_ptr<T>>& nodes) noexcept{
-    std::vector<std::shared_ptr<Node>> tmp;
+    std::vector<std::shared_ptr<AbstractNode>> tmp;
     std::copy(nodes.begin(),nodes.end(),std::back_inserter(tmp));
     return equal_morphology_nodes(tmp);
 }

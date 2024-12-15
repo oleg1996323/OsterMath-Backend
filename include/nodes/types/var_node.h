@@ -1,15 +1,15 @@
 #pragma once
 #include <unordered_set>
-#include "node.h"
+#include "abstract_node.h"
 
 class VariableBase;
 using namespace node_range_operation;
-class VariableNode:public Node{
+class VariableNode:public AbstractNode{
     mutable std::shared_ptr<exceptions::Exception> cache_;
     VariableBase* var_;
     public:
-    using Node::operator=;
-    using Node::insert_back;
+    using AbstractNode::operator=;
+    using AbstractNode::insert_back;
     VariableNode(VariableBase* variable);
     VariableNode(const VariableNode& other) = delete;
     VariableNode(VariableNode&&) = delete;
@@ -23,7 +23,7 @@ class VariableNode:public Node{
 
     VariableBase* variable() noexcept;
 
-    virtual void insert_back(std::shared_ptr<Node> node) override;
+    //virtual void insert_back(std::shared_ptr<Node> node) override;
 
     virtual Result execute() const override;
 

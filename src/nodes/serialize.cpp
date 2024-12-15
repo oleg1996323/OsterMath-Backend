@@ -27,7 +27,7 @@ void SerialData::insert_var(uint64_t var_id, const std::shared_ptr<VariableNode>
     if(node)
         nodes_[var_id]=node;
 
-    for(auto& [parent,ids]:node->parents()){
+    for(auto& [parent,ids]:node->references()){
         add_dependency((uint64_t)parent,var_id);
     }
     if(node->childs().size()>0)
@@ -66,14 +66,16 @@ void SerialData::serialize_header(DataPool* pool){
         sz = data_base->variables().size();
         data_stream_.write(reinterpret_cast<const char*>(&sz),sizeof(sz));
         if(!data_base->variables().empty()){
-            std::function<void(const std::shared_ptr<Node>&)> nodes_size;
+            std::function<void(const std::shared_ptr<AbstractNode>&)> nodes_size;
             sz=0;
-            nodes_size=[&sz](const std::shared_ptr<Node>& node)->void{
+            nodes_size=[&sz](const std::shared_ptr<AbstractNode>& node)->void
+            {
                 ++sz;
             };
 
-            std::function<void(const std::shared_ptr<Node>&)> nodes_to_header;
-            nodes_to_header=[this](const std::shared_ptr<Node>& node)->void{
+            std::function<void(const std::shared_ptr<AbstractNode>&)> nodes_to_header;
+            nodes_to_header=[this](const std::shared_ptr<AbstractNode>& node)->void
+            {
                 if(node){
                     NodeProperties props;
                     props.id = (uint64_t)node.get();
@@ -230,8 +232,8 @@ DataPool SerialData::deserialize_header(){
         data_stream_.read(reinterpret_cast<char*>(&sz_var),sizeof(sz_var));
         if(sz_var!=0){
 
-            std::function<std::shared_ptr<Node>()> nodes_from_header;
-            nodes_from_header = [this]()->std::shared_ptr<Node> {
+            std::function<std::shared_ptr<AbstractNode>()> nodes_from_header;
+            nodes_from_header = [this]()->std::shared_ptr<AbstractNode> {
                 NodeProperties props;
                 data_stream_.read(reinterpret_cast<char*>(&props),sizeof(props));
                 switch ((NODE_TYPE)props.type){

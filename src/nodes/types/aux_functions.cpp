@@ -19,48 +19,48 @@ size_t pow(size_t base, size_t pow){
     else return 1;    
 }
 
-bool functions::auxiliary::all_numeric(decltype(std::declval<const Node>().childs()) arrays){
-    return std::all_of(arrays.begin(),arrays.end(),[](const std::decay_t<decltype(std::declval<Node>().childs())>::value_type& node){
+bool functions::auxiliary::all_numeric(decltype(std::declval<const AbstractNode>().childs()) arrays){
+    return std::all_of(arrays.begin(),arrays.end(),[](const std::decay_t<decltype(std::declval<AbstractNode>().childs())>::value_type& node){
         return node->is_numeric();
     });
 }
 
-bool functions::auxiliary::all_string(decltype(std::declval<const Node>().childs()) arrays){
-    return std::all_of(arrays.begin(),arrays.end(),[](const std::decay_t<decltype(std::declval<Node>().childs())>::value_type& node){
+bool functions::auxiliary::all_string(decltype(std::declval<const AbstractNode>().childs()) arrays){
+    return std::all_of(arrays.begin(),arrays.end(),[](const std::decay_t<decltype(std::declval<AbstractNode>().childs())>::value_type& node){
         return node->is_string();
     });
 }
 
-std::shared_ptr<ArrayNode> functions::auxiliary::to_array_node(const std::shared_ptr<Node>& node) noexcept{
+std::shared_ptr<ArrayNode> functions::auxiliary::to_array_node(const std::shared_ptr<AbstractNode>& node) noexcept{
     return reinterpret_cast<const std::shared_ptr<ArrayNode>&>(node);
 }
-std::shared_ptr<ValueNode> functions::auxiliary::to_value_node(const std::shared_ptr<Node>& node) noexcept{
+std::shared_ptr<ValueNode> functions::auxiliary::to_value_node(const std::shared_ptr<AbstractNode>& node) noexcept{
     return reinterpret_cast<const std::shared_ptr<ValueNode>&>(node);
 }
 
-std::shared_ptr<Node> functions::auxiliary::first_node_not_var(const std::shared_ptr<Node>& node) noexcept{
+std::shared_ptr<AbstractNode> functions::auxiliary::first_node_not_var(const std::shared_ptr<AbstractNode>& node) noexcept{
     if(node){
         if(node->type()!=NODE_TYPE::VARIABLE)
             return node;
-        std::shared_ptr<Node> child;
+        std::shared_ptr<AbstractNode> child;
         if(node->has_child(0))
             child = node->child(0);
-        else return std::shared_ptr<Node>();
+        else return std::shared_ptr<AbstractNode>();
         while(child->has_child(0) && child->type()==NODE_TYPE::VARIABLE){
             child = child->child(0);
         }
         if(child->type()==NODE_TYPE::VARIABLE){
-            return std::shared_ptr<Node>();
+            return std::shared_ptr<AbstractNode>();
         }
         return child;
     }
-    return std::shared_ptr<Node>();
+    return std::shared_ptr<AbstractNode>();
 }
-const Node* functions::auxiliary::first_node_not_var(const Node* node) noexcept{
+const AbstractNode* functions::auxiliary::first_node_not_var(const AbstractNode* node) noexcept{
     if(node){
         if(node->type()!=NODE_TYPE::VARIABLE)
             return node;
-        std::shared_ptr<Node> child;
+        std::shared_ptr<AbstractNode> child;
         if(node->has_child(0))
             child = node->child(0);
         else return nullptr;
@@ -75,24 +75,24 @@ const Node* functions::auxiliary::first_node_not_var(const Node* node) noexcept{
     return nullptr;
 }
 
-std::shared_ptr<Node> functions::auxiliary::first_node_not_var_by_ids(const std::shared_ptr<Node>& node, const std::vector<size_t>::const_iterator& first,const std::vector<size_t>::const_iterator& last) noexcept{
-    std::shared_ptr<Node> child = first_node_not_var(node);
+std::shared_ptr<AbstractNode> functions::auxiliary::first_node_not_var_by_ids(const std::shared_ptr<AbstractNode>& node, const std::vector<size_t>::const_iterator& first,const std::vector<size_t>::const_iterator& last) noexcept{
+    std::shared_ptr<AbstractNode> child = first_node_not_var(node);
     if(child){
         for(auto i = first;i<last;++i){
             if(child->has_child(*i))
                 child = child->child(*i);
-            else return std::shared_ptr<Node>();
+            else return std::shared_ptr<AbstractNode>();
             child = first_node_not_var(child);
             if(!child)
-                return std::shared_ptr<Node>();
+                return std::shared_ptr<AbstractNode>();
         }
         return child;
     }
     return nullptr;
 }
 #include <ranges>
-const Node* functions::auxiliary::first_node_not_var_by_ids(const Node* node, const std::vector<size_t>::const_iterator& first,const std::vector<size_t>::const_iterator& last) noexcept{
-    const Node* child = first_node_not_var(node);
+const AbstractNode* functions::auxiliary::first_node_not_var_by_ids(const AbstractNode* node, const std::vector<size_t>::const_iterator& first,const std::vector<size_t>::const_iterator& last) noexcept{
+    const AbstractNode* child = first_node_not_var(node);
     if(child){
         for(auto i = first;i<last;++i){
             if(child->has_child(*i))
@@ -106,24 +106,24 @@ const Node* functions::auxiliary::first_node_not_var_by_ids(const Node* node, co
     }
     return nullptr;
 }
-std::shared_ptr<Node> functions::auxiliary::first_node_not_var_by_ids(const std::shared_ptr<Node>& node, const SizeDepthMeasure& seq_iterators) noexcept{
-    std::shared_ptr<Node> child = first_node_not_var(node);
+std::shared_ptr<AbstractNode> functions::auxiliary::first_node_not_var_by_ids(const std::shared_ptr<AbstractNode>& node, const SizeDepthMeasure& seq_iterators) noexcept{
+    std::shared_ptr<AbstractNode> child = first_node_not_var(node);
     if(child){
         for(const size_iterator& i:seq_iterators){
             if(child->has_child(i.current_iterator_))
                 child = child->child(i.current_iterator_);
-            else return std::shared_ptr<Node>();
+            else return std::shared_ptr<AbstractNode>();
             child = first_node_not_var(child);
             if(!child)
-                return std::shared_ptr<Node>();
+                return std::shared_ptr<AbstractNode>();
         }
         return child;
     }
     return nullptr;
 }
 
-const Node* functions::auxiliary::first_node_not_var_by_ids(const Node* node, const SizeDepthMeasure& seq_iterators) noexcept{
-    const Node* child = first_node_not_var(node);
+const AbstractNode* functions::auxiliary::first_node_not_var_by_ids(const AbstractNode* node, const SizeDepthMeasure& seq_iterators) noexcept{
+    const AbstractNode* child = first_node_not_var(node);
     if(child){
         for(const size_iterator& i:seq_iterators){
             if(child->has_child(i.current_iterator_))
@@ -140,22 +140,22 @@ const Node* functions::auxiliary::first_node_not_var_by_ids(const Node* node, co
 
 #include "test/log_duration.h"
 //check if array has rectangular morphology (all childs have same sizes in all dimensions)
-bool functions::auxiliary::is_rectangle_array_node(const std::shared_ptr<Node>& node) noexcept{
-    std::shared_ptr<Node> first_node = first_node_not_var(node);
+bool functions::auxiliary::is_rectangle_array_node(const std::shared_ptr<AbstractNode>& node) noexcept{
+    std::shared_ptr<AbstractNode> first_node = first_node_not_var(node);
     if(!first_node)
         return false;
     if(first_node->type()!=NODE_TYPE::ARRAY || first_node->childs().size()==0)
         return true;
 
-    return std::all_of(first_node->childs().begin(),first_node->childs().end(),[first_node](std::shared_ptr<Node> child){
+    return std::all_of(first_node->childs().begin(),first_node->childs().end(),[first_node](std::shared_ptr<AbstractNode> child){
         if(first_node->child(0)->childs().size() == child->childs().size() && is_rectangle_array_node(child))
             return true;
         return false;
     });
 }
 
-bool functions::auxiliary::is_filled_array_node(const std::shared_ptr<Node>& node) noexcept{
-    std::shared_ptr<Node> first_node = first_node_not_var(node);
+bool functions::auxiliary::is_filled_array_node(const std::shared_ptr<AbstractNode>& node) noexcept{
+    std::shared_ptr<AbstractNode> first_node = first_node_not_var(node);
     if(!first_node)
         return false;
     if(first_node->type()!=NODE_TYPE::ARRAY)
@@ -164,14 +164,14 @@ bool functions::auxiliary::is_filled_array_node(const std::shared_ptr<Node>& nod
         if(first_node->childs().size()==0)
             return false;
         else{
-            return std::all_of(first_node->childs().begin(),first_node->childs().end(),[first_node](std::shared_ptr<Node> child){
+            return std::all_of(first_node->childs().begin(),first_node->childs().end(),[first_node](std::shared_ptr<AbstractNode> child){
                 return is_filled_array_node(child);
             });
         }
     }
 }
-bool functions::auxiliary::is_filled_rectangle_array_node_of_type(TYPE_VAL type_value,const std::shared_ptr<Node>& node) noexcept{
-    std::shared_ptr<Node> first_node = first_node_not_var(node);
+bool functions::auxiliary::is_filled_rectangle_array_node_of_type(TYPE_VAL type_value,const std::shared_ptr<AbstractNode>& node) noexcept{
+    std::shared_ptr<AbstractNode> first_node = first_node_not_var(node);
     if(!first_node)
         return false;
     if(first_node->type()!=NODE_TYPE::ARRAY)
@@ -180,16 +180,16 @@ bool functions::auxiliary::is_filled_rectangle_array_node_of_type(TYPE_VAL type_
         if(first_node->childs().size()==0)
             return false;
         else{
-            return std::all_of(first_node->childs().begin(),first_node->childs().end(),[first_node, type_value](std::shared_ptr<Node> child){
+            return std::all_of(first_node->childs().begin(),first_node->childs().end(),[first_node, type_value](std::shared_ptr<AbstractNode> child){
                 return first_node->child(0)->childs().size() == child->childs().size() && type_value&child->type_val() && is_filled_rectangle_array_node_of_type(type_value,child);
             });
         }
     }
 }
 
-bool functions::auxiliary::has_cyclic_references(const std::shared_ptr<Node>& node) noexcept{
+bool functions::auxiliary::has_cyclic_references(const std::shared_ptr<AbstractNode>& node) noexcept{
     if(node->is_not_cycled()){
-        for(const std::shared_ptr<Node>& child: node->childs()){
+        for(const std::shared_ptr<AbstractNode>& child: node->childs()){
             if(has_cyclic_references(child))
                 return true;
         }
@@ -198,11 +198,11 @@ bool functions::auxiliary::has_cyclic_references(const std::shared_ptr<Node>& no
     else return true;
 }
 
-bool functions::auxiliary::has_cyclic_references(const Node* node) noexcept{
+bool functions::auxiliary::has_cyclic_references(const AbstractNode* node) noexcept{
     if(!node)
         return false;
     if(node->is_not_cycled()){
-        for(const std::shared_ptr<Node>& child: node->childs()){
+        for(const std::shared_ptr<AbstractNode>& child: node->childs()){
             if(has_cyclic_references(child))
                 return true;
         }
@@ -213,19 +213,19 @@ bool functions::auxiliary::has_cyclic_references(const Node* node) noexcept{
 
 //independent form of nodes (compare value types, number childs, number depth)
 //add exclusion of function, range_function nodes
-bool functions::auxiliary::equal_morphology_nodes(const std::vector<std::shared_ptr<Node>>& nodes) noexcept{
+bool functions::auxiliary::equal_morphology_nodes(const std::vector<std::shared_ptr<AbstractNode>>& nodes) noexcept{
     if(nodes.size()==0)
         return false;
     if(nodes.size()==1)
         return true;
-    std::shared_ptr<Node> first_node = first_node_not_var(nodes.front());
+    std::shared_ptr<AbstractNode> first_node = first_node_not_var(nodes.front());
     std::vector<size_t> seq_iterators;
-    std::vector<std::shared_ptr<Node>> ex_nodes;
+    std::vector<std::shared_ptr<AbstractNode>> ex_nodes;
     size_t count = 0;
     if(!first_node)
         return false;
-    if(!std::all_of(nodes.begin()+1,nodes.end(),[first_node](const std::shared_ptr<Node>& node){
-        std::shared_ptr<Node> cl_node = first_node_not_var(node);
+    if(!std::all_of(nodes.begin()+1,nodes.end(),[first_node](const std::shared_ptr<AbstractNode>& node){
+        std::shared_ptr<AbstractNode> cl_node = first_node_not_var(node);
         if(!cl_node)
             return false;
         return cl_node->childs().size() == first_node->childs().size() && cl_node->type_val() == first_node->type_val();
@@ -237,10 +237,10 @@ bool functions::auxiliary::equal_morphology_nodes(const std::vector<std::shared_
     if(!seq_iterators.empty())
         while(seq_iterators.front()<first_node->childs().size()){
             for(size_t iter = 1;iter<nodes.size();++iter){
-                std::shared_ptr<Node> seq_node_child = first_node_not_var_by_ids(first_node,seq_iterators.begin(),seq_iterators.end());
+                std::shared_ptr<AbstractNode> seq_node_child = first_node_not_var_by_ids(first_node,seq_iterators.begin(),seq_iterators.end());
                 if(!seq_node_child)
                     return false;
-                std::shared_ptr<Node> other_child_node = first_node_not_var_by_ids(nodes.at(iter),seq_iterators.begin(),seq_iterators.end());
+                std::shared_ptr<AbstractNode> other_child_node = first_node_not_var_by_ids(nodes.at(iter),seq_iterators.begin(),seq_iterators.end());
                 if(!other_child_node)
                     return false;
                 if(seq_node_child->type_val() != other_child_node->type_val() || (other_child_node->type_val()&TYPE_VAL::ARRAY &&
@@ -250,7 +250,7 @@ bool functions::auxiliary::equal_morphology_nodes(const std::vector<std::shared_
                 }
                 ++count;
             }
-            std::shared_ptr<Node> tmp_node = first_node_not_var_by_ids(first_node,seq_iterators.begin(),seq_iterators.end());
+            std::shared_ptr<AbstractNode> tmp_node = first_node_not_var_by_ids(first_node,seq_iterators.begin(),seq_iterators.end());
             if(seq_iterators.empty() && first_node->has_childs() && 
             first_node->type_val()&TYPE_VAL::ARRAY){
                 seq_iterators.push_back(0);

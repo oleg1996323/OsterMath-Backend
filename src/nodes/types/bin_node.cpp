@@ -3,17 +3,12 @@
 #include "events_errors/exception.h"
 #include "relation_manager.h"
 
-void BinaryNode::insert_back(std::shared_ptr<Node> node){
-    flush_cache();
-    __invalidate_type_val__();
-    if(childs().size()<2){
-        rel_mng_->insert_back(this,node);
-        rel_mng_->add_parent(node.get(),this, childs().size()-1);
-    }
-    else std::logic_error("Invalid inserting. Prompt: Unvalailable to insert more than 2 nodes to binary node");
+#include "aux_functions.h"
+
+BinaryNode::~BinaryNode(){
+    rel_mng_->delete_node(this);
 }
 
-#include "aux_functions.h"
 Result BinaryNode::execute() const{
     if(!(has_child(0) && has_child(1) && childs().size()==2))
         return std::make_shared<exceptions::InvalidNumberOfArguments>(2);
@@ -80,14 +75,14 @@ void BinaryNode::print_text(std::ostream& stream) const{
     if(has_child(0))
         childs().at(0)->print_text(stream);
     else{
-        Node node;
+        EmptyNode node;
         node.print_text(stream);
     }
     stream<<(char)operation_;
     if(has_child(1))
         childs().at(1)->print_text(stream);
     else {
-        Node node;
+        EmptyNode node;
         node.print_text(stream);
     }
 }
@@ -112,6 +107,10 @@ bool BinaryNode::is_array() const{
     if(!has_child(0) && !has_child(1))
         return false;
     return childs().at(0)->is_array() && childs().at(1)->is_array();
+}
+
+bool BinaryNode::is_empty() const{
+    return false;
 }
 
 TYPE_VAL BinaryNode::type_val() const{

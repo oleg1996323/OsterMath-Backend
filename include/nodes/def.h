@@ -5,7 +5,7 @@
 #include <memory>
 
 class VariableNode;
-class Node;
+class AbstractNode;
 class ArrayNode;
 class VariableNode;
 class AbstractEvent;
@@ -13,8 +13,8 @@ class AbstractEvent;
 #include <variant>
 
 using Value_t = boost::multiprecision::cpp_dec_float_50;//boost::multiprecision::number<boost::multiprecision::cpp_dec_float<10>>;
-using Bound_types = std::variant<std::monostate,Node*>;
-using Result_t = std::variant<std::monostate,std::string,std::shared_ptr<ArrayNode>, const Node*, std::shared_ptr<AbstractEvent>,Value_t>;
+using Bound_types = std::variant<std::monostate,AbstractNode*>;
+using Result_t = std::variant<std::monostate,std::string,std::shared_ptr<ArrayNode>, const AbstractNode*, std::shared_ptr<AbstractEvent>,Value_t>;
 
 #define ENUM_NAME(p) #p;
 
@@ -91,11 +91,11 @@ class Result:public Result_t{
     inline std::shared_ptr<warnings::Warning> get_warning() const noexcept{
         return std::dynamic_pointer_cast<warnings::Warning>(get<std::shared_ptr<AbstractEvent>>());
     }
-    inline const Node* get_node() noexcept{
-        return get<const Node*>();
+    inline const AbstractNode* get_node() noexcept{
+        return get<const AbstractNode*>();
     }
     inline const ArrayNode* get_array_node() noexcept{
-        return reinterpret_cast<const ArrayNode*>(get<const Node*>());
+        return reinterpret_cast<const ArrayNode*>(get<const AbstractNode*>());
     }
     inline const Value_t& get_value() const noexcept{
         return get<Value_t>();
@@ -103,11 +103,11 @@ class Result:public Result_t{
     inline const std::string& get_string() const noexcept{
         return get<std::string>();
     }
-    inline const Node* get_node() const noexcept{
-        return get<const Node*>();
+    inline const AbstractNode* get_node() const noexcept{
+        return get<const AbstractNode*>();
     }
     inline const ArrayNode* get_array_node() const noexcept{
-        return reinterpret_cast<const ArrayNode*>(get<const Node*>());
+        return reinterpret_cast<const ArrayNode*>(get<const AbstractNode*>());
     }
     inline std::shared_ptr<ArrayNode> get_array_result() const noexcept{
         return get<std::shared_ptr<ArrayNode>>();

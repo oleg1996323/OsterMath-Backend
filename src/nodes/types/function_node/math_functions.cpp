@@ -8,7 +8,7 @@
 #include <numeric>
 #include <arithmetic_types.h>
 
-using childs_t = std::decay_t<decltype(std::declval<Node>().childs())>;
+using childs_t = std::decay_t<decltype(std::declval<AbstractNode>().childs())>;
 
 Result node_function::functions::math::Sum(const FunctionNode* node){
     using namespace ::functions::auxiliary;
@@ -26,10 +26,10 @@ Result node_function::functions::math::Sum(const FunctionNode* node){
         if(!::functions::auxiliary::equal_morphology_nodes(node->childs()))
             return std::make_shared<exceptions::UnequalSizeArrays>("Sum");
 
-        for(const std::shared_ptr<Node>& array:node->childs()){
+        for(const std::shared_ptr<AbstractNode>& array:node->childs()){
             while(true)
             {
-                std::shared_ptr<Node> node = first_node_not_var(array);
+                std::shared_ptr<AbstractNode> node = first_node_not_var(array);
                 for(size_t depth=0; depth<sz_depth_measure.dimensions();++depth){
                     //std::cout<<"Iterator: "<<sz_depth_measure.current_iterator(depth)<<std::endl;
                     node = first_node_not_var(node->child(sz_depth_measure.current_iterator(depth)));
@@ -46,7 +46,7 @@ Result node_function::functions::math::Sum(const FunctionNode* node){
     }
     else if(check_type_container_nodes(TYPE_VAL::VALUE,node->childs())){
         Value_t init = 0.;
-        std::for_each(node->childs().begin(),node->childs().end(),[&](const std::shared_ptr<Node>& child)->Result{
+        std::for_each(node->childs().begin(),node->childs().end(),[&](const std::shared_ptr<AbstractNode>& child)->Result{
             return init+=child->execute().get<Value_t>();
         });
         return init;
@@ -72,10 +72,10 @@ Result node_function::functions::math::SumProduct(const FunctionNode* node){
 
         value_vector.resize(sz_depth_measure.max_seq_iterator(),1);
 
-        for(const std::shared_ptr<Node>& array:node->childs()){
+        for(const std::shared_ptr<AbstractNode>& array:node->childs()){
             while(true)
             {
-                std::shared_ptr<Node> node = first_node_not_var(array);
+                std::shared_ptr<AbstractNode> node = first_node_not_var(array);
                 for(size_t depth=0; depth<sz_depth_measure.dimensions();++depth){
                     //std::cout<<"Iterator: "<<sz_depth_measure.current_iterator(depth)<<std::endl;
                     node = first_node_not_var(node->child(sz_depth_measure.current_iterator(depth)));
@@ -94,7 +94,7 @@ Result node_function::functions::math::SumProduct(const FunctionNode* node){
     }
     else if(check_type_container_nodes(TYPE_VAL::VALUE,node->childs())){
         Value_t init = 0.;
-        std::for_each(node->childs().begin(),node->childs().end(),[&](const std::shared_ptr<Node>& child)->Result{
+        std::for_each(node->childs().begin(),node->childs().end(),[&](const std::shared_ptr<AbstractNode>& child)->Result{
             return init+=child->execute().get<Value_t>();
         });
         return init;
@@ -117,9 +117,9 @@ Result node_function::functions::math::Product(const FunctionNode* node){
         if(!::functions::auxiliary::equal_morphology_nodes(node->childs()))
             return std::make_shared<exceptions::UnequalSizeArrays>("Product");
 
-        for(const std::shared_ptr<Node>& array:node->childs()){
+        for(const std::shared_ptr<AbstractNode>& array:node->childs()){
             while(true){
-                std::shared_ptr<Node> node = first_node_not_var(array);
+                std::shared_ptr<AbstractNode> node = first_node_not_var(array);
                 for(size_t depth=0; depth<sz_depth_measure.dimensions();++depth){
                     //std::cout<<"Iterator: "<<sz_depth_measure.current_iterator(depth)<<std::endl;
                     node = first_node_not_var(node->child(sz_depth_measure.current_iterator(depth)));
@@ -136,7 +136,7 @@ Result node_function::functions::math::Product(const FunctionNode* node){
     }
     else if(check_type_container_nodes(TYPE_VAL::VALUE,node->childs())){
         Value_t init = 1.;
-        std::for_each(node->childs().begin(),node->childs().end(),[&](const std::shared_ptr<Node>& child)->Result{
+        std::for_each(node->childs().begin(),node->childs().end(),[&](const std::shared_ptr<AbstractNode>& child)->Result{
             return init*=child->execute().get<Value_t>();
         });
         return init;

@@ -3,7 +3,7 @@
 #include "events_errors/exception.h"
 #include "aux_functions.h"
 
-VariableNode::VariableNode(VariableBase* variable):Node(),
+VariableNode::VariableNode(VariableBase* variable):AbstractNode(),
     var_(variable){}
 
 const VariableBase* VariableNode::variable() const noexcept{
@@ -20,7 +20,7 @@ Result VariableNode::execute() const{
         cache_=std::make_shared<exceptions::CyclicReference>(var_->name());
     if(has_childs())
         return childs().at(0)->execute();
-    else return Node::execute();
+    else return AbstractNode::execute();
 }
 
 inline Result VariableNode::cached_result() const{
@@ -29,7 +29,7 @@ inline Result VariableNode::cached_result() const{
     if(has_childs()){
         return childs().at(0)->cached_result();
     }
-    else return Node::execute();
+    else return AbstractNode::execute();
 }
 
 void VariableNode::flush_cache() const{
@@ -70,23 +70,12 @@ void VariableNode::print_result(std::ostream& stream) const{
         childs().at(0)->print_result(stream);
 }
 
-#include "relation_manager.h"
-void VariableNode::insert_back(std::shared_ptr<Node> node){
-    if(node){
-        if(childs().size()<1)
-            rel_mng_->insert_back(this,node);
-        else
-            rel_mng_->child(this,0)=node;
-        rel_mng_->add_parent(node.get(),this,0);
-    }
-}
-
 #include "test/log_duration.h"
 Result VariableNode::execute_for_array_variables(const execute_for_array_variables_t& structure) const{
     //LOG_DURATION("get variable value");
     using namespace ::functions::auxiliary;
     if(structure.contains(this)){
-        const Node* found_node;
+        const AbstractNode* found_node;
         {
             //LOG_DURATION("first_node_not_var_by_ids");
             found_node = first_node_not_var_by_ids(this,structure.at(this).sz_depth_measure);

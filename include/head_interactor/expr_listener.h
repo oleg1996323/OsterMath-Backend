@@ -44,16 +44,16 @@ class BaseListener: public head_interactorBaseListener{
     bool is_domain_definition() const;
     bool is_expression_definition() const;
     bool is_array_definition() const;
-    bool is__array_item_definition() const;
+    bool is_array_item_definition() const;
 
     void __insert_to_prec_node__(MODE mode_assert_check);
 
     BaseData* __insert_new_data_base__(std::string&& name);
 
-    std::stack<std::shared_ptr<Node>> anonymous_node_;
+    std::stack<std::shared_ptr<AbstractNode>> anonymous_node_;
     std::stack<MODE> mode_;
     std::optional<Domain> domain_;
-    std::shared_ptr<Node> current_node_;
+    std::shared_ptr<AbstractNode> current_node_;
     std::unique_ptr<INFO_NODE> info;
     BaseData* data_base_;
     

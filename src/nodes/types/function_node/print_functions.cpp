@@ -1,5 +1,6 @@
 #include "function_node/print_functions.h"
 #include "func_node.h"
+#include "node.h"
 
 void node_function::functions::print::print_text(const FunctionNode* node,std::ostream& stream){
     switch (node->operation()){
@@ -117,7 +118,7 @@ void node_function::functions::print::print_text(const FunctionNode* node,std::o
             child->print_text(stream);
         }
     else {
-        Node node;
+        EmptyNode node;
         node.print_text(stream);
     }
     stream<<")";

@@ -72,12 +72,10 @@ class VariableBase: public FormattingData{
 
     std::string full_name() const;
 
-    protected:
-    void set_data_base(BaseData* data_pool);
-    BaseData* get_data_base() const;
+    void set_data_base(BaseData* data);
+    const BaseData* get_data_base() const;
 
     private:
-    
     std::shared_ptr<VariableNode> node_; //shared, так как может быть передан в любое арифметическое дерево
     VariableDomain domains_;
     std::string_view name_;

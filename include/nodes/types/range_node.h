@@ -14,7 +14,7 @@ enum class RANGE_OP{
 using namespace node_range_operation;
 //calculate some expressions by range of input values.
 //Childs should be only numeric variable-arrays and have same length
-class RangeOperationNode:public Node{
+class RangeOperationNode:public AbstractNode{
     mutable Result cache_;
     mutable std::unordered_map<const VariableNode*,std::optional<size_t>> var_ids_;
     mutable size_t sz_iteration = 0;
@@ -22,15 +22,18 @@ class RangeOperationNode:public Node{
     public:
     RangeOperationNode(RANGE_OP op):operation_(op){}
 
-    RangeOperationNode(RANGE_OP op, std::shared_ptr<Node> expr):
+    RangeOperationNode(RANGE_OP op, std::shared_ptr<AbstractNode> expr):
     operation_(op){
         set_expression(expr);
     }
 
     RangeOperationNode(const RangeOperationNode& other);
     RangeOperationNode(RangeOperationNode&&) = delete;
+    ~RangeOperationNode(){
+        rel_mng_->delete_node(this);
+    }
 
-    inline virtual NODE_TYPE type() const override{
+    virtual NODE_TYPE type() const override{
         return NODE_TYPE::RANGEOP;
     }
 
@@ -44,16 +47,17 @@ class RangeOperationNode:public Node{
     virtual bool is_numeric() const override;
     virtual bool is_string() const override;
     virtual bool is_array() const override;
-    inline void set_expression(std::shared_ptr<Node> expr){
+    virtual bool is_empty() const override;
+    inline void set_expression(std::shared_ptr<AbstractNode> expr){
         insert_back(expr);
     }
     inline bool has_expression() const{
         return has_child(0) && child(0);
     }
-    inline std::shared_ptr<Node> get_expression() const{
+    inline std::shared_ptr<AbstractNode> get_expression() const{
         if(has_child(0))
             return child(0);
-        else return std::shared_ptr<Node>();
+        else return std::shared_ptr<AbstractNode>();
     }
 
     RANGE_OP operation() const;
@@ -76,15 +80,15 @@ class RangeOperationNode:public Node{
     protected:
     virtual Result execute_for_array_variables(const execute_for_array_variables_t&) const override;
     private:
-    virtual void insert_back(std::shared_ptr<Node> node) override{
-        if(has_child(0))
-            rel_mng_->child(this,0) = node;
-        else rel_mng_->insert_back(this,node);
-        rel_mng_->add_parent(node.get(),this, childs().size()-1);
-    }
+    // virtual void insert_back(std::shared_ptr<Node> node) override{
+    //     if(has_child(0))
+    //         rel_mng_->child(this,0) = node;
+    //     else rel_mng_->insert_back(this,node);
+    //     rel_mng_->add_parent(node.get(),this, childs().size()-1);
+    // }
     bool check_variables_sizes_and_define_size_iteration(size_t, 
                 execute_for_array_variables_t&) const;
-    std::set<std::shared_ptr<Node>> define_range_node_range_nodes() const;
+    std::set<std::shared_ptr<AbstractNode>> define_range_node_range_nodes() const;
     std::set<std::shared_ptr<VariableNode>> define_range_node_array_type_variables() const;
     std::set<std::shared_ptr<VariableNode>> define_array_type_variables() const;
 };
