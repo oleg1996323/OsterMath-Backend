@@ -13,6 +13,7 @@ enum class BINARY_OP{
     POW='^'
 };
 
+#include "relation_manager.h"
 using namespace node_range_operation;
 class BinaryNode:public AbstractNode{
     BINARY_OP operation_;
@@ -22,8 +23,14 @@ class BinaryNode:public AbstractNode{
     friend VariableNode;
     public:
     BinaryNode(BINARY_OP op):operation_(op){}
-    BinaryNode(const BinaryNode& other):AbstractNode(other),operation_(other.operation_){}
-    BinaryNode(BinaryNode&& other):AbstractNode(other),operation_(other.operation_){}
+    BinaryNode(const BinaryNode& other):AbstractNode(other),operation_(other.operation_){
+        if(this!=&other)
+            rel_mng_->copy_childs(this,other.childs());
+    }
+    BinaryNode(BinaryNode&& other):AbstractNode(other),operation_(other.operation_){
+        if(this!=&other)
+            rel_mng_->swap_childs(this,&other);
+    }
     ~BinaryNode();
     virtual NODE_TYPE type() const override{
         return NODE_TYPE::BINARY;

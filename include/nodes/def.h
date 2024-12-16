@@ -1,4 +1,5 @@
 #pragma once
+#include <unordered_set>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #include <events_errors/exception.h>
 #include <events_errors/warning.h>
@@ -9,12 +10,15 @@ class AbstractNode;
 class ArrayNode;
 class VariableNode;
 class AbstractEvent;
+class ReferenceNode;
 
 #include <variant>
 
 using Value_t = boost::multiprecision::cpp_dec_float_50;//boost::multiprecision::number<boost::multiprecision::cpp_dec_float<10>>;
 using Bound_types = std::variant<std::monostate,AbstractNode*>;
 using Result_t = std::variant<std::monostate,std::string,std::shared_ptr<ArrayNode>, const AbstractNode*, std::shared_ptr<AbstractEvent>,Value_t>;
+using References_t = std::unordered_set<ReferenceNode*>;
+using Childs_t = std::vector<std::shared_ptr<AbstractNode>>;
 
 #define ENUM_NAME(p) #p;
 

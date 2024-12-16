@@ -205,14 +205,14 @@ void RelationManager::__add_reference__(AbstractNode* node_to_add, const Abstrac
             info.id = index;
             node_to_add->relation_manager()->owner_[node_to_add] = info;
         }
-        //create reference node if owner already exists
-        node_to_add->relation_manager()->references_[node_to_add][parent].push_back(index);
     }
     else{
         ++node_to_add->relation_manager()->refered;
         std::shared_ptr<AbstractNode> tmp = parent->relation_manager()->childs_.at(parent).at(index);
-        parent->relation_manager()->childs_.at(parent).at(index)=std::make_shared<ReferenceNode>(tmp);
-        node_to_add->relation_manager()->references_[node_to_add][parent].push_back(index);
+        std::shared_ptr<ReferenceNode> ref_node = std::make_shared<ReferenceNode>(tmp);
+        parent->relation_manager()->childs_.at(parent).at(index)=ref_node;
+        //delete ex-reference to the child, if it was deleted
+        node_to_add->relation_manager()->references_[node_to_add].insert(ref_node.get());
     }
 }
 bool RelationManager::has_references(const AbstractNode* node) noexcept{
@@ -292,27 +292,38 @@ void RelationManager::delete_node(const AbstractNode* node){
     if(owner_tmp.has_node())
         erase_child(owner_tmp.parent,owner_tmp.id);
 }
-
 #include "arithmetic_types.h"
 
 void RelationManager::swap_childs(const AbstractNode* lhs, const AbstractNode* rhs){
-    if(lhs->relation_manager()->childs_.contains(lhs))
-        if(rhs->relation_manager()->childs_.contains(rhs)){
-            // for(auto child:lhs->relation_manager()->childs_.at(lhs))
-            //     lhs->relation_manager()->owners_.at()
-            lhs->relation_manager()->childs_.at(lhs).swap(rhs->relation_manager()->childs_.at(rhs));
+    if(lhs && rhs){
+        assert(lhs->type()!=NODE_TYPE::VARIABLE && rhs->type()!=NODE_TYPE::VARIABLE);
+        assert(lhs->has_owner());
+        assert(rhs->has_owner());
+        owner(lhs).parent->child(owner(lhs).id).swap(owner(rhs).parent->child(owner(rhs).id));
+        INFO_NODE owner_lhs = owner(lhs);
+        if(rhs->has_owner())
+            lhs->relation_manager()->owner_[lhs] = owner(rhs);
+        else lhs->relation_manager()->owner_.erase(lhs);
+        if(owner_lhs.has_node())
+            rhs->relation_manager()->owner_[rhs] = owner_lhs;
+        else rhs->relation_manager()->owner_.erase(rhs);
+
+        if(lhs->relation_manager()->references_.contains(lhs) && rhs->relation_manager()->references_.contains(rhs))
+            lhs->relation_manager()->references_.at(lhs).swap(rhs->relation_manager()->references_.at(rhs));
+        else if(lhs->relation_manager()->references_.contains(lhs)){
+            rhs->relation_manager()->references_[rhs].swap(lhs->relation_manager()->references_.at(lhs));
+            lhs->relation_manager()->references_.erase(lhs);
+        }
+        else if(rhs->relation_manager()->references_.contains(rhs)){
+            lhs->relation_manager()->references_[lhs].swap(rhs->relation_manager()->references_.at(rhs));
+            rhs->relation_manager()->references_.erase(rhs);
         }
         else{
-            lhs->relation_manager()->childs_.at(lhs).swap(rhs->relation_manager()->childs_[rhs]);
+            rhs->relation_manager()->references_.erase(rhs);
             lhs->relation_manager()->references_.erase(lhs);
-            //erase owner also
         }
-    else{
-        //if(references_.contains(rhs))
     }
 }
-
-#include "string_node.h"
 void RelationManager::copy_childs(AbstractNode* node, const Childs_t& childs){
     for(const std::shared_ptr<AbstractNode>& child:childs){
         switch(child->type()){
@@ -358,6 +369,5 @@ void RelationManager::copy_childs(AbstractNode* node, const Childs_t& childs){
                 break;
             }
         }
-        __add_reference__(node->relation_manager()->childs_.at(node).back().get(),node,node->relation_manager()->childs_.at(node).size()-1);
     }
 }

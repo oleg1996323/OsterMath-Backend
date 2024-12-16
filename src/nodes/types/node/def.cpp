@@ -48,3 +48,10 @@ bool INFO_NODE_Comparator::operator()(const INFO_NODE& lhs,const AbstractNode* r
 {
     return lhs.parent < rhs;
 }
+
+void INFO_NODE::swap(INFO_NODE& other) noexcept{
+    if(this!=&other){
+        std::swap(this->parent,other.parent);
+        std::swap(this->id,other.id);
+    }
+}

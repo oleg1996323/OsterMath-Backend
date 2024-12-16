@@ -10,3 +10,4 @@
 #include "array_node.h"
 #include "func_node.h"
 #include "range_node.h"
+#include "string_node.h"

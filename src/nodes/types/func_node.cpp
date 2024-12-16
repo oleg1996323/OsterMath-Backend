@@ -12,7 +12,10 @@
 FunctionNode::FunctionNode(const FunctionNode& other):
 AbstractNode(other),
 operation_(other.operation_),
-array_type_function(other.array_type_function){}
+array_type_function(other.array_type_function){
+    if(this!=&other)
+        rel_mng_->copy_childs(this,other.childs());
+}
 
 FunctionNode::~FunctionNode(){
     rel_mng_->delete_node(this);

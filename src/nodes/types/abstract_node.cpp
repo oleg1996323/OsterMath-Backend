@@ -179,7 +179,7 @@ void AbstractNode::refresh_parent_links() const{
     relation_manager()->refresh_parent_links(this);
 }
 
-const std::unordered_map<const AbstractNode*,std::vector<int>>& AbstractNode::references() const{
+const References_t& AbstractNode::references() const{
     return rel_mng_->references(this);
 }
 void AbstractNode::insert_back(std::shared_ptr<AbstractNode> node){
@@ -221,18 +221,12 @@ void AbstractNode::__insert_back_value_node__(Value_t&& val){
 AbstractNode::AbstractNode(const AbstractNode& other):
 rel_mng_(other.rel_mng_),
 caller_(other.caller_)
-{
-    if(&other!=this)
-        rel_mng_->copy_childs(this,other.childs());
-}
+{}
 
 AbstractNode::AbstractNode(AbstractNode&& other):
 rel_mng_(std::move(other.rel_mng_)),
 caller_(other.caller_)
-{
-    if(&other!=this)
-        rel_mng_->swap_childs(this,&other);
-}
+{}
 AbstractNode& AbstractNode::operator=(const AbstractNode& other){
     if(&other!=this)
         rel_mng_->copy_childs(this,other.childs());
@@ -253,5 +247,6 @@ void AbstractNode::erase_child(size_t id) const{
 }
 
 void AbstractNode::__rel_tmp_forward_insert_back__(std::shared_ptr<AbstractNode> node){
+    //assert(!std::is_abstract_v<std::decay_t<decltype(*this)>>);
     rel_mng_->insert_back(this,node);
 }

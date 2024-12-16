@@ -7,7 +7,7 @@
 
 class BaseData;
 
-using References_t = std::unordered_map<const AbstractNode*, std::vector<int>>;
+using References_t = std::unordered_set<ReferenceNode*>;
 using Childs_t = std::vector<std::shared_ptr<AbstractNode>>;
 
 class RelationManager{

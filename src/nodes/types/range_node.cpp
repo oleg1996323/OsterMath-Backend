@@ -8,7 +8,10 @@ cache_(other.cache_),
 sz_iteration(other.sz_iteration),
 operation_(other.operation_)
 {
-    set_expression(other.get_expression());
+    if(this!=&other){
+        set_expression(other.get_expression());
+        rel_mng_->copy_childs(this,other.childs());
+    }
 }
 
 #include "types.h"

@@ -16,6 +16,8 @@ struct INFO_NODE{
     bool operator==(const INFO_NODE& other) const noexcept;
     bool operator<(AbstractNode* v) const noexcept;
     bool operator==(AbstractNode* other) const noexcept;
+
+    void swap(INFO_NODE& other) noexcept;
 };
 
 struct Parent_ref{

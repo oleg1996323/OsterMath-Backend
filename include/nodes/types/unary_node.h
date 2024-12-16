@@ -16,6 +16,7 @@ class BinaryNode;
 class ValueNode;
 class VariableNode;
 
+#include "relation_manager.h"
 using namespace node_range_operation;
 class UnaryNode:public AbstractNode{
     UNARY_OP operation_;
@@ -26,10 +27,16 @@ class UnaryNode:public AbstractNode{
     public:
     UnaryNode(UNARY_OP op):operation_(op){}
     UnaryNode(const UnaryNode& other):AbstractNode(other){
-        operation_ = other.operation_;
+        if(&other!=this){
+            operation_ = other.operation_;
+            rel_mng_->copy_childs(this,other.childs());
+        }
     }
     UnaryNode(UnaryNode&& other):AbstractNode(other){
-        operation_ = other.operation_;
+        if(&other!=this){
+            operation_ = other.operation_;
+            rel_mng_->swap_childs(this,&other);
+        }
     }
     ~UnaryNode();
 
@@ -44,7 +51,7 @@ class UnaryNode:public AbstractNode{
     virtual Result cached_result() const override{
         if(has_child(0))
             return child()->execute();
-        else std::runtime_error("Unexpected error: not completely identified unary node");
+        else throw std::runtime_error("Unexpected error: not completely identified unary node");
     }
     virtual bool is_numeric() const override;
     virtual bool is_string() const override;
