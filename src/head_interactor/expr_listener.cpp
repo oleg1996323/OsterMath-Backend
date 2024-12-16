@@ -36,8 +36,7 @@ bool BaseListener::is_array_item_definition() const{
 }
 
 void BaseListener::__insert_to_prec_node__(MODE mode_assert_check){
-    MODE m = mode_.top();
-    assert(m&mode_assert_check);
+    assert(mode_.top()&mode_assert_check);
     mode_.pop();
     assert(!anonymous_node_.empty());
     auto node = anonymous_node_.top();

@@ -7,7 +7,7 @@
 
 class BaseData;
 
-using References_t = std::unordered_set<ReferenceNode*>;
+using References_t = std::unordered_set<const ReferenceNode*>;
 using Childs_t = std::vector<std::shared_ptr<AbstractNode>>;
 
 class RelationManager{
@@ -38,6 +38,9 @@ class RelationManager{
         std::cout<<"Constructed: "<<constructed<<std::endl;
         std::cout<<"Refered: "<<refered<<std::endl;
         std::cout<<"Destructed: "<<destructed<<std::endl;
+        std::cout<<"references_ size: "<<references_.size()<<std::endl;
+        std::cout<<"childs_ size: "<<childs_.size()<<std::endl;
+        std::cout<<"owner_ size: "<<owner_.size()<<std::endl;
     }
 
     static INFO_NODE owner(const AbstractNode* node) noexcept{

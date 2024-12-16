@@ -4,6 +4,11 @@
 ReferenceNode::ReferenceNode(std::shared_ptr<AbstractNode> reference):AbstractNode(reference->relation_manager()){
     insert_back(reference);
 }
+
+ReferenceNode::ReferenceNode(const ReferenceNode& other):AbstractNode(){//should refer the same node as "other" (node should not be copied)
+    if(other.has_child(0))
+        insert_back(other.child(0));
+}
 ReferenceNode::~ReferenceNode(){
     rel_mng_->delete_node(this);
 }

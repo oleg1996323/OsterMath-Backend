@@ -30,7 +30,9 @@ using namespace functions::auxiliary;
 //     EXPECT_EQ(arr->childs().capacity(),10);
 //     arr->relation_manager()->log_state();
 // }
+#include "data.h"
 TEST(ArrayNode_test,Insert_Back){
+    {
     std::cout<<"Run test insert back"<<std::endl;
     std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(10);
     std::vector<Value_t> values(10);
@@ -40,7 +42,8 @@ TEST(ArrayNode_test,Insert_Back){
     EXPECT_EQ(arr->childs().size(),10);
     arr->insert_back(std::make_shared<ValueNode>(values.back()+1));
     EXPECT_EQ(arr->childs().size(),11);
-    arr->relation_manager()->log_state();
+    }
+    BaseData::get_anonymous_relation_manager()->log_state();
 }
 TEST(ArrayNode_test,Insert){
     std::cout<<"Run test insert at position"<<std::endl;
@@ -50,22 +53,27 @@ TEST(ArrayNode_test,Replace){
     std::cout<<"Run test replace at position"<<std::endl;
 }
 TEST(ArrayNode_test,Begins){
+    {
     std::cout<<"Run test begin"<<std::endl;
     std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(0);
     EXPECT_EQ(arr->childs().begin(), arr->begin());
     arr->insert_back(std::make_shared<ValueNode>(1));
     EXPECT_EQ(arr->childs().begin(), arr->begin());
-    arr->relation_manager()->log_state();
+    }
+    BaseData::get_anonymous_relation_manager()->log_state();
 }
 TEST(ArrayNode_test,Ends){
+    {
     std::cout<<"Run test begin"<<std::endl;
     std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(0);
     EXPECT_EQ(arr->begin(), arr->end());
     arr->insert_back(std::make_shared<ValueNode>(1));
     EXPECT_EQ(arr->begin()+1, arr->end());
-    arr->relation_manager()->log_state();
+    }
+    BaseData::get_anonymous_relation_manager()->log_state();
 }
 TEST(ArrayNode_test,CopyConstructor){
+    {
     std::cout<<"Run test copy constructor"<<std::endl;
     //TODO: here error
     std::shared_ptr<ArrayNode> arr_1 = std::make_shared<ArrayNode>(10);
@@ -78,9 +86,11 @@ TEST(ArrayNode_test,CopyConstructor){
     for(auto iter = arr_2->begin();iter!=arr_2->end();++iter){
         EXPECT_TRUE(check_arguments(TYPE_VAL::VALUE,arr_1->child(iter-arr_2->begin())));
     }
-    arr_1->relation_manager()->log_state();
+    }
+    BaseData::get_anonymous_relation_manager()->log_state();
 }
 TEST(ArrayNode_test,MoveConstructor){
+    {
     std::cout<<"Run test move constructor"<<std::endl;
     ArrayNode arr_1(10);
     std::vector<Value_t> values(10);
@@ -92,9 +102,11 @@ TEST(ArrayNode_test,MoveConstructor){
     for(auto iter = arr_2->begin();iter!=arr_2->end();++iter){
         EXPECT_TRUE(check_arguments(TYPE_VAL::VALUE,arr_1.child(iter-arr_2->begin())));
     }
-    arr_1.relation_manager()->log_state();
+    }
+    BaseData::get_anonymous_relation_manager()->log_state();
 }
 TEST(ArrayNode_test,Operator_Eq_copy){
+    {
     std::cout<<"Run test operator equal copy"<<std::endl;
     EXPECT_TRUE(std::is_copy_constructible_v<ArrayNode>);
     std::shared_ptr<ArrayNode> arr_1 = std::make_shared<ArrayNode>(1);
@@ -105,9 +117,12 @@ TEST(ArrayNode_test,Operator_Eq_copy){
     arr_1 = ArrayNode::return_from(arr_2);
     EXPECT_EQ(arr_1->size(),2);
     EXPECT_EQ(arr_1->childs().capacity(),2);
+    }
+    BaseData::get_anonymous_relation_manager()->log_state();
     //EXPECT_EQ(arr_1->child(0)->execute().get_value(),2);
 }
 TEST(ArrayNode_test,Operator_Eq_move){
+    {
     std::cout<<"Run test operator equal"<<std::endl;
     EXPECT_TRUE(std::is_move_constructible_v<ArrayNode>);
     std::shared_ptr<ArrayNode> arr_1 = std::make_shared<ArrayNode>(1);
@@ -120,8 +135,11 @@ TEST(ArrayNode_test,Operator_Eq_move){
     //EXPECT_EQ(arr_1->child(0)->execute().get_value(),2);
     EXPECT_EQ(arr_1->size(),sz);
     EXPECT_EQ(arr_1->childs().capacity(),cap);
+    }
+    BaseData::get_anonymous_relation_manager()->log_state();
 }
 TEST(ArrayNode_test,Type_Numeric_Array){
+    {
     std::cout<<"Run test operator equal"<<std::endl;
     std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(3);
     arr->insert_back(std::make_shared<ValueNode>(1));
@@ -131,6 +149,8 @@ TEST(ArrayNode_test,Type_Numeric_Array){
     EXPECT_TRUE(arr->type_val()&TYPE_VAL::VALUE);
     EXPECT_TRUE(arr->type_val()&TYPE_VAL::ARRAY);
     EXPECT_TRUE(arr->type_val()&TYPE_VAL::NUMERIC_ARRAY);
+    }
+    BaseData::get_anonymous_relation_manager()->log_state();
 }
 TEST(ArrayNode_test,Type_String_Array){
     //TODO: develop string node
@@ -139,6 +159,7 @@ TEST(ArrayNode_test,Type_Array){
     //TODO: develop string node
 }
 TEST(ArrayNode_test,ExecuteCorrect){
+    {
     std::cout<<"Run test execute with expected correct result"<<std::endl;
     std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(3);
     arr->insert_back(std::make_shared<ValueNode>(1));
@@ -146,8 +167,11 @@ TEST(ArrayNode_test,ExecuteCorrect){
     arr->insert_back(std::make_shared<ValueNode>(100000000));
     EXPECT_TRUE(arr->execute().is_node());
     EXPECT_EQ(arr.get(),arr->execute().get_node());
+    }
+    BaseData::get_anonymous_relation_manager()->log_state();
 }
 TEST(ArrayNode_test,ExecuteError){
+    {
     std::cout<<"Run test execute with expected error result"<<std::endl;
     std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(3);
     arr->insert_back(std::make_shared<ValueNode>(1));
@@ -159,6 +183,8 @@ TEST(ArrayNode_test,ExecuteError){
     EXPECT_TRUE(res.is_error());
     EXPECT_EQ(exceptions::EXCEPTION_TYPE::DIVISION_ZERO,res.get_exception()->type());
     std::cout<<res.get_exception()->get_error()<<std::endl;
+    }
+    BaseData::get_anonymous_relation_manager()->log_state();
 }
 TEST(ArrayNode_test,ExecuteCorrect_id){
     std::cout<<"Run test execute with expected correct result"<<std::endl;

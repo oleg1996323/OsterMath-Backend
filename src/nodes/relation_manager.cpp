@@ -254,7 +254,7 @@ bool RelationManager::has_childs(const AbstractNode* node) noexcept{
         !node->relation_manager()->childs_.at(node).empty();
 }
 bool RelationManager::has_child(const AbstractNode* node, size_t id) noexcept{
-    return node->relation_manager()->childs_.size()>id;
+    return node->relation_manager()->childs_.contains(node) && node->relation_manager()->childs_.at(node).size()>id;
 }
 void RelationManager::release_childs(const AbstractNode* node) noexcept{
     for(std::shared_ptr child:childs(node)){
@@ -263,12 +263,12 @@ void RelationManager::release_childs(const AbstractNode* node) noexcept{
             child->relation_manager()->references_.erase(child.get());
             child->relation_manager()->release_childs(child.get());
         }
-        else
-            child->relation_manager()->references_.at(child.get()).erase(node);
+        else{
+            assert(child->type()==NODE_TYPE::REF);
+            child->relation_manager()->references_.at(child.get()).erase(static_cast<const ReferenceNode*>(node));
+        }
     }
-    if(node->has_childs()){
-        node->relation_manager()->childs_.at(node).clear();
-    }
+    node->relation_manager()->childs_.erase(node);
 }
 const References_t& RelationManager::references(const AbstractNode* node) noexcept{
     if(node->relation_manager()->references_.contains(node))
@@ -282,10 +282,8 @@ void RelationManager::erase_child(const AbstractNode* node, size_t id) noexcept{
 void RelationManager::delete_node(const AbstractNode* node){
     ++node->relation_manager()->destructed;
     release_childs(node);
-    for(auto& [ref,ids]:node->relation_manager()->references_[node])
-        for(int id:ids)
-            if(!(owner(node).parent==ref || owner(node).id==id))
-                erase_child(ref,id);
+    for(auto& ref:node->relation_manager()->references_[node])
+        erase_child(ref,0);
     node->relation_manager()->references_.erase(node);
     INFO_NODE owner_tmp = owner(node);
     node->relation_manager()->owner_.erase(node);
@@ -353,6 +351,10 @@ void RelationManager::copy_childs(AbstractNode* node, const Childs_t& childs){
             }
             case NODE_TYPE::VALUE :{
                 node->insert_back(std::make_shared<ValueNode>(*std::dynamic_pointer_cast<ValueNode>(child))); //need to check
+                break;
+            }
+            case NODE_TYPE::REF:{
+                node->insert_back(std::make_shared<ReferenceNode>(*std::dynamic_pointer_cast<ReferenceNode>(child))); //need to check
                 break;
             }
             case NODE_TYPE::CUSTOM :{

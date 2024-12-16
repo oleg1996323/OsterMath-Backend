@@ -14,7 +14,7 @@
 #include "types.h"
 #include "data.h"
 #include <vector>
-
+#include "relation_manager.h"
 using namespace functions::auxiliary;
 
 TEST(Node_test,TestDefaultConstruct){
@@ -65,7 +65,7 @@ TEST(Node_test,TestCopyConstruct){
         EXPECT_EQ(node_1->references().size(),0);
         EXPECT_EQ(node_1->childs().size(),values_2.size());
         EXPECT_EQ(tmp_node_1->references().size(),1);
-        EXPECT_EQ(tmp_node_1->references().begin()->first,bd->get("A")->node().get());
+        //EXPECT_EQ(tmp_node_1->references().begin()->first,bd->get("A")->node().get());
         EXPECT_EQ(bd->get("A")->node()->child(0).get(),tmp_node_1.get());
     }
 }
@@ -159,27 +159,27 @@ TEST(NodeTest,TestReleaseChilds){
     var_F->node()->insert_back(value_1);
     array->insert_back(value_2);
     array->insert_back(value_3);
-    EXPECT_TRUE(var_A->node()->references().contains(array.get()));
-    EXPECT_TRUE(var_B->node()->references().contains(array.get()));
-    EXPECT_TRUE(var_C->node()->references().contains(array.get()));
-    EXPECT_TRUE(var_D->node()->references().contains(array.get()));
-    EXPECT_TRUE(var_E->node()->references().contains(array.get()));
-    EXPECT_TRUE(var_F->node()->references().contains(var_E->node().get()));
-    EXPECT_TRUE(value_1->references().contains(var_F->node().get()));
-    EXPECT_TRUE(value_2->references().contains(array.get()));
-    EXPECT_TRUE(value_3->references().contains(array.get()));
+    EXPECT_TRUE(var_A->node()->owner()==array.get());
+    EXPECT_TRUE(var_B->node()->owner()==array.get());
+    EXPECT_TRUE(var_C->node()->owner()==array.get());
+    EXPECT_TRUE(var_D->node()->owner()==array.get());
+    EXPECT_TRUE(var_E->node()->owner()==array.get());
+    EXPECT_TRUE(var_F->node()->owner()==var_E->node().get());
+    EXPECT_TRUE(value_1->owner() == var_F->node().get());
+    EXPECT_TRUE(value_2->owner() == array.get());
+    EXPECT_TRUE(value_3->owner() == array.get());
     EXPECT_EQ(array->size(),7);
     array->relation_manager()->release_childs(array.get());
     EXPECT_EQ(array->size(),0);
-    EXPECT_FALSE(var_A->node()->references().contains(array.get()));
-    EXPECT_FALSE(var_B->node()->references().contains(array.get()));
-    EXPECT_FALSE(var_C->node()->references().contains(array.get()));
-    EXPECT_FALSE(var_D->node()->references().contains(array.get()));
-    EXPECT_FALSE(var_E->node()->references().contains(array.get()));
-    EXPECT_TRUE(var_F->node()->references().contains(var_E->node().get()));
-    EXPECT_TRUE(value_1->references().contains(var_F->node().get()));
-    EXPECT_FALSE(value_2->references().contains(array.get()));
-    EXPECT_FALSE(value_3->references().contains(array.get()));
+    EXPECT_FALSE(var_A->node()->owner() == array.get());
+    EXPECT_FALSE(var_B->node()->owner() == array.get());
+    EXPECT_FALSE(var_C->node()->owner() == array.get());
+    EXPECT_FALSE(var_D->node()->owner() == array.get());
+    EXPECT_FALSE(var_E->node()->owner() == array.get());
+    EXPECT_TRUE(var_F->node()->owner() == var_E->node().get());
+    EXPECT_TRUE(value_1->owner() == var_F->node().get());
+    EXPECT_FALSE(value_2->owner() == array.get());
+    EXPECT_FALSE(value_3->owner() == array.get());
 }
 // TEST(NodeTest,TestNodeType){
 //     //virtual NODE_TYPE type() const;

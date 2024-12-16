@@ -72,7 +72,7 @@ public:
     //void replace_copy_child_to(Node*,size_t,size_t);
     void refresh_parent_links() const;
     void refresh() const;
-    const std::unordered_map<const AbstractNode*,std::vector<int>>& references() const;
+    const References_t& references() const;
     bool refer_to(std::string_view var_name) const;
     bool is_not_cycled() const;
     std::set<std::shared_ptr<VariableNode>> refer_to_vars() const;
@@ -84,7 +84,7 @@ public:
     bool has_child(size_t id) const noexcept;
     template<typename T, typename... U>
     void recursive_function_applied_to_all_childs(std::function<T(const std::shared_ptr<AbstractNode>&,U...)> func);
-    const std::vector<std::shared_ptr<AbstractNode>>& childs() const;
+    const Childs_t& childs() const;
     void cache_type_value() const;
     RelationManager* relation_manager() const{
         return rel_mng_;

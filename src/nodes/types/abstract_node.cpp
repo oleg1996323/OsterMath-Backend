@@ -50,8 +50,8 @@ void AbstractNode::refresh() const{
     execute();
     refresh_parent_links();
     caller_ = true;
-    for(auto& [parent,ids]:references())
-        parent->refresh();
+    for(auto ref:references())
+        ref->refresh();
     caller_ = false;
 }
 
@@ -142,8 +142,8 @@ bool AbstractNode::is_not_cycled() const{
         return true;
     }
     else {
-        for(auto& [parent,id]:references()){
-            if(!parent->__is_not_cycled__(this))
+        for(auto ref:references()){
+            if(!ref->__is_not_cycled__(this))
                 return false;
         }
         return true;
@@ -157,8 +157,8 @@ bool AbstractNode::__is_not_cycled__(const AbstractNode* node_cycled_search) con
         return true;
     }
     else {
-        for(auto& [parent,id]:references()){
-            if(!parent->__is_not_cycled__(node_cycled_search))
+        for(auto ref:references()){
+            if(!ref->__is_not_cycled__(node_cycled_search))
                 return false;
         }
         return true;
