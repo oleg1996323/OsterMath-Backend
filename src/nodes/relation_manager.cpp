@@ -76,7 +76,7 @@ void RelationManager::insert_back(const AbstractNode* node,std::shared_ptr<Abstr
             case NODE_TYPE::RANGEOP:{
                 if(has_child(node,0))
                     node->relation_manager()->childs_.at(node).at(0)=new_child;
-                else node->relation_manager()->childs_.at(node).push_back(new_child);
+                else node->relation_manager()->childs_[node].push_back(new_child);
                 break;
             }
             case NODE_TYPE::UNARY:{
@@ -197,22 +197,22 @@ std::shared_ptr<AbstractNode> RelationManager::replace(const AbstractNode* node,
 void RelationManager::__add_reference__(AbstractNode* node_to_add, const AbstractNode* parent, int index) noexcept{
     //variable type cannot has owner (only BaseData class object)
     assert(node_to_add);
-    if(!owner(node_to_add).has_node()){
-        ++node_to_add->relation_manager()->constructed;
-        if(node_to_add->type()!=NODE_TYPE::VARIABLE){
-            INFO_NODE info;
-            info.parent = const_cast<AbstractNode*>(parent);
-            info.id = index;
-            node_to_add->relation_manager()->owner_[node_to_add] = info;
+    if(parent->type()!=NODE_TYPE::REF){
+        if(node_to_add->type()!=NODE_TYPE::VARIABLE && !owner(node_to_add).has_node()){
+                ++node_to_add->relation_manager()->constructed;
+                INFO_NODE info;
+                info.parent = const_cast<AbstractNode*>(parent);
+                info.id = index;
+                node_to_add->relation_manager()->owner_[node_to_add] = info;
         }
-    }
-    else{
-        ++node_to_add->relation_manager()->refered;
-        std::shared_ptr<AbstractNode> tmp = parent->relation_manager()->childs_.at(parent).at(index);
-        std::shared_ptr<ReferenceNode> ref_node = std::make_shared<ReferenceNode>(tmp);
-        parent->relation_manager()->childs_.at(parent).at(index)=ref_node;
-        //delete ex-reference to the child, if it was deleted
-        node_to_add->relation_manager()->references_[node_to_add].insert(ref_node.get());
+        else{
+            ++node_to_add->relation_manager()->refered;
+            std::shared_ptr<AbstractNode> tmp = parent->relation_manager()->childs_.at(parent).at(index);
+            std::shared_ptr<ReferenceNode> ref_node = std::make_shared<ReferenceNode>(tmp);
+            parent->relation_manager()->childs_.at(parent).at(index)=ref_node;
+            //delete ex-reference to the child, if it was deleted
+            node_to_add->relation_manager()->references_[node_to_add].insert(ref_node.get());
+        }
     }
 }
 bool RelationManager::has_references(const AbstractNode* node) noexcept{
@@ -254,6 +254,10 @@ bool RelationManager::has_childs(const AbstractNode* node) noexcept{
         !node->relation_manager()->childs_.at(node).empty();
 }
 bool RelationManager::has_child(const AbstractNode* node, size_t id) noexcept{
+    if(node->relation_manager()->childs_.contains(node))
+        if(node->relation_manager()->childs_.at(node).size()>id)
+            return true;
+    return false;
     return node->relation_manager()->childs_.contains(node) && node->relation_manager()->childs_.at(node).size()>id;
 }
 void RelationManager::release_childs(const AbstractNode* node) noexcept{
