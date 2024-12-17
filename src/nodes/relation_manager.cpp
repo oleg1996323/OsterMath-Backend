@@ -74,14 +74,14 @@ void RelationManager::insert_back(const AbstractNode* node,std::shared_ptr<Abstr
             case NODE_TYPE::VARIABLE:
             case NODE_TYPE::REF:
             case NODE_TYPE::RANGEOP:{
-                if(has_child(node,0))
+                if(node->has_child(0))
                     node->relation_manager()->childs_.at(node).at(0)=new_child;
                 else node->relation_manager()->childs_[node].push_back(new_child);
                 break;
             }
             case NODE_TYPE::UNARY:{
                 assert(node->relation_manager()->childs_[node].size()<1);
-                node->relation_manager()->childs_.at(node).push_back(new_child);
+                node->relation_manager()->childs_[node].push_back(new_child);
                 break;
             }
             case NODE_TYPE::BINARY:{
@@ -107,7 +107,7 @@ void RelationManager::insert_back(const AbstractNode* node,std::shared_ptr<Abstr
             default:
                 break;
         }
-        __add_reference__(node->relation_manager()->childs_.at(node).at(node->childs().size()-1).get(),node, node->childs().size()-1);
+        __add_reference__(node->childs().at(node->childs().size()-1).get(),node, node->childs().size()-1);
     }
 }
 
@@ -127,13 +127,13 @@ std::shared_ptr<AbstractNode> RelationManager::insert(const AbstractNode* node,s
             case NODE_TYPE::RANGEOP:{
                 if(has_child(node,0))
                     node->relation_manager()->childs_.at(node).at(0)=new_child;
-                else node->relation_manager()->childs_.at(node).insert(node->relation_manager()->childs_[node].cbegin()+id,new_child);
+                else node->relation_manager()->childs_[node].insert(node->relation_manager()->childs_[node].cbegin()+id,new_child);
                 break;
             }
             case NODE_TYPE::UNARY:{
                 assert(id<1);
                 assert(node->relation_manager()->childs_[node].size()<1);
-                node->relation_manager()->childs_.at(node).insert(node->relation_manager()->childs_[node].cbegin()+id,new_child);
+                node->relation_manager()->childs_[node].insert(node->relation_manager()->childs_[node].cbegin()+id,new_child);
                 break;
             }
             case NODE_TYPE::BINARY:{
@@ -207,12 +207,24 @@ void RelationManager::__add_reference__(AbstractNode* node_to_add, const Abstrac
         }
         else{
             ++node_to_add->relation_manager()->refered;
-            std::shared_ptr<AbstractNode> tmp = parent->relation_manager()->childs_.at(parent).at(index);
+            std::shared_ptr<AbstractNode> tmp = parent->childs().at(index);
             std::shared_ptr<ReferenceNode> ref_node = std::make_shared<ReferenceNode>(tmp);
             parent->relation_manager()->childs_.at(parent).at(index)=ref_node;
+            {
+                ++node_to_add->relation_manager()->constructed;
+                INFO_NODE info;
+                info.parent = const_cast<AbstractNode*>(parent);
+                info.id = index;
+                ref_node->relation_manager()->owner_[ref_node.get()] = info;
+            }
             //delete ex-reference to the child, if it was deleted
-            node_to_add->relation_manager()->references_[node_to_add].insert(ref_node.get());
+            assert(tmp->references().contains(ref_node.get()));
+            assert(ref_node->owner()==parent);
+            assert(ref_node.get()==parent->childs().at(index).get());
         }
+    }
+    else{
+        node_to_add->relation_manager()->references_[node_to_add].insert(static_cast<const ReferenceNode*>(parent));
     }
 }
 bool RelationManager::has_references(const AbstractNode* node) noexcept{
@@ -263,13 +275,14 @@ bool RelationManager::has_child(const AbstractNode* node, size_t id) noexcept{
 void RelationManager::release_childs(const AbstractNode* node) noexcept{
     for(std::shared_ptr child:childs(node)){
         if(child->owner()==node){
+            child->relation_manager()->release_childs(child.get());
             child->relation_manager()->owner_.erase(child.get());
             child->relation_manager()->references_.erase(child.get());
-            child->relation_manager()->release_childs(child.get());
         }
         else{
-            assert(child->type()==NODE_TYPE::REF);
-            child->relation_manager()->references_.at(child.get()).erase(static_cast<const ReferenceNode*>(node));
+            if(!child->references().empty())
+                child->relation_manager()->references_.at(child.get()).erase(static_cast<const ReferenceNode*>(node));
+            //maybe replace child (delete or make EmptyNode()?)
         }
     }
     node->relation_manager()->childs_.erase(node);

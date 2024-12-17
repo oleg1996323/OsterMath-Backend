@@ -52,6 +52,7 @@ void BaseData::rename_var(const std::string& current_name,const std::string& new
     }
 }
 
+//TODO: make add variable to relation manager of BaseData
 std::shared_ptr<VariableBase>& BaseData::add_variable(std::string&& name){
     if(!exists(name)){
         auto str_name = var_names_.emplace(name).first;

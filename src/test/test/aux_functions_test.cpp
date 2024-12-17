@@ -231,13 +231,13 @@ protected:
 TEST_F(ComplexNode_1,Find_first_node_not_variable){
     auto node = first_node_not_var(node_1_.node_1());
     EXPECT_TRUE(node);
-    EXPECT_TRUE(node->type()==NODE_TYPE::ARRAY);
-    EXPECT_TRUE(node.get()==node_1_.node_1()->child(0).get());
+    EXPECT_EQ(node->type(),NODE_TYPE::ARRAY);
+    EXPECT_EQ(node.get(),node_1_.node_1()->child(0).get());
     node = first_node_not_var(node->child(0));
     EXPECT_TRUE(node);
     node = first_node_not_var(node->child(0));
     EXPECT_TRUE(node);
-    EXPECT_TRUE(node->type()==NODE_TYPE::VALUE);
+    EXPECT_EQ(node->type(),NODE_TYPE::VALUE);
     //var.insert_back()
 }
 
