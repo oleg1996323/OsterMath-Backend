@@ -46,7 +46,7 @@ std::shared_ptr<AbstractNode> functions::auxiliary::first_node_not_var(const std
         if(node->has_child(0))
             child = node->child(0);
         else return std::shared_ptr<AbstractNode>();
-        while(child->has_child(0) && (child->type()==NODE_TYPE::VARIABLE || node->type()!=NODE_TYPE::REF)){
+        while(child->has_child(0) && (child->type()==NODE_TYPE::VARIABLE || child->type()==NODE_TYPE::REF)){
             child = child->child(0);
         }
         if(child->type()==NODE_TYPE::VARIABLE || child->type()==NODE_TYPE::REF){
@@ -64,7 +64,7 @@ const AbstractNode* functions::auxiliary::first_node_not_var(const AbstractNode*
         if(node->has_child(0))
             child = node->child(0);
         else return nullptr;
-        while(child->has_child(0) && (child->type()==NODE_TYPE::VARIABLE || node->type()!=NODE_TYPE::REF)){
+        while(child->has_child(0) && (child->type()==NODE_TYPE::VARIABLE || child->type()==NODE_TYPE::REF)){
             child = child->child(0);
         }
         if(child->type()==NODE_TYPE::VARIABLE || child->type()==NODE_TYPE::REF){

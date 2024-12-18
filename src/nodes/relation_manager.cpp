@@ -1,9 +1,21 @@
 #include "relation_manager.h"
 #include "core/settings.h"
 #include "node.h"
+#include "data.h"
 
 const Childs_t RelationManager::empty_childs_{};
 const References_t RelationManager::empty_references_{};
+
+RelationManager::~RelationManager(){
+    for(auto& [node,refs]:references_)
+        for(auto& ref:refs)
+            ref->relation_manager()->release_childs(ref);
+    references_.clear();
+    for(auto& [node,owner]:owner_)
+        owner.parent->erase_child(owner.id);
+    owner_.clear();
+    childs_.clear();
+}
 
 void RelationManager::reserve_childs(const AbstractNode* node,size_t size){
     node->relation_manager()->childs_[node].reserve(size);
@@ -72,11 +84,12 @@ void RelationManager::insert_back(const AbstractNode* node,std::shared_ptr<Abstr
                 break;
             }
             case NODE_TYPE::VARIABLE:
+                assert(node->relation_manager()->bd_);
             case NODE_TYPE::REF:
             case NODE_TYPE::RANGEOP:{
                 if(node->has_child(0))
-                    node->relation_manager()->childs_.at(node).at(0)=new_child;
-                else node->relation_manager()->childs_[node].push_back(new_child);
+                    node->relation_manager()->childs_.at(node).clear();
+                node->relation_manager()->childs_[node].push_back(new_child);
                 break;
             }
             case NODE_TYPE::UNARY:{
@@ -107,6 +120,7 @@ void RelationManager::insert_back(const AbstractNode* node,std::shared_ptr<Abstr
             default:
                 break;
         }
+        assert(!node->childs().empty());
         __add_reference__(node->childs().at(node->childs().size()-1).get(),node, node->childs().size()-1);
     }
 }
@@ -123,6 +137,7 @@ std::shared_ptr<AbstractNode> RelationManager::insert(const AbstractNode* node,s
                 break;
             }
             case NODE_TYPE::VARIABLE:
+                assert(node->relation_manager()->bd_);
             case NODE_TYPE::REF:
             case NODE_TYPE::RANGEOP:{
                 if(has_child(node,0))
@@ -266,18 +281,17 @@ bool RelationManager::has_childs(const AbstractNode* node) noexcept{
         !node->relation_manager()->childs_.at(node).empty();
 }
 bool RelationManager::has_child(const AbstractNode* node, size_t id) noexcept{
-    if(node->relation_manager()->childs_.contains(node))
-        if(node->relation_manager()->childs_.at(node).size()>id)
-            return true;
+    if(node->childs().size()>id)
+        return true;
     return false;
     return node->relation_manager()->childs_.contains(node) && node->relation_manager()->childs_.at(node).size()>id;
 }
 void RelationManager::release_childs(const AbstractNode* node) noexcept{
     for(std::shared_ptr child:childs(node)){
         if(child->owner()==node){
-            child->relation_manager()->release_childs(child.get());
             child->relation_manager()->owner_.erase(child.get());
             child->relation_manager()->references_.erase(child.get());
+            child->relation_manager()->release_childs(child.get());
         }
         else{
             if(!child->references().empty())

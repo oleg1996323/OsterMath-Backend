@@ -9,7 +9,7 @@ using namespace std::string_literals;
 uint16_t BaseData::counter = 0;
 RelationManager BaseData::anonymous_nodes{};
 
-BaseData::BaseData(std::string_view name):name_(name), buffer_(std::make_shared<VariableBase>("buffer",this)), data_count(counter++){}
+BaseData::BaseData(std::string_view name):rel_mng_(this),name_(name), buffer_(std::make_shared<VariableBase>("buffer",this)), data_count(counter++){}
 
 VariableBase* BaseData::get(std::string_view name){
     if(!exists(name))
@@ -56,9 +56,11 @@ void BaseData::rename_var(const std::string& current_name,const std::string& new
 std::shared_ptr<VariableBase>& BaseData::add_variable(std::string&& name){
     if(!exists(name)){
         auto str_name = var_names_.emplace(name).first;
-        return vars_.emplace(
+        std::shared_ptr<VariableBase>& var = vars_.emplace(
             *str_name,
             std::make_shared<VariableBase>(*str_name,this)).first->second;
+        var->node()->set_relation_manager(&this->rel_mng_);
+        return var;
     }
     else return vars_.find(name)->second;
 }

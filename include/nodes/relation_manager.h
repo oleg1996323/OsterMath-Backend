@@ -19,11 +19,11 @@ class RelationManager{
     int constructed = 0;
     int refered = 0;
     int destructed = 0;
-    BaseData* bd_ = nullptr;
+    const BaseData* bd_ = nullptr;
     public:
     RelationManager() = default;
-    RelationManager(BaseData* bd):bd_(bd){}
-
+    RelationManager(const BaseData* bd):bd_(bd){}
+    ~RelationManager();
     RelationManager(const RelationManager& other):
     references_(other.references_),
     childs_(other.childs_),
@@ -55,12 +55,14 @@ class RelationManager{
         else return empty_childs_;
     }
     static const Childs_t& childs(const AbstractNode* node) noexcept{
+        node->relation_manager()->childs_;
         if(node->relation_manager()->childs_.contains(node))
             return node->relation_manager()->childs_.at(node);
         else return empty_childs_;
     }
     static void reserve_childs(const AbstractNode* node,size_t size);
     static void erase_child(const AbstractNode* node, size_t id) noexcept;
+    static void empty_child(const AbstractNode* node, size_t id) noexcept;
     static void delete_node(const AbstractNode* node);
     static const std::shared_ptr<AbstractNode>& child(const AbstractNode* node,size_t id);
     static std::shared_ptr<AbstractNode>& child(AbstractNode* node,size_t id);

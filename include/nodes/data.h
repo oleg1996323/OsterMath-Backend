@@ -9,7 +9,6 @@
 #include "expr_parser.h"
 #include "types.h"
 
-
 class VariableBase;
 class Parser;
 class DataPool;
@@ -103,6 +102,7 @@ class BaseData{
     }
 
     private:
+    mutable RelationManager rel_mng_;
     std::unordered_set<std::string> var_names_;
     std::unordered_map<std::string_view,std::shared_ptr<VariableBase>> vars_;
     std::string_view name_;
@@ -111,7 +111,7 @@ class BaseData{
     DataPool* pool_;
     std::string generate_hash_name();
     uint16_t data_count;
-    mutable RelationManager rel_mng_;
+    
     
     static RelationManager anonymous_nodes;
     static uint16_t counter;
