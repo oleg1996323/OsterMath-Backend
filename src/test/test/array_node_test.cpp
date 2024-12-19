@@ -10,7 +10,7 @@
 #include "string_node.h"
 #include "bin_node.h"
 #include "aux_functions.h"
-#include "relation_manager.h"
+#include "node_manager.h"
 
 using namespace functions::auxiliary;
 

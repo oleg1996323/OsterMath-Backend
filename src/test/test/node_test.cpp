@@ -14,7 +14,7 @@
 #include "types.h"
 #include "data.h"
 #include <vector>
-#include "relation_manager.h"
+#include "node_manager.h"
 using namespace functions::auxiliary;
 
 TEST(Node_test,TestDefaultConstruct){

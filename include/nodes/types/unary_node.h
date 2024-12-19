@@ -16,7 +16,7 @@ class BinaryNode;
 class ValueNode;
 class VariableNode;
 
-#include "relation_manager.h"
+#include "node_manager.h"
 using namespace node_range_operation;
 class UnaryNode:public AbstractNode{
     UNARY_OP operation_;

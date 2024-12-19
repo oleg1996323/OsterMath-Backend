@@ -238,7 +238,7 @@ Result FunctionNode::execute() const{ //TODO add checking for arrays size compar
 
 #include "types.h"
 #include "function_node/print_functions.h"
-#include "relation_manager.h"
+#include "node_manager.h"
 
 void FunctionNode::print_text(std::ostream& stream) const{
     node_function::functions::print::print_text(this,stream);

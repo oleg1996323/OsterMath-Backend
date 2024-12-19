@@ -3,7 +3,7 @@
 #include "var_node.h"
 #include "array_node.h"
 #include "range_node/def.h"
-#include "relation_manager.h"
+#include "node_manager.h"
 
 enum class RANGE_OP{
     SUM,

@@ -96,7 +96,7 @@ public:
 
     virtual Result execute_for_array_variables(const execute_for_array_variables_t&) const;
 
-    virtual ~AbstractNode() = 0;
+    virtual ~AbstractNode() = default;
     virtual TYPE_VAL type_val() const;
     virtual NODE_TYPE type() const = 0;
     virtual Result execute() const = 0;

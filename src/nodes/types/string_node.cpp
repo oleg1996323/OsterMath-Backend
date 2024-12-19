@@ -1,6 +1,6 @@
 #include "string_node.h"
 #include "array_node.h"
-#include "relation_manager.h"
+#include "node_manager.h"
 
 StringNode::~StringNode(){
     rel_mng_->delete_node(this);

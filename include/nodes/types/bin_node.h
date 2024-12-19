@@ -13,7 +13,7 @@ enum class BINARY_OP{
     POW='^'
 };
 
-#include "relation_manager.h"
+#include "node_manager.h"
 using namespace node_range_operation;
 class BinaryNode:public AbstractNode{
     BINARY_OP operation_;

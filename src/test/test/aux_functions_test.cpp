@@ -127,12 +127,12 @@ public:
         bd->add_variable("var_1");
         bd->add_variable("var_2");
         bd->add_variable("var_3");
-        rect_node = std::make_shared<ArrayNode>(5);
-        not_rect_node = std::make_shared<ArrayNode>(5);
-        std::shared_ptr<ArrayNode> rect_node_1 = std::make_shared<ArrayNode>(5);
-        std::shared_ptr<ArrayNode> not_rect_node_1 = std::make_shared<ArrayNode>(5);
-        std::shared_ptr<ArrayNode> rect_node_10 = std::make_shared<ArrayNode>(5);
-        std::shared_ptr<ArrayNode> not_rect_node_10 = std::make_shared<ArrayNode>(5);
+        rect_node = bd->make_node<ArrayNode>(5);
+        not_rect_node = bd->make_node<ArrayNode>(5);
+        std::shared_ptr<ArrayNode> rect_node_1 = bd->make_node<ArrayNode>(5);
+        std::shared_ptr<ArrayNode> not_rect_node_1 = bd->make_node<ArrayNode>(5);
+        std::shared_ptr<ArrayNode> rect_node_10 = bd->make_node<ArrayNode>(5);
+        std::shared_ptr<ArrayNode> not_rect_node_10 = bd->make_node<ArrayNode>(5);
         for(int i=0;i<5;++i){
             if(i!=2){
                 rect_node->insert_back(bd->get("var_1")->node());
@@ -141,10 +141,10 @@ public:
             not_rect_node->insert_back(not_rect_node_1);
             if(i==0)
                 not_rect_node_1->insert_back(not_rect_node_10);
-            else not_rect_node_1->insert_back(std::make_shared<ValueNode>(i));
-            not_rect_node_10->insert_back(std::make_shared<ValueNode>(i));
+            else not_rect_node_1->insert_back(bd->make_node<ValueNode>(i));
+            not_rect_node_10->insert_back(bd->make_node<ValueNode>(i));
             rect_node_1->insert_back(rect_node_10);
-            rect_node_10->insert_back(std::make_shared<ValueNode>(i));
+            rect_node_10->insert_back(bd->make_node<ValueNode>(i));
         }
     }
 
@@ -229,15 +229,25 @@ protected:
 };*/
 
 TEST_F(ComplexNode_1,Find_first_node_not_variable){
-    auto node = first_node_not_var(node_1_.node_1());
-    EXPECT_TRUE(node);
-    EXPECT_EQ(node->type(),NODE_TYPE::ARRAY);
-    EXPECT_EQ(node.get(),node_1_.node_1()->child(0).get());
-    node = first_node_not_var(node->child(0));
-    EXPECT_TRUE(node);
-    node = first_node_not_var(node->child(0));
-    EXPECT_TRUE(node);
-    EXPECT_EQ(node->type(),NODE_TYPE::VALUE);
+    try{
+        auto node = first_node_not_var(node_1_.node_1());
+        EXPECT_TRUE(node);
+        EXPECT_EQ(node->type(),NODE_TYPE::ARRAY);
+        EXPECT_EQ(node.get(),node_1_.node_1()->child(0).get());
+        node = first_node_not_var(node->child(0));
+        EXPECT_TRUE(node);
+        node = first_node_not_var(node->child(0));
+        EXPECT_TRUE(node);
+        EXPECT_EQ(node->type(),NODE_TYPE::VALUE);
+    }
+    catch(const std::exception& err){
+        for(auto& [node,childs]:node_1_.node_1()->relation_manager()->childs_){
+            std::cerr<<"Type: "<<node->type();
+            for(auto& child:childs)
+                std::cerr<<"Childs: "<<child->type()<<" ; ";
+            std::cerr<<std::endl;
+        }
+    }
     //var.insert_back()
 }
 

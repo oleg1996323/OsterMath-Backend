@@ -3,7 +3,7 @@
 #include "arithmetic_types.h"
 #include "expr_listener.h"
 #include "exception.h"
-#include "relation_manager.h"
+#include "node_manager.h"
 
 using namespace std::string_view_literals;
 

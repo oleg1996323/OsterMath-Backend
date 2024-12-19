@@ -3,7 +3,7 @@
 #include "types.h"
 #include "events_errors/exception.h"
 #include "string_node.h"
-#include "relation_manager.h"
+#include "node_manager.h"
 
 EmptyNode::EmptyNode():
 AbstractNode(BaseData::get_anonymous_relation_manager()){}

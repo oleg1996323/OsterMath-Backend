@@ -1,6 +1,6 @@
 #include "val_node.h"
 #include "array_node.h"
-#include "relation_manager.h"
+#include "node_manager.h"
 
 ValueNode::~ValueNode(){
     rel_mng_->delete_node(this);

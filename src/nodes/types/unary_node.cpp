@@ -1,6 +1,6 @@
 #include "unary_node.h"
 #include "def.h"
-#include "relation_manager.h"
+#include "node_manager.h"
 
 UnaryNode::~UnaryNode(){
     rel_mng_->delete_node(this);

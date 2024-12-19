@@ -3,7 +3,7 @@
 #include "types.h"
 #include "events_errors/exception.h"
 #include "string_node.h"
-#include "relation_manager.h"
+#include "node_manager.h"
 
 AbstractNode::AbstractNode():
 rel_mng_(BaseData::get_anonymous_relation_manager()){}
@@ -35,10 +35,6 @@ std::shared_ptr<AbstractNode> AbstractNode::get_this() const{
         assert(has_owner());
         return rel_mng_->owner(this).node();
     }
-}
-
-AbstractNode::~AbstractNode(){
-    //rel_mng_-> call delete method for destructed node
 }
 
 AbstractNode::AbstractNode(size_t sz):

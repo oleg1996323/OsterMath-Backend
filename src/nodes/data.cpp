@@ -11,6 +11,10 @@ RelationManager BaseData::anonymous_nodes{};
 
 BaseData::BaseData(std::string_view name):rel_mng_(this),name_(name), buffer_(std::make_shared<VariableBase>("buffer",this)), data_count(counter++){}
 
+BaseData::~BaseData(){
+    vars_.clear();
+}
+
 VariableBase* BaseData::get(std::string_view name){
     if(!exists(name))
         throw std::invalid_argument("Variable "s + std::string(name) + " don't exists.\n");

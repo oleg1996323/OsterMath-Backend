@@ -6,6 +6,10 @@
 VariableNode::VariableNode(VariableBase* variable):AbstractNode(),
     var_(variable){}
 
+VariableNode::~VariableNode(){
+    rel_mng_->delete_node(this);
+}
+
 const VariableBase* VariableNode::variable() const noexcept{
     return var_;
 }

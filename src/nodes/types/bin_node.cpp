@@ -1,7 +1,7 @@
 #include "bin_node.h"
 #include "def.h"
 #include "events_errors/exception.h"
-#include "relation_manager.h"
+#include "node_manager.h"
 
 #include "aux_functions.h"
 

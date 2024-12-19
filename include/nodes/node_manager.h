@@ -2,6 +2,7 @@
 #include <unordered_map>
 #include <vector>
 #include <memory>
+#include <string>
 #include "node.h"
 #include "ref_node.h"
 
@@ -12,7 +13,9 @@ using Childs_t = std::vector<std::shared_ptr<AbstractNode>>;
 
 class RelationManager{
     std::unordered_map<const AbstractNode*,References_t> references_; //referencing, but not owning parents
-    std::unordered_map<const AbstractNode*,Childs_t> childs_;
+    public:
+    std::map<const AbstractNode*,Childs_t> childs_;
+    private:
     std::unordered_map<const AbstractNode*,INFO_NODE> owner_; //parent, which own this node
     static const Childs_t empty_childs_;
     static const References_t empty_references_;

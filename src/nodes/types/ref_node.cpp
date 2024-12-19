@@ -1,5 +1,5 @@
 #include "ref_node.h"
-#include "relation_manager.h"
+#include "node_manager.h"
 
 ReferenceNode::ReferenceNode(std::shared_ptr<AbstractNode> reference):AbstractNode(reference->relation_manager()){
     insert_back(reference);

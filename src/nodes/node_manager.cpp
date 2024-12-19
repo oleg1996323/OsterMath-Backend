@@ -1,4 +1,4 @@
-#include "relation_manager.h"
+#include "node_manager.h"
 #include "core/settings.h"
 #include "node.h"
 #include "data.h"
@@ -7,14 +7,6 @@ const Childs_t RelationManager::empty_childs_{};
 const References_t RelationManager::empty_references_{};
 
 RelationManager::~RelationManager(){
-    for(auto& [node,refs]:references_)
-        for(auto& ref:refs)
-            ref->relation_manager()->release_childs(ref);
-    references_.clear();
-    for(auto& [node,owner]:owner_)
-        owner.parent->erase_child(owner.id);
-    owner_.clear();
-    childs_.clear();
 }
 
 void RelationManager::reserve_childs(const AbstractNode* node,size_t size){
@@ -287,19 +279,20 @@ bool RelationManager::has_child(const AbstractNode* node, size_t id) noexcept{
     return node->relation_manager()->childs_.contains(node) && node->relation_manager()->childs_.at(node).size()>id;
 }
 void RelationManager::release_childs(const AbstractNode* node) noexcept{
-    for(std::shared_ptr child:childs(node)){
-        if(child->owner()==node){
-            child->relation_manager()->owner_.erase(child.get());
-            child->relation_manager()->references_.erase(child.get());
-            child->relation_manager()->release_childs(child.get());
-        }
-        else{
-            if(!child->references().empty())
-                child->relation_manager()->references_.at(child.get()).erase(static_cast<const ReferenceNode*>(node));
-            //maybe replace child (delete or make EmptyNode()?)
-        }
-    }
-    node->relation_manager()->childs_.erase(node);
+    // for(std::shared_ptr child:childs(node)){
+    //     if(child->owner()==node || child->owner()==nullptr)
+    //         child->relation_manager()->release_childs(child.get());
+    //     else{
+    //         if(!child->references().empty()){
+    //             assert(node->type()==NODE_TYPE::REF);
+    //             node->relation_manager()->childs_.erase(node);
+    //             child->relation_manager()->references_.at(child.get()).erase(static_cast<const ReferenceNode*>(node));
+    //         }
+    //         //maybe replace child (delete or make EmptyNode()?)
+    //     }
+    // }
+    if(node->has_childs())
+        node->relation_manager()->childs_.erase(node);
 }
 const References_t& RelationManager::references(const AbstractNode* node) noexcept{
     if(node->relation_manager()->references_.contains(node))
@@ -307,7 +300,8 @@ const References_t& RelationManager::references(const AbstractNode* node) noexce
     else return RelationManager::empty_references_;
 }
 void RelationManager::erase_child(const AbstractNode* node, size_t id) noexcept{
-    node->relation_manager()->childs_.at(node).erase(node->relation_manager()->childs_.at(node).cbegin()+id);
+    if(node->has_child(id)) //TODO: check if it is reference or owned node (then must be deleted)
+        node->relation_manager()->childs_.at(node).erase(node->relation_manager()->childs_.at(node).cbegin()+id);
 }
 #include <cassert>
 void RelationManager::delete_node(const AbstractNode* node){

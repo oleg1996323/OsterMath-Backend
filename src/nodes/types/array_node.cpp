@@ -3,7 +3,7 @@
 #include "types.h"
 #include <vector>
 #include <memory>
-#include "relation_manager.h"
+#include "node_manager.h"
 
 ArrayNode::ArrayNode(size_t sz):
     AbstractNode(sz)

@@ -17,7 +17,7 @@ class VariableNode:public AbstractNode{
     virtual NODE_TYPE type() const override{
         return NODE_TYPE::VARIABLE;
     }
-    ~VariableNode(){}
+    ~VariableNode();
 
     const VariableBase* variable() const noexcept;
 
