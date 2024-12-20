@@ -229,6 +229,7 @@ void RelationManager::__add_reference__(AbstractNode* node_to_add, const Abstrac
                 true);
         }
         else{
+                assert(node_to_add->type()!=NODE_TYPE::VARIABLE);
                 ++node_to_add->relation_manager()->constructed;
                 INFO_NODE info;
                 info.parent = const_cast<AbstractNode*>(parent);
@@ -314,7 +315,6 @@ void RelationManager::erase_child(const AbstractNode* node, size_t id) noexcept{
 #include <cassert>
 void RelationManager::delete_node(const AbstractNode* node){
     ++node->relation_manager()->destructed;
-    release_childs(node);
     for(auto& ref:node->relation_manager()->references_[node])
         erase_child(ref,0);
     node->relation_manager()->references_.erase(node);
@@ -322,6 +322,7 @@ void RelationManager::delete_node(const AbstractNode* node){
     node->relation_manager()->owner_.erase(node);
     if(owner_tmp.has_node())
         erase_child(owner_tmp.parent,owner_tmp.id);
+    release_childs(node);
 }
 #include "arithmetic_types.h"
 

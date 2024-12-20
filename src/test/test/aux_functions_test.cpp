@@ -112,6 +112,13 @@ public:
         return node_2_with_vars_;
     }
 
+    ~Initial_Complex_Node_2(){
+        RelationManager* rel_mng_ = node_2_->relation_manager();
+        const AbstractNode* node_2_ptr = node_2_.get();
+        node_2_.reset();
+        assert(!rel_mng_->childs_.contains(node_2_ptr));
+    }
+
 private:
     std::shared_ptr<AbstractNode> node_2_;
     std::shared_ptr<AbstractNode> node_2_with_vars_;
@@ -123,7 +130,7 @@ class Initial_Rect_ArrayNode{
 public:
 
     Initial_Rect_ArrayNode(){
-        bd = std::make_shared<BaseData>("bd");
+        bd = std::make_shared<BaseData>("bd_3");
         bd->add_variable("var_1");
         bd->add_variable("var_2");
         bd->add_variable("var_3");
