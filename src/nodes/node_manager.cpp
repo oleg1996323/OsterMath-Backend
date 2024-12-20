@@ -77,6 +77,7 @@ void RelationManager::insert_back(const AbstractNode* node,std::shared_ptr<Abstr
             }
             case NODE_TYPE::VARIABLE:
                 assert(node->relation_manager()->bd_);
+                assert(!node->has_owner());
             case NODE_TYPE::REF:
             case NODE_TYPE::RANGEOP:{
                 if(node->has_child(0))
@@ -204,15 +205,10 @@ std::shared_ptr<AbstractNode> RelationManager::replace(const AbstractNode* node,
 void RelationManager::__add_reference__(AbstractNode* node_to_add, const AbstractNode* parent, int index) noexcept{
     //variable type cannot has owner (only BaseData class object)
     assert(node_to_add);
+    assert(parent);
     if(parent->type()!=NODE_TYPE::REF){
-        if(node_to_add->type()!=NODE_TYPE::VARIABLE && !owner(node_to_add).has_node()){
-                ++node_to_add->relation_manager()->constructed;
-                INFO_NODE info;
-                info.parent = const_cast<AbstractNode*>(parent);
-                info.id = index;
-                node_to_add->relation_manager()->owner_[node_to_add] = info;
-        }
-        else{
+        if(node_to_add->type()==NODE_TYPE::VARIABLE || owner(node_to_add).has_node())
+        {
             ++node_to_add->relation_manager()->refered;
             std::shared_ptr<AbstractNode> tmp = parent->childs().at(index);
             std::shared_ptr<ReferenceNode> ref_node = std::make_shared<ReferenceNode>(tmp);
@@ -227,7 +223,19 @@ void RelationManager::__add_reference__(AbstractNode* node_to_add, const Abstrac
             //delete ex-reference to the child, if it was deleted
             assert(tmp->references().contains(ref_node.get()));
             assert(ref_node->owner()==parent);
-            assert(ref_node.get()==parent->childs().at(index).get());
+            assert(ref_node.get()==parent->child(index).get());
+            assert(tmp->relation_manager()!=parent->relation_manager()?
+                ref_node->relation_manager()!=parent->relation_manager():
+                true);
+        }
+        else{
+                ++node_to_add->relation_manager()->constructed;
+                INFO_NODE info;
+                info.parent = const_cast<AbstractNode*>(parent);
+                info.id = index;
+                node_to_add->relation_manager()->owner_[node_to_add] = info;
+                assert(node_to_add->owner()==parent);
+                assert(parent->child(index).get()==node_to_add);
         }
     }
     else{
