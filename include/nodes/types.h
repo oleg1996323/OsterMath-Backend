@@ -38,8 +38,8 @@ class VariableBase: public FormattingData{
     void set_name(std::string_view name);
     void refresh() const;
 
-    const std::shared_ptr<VariableNode>& node() const;
-    const std::shared_ptr<VariableNode>& node();
+    const VariableNode* node() const;
+    VariableNode* node();
 
     bool is_expression() const;
     bool is_value() const;
@@ -76,7 +76,7 @@ class VariableBase: public FormattingData{
     const BaseData* get_data_base() const;
 
     private:
-    std::shared_ptr<VariableNode> node_; //shared, так как может быть передан в любое арифметическое дерево
+    std::unique_ptr<VariableNode> node_;
     VariableDomain domains_;
     std::string_view name_;
     std::string text_;

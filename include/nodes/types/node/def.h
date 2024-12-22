@@ -8,7 +8,7 @@ struct INFO_NODE{
     AbstractNode* parent = nullptr;
     int id = -1;
 
-    std::shared_ptr<AbstractNode> node() const;
+    AbstractNode* node() const;
     bool has_node() const;
     bool is_valid() const;
 
@@ -18,20 +18,6 @@ struct INFO_NODE{
     bool operator==(AbstractNode* other) const noexcept;
 
     void swap(INFO_NODE& other) noexcept;
-};
-
-struct Parent_ref{
-    AbstractNode* parent = nullptr;
-    std::vector<int> id;
-
-    std::shared_ptr<AbstractNode> node() const;
-    bool has_node() const;
-    bool is_valid() const;
-
-    bool operator<(const INFO_NODE& v) const noexcept;
-    bool operator==(const INFO_NODE& other) const noexcept;
-    bool operator<(AbstractNode* v) const noexcept;
-    bool operator==(AbstractNode* other) const noexcept;
 };
 
 struct INFO_NODE_Comparator{

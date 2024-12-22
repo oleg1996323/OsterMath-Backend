@@ -31,7 +31,6 @@ concept __comparable_check_values_val_t__ = requires(CHECK_VAL ch, T arg){
     (ch!=arg.type_val());
 };
 
-
 template<template<typename> typename CONT,typename T>
 concept __container_array_node_req__ = requires (CONT<T> container, T arg){
     container.begin();

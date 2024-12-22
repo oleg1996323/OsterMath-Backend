@@ -15,7 +15,7 @@ ArrayNode::~ArrayNode(){
 
 Result ArrayNode::execute() const{
     flush_cache();
-    for(auto child:childs()){
+    for(const AbstractNode* child:childs()){
         if(child->execute().is_error()){
             cache_ = child->cached_result();
             return cache_;
@@ -33,23 +33,23 @@ bool ArrayNode::empty() const{
     return childs().empty();
 }
 
-std::vector<std::shared_ptr<AbstractNode>>::const_iterator ArrayNode::begin() const{
+Childs_t::const_iterator ArrayNode::begin() const{
     return childs().begin();
 }
 
-std::vector<std::shared_ptr<AbstractNode>>::const_iterator ArrayNode::end() const{
+Childs_t::const_iterator ArrayNode::end() const{
     return childs().end();
 }
 
-std::vector<std::shared_ptr<AbstractNode>>::const_iterator ArrayNode::cbegin() const{
+Childs_t::const_iterator ArrayNode::cbegin() const{
     return begin();
 }
-std::vector<std::shared_ptr<AbstractNode>>::const_iterator ArrayNode::cend() const{
+Childs_t::const_iterator ArrayNode::cend() const{
     return begin();
 }
 
 bool ArrayNode::is_numeric() const{
-    if(!childs().empty() && std::all_of(childs().begin(),childs().end(),[](std::shared_ptr<AbstractNode> child){
+    if(!childs().empty() && std::all_of(childs().begin(),childs().end(),[](const AbstractNode* child){
         return child->is_numeric();
     })){
         return true;
@@ -58,7 +58,7 @@ bool ArrayNode::is_numeric() const{
 }
 
 bool ArrayNode::is_string() const{
-    if(!childs().empty() && std::all_of(childs().begin(),childs().end(),[](std::shared_ptr<AbstractNode> child){
+    if(!childs().empty() && std::all_of(childs().begin(),childs().end(),[](const AbstractNode* child){
         return child->is_string();
     })){
         return true;
@@ -79,7 +79,7 @@ void ArrayNode::print_text(std::ostream& stream) const{
     //     print_text(std::cout);
     bool first = true;
     stream<<'[';
-    for(auto child:childs()){
+    for(const AbstractNode* child:childs()){
         if(first)
             first = false;
         else
@@ -95,7 +95,7 @@ void ArrayNode::print_result(std::ostream& stream) const{
     bool first = true;
     stream<<'[';
     if(!childs().empty()){
-        for(auto child:childs()){
+        for(const AbstractNode* child:childs()){
             if(first)
                 first = false;
             else
@@ -106,7 +106,7 @@ void ArrayNode::print_result(std::ostream& stream) const{
     stream<<']';
 }
 
-std::ostream& operator<<(std::ostream& stream, const std::shared_ptr<ArrayNode>& node){
+std::ostream& operator<<(std::ostream& stream, const ArrayNode* node){
     node->print_text(stream);
     return stream;
 }
@@ -118,4 +118,29 @@ TYPE_VAL ArrayNode::type_val() const{
         return TYPE_VAL::STRING_ARRAY;
     else
         return TYPE_VAL::ARRAY;
+}
+
+#include "string_node.h"
+#include "val_node.h"
+#include "func_node.h"
+#include "range_node.h"
+
+template<>
+AbstractNode* ArrayNode::replace_in_owner_by_array(StringNode* val){
+    if(val){
+        //replace child in owner by array
+        INFO_NODE tmp_owner = val->owner();
+        assert(tmp_owner.is_valid());
+        std::unique_ptr<ArrayNode> tmp = std::make_unique<ArrayNode>(0);
+        tmp->set_relation_manager(val->relation_manager());
+        AbstractNode* result = NodeManager::add_node(tmp_owner.parent->relation_manager(),std::move(tmp));
+        tmp_owner.parent->relation_manager()->replace_child_wo_delete_in_owner_by(
+                tmp_owner.parent,
+                tmp_owner.id,
+                result
+        );
+        assert(result);
+        result->insert_back(std::move(val));
+    }
+    return result;
 }

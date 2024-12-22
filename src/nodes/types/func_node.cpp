@@ -22,13 +22,13 @@ FunctionNode::~FunctionNode(){
 }
 
 bool FunctionNode::is_numeric() const{
-    return std::all_of(childs().begin(),childs().end(),[](std::shared_ptr<AbstractNode> child){
+    return std::all_of(childs().begin(),childs().end(),[](const AbstractNode* child){
         return child->is_numeric();
     });
 }
 
 bool FunctionNode::is_string() const{
-    return std::all_of(childs().begin(),childs().end(),[](std::shared_ptr<AbstractNode> child){
+    return std::all_of(childs().begin(),childs().end(),[](const AbstractNode* child){
         return child->is_string();
     });
 }
@@ -161,7 +161,7 @@ Result FunctionNode::execute() const{ //TODO add checking for arrays size compar
                 cache_ = std::make_shared<exceptions::IncorrectTypeArrays>("numeric array");
                 return cache_;
             }
-            if(check_arguments_size(to_array_node(child(0)).get(),to_array_node(child(1)).get())){
+            if(check_arguments_size(to_array_node(child(0)),to_array_node(child(1)))){
                 cache_ = std::make_shared<exceptions::UnequalSizeArrays>("PEARSON()");
                 return cache_;
             }

@@ -27,7 +27,7 @@ void UnaryNode::print_text(std::ostream& stream) const{
 }
 
 void UnaryNode::print_result(std::ostream& stream) const{
-    stream<<const_cast<UnaryNode*>(this)->execute();
+    stream<<execute();
 }
 
 Result UnaryNode::execute() const{

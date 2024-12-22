@@ -12,8 +12,8 @@ void VariableBase::print_text(){
 }
 
 VariableBase::VariableBase(std::string_view name, BaseData* data_base):
-    node_(std::make_shared<VariableNode>(this)),
-    domains_(node_),
+    node_(std::make_unique<VariableNode>(this)),
+    domains_(node_.get()),
     name_(name),
     data_base_(data_base)
 {}
@@ -69,12 +69,12 @@ std::string VariableBase::text() const{
     return stream.str();
 }
 
-const std::shared_ptr<VariableNode>& VariableBase::node() const{
-    return node_;
+const VariableNode* VariableBase::node() const{
+    return node_.get();
 }
 
-const std::shared_ptr<VariableNode>& VariableBase::node(){
-    return node_;
+VariableNode* VariableBase::node(){
+    return node_.get();
 }
 
 bool VariableBase::is_expression() const{

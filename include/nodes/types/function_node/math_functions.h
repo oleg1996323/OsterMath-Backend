@@ -24,10 +24,10 @@ namespace node_function::functions{
 
         template<typename ExecutionPolicy>
         Result CorrelationCoefficient(ExecutionPolicy&& exec,
-                                    const std::shared_ptr<ArrayNode>&, 
-                                    const std::shared_ptr<ArrayNode>&);
-        Result CorrelationCoefficient(const std::shared_ptr<ArrayNode>&,
-                                    const std::shared_ptr<ArrayNode>&);
+                                    const ArrayNode*, 
+                                    const ArrayNode*);
+        Result CorrelationCoefficient(const ArrayNode*,
+                                    const ArrayNode*);
         size_t pow(size_t base, size_t pow);
 
 #include "correlation.h"
@@ -38,8 +38,8 @@ namespace node_function::functions{
 }
 
 template<typename ExecutionPolicy>
-Result node_function::functions::math::CorrelationCoefficient(ExecutionPolicy&& exec,const std::shared_ptr<ArrayNode>& arr_1, 
-        const std::shared_ptr<ArrayNode>& arr_2){
+Result node_function::functions::math::CorrelationCoefficient(ExecutionPolicy&& exec,const ArrayNode* arr_1, 
+        const ArrayNode* arr_2){
     CovariationMatrix((*arr_1),(*arr_2));
     if(arr_1->is_numeric() && arr_2->is_numeric()){
         if constexpr (std::is_same_v<std::remove_reference_t<decltype(exec)>, decltype(std::execution::seq)>){

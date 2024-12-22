@@ -43,7 +43,7 @@ class UnaryNode:public AbstractNode{
     virtual NODE_TYPE type() const override{
         return NODE_TYPE::UNARY;
     }
-    const std::shared_ptr<AbstractNode>& child() const{
+    const AbstractNode* child() const{
         return childs().at(0);
     }
     //virtual void insert_back(std::shared_ptr<Node> node) override;

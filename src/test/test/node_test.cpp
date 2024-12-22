@@ -30,24 +30,24 @@ TEST(Node_test,TestCopyConstruct){
         std::shared_ptr<BaseData> bd = std::make_shared<BaseData>("bd");
         std::shared_ptr<VariableBase> var_A = bd->add_variable("A");
         std::shared_ptr<VariableBase> var_B = bd->add_variable("B");
-        std::shared_ptr<ArrayNode> node_1 = std::make_shared<ArrayNode>(10);
-        std::shared_ptr<AbstractNode> tmp_node_1;
-        std::vector<std::shared_ptr<ValueNode>> values_1;
-        std::vector<std::shared_ptr<ValueNode>> values_2;
+        std::unique_ptr<ArrayNode> node_1 = std::make_unique<ArrayNode>(10);
+        std::unique_ptr<AbstractNode> tmp_node_1;
+        std::vector<std::unique_ptr<ValueNode>> values_1;
+        std::vector<std::unique_ptr<ValueNode>> values_2;
         var_A->node()->insert_back(node_1);
         {
-            std::shared_ptr<ArrayNode> node_2 = std::make_shared<ArrayNode>(10);
+            std::unique_ptr<ArrayNode> node_2 = std::make_unique<ArrayNode>(10);
             var_B->node()->insert_back(node_2);
             for(int i=0;i<10;++i){
                 if(i<9){
-                    values_1.push_back(std::make_shared<ValueNode>(i+10));
+                    values_1.push_back(std::make_unique<ValueNode>(i+10));
                     node_1->insert_back(values_1.at(i));
                 }
-                values_2.push_back(std::make_shared<ValueNode>(i));
+                values_2.push_back(std::make_unique<ValueNode>(i));
                 node_2->insert_back(values_2.at(i));
             }
             tmp_node_1 = node_1;
-            node_1=std::make_shared<ArrayNode>(*node_2);
+            node_1=std::make_unique<ArrayNode>(*node_2);
         }
 
         EXPECT_TRUE(&node_1);
@@ -86,20 +86,20 @@ TEST(NodeTest,TestChildInfoByIndexesConst){
     bd->add_variable("D");
     bd->add_variable("E");
     bd->add_variable("F");
-    std::shared_ptr<ArrayNode> array_1 = std::make_shared<ArrayNode>(3);
-    std::shared_ptr<ValueNode> value_1 = std::make_shared<ValueNode>(1);
-    std::shared_ptr<ValueNode> value_2 = std::make_shared<ValueNode>(2);
-    std::shared_ptr<ValueNode> value_3 = std::make_shared<ValueNode>(3);
-    bd->get("D")->node()->insert_back(bd->get("C")->node());
-    bd->get("C")->node()->insert_back(bd->get("A")->node());
+    std::unique_ptr<ArrayNode> array_1 = std::make_unique<ArrayNode>(3);
+    std::unique_ptr<ValueNode> value_1 = std::make_unique<ValueNode>(1);
+    std::unique_ptr<ValueNode> value_2 = std::make_unique<ValueNode>(2);
+    std::unique_ptr<ValueNode> value_3 = std::make_unique<ValueNode>(3);
+    bd->get("D")->node()->insert_back_ref(bd->get("C")->node());
+    bd->get("C")->node()->insert_back_ref(bd->get("A")->node());
     bd->get("A")->node()->insert_back(value_3);
     array_1->insert_back(bd->get("D")->node());
-    std::shared_ptr<BinaryNode> add = std::make_shared<BinaryNode>(BINARY_OP::ADD);
+    std::unique_ptr<BinaryNode> add = std::make_unique<BinaryNode>(BINARY_OP::ADD);
     add->insert_back(value_1);
     add->insert_back(value_2);
     array_1->insert_back(bd->get("E")->node());
     bd->get("E")->node()->insert_back(add);
-    std::shared_ptr<UnaryNode> un_minus = std::make_shared<UnaryNode>(UNARY_OP::SUB);
+    std::unique_ptr<UnaryNode> un_minus = std::make_unique<UnaryNode>(UNARY_OP::SUB);
     un_minus->insert_back(value_2);
     array_1->insert_back(bd->get("F")->node());
     bd->get("F")->node()->insert_back(un_minus);
@@ -146,10 +146,10 @@ TEST(NodeTest,TestReleaseChilds){
     std::shared_ptr<VariableBase> var_D = bd->add_variable("D");
     std::shared_ptr<VariableBase> var_E = bd->add_variable("E");
     std::shared_ptr<VariableBase> var_F = bd->add_variable("F");
-    std::shared_ptr<ValueNode> value_1 = std::make_shared<ValueNode>(1);
-    std::shared_ptr<ValueNode> value_2 = std::make_shared<ValueNode>(2);
-    std::shared_ptr<ValueNode> value_3 = std::make_shared<ValueNode>(3);
-    std::shared_ptr<ArrayNode> array = std::make_shared<ArrayNode>(7);
+    std::unique_ptr<ValueNode> value_1 = std::make_unique<ValueNode>(1);
+    std::unique_ptr<ValueNode> value_2 = std::make_unique<ValueNode>(2);
+    std::unique_ptr<ValueNode> value_3 = std::make_unique<ValueNode>(3);
+    std::unique_ptr<ArrayNode> array = std::make_unique<ArrayNode>(7);
     array->insert_back(var_A->node());
     array->insert_back(var_B->node());
     array->insert_back(var_C->node());

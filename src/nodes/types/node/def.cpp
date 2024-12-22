@@ -1,10 +1,10 @@
 #include "node/def.h"
 #include "node.h"
 
-std::shared_ptr<AbstractNode> INFO_NODE::node() const{
+AbstractNode* INFO_NODE::node() const{
     if(has_node())
         return parent->child(id);
-    else return std::shared_ptr<AbstractNode>();
+    else return nullptr;
 }
 
 bool INFO_NODE::has_node() const{

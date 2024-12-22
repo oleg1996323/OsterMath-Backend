@@ -17,25 +17,25 @@ enum class COMP_T{
 };
 
 struct Domain{
-    mutable std::shared_ptr<AbstractNode> lhs_;
-    mutable std::shared_ptr<AbstractNode> rhs_;
-    std::shared_ptr<AbstractNode> value_if_true_ = std::make_shared<ValueNode>(0);
+    mutable AbstractNode* lhs_;
+    mutable AbstractNode* rhs_;
+    std::unique_ptr<AbstractNode> value_if_true_ = std::make_unique<ValueNode>(0);
     COMP_T type_;
 
     bool is() const;
-    void set_expression_if_true(std::shared_ptr<AbstractNode> value_if_true);
+    void set_expression_if_true(std::unique_ptr<AbstractNode>&& value_if_true);
     void print_text(std::ostream&) const;
 };
 
 class VariableDomain{
     public:
-    VariableDomain(std::shared_ptr<VariableNode> var_node);
+    VariableDomain(const VariableNode* var_node);
 
     void add_domain(Domain&&);
 
-    std::optional<Domain> get_domain(size_t id);
+    // std::optional<Domain> get_domain(size_t id);
 
-    std::optional<Domain> get_domain(size_t id) const;
+    // std::optional<Domain> get_domain(size_t id) const;
 
     void unset_domain(size_t id);
 
@@ -51,5 +51,5 @@ class VariableDomain{
 
     private:
     std::list<Domain> domains_;
-    std::shared_ptr<VariableNode> default_expression_;
+    const VariableNode* default_expression_;
 };

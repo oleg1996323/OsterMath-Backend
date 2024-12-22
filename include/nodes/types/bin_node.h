@@ -37,10 +37,10 @@ class BinaryNode:public AbstractNode{
     }
     virtual Result execute() const override;
 
-    std::shared_ptr<AbstractNode> lhs() const{
+    const AbstractNode* lhs() const{
         return child(0);
     }
-    std::shared_ptr<AbstractNode> rhs() const{
+    const AbstractNode* rhs() const{
         return child(1);
     }
 

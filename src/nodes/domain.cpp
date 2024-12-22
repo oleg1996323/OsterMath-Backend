@@ -65,7 +65,7 @@ void Domain::print_text(std::ostream& stream) const{
     else stream<<"#NAN";
 }
 
-VariableDomain::VariableDomain(std::shared_ptr<VariableNode> var_node):
+VariableDomain::VariableDomain(const VariableNode* var_node):
     default_expression_(var_node){}
     
 void VariableDomain::add_domain(Domain&& domain){
@@ -81,15 +81,15 @@ void VariableDomain::clear(){
     domains_.clear();
 }
 
-std::optional<Domain> VariableDomain::get_domain(size_t id){
-    if(domains_.size()>id)
-        return *std::next(domains_.begin(),id);
-    return std::nullopt;
-}
+// std::optional<Domain> VariableDomain::get_domain(size_t id){
+//     if(domains_.size()>id)
+//         return *std::next(domains_.begin(),id);
+//     return std::nullopt;
+// }
 
-std::optional<Domain> VariableDomain::get_domain(size_t id) const{
-    return get_domain(id);
-}
+// std::optional<Domain> VariableDomain::get_domain(size_t id) const{
+//     return get_domain(id);
+// }
 
 Result VariableDomain::execute() const{
     for(const auto& domain:domains_)

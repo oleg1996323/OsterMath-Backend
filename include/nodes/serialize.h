@@ -27,7 +27,7 @@ class SerialData{
         open_to_write(path);
     }
 
-    void insert_node(uint64_t id, std::shared_ptr<AbstractNode> node){
+    void insert_node(uint64_t id, AbstractNode* node){
         if(node)
             nodes_[id]=node;
     }
@@ -54,7 +54,7 @@ class SerialData{
         return data_bases_.contains(db_id);
     }
 
-    std::shared_ptr<AbstractNode> get_node(uint64_t hash){
+    AbstractNode* get_node(uint64_t hash){
         if(nodes_.contains(hash))
             return nodes_.at(hash);
         else throw std::runtime_error("Undefined hash of node");
@@ -87,7 +87,7 @@ class SerialData{
         nodes_dependencies_[parent_id].push_back(child_id);
     }
 
-    void insert_var(uint64_t var_id, const std::shared_ptr<VariableNode>& node) noexcept;
+    void insert_var(uint64_t var_id, const VariableNode* node) noexcept;
 
     void serialize_header(DataPool* pool);
 
@@ -102,7 +102,7 @@ class SerialData{
     //add std::unordered_map for search and inserting at deserialization
     std::unordered_map<uint64_t,DataPool*> pools_;
     std::unordered_map<uint64_t,BaseData*> data_bases_;
-    std::unordered_map<uint64_t,std::shared_ptr<AbstractNode>> nodes_;
+    std::unordered_map<uint64_t,AbstractNode*> nodes_;
     std::unordered_map<uint64_t,std::vector<uint64_t>> nodes_dependencies_;
 
     struct VarProperties{

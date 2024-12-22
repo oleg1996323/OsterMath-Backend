@@ -34,13 +34,13 @@ using namespace functions::auxiliary;
 TEST(ArrayNode_test,Insert_Back){
     {
     std::cout<<"Run test insert back"<<std::endl;
-    std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(10);
+    std::unique_ptr<ArrayNode> arr = std::make_unique<ArrayNode>(10);
     std::vector<Value_t> values(10);
     std::iota(values.begin(),values.end(),0);
     for(const auto& val:values)
-        arr->insert_back(std::make_shared<ValueNode>(val));
+        arr->insert_back(std::make_unique<ValueNode>(val));
     EXPECT_EQ(arr->childs().size(),10);
-    arr->insert_back(std::make_shared<ValueNode>(values.back()+1));
+    arr->insert_back(std::make_unique<ValueNode>(values.back()+1));
     EXPECT_EQ(arr->childs().size(),11);
     }
     BaseData::get_anonymous_relation_manager()->log_state();
@@ -55,9 +55,9 @@ TEST(ArrayNode_test,Replace){
 TEST(ArrayNode_test,Begins){
     {
     std::cout<<"Run test begin"<<std::endl;
-    std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(0);
+    std::unique_ptr<ArrayNode> arr = std::make_unique<ArrayNode>(0);
     EXPECT_EQ(arr->childs().begin(), arr->begin());
-    arr->insert_back(std::make_shared<ValueNode>(1));
+    arr->insert_back(std::make_unique<ValueNode>(1));
     EXPECT_EQ(arr->childs().begin(), arr->begin());
     }
     BaseData::get_anonymous_relation_manager()->log_state();
@@ -65,9 +65,9 @@ TEST(ArrayNode_test,Begins){
 TEST(ArrayNode_test,Ends){
     {
     std::cout<<"Run test begin"<<std::endl;
-    std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(0);
+    std::unique_ptr<ArrayNode> arr = std::make_unique<ArrayNode>(0);
     EXPECT_EQ(arr->begin(), arr->end());
-    arr->insert_back(std::make_shared<ValueNode>(1));
+    arr->insert_back(std::make_unique<ValueNode>(1));
     EXPECT_EQ(arr->begin()+1, arr->end());
     }
     BaseData::get_anonymous_relation_manager()->log_state();
@@ -76,12 +76,12 @@ TEST(ArrayNode_test,CopyConstructor){
     {
     std::cout<<"Run test copy constructor"<<std::endl;
     //TODO: here error
-    std::shared_ptr<ArrayNode> arr_1 = std::make_shared<ArrayNode>(10);
+    std::unique_ptr<ArrayNode> arr_1 = std::make_unique<ArrayNode>(10);
     std::vector<Value_t> values(10);
     std::iota(values.begin(),values.end(),0);
     for(const auto& val:values)
-        arr_1->insert_back(std::make_shared<ValueNode>(val));
-    std::shared_ptr<ArrayNode> arr_2 = std::make_shared<ArrayNode>(*arr_1.get());
+        arr_1->insert_back(std::make_unique<ValueNode>(val));
+    std::unique_ptr<ArrayNode> arr_2 = std::make_unique<ArrayNode>(*arr_1.get());
     EXPECT_EQ(arr_1->size(),arr_2->size());
     for(auto iter = arr_2->begin();iter!=arr_2->end();++iter){
         EXPECT_TRUE(check_arguments(TYPE_VAL::VALUE,arr_1->child(iter-arr_2->begin())));
@@ -96,8 +96,8 @@ TEST(ArrayNode_test,MoveConstructor){
     std::vector<Value_t> values(10);
     std::iota(values.begin(),values.end(),0);
     for(const auto& val:values)
-        arr_1.insert_back(std::make_shared<ValueNode>(val));
-    std::shared_ptr<ArrayNode> arr_2 = std::make_shared<ArrayNode>(std::move(arr_1));
+        arr_1.insert_back(std::make_unique<ValueNode>(val));
+    std::unique_ptr<ArrayNode> arr_2 = std::make_unique<ArrayNode>(std::move(arr_1));
     EXPECT_EQ(arr_1.size(),arr_2->size());
     for(auto iter = arr_2->begin();iter!=arr_2->end();++iter){
         EXPECT_TRUE(check_arguments(TYPE_VAL::VALUE,arr_1.child(iter-arr_2->begin())));
@@ -109,12 +109,12 @@ TEST(ArrayNode_test,Operator_Eq_copy){
     {
     std::cout<<"Run test operator equal copy"<<std::endl;
     EXPECT_TRUE(std::is_copy_constructible_v<ArrayNode>);
-    std::shared_ptr<ArrayNode> arr_1 = std::make_shared<ArrayNode>(1);
-    arr_1->insert_back(std::make_shared<ValueNode>(1));
-    std::shared_ptr<ArrayNode> arr_2 = std::make_shared<ArrayNode>(2);
-    arr_2->insert_back(std::make_shared<ValueNode>(2));
-    arr_2->insert_back(std::make_shared<ValueNode>(3));
-    arr_1 = ArrayNode::return_from(arr_2);
+    std::unique_ptr<ArrayNode> arr_1 = std::make_unique<ArrayNode>(1);
+    arr_1->insert_back(std::make_unique<ValueNode>(1));
+    std::unique_ptr<ArrayNode> arr_2 = std::make_unique<ArrayNode>(2);
+    arr_2->insert_back(std::make_unique<ValueNode>(2));
+    arr_2->insert_back(std::make_unique<ValueNode>(3));
+    arr_1 = ArrayNode::replace_by_array(std::move(arr_2));
     EXPECT_EQ(arr_1->size(),2);
     EXPECT_EQ(arr_1->childs().capacity(),2);
     }
@@ -125,13 +125,13 @@ TEST(ArrayNode_test,Operator_Eq_move){
     {
     std::cout<<"Run test operator equal"<<std::endl;
     EXPECT_TRUE(std::is_move_constructible_v<ArrayNode>);
-    std::shared_ptr<ArrayNode> arr_1 = std::make_shared<ArrayNode>(1);
-    arr_1->insert_back(std::make_shared<ValueNode>(1));
-    arr_1->insert_back(std::make_shared<ValueNode>(2));
-    std::shared_ptr<ArrayNode> arr_2 = ArrayNode::return_from(std::make_shared<ValueNode>(2));
+    std::unique_ptr<ArrayNode> arr_1 = std::make_unique<ArrayNode>(1);
+    arr_1->insert_back(std::make_unique<ValueNode>(1));
+    arr_1->insert_back(std::make_unique<ValueNode>(2));
+    std::unique_ptr<ArrayNode> arr_2 = ArrayNode::replace_by_array(std::make_unique<ValueNode>(2));
     size_t sz = arr_2->size();
     size_t cap = arr_2->childs().capacity();
-    arr_1 = ArrayNode::return_from(arr_2);
+    arr_1 = ArrayNode::replace_by_array(std::move(arr_2));
     //EXPECT_EQ(arr_1->child(0)->execute().get_value(),2);
     EXPECT_EQ(arr_1->size(),sz);
     EXPECT_EQ(arr_1->childs().capacity(),cap);
@@ -141,10 +141,10 @@ TEST(ArrayNode_test,Operator_Eq_move){
 TEST(ArrayNode_test,Type_Numeric_Array){
     {
     std::cout<<"Run test operator equal"<<std::endl;
-    std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(3);
-    arr->insert_back(std::make_shared<ValueNode>(1));
-    arr->insert_back(std::make_shared<ValueNode>(2));
-    arr->insert_back(std::make_shared<ValueNode>(100000000));
+    std::unique_ptr<ArrayNode> arr = std::make_unique<ArrayNode>(3);
+    arr->insert_back(std::make_unique<ValueNode>(1));
+    arr->insert_back(std::make_unique<ValueNode>(2));
+    arr->insert_back(std::make_unique<ValueNode>(100000000));
     EXPECT_EQ(arr->type_val(),TYPE_VAL::NUMERIC_ARRAY);
     EXPECT_TRUE(arr->type_val()&TYPE_VAL::VALUE);
     EXPECT_TRUE(arr->type_val()&TYPE_VAL::ARRAY);
@@ -161,10 +161,10 @@ TEST(ArrayNode_test,Type_Array){
 TEST(ArrayNode_test,ExecuteCorrect){
     {
     std::cout<<"Run test execute with expected correct result"<<std::endl;
-    std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(3);
-    arr->insert_back(std::make_shared<ValueNode>(1));
-    arr->insert_back(std::make_shared<ValueNode>(2));
-    arr->insert_back(std::make_shared<ValueNode>(100000000));
+    std::unique_ptr<ArrayNode> arr = std::make_unique<ArrayNode>(3);
+    arr->insert_back(std::make_unique<ValueNode>(1));
+    arr->insert_back(std::make_unique<ValueNode>(2));
+    arr->insert_back(std::make_unique<ValueNode>(100000000));
     EXPECT_TRUE(arr->execute().is_node());
     EXPECT_EQ(arr.get(),arr->execute().get_node());
     }
@@ -173,12 +173,12 @@ TEST(ArrayNode_test,ExecuteCorrect){
 TEST(ArrayNode_test,ExecuteError){
     {
     std::cout<<"Run test execute with expected error result"<<std::endl;
-    std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(3);
-    arr->insert_back(std::make_shared<ValueNode>(1));
-    arr->insert_back(std::make_shared<ValueNode>(2));
-    arr->insert_back(std::make_shared<BinaryNode>(BINARY_OP::DIV));
-    arr->child(2)->insert_back(std::make_shared<ValueNode>(100));
-    arr->child(2)->insert_back(std::make_shared<ValueNode>(0));
+    std::unique_ptr<ArrayNode> arr = std::make_unique<ArrayNode>(3);
+    arr->insert_back(std::make_unique<ValueNode>(1));
+    arr->insert_back(std::make_unique<ValueNode>(2));
+    arr->insert_back(std::make_unique<BinaryNode>(BINARY_OP::DIV));
+    arr->child(2)->insert_back(std::make_unique<ValueNode>(100));
+    arr->child(2)->insert_back(std::make_unique<ValueNode>(0));
     Result res = arr->execute();
     EXPECT_TRUE(res.is_error());
     EXPECT_EQ(exceptions::EXCEPTION_TYPE::DIVISION_ZERO,res.get_exception()->type());
@@ -188,31 +188,31 @@ TEST(ArrayNode_test,ExecuteError){
 }
 TEST(ArrayNode_test,ExecuteCorrect_id){
     std::cout<<"Run test execute with expected correct result"<<std::endl;
-    std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(3);
-    arr->insert_back(std::make_shared<ValueNode>(1));
-    arr->insert_back(std::make_shared<ValueNode>(2));
-    arr->insert_back(std::make_shared<ValueNode>(100000000));
+    std::unique_ptr<ArrayNode> arr = std::make_unique<ArrayNode>(3);
+    arr->insert_back(std::make_unique<ValueNode>(1));
+    arr->insert_back(std::make_unique<ValueNode>(2));
+    arr->insert_back(std::make_unique<ValueNode>(100000000));
     EXPECT_EQ(100000000,arr->execute().get_array_node()->child(2)->cached_result().get_value());
 }
 TEST(ArrayNode_test,ExecuteError_id){
     std::cout<<"Run test execute with expected error result"<<std::endl;
-    std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(3);
-    arr->insert_back(std::make_shared<ValueNode>(1));
-    arr->insert_back(std::make_shared<ValueNode>(2));
-    arr->insert_back(std::make_shared<BinaryNode>(BINARY_OP::DIV));
-    arr->child(2)->insert_back(std::make_shared<ValueNode>(100));
-    arr->child(2)->insert_back(std::make_shared<ValueNode>(0));
+    std::unique_ptr<ArrayNode> arr = std::make_unique<ArrayNode>(3);
+    arr->insert_back(std::make_unique<ValueNode>(1));
+    arr->insert_back(std::make_unique<ValueNode>(2));
+    arr->insert_back(std::make_unique<BinaryNode>(BINARY_OP::DIV));
+    arr->child(2)->insert_back(std::make_unique<ValueNode>(100));
+    arr->child(2)->insert_back(std::make_unique<ValueNode>(0));
     Result res = arr->execute();
     EXPECT_EQ(exceptions::EXCEPTION_TYPE::DIVISION_ZERO,res.get_exception()->type());
 }
 TEST(ArrayNode_test,Cached_Result_With_Correct){
     std::cout<<"Run test cached result when executed correct"<<std::endl;
-    std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(3);
-    arr->insert_back(std::make_shared<ValueNode>(1));
-    arr->insert_back(std::make_shared<ValueNode>(2));
-    arr->insert_back(std::make_shared<BinaryNode>(BINARY_OP::DIV));
-    arr->child(2)->insert_back(std::make_shared<ValueNode>(100));
-    arr->child(2)->insert_back(std::make_shared<ValueNode>(100));
+    std::unique_ptr<ArrayNode> arr = std::make_unique<ArrayNode>(3);
+    arr->insert_back(std::make_unique<ValueNode>(1));
+    arr->insert_back(std::make_unique<ValueNode>(2));
+    arr->insert_back(std::make_unique<BinaryNode>(BINARY_OP::DIV));
+    arr->child(2)->insert_back(std::make_unique<ValueNode>(100));
+    arr->child(2)->insert_back(std::make_unique<ValueNode>(100));
     EXPECT_TRUE(arr->execute().is_node());
     EXPECT_TRUE(arr->execute().is_array());
     EXPECT_TRUE(arr->cached_result().get_array_node()->child(2)->cached_result().is_value());
@@ -223,12 +223,12 @@ TEST(ArrayNode_test,Cached_Result_With_Correct){
 }
 TEST(ArrayNode_test,Cached_Result_With_Error){
     std::cout<<"Run test cached result when executed with error"<<std::endl;
-    std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(3);
-    arr->insert_back(std::make_shared<ValueNode>(1));
-    arr->insert_back(std::make_shared<ValueNode>(2));
-    arr->insert_back(std::make_shared<BinaryNode>(BINARY_OP::DIV));
-    arr->child(2)->insert_back(std::make_shared<ValueNode>(100));
-    arr->child(2)->insert_back(std::make_shared<ValueNode>(0));
+    std::unique_ptr<ArrayNode> arr = std::make_unique<ArrayNode>(3);
+    arr->insert_back(std::make_unique<ValueNode>(1));
+    arr->insert_back(std::make_unique<ValueNode>(2));
+    arr->insert_back(std::make_unique<BinaryNode>(BINARY_OP::DIV));
+    arr->child(2)->insert_back(std::make_unique<ValueNode>(100));
+    arr->child(2)->insert_back(std::make_unique<ValueNode>(0));
     EXPECT_TRUE(arr->child(2)->execute().is_error());
     EXPECT_TRUE(arr->execute().is_error());
     Result res = arr->execute();
@@ -238,32 +238,32 @@ TEST(ArrayNode_test,Cached_Result_With_Error){
 }
 TEST(ArrayNode_test,Cached_Result_id){
     std::cout<<"Run test cached at id result when executed"<<std::endl;
-    std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(3);
-    arr->insert_back(std::make_shared<ValueNode>(1));
-    arr->insert_back(std::make_shared<ValueNode>(2));
-    arr->insert_back(std::make_shared<BinaryNode>(BINARY_OP::DIV));
-    arr->child(2)->insert_back(std::make_shared<ValueNode>(100));
-    arr->child(2)->insert_back(std::make_shared<ValueNode>(100));
+    std::unique_ptr<ArrayNode> arr = std::make_unique<ArrayNode>(3);
+    arr->insert_back(std::make_unique<ValueNode>(1));
+    arr->insert_back(std::make_unique<ValueNode>(2));
+    arr->insert_back(std::make_unique<BinaryNode>(BINARY_OP::DIV));
+    arr->child(2)->insert_back(std::make_unique<ValueNode>(100));
+    arr->child(2)->insert_back(std::make_unique<ValueNode>(100));
     EXPECT_TRUE(arr->child(2)->cached_result().is_value());
     Result res = arr->execute();
     EXPECT_EQ(res,arr->cached_result());
 }
 TEST(ArrayNode_test,is_Numeric){
     std::cout<<"Run test cached result when executed"<<std::endl;
-    std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(3);
+    std::unique_ptr<ArrayNode> arr = std::make_unique<ArrayNode>(3);
     arr->insert_back(Value_t(1));
-    arr->insert_back(std::make_shared<ValueNode>(2));
-    arr->insert_back(std::make_shared<BinaryNode>(BINARY_OP::DIV));
+    arr->insert_back(std::make_unique<ValueNode>(2));
+    arr->insert_back(std::make_unique<BinaryNode>(BINARY_OP::DIV));
     arr->child(2)->insert_back(Value_t(100));
-    arr->child(2)->insert_back(std::make_shared<ValueNode>(100));
-    arr->insert_back(std::make_shared<ArrayNode>(2));
+    arr->child(2)->insert_back(std::make_unique<ValueNode>(100));
+    arr->insert_back(std::make_unique<ArrayNode>(2));
     arr->child(3)->insert_back(Value_t(1));
     arr->child(3)->insert_back(Value_t(2));
     EXPECT_TRUE(arr->is_numeric());
 }
 TEST(ArrayNode_test,is_String){
     std::cout<<"Run test is string array"<<std::endl;
-    std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(3);
+    std::unique_ptr<ArrayNode> arr = std::make_unique<ArrayNode>(3);
     arr->insert_back(std::string("1"));
     arr->insert_back(std::string("2"));
     EXPECT_TRUE(arr->is_string());
@@ -273,14 +273,14 @@ TEST(ArrayNode_test,is_String){
 }
 TEST(ArrayNode_test,is_Array){
     std::cout<<"Run test cached result when executed"<<std::endl;
-    std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(3);
+    std::unique_ptr<ArrayNode> arr = std::make_unique<ArrayNode>(3);
     arr->insert_back(std::string("1"));
     arr->insert_back(std::string("2"));
     EXPECT_TRUE(arr->is_string());
 }
 TEST(ArrayNode_test,Print_Text){
     std::cout<<"Run test print text"<<std::endl;
-    std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(3);
+    std::unique_ptr<ArrayNode> arr = std::make_unique<ArrayNode>(3);
     arr->insert_back(std::string("1"));
     arr->insert_back(std::string("2"));
     arr->insert_back(Value_t("2"));
@@ -291,7 +291,7 @@ TEST(ArrayNode_test,Print_Text){
 }
 TEST(ArrayNode_test,Print_Result){
     std::cout<<"Run test print text"<<std::endl;
-    std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(3);
+    std::unique_ptr<ArrayNode> arr = std::make_unique<ArrayNode>(3);
     arr->insert_back(std::string("1"));
     arr->insert_back(std::string("2"));
     arr->insert_back(Value_t("2"));
@@ -300,7 +300,7 @@ TEST(ArrayNode_test,Print_Result){
 }
 TEST(ArrayNode_test,StringRectangleF){
     std::cout<<"Run test print text"<<std::endl;
-    std::shared_ptr<ArrayNode> arr = std::make_shared<ArrayNode>(3);
+    std::unique_ptr<ArrayNode> arr = std::make_unique<ArrayNode>(3);
     arr->insert_back(std::string("1"));
     arr->insert_back(std::string("2"));
     arr->insert_back(Value_t("2"));

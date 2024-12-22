@@ -50,10 +50,10 @@ class BaseListener: public head_interactorBaseListener{
 
     BaseData* __insert_new_data_base__(std::string&& name);
 
-    std::stack<std::shared_ptr<AbstractNode>> anonymous_node_;
+    std::stack<AbstractNode*> anonymous_node_;
     std::stack<MODE> mode_;
     std::optional<Domain> domain_;
-    std::shared_ptr<AbstractNode> current_node_;
+    std::unique_ptr<AbstractNode> current_node_;
     std::unique_ptr<INFO_NODE> info;
     BaseData* data_base_;
     

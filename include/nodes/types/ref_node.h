@@ -3,7 +3,7 @@
 
 class ReferenceNode:public AbstractNode{
     public:
-    ReferenceNode(std::shared_ptr<AbstractNode> reference);
+    ReferenceNode(AbstractNode* reference);
     ReferenceNode(const ReferenceNode& other);
     ReferenceNode(ReferenceNode&&) = delete;
 

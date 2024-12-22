@@ -22,9 +22,14 @@ class RangeOperationNode:public AbstractNode{
     public:
     RangeOperationNode(RANGE_OP op):operation_(op){}
 
-    RangeOperationNode(RANGE_OP op, std::shared_ptr<AbstractNode> expr):
+    RangeOperationNode(RANGE_OP op, std::unique_ptr<AbstractNode>&& expr):
     operation_(op){
-        set_expression(expr);
+        set_expression(std::move(expr));
+    }
+
+    RangeOperationNode(RANGE_OP op, AbstractNode* expr):
+    operation_(op){
+        set_expression_ref(expr);
     }
 
     RangeOperationNode(const RangeOperationNode& other);
@@ -48,16 +53,19 @@ class RangeOperationNode:public AbstractNode{
     virtual bool is_string() const override;
     virtual bool is_array() const override;
     virtual bool is_empty() const override;
-    inline void set_expression(std::shared_ptr<AbstractNode> expr){
-        insert_back(expr);
+    inline void set_expression(std::unique_ptr<AbstractNode>&& expr){
+        insert_back(std::move(expr));
+    }
+    inline void set_expression_ref(AbstractNode* expr){
+        insert_back_ref(expr);
     }
     inline bool has_expression() const{
         return has_child(0) && child(0);
     }
-    inline std::shared_ptr<AbstractNode> get_expression() const{
+    inline const AbstractNode* get_expression() const{
         if(has_child(0))
             return child(0);
-        else return std::shared_ptr<AbstractNode>();
+        else return nullptr;
     }
 
     RANGE_OP operation() const;
@@ -66,13 +74,13 @@ class RangeOperationNode:public AbstractNode{
         cache_ = std::monostate();
     }
 
-    inline void set_variable_order(const std::shared_ptr<VariableNode>& var,size_t order){
-        var_ids_[var.get()].emplace(order);  
+    inline void set_variable_order(const VariableNode* var,size_t order){
+        var_ids_[var].emplace(order);  
     }
 
-    inline std::optional<size_t> set_variable_order(const std::shared_ptr<VariableNode>& var){
-        if(var_ids_.contains(var.get())){
-            return var_ids_.at(var.get());
+    inline std::optional<size_t> set_variable_order(const VariableNode* var){
+        if(var_ids_.contains(var)){
+            return var_ids_.at(var);
         }
         return std::nullopt;
     }
@@ -88,7 +96,7 @@ class RangeOperationNode:public AbstractNode{
     // }
     bool check_variables_sizes_and_define_size_iteration(size_t, 
                 execute_for_array_variables_t&) const;
-    std::set<std::shared_ptr<AbstractNode>> define_range_node_range_nodes() const;
-    std::set<std::shared_ptr<VariableNode>> define_range_node_array_type_variables() const;
-    std::set<std::shared_ptr<VariableNode>> define_array_type_variables() const;
+    std::set<const AbstractNode*> define_range_node_range_nodes() const;
+    std::set<const VariableNode*> define_range_node_array_type_variables() const;
+    std::set<const VariableNode*> define_array_type_variables() const;
 };

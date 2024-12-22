@@ -16,9 +16,9 @@ class ReferenceNode;
 
 using Value_t = boost::multiprecision::cpp_dec_float_50;//boost::multiprecision::number<boost::multiprecision::cpp_dec_float<10>>;
 using Bound_types = std::variant<std::monostate,AbstractNode*>;
-using Result_t = std::variant<std::monostate,std::string,std::shared_ptr<ArrayNode>, const AbstractNode*, std::shared_ptr<AbstractEvent>,Value_t>;
-using References_t = std::unordered_set<const ReferenceNode*>;
-using Childs_t = std::vector<std::shared_ptr<AbstractNode>>;
+using Result_t = std::variant<std::monostate,std::string, const AbstractNode*, std::shared_ptr<AbstractEvent>,Value_t>;
+using References_t = std::unordered_set<ReferenceNode*>;
+using Childs_t = std::vector<AbstractNode*>;
 
 #define ENUM_NAME(p) #p;
 
@@ -113,9 +113,6 @@ class Result:public Result_t{
     inline const ArrayNode* get_array_node() const noexcept{
         return reinterpret_cast<const ArrayNode*>(get<const AbstractNode*>());
     }
-    inline std::shared_ptr<ArrayNode> get_array_result() const noexcept{
-        return get<std::shared_ptr<ArrayNode>>();
-    }
     private:
 };
 
@@ -123,8 +120,8 @@ bool operator==(const Value_t& val, const Result& res);
 bool operator==(const Result& res,const Value_t& val);
 bool operator==(const std::string& val, const Result& res);
 bool operator==(const Result& res,const std::string& val);
-bool operator==(std::shared_ptr<ArrayNode> val, const Result& res);
-bool operator==(const Result& res,std::shared_ptr<ArrayNode> val);
+bool operator==(const ArrayNode* val, const Result& res);
+bool operator==(const Result& res,const ArrayNode* val);
 
 Result operator+(const Result& lhs, const Result& rhs);
 Result operator-(const Result& lhs, const Result& rhs);

@@ -52,7 +52,7 @@ class BaseData{
     std::shared_ptr<VariableBase> get_buffer() const;
     uint16_t id() const;
     template<typename T>
-    static std::shared_ptr<T> make_node(T&& node_val,const RelationManager& rel_mng);
+    static std::shared_ptr<T> make_node(T&& node_val,const NodeManager& rel_mng);
     template<typename T>
     static std::shared_ptr<T> make_node(T&& node_val,const BaseData& bd){
         node_val.set_relation_manager(&bd.rel_mng_);
@@ -64,14 +64,14 @@ class BaseData{
         n_res->set_relation_manager(relation_manager());
         return n_res;
     }
-    static RelationManager* get_anonymous_relation_manager(){
+    static NodeManager* get_anonymous_relation_manager(){
         return &anonymous_nodes;
     }
-    RelationManager* relation_manager() const{
+    NodeManager* relation_manager() const{
         return &rel_mng_;
     }
     private:
-    mutable RelationManager rel_mng_;
+    mutable NodeManager rel_mng_;
     std::unordered_map<std::string_view,std::shared_ptr<VariableBase>> vars_;
     std::unordered_set<std::string> var_names_;
     std::string_view name_;
@@ -80,7 +80,7 @@ class BaseData{
     DataPool* pool_;
     std::string generate_hash_name();
     uint16_t data_count;
-    static RelationManager anonymous_nodes;
+    static NodeManager anonymous_nodes;
     static uint16_t counter;
 };
 

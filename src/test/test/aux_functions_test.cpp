@@ -24,29 +24,29 @@ public:
         auto var_1_base = bd->add_variable("Var_1");
         auto var_2_base = bd->add_variable("Var_2");
         auto var_3_base = bd->add_variable("Var_3");
-        std::shared_ptr<ArrayNode> arr_1 = std::make_shared<ArrayNode>(5);
-        std::shared_ptr<ArrayNode> arr_2 = std::make_shared<ArrayNode>(5);
-        std::shared_ptr<VariableNode> var_1 = var_1_base->node();
-        std::shared_ptr<VariableNode> var_2 = var_2_base->node();
-        std::shared_ptr<VariableNode> var_3 = var_3_base->node();
+        std::unique_ptr<ArrayNode> arr_1 = std::make_unique<ArrayNode>(5);
+        std::unique_ptr<ArrayNode> arr_2 = std::make_unique<ArrayNode>(5);
+        std::unique_ptr<VariableNode> var_1 = var_1_base->node();
+        std::unique_ptr<VariableNode> var_2 = var_2_base->node();
+        std::unique_ptr<VariableNode> var_3 = var_3_base->node();
         EXPECT_FALSE(first_node_not_var(var_1));
         EXPECT_FALSE(first_node_not_var(var_1.get()));
         var_1->insert_back(arr_1);
         arr_1->insert_back(var_2);
         var_2->insert_back(arr_2);
         arr_2->insert_back(var_3);
-        var_3->insert_back(std::make_shared<ValueNode>(1));
+        var_3->insert_back(std::make_unique<ValueNode>(1));
         node_1_ = var_1_base->node();
     }
 
-    std::shared_ptr<VariableNode> node_1(){
+    std::unique_ptr<VariableNode> node_1(){
         return node_1_;
     }
 
 private:
     std::string bd_name = "bd";
     std::shared_ptr<BaseData> bd;
-    std::shared_ptr<VariableNode> node_1_;
+    std::unique_ptr<VariableNode> node_1_;
 };
 
 class Initial_Complex_Node_2{
@@ -58,20 +58,20 @@ public:
         bd->add_variable("var_1");
         bd->add_variable("var_2");
         bd->add_variable("var_3");
-        node_2_ = std::make_shared<ArrayNode>(5);
-        node_2_with_vars_ = std::make_shared<ArrayNode>(5);
-        std::shared_ptr<ArrayNode> subarr_1 = std::make_shared<ArrayNode>(5);
-        std::shared_ptr<ArrayNode> subarr_2 = std::make_shared<ArrayNode>(5);
-        std::shared_ptr<ArrayNode> subarr_10 = std::make_shared<ArrayNode>(5);
-        std::shared_ptr<ArrayNode> subarr_20 = std::make_shared<ArrayNode>(5);
-        std::shared_ptr<ArrayNode> subarr_11 = std::make_shared<ArrayNode>(5);
-        std::shared_ptr<ArrayNode> subarr_21 = std::make_shared<ArrayNode>(5);
-        std::shared_ptr<ArrayNode> subarr_114 = std::make_shared<ArrayNode>(5);
-        std::shared_ptr<ArrayNode> subarr_214 = std::make_shared<ArrayNode>(5);
+        node_2_ = std::make_unique<ArrayNode>(5);
+        node_2_with_vars_ = std::make_unique<ArrayNode>(5);
+        std::unique_ptr<ArrayNode> subarr_1 = std::make_unique<ArrayNode>(5);
+        std::unique_ptr<ArrayNode> subarr_2 = std::make_unique<ArrayNode>(5);
+        std::unique_ptr<ArrayNode> subarr_10 = std::make_unique<ArrayNode>(5);
+        std::unique_ptr<ArrayNode> subarr_20 = std::make_unique<ArrayNode>(5);
+        std::unique_ptr<ArrayNode> subarr_11 = std::make_unique<ArrayNode>(5);
+        std::unique_ptr<ArrayNode> subarr_21 = std::make_unique<ArrayNode>(5);
+        std::unique_ptr<ArrayNode> subarr_114 = std::make_unique<ArrayNode>(5);
+        std::unique_ptr<ArrayNode> subarr_214 = std::make_unique<ArrayNode>(5);
         for(int i=0;i<5;++i){
             if(i!=4){
-                subarr_11->insert_back(std::make_shared<ValueNode>(i));
-                subarr_21->insert_back(std::make_shared<ValueNode>(i));
+                subarr_11->insert_back(std::make_unique<ValueNode>(i));
+                subarr_21->insert_back(std::make_unique<ValueNode>(i));
             }
             else{
                 subarr_11->insert_back(subarr_114);
@@ -79,10 +79,10 @@ public:
                 bd->get("var_3")->node()->insert_back(subarr_214);
             }
             if(i!=1 && i!=0){
-                node_2_->insert_back(std::make_shared<ValueNode>(i));
-                node_2_with_vars_->insert_back(std::make_shared<ValueNode>(i));
-                subarr_1->insert_back(std::make_shared<ValueNode>(i));
-                subarr_2->insert_back(std::make_shared<ValueNode>(i));
+                node_2_->insert_back(std::make_unique<ValueNode>(i));
+                node_2_with_vars_->insert_back(std::make_unique<ValueNode>(i));
+                subarr_1->insert_back(std::make_unique<ValueNode>(i));
+                subarr_2->insert_back(std::make_unique<ValueNode>(i));
             }
             else if(i==1){
                 node_2_->insert_back(subarr_1);
@@ -96,32 +96,32 @@ public:
                 subarr_1->insert_back(subarr_10);
                 subarr_2->insert_back(subarr_20);
             }
-            subarr_114->insert_back(std::make_shared<ValueNode>(i));
-            auto bin_node = std::make_shared<BinaryNode>(BINARY_OP::ADD);
-            bin_node->insert_back(std::make_shared<ValueNode>(i));
-            bin_node->insert_back(std::make_shared<ValueNode>(i));
+            subarr_114->insert_back(std::make_unique<ValueNode>(i));
+            auto bin_node = std::make_unique<BinaryNode>(BINARY_OP::ADD);
+            bin_node->insert_back(std::make_unique<ValueNode>(i));
+            bin_node->insert_back(std::make_unique<ValueNode>(i));
             subarr_214->insert_back(bin_node);
         }
     }
 
-    std::shared_ptr<AbstractNode> node_2(){
+    std::unique_ptr<AbstractNode> node_2(){
         return node_2_;
     }
 
-    std::shared_ptr<AbstractNode> node_2_with_vars(){
+    std::unique_ptr<AbstractNode> node_2_with_vars(){
         return node_2_with_vars_;
     }
 
     ~Initial_Complex_Node_2(){
-        RelationManager* rel_mng_ = node_2_->relation_manager();
+        NodeManager* rel_mng_ = node_2_->relation_manager();
         const AbstractNode* node_2_ptr = node_2_.get();
         node_2_.reset();
         assert(!rel_mng_->childs_.contains(node_2_ptr));
     }
 
 private:
-    std::shared_ptr<AbstractNode> node_2_;
-    std::shared_ptr<AbstractNode> node_2_with_vars_;
+    const AbstractNode* node_2_;
+    const AbstractNode* node_2_with_vars_;
     std::shared_ptr<BaseData> bd;
 };
 
@@ -136,10 +136,10 @@ public:
         bd->add_variable("var_3");
         rect_node = bd->make_node<ArrayNode>(5);
         not_rect_node = bd->make_node<ArrayNode>(5);
-        std::shared_ptr<ArrayNode> rect_node_1 = bd->make_node<ArrayNode>(5);
-        std::shared_ptr<ArrayNode> not_rect_node_1 = bd->make_node<ArrayNode>(5);
-        std::shared_ptr<ArrayNode> rect_node_10 = bd->make_node<ArrayNode>(5);
-        std::shared_ptr<ArrayNode> not_rect_node_10 = bd->make_node<ArrayNode>(5);
+        std::unique_ptr<ArrayNode> rect_node_1 = bd->make_node<ArrayNode>(5);
+        std::unique_ptr<ArrayNode> not_rect_node_1 = bd->make_node<ArrayNode>(5);
+        std::unique_ptr<ArrayNode> rect_node_10 = bd->make_node<ArrayNode>(5);
+        std::unique_ptr<ArrayNode> not_rect_node_10 = bd->make_node<ArrayNode>(5);
         for(int i=0;i<5;++i){
             if(i!=2){
                 rect_node->insert_back(bd->get("var_1")->node());
@@ -155,17 +155,17 @@ public:
         }
     }
 
-    std::shared_ptr<AbstractNode> rect_array(){
+    std::unique_ptr<AbstractNode> rect_array(){
         return rect_node;
     }
 
-    std::shared_ptr<AbstractNode> not_rect_array(){
+    std::unique_ptr<AbstractNode> not_rect_array(){
         return not_rect_node;
     }
 
 private:
-    std::shared_ptr<AbstractNode> rect_node;
-    std::shared_ptr<AbstractNode> not_rect_node;
+    std::unique_ptr<AbstractNode> rect_node;
+    std::unique_ptr<AbstractNode> not_rect_node;
     std::shared_ptr<BaseData> bd;
 };
 
@@ -267,24 +267,24 @@ TEST(AuxiliaryFunctions,Find_first_node_not_variable_by_ids){
     VariableBase var_1_base(var_1_name,&bd);
     VariableBase var_2_base(var_1_name,&bd);
     VariableBase var_3_base(var_1_name,&bd);
-    std::shared_ptr<ArrayNode> arr_1 = std::make_shared<ArrayNode>(5);
-    std::shared_ptr<ArrayNode> arr_2 = std::make_shared<ArrayNode>(5);
-    std::shared_ptr<VariableNode> var_1 = std::make_shared<VariableNode>(&var_1_base);
-    std::shared_ptr<VariableNode> var_2 = std::make_shared<VariableNode>(&var_2_base);
-    std::shared_ptr<VariableNode> var_3 = std::make_shared<VariableNode>(&var_3_base);
+    std::unique_ptr<ArrayNode> arr_1 = std::make_unique<ArrayNode>(5);
+    std::unique_ptr<ArrayNode> arr_2 = std::make_unique<ArrayNode>(5);
+    std::unique_ptr<VariableNode> var_1 = std::make_unique<VariableNode>(&var_1_base);
+    std::unique_ptr<VariableNode> var_2 = std::make_unique<VariableNode>(&var_2_base);
+    std::unique_ptr<VariableNode> var_3 = std::make_unique<VariableNode>(&var_3_base);
     EXPECT_FALSE(first_node_not_var(var_1));
     EXPECT_FALSE(first_node_not_var(var_1.get()));
     var_1->insert_back(arr_1);
     arr_1->insert_back(var_2);
     for(int i = 0;i<4;++i){
-        arr_1->insert_back(std::make_shared<ValueNode>(i));
+        arr_1->insert_back(std::make_unique<ValueNode>(i));
     }
     var_2->insert_back(arr_2);
     arr_2->insert_back(var_3);
     for(int i = 0;i<4;++i){
-        arr_2->insert_back(std::make_shared<ValueNode>(i));
+        arr_2->insert_back(std::make_unique<ValueNode>(i));
     }
-    var_3->insert_back(std::make_shared<ValueNode>(1));
+    var_3->insert_back(std::make_unique<ValueNode>(1));
     std::vector<size_t> tmp_1{0,0};
     auto node = first_node_not_var_by_ids(var_1,tmp_1.begin(),tmp_1.end()); //arr_1(initial node) -> arr_2(0) -> arr_2(0) value
     EXPECT_TRUE(node);
@@ -296,7 +296,7 @@ TEST(AuxiliaryFunctions,Find_first_node_not_variable_by_ids){
 }
 
 TEST_F(ComplexNode_1,CompareArrays_UniversalFunction_1){
-    std::vector<std::shared_ptr<AbstractNode>> nodes;
+    std::vector<const AbstractNode*> nodes;
     nodes.push_back(node_2_.node_2());
     nodes.push_back(node_2_.node_2_with_vars());
     EXPECT_TRUE(equal_morphology_nodes(nodes));

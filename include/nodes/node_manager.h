@@ -4,19 +4,21 @@
 #include <memory>
 #include <string>
 #include "node.h"
+#include "node/hash.h"
 #include "ref_node.h"
 
 class BaseData;
 
-using References_t = std::unordered_set<const ReferenceNode*>;
-using Childs_t = std::vector<std::shared_ptr<AbstractNode>>;
+using References_t = std::unordered_set<ReferenceNode*>;
+using Childs_t = std::vector<AbstractNode*>;
 
-class RelationManager{
+class NodeManager{
     std::unordered_map<const AbstractNode*,References_t> references_; //referencing, but not owning parents
     public:
-    std::map<const AbstractNode*,Childs_t> childs_;
+    std::unordered_map<const AbstractNode*,Childs_t> childs_;
     private:
     std::unordered_map<const AbstractNode*,INFO_NODE> owner_; //parent, which own this node
+    std::unordered_set<std::unique_ptr<AbstractNode>,NodeHash<std::unique_ptr<AbstractNode>>,NodeEq<std::unique_ptr<AbstractNode>>> nodes_;
     static const Childs_t empty_childs_;
     static const References_t empty_references_;
     int constructed = 0;
@@ -24,15 +26,17 @@ class RelationManager{
     int destructed = 0;
     const BaseData* bd_ = nullptr;
     public:
-    RelationManager() = default;
-    RelationManager(const BaseData* bd):bd_(bd){}
-    ~RelationManager();
-    RelationManager(const RelationManager& other):
+    NodeManager() = default;
+    NodeManager(const BaseData* bd):bd_(bd){}
+    ~NodeManager();
+    NodeManager(const NodeManager& other):
     references_(other.references_),
-    childs_(other.childs_),
-    owner_(other.owner_){}
+    //childs_(other.childs_),
+    owner_(other.owner_){
+        //TODO: create variable-copies in copied relation_manager
+    }
 
-    RelationManager(RelationManager&& other):
+    NodeManager(NodeManager&& other):
     references_(std::move(other.references_)),
     childs_(std::move(other.childs_)),
     owner_(std::move(other.owner_)){}
@@ -52,13 +56,7 @@ class RelationManager{
         else return INFO_NODE();
     }
 
-    static const Childs_t& childs(AbstractNode* node) noexcept{
-        if(node->relation_manager()->childs_.contains(node))
-            return node->relation_manager()->childs_.at(node);
-        else return empty_childs_;
-    }
     static const Childs_t& childs(const AbstractNode* node) noexcept{
-        node->relation_manager()->childs_;
         if(node->relation_manager()->childs_.contains(node))
             return node->relation_manager()->childs_.at(node);
         else return empty_childs_;
@@ -67,19 +65,32 @@ class RelationManager{
     static void erase_child(const AbstractNode* node, size_t id) noexcept;
     static void empty_child(const AbstractNode* node, size_t id) noexcept;
     static void delete_node(const AbstractNode* node);
-    static const std::shared_ptr<AbstractNode>& child(const AbstractNode* node,size_t id);
-    static std::shared_ptr<AbstractNode>& child(AbstractNode* node,size_t id);
+    static AbstractNode* child(const AbstractNode* node,size_t id);
+    static AbstractNode* child(AbstractNode* node,size_t id);
     static INFO_NODE child(AbstractNode* node,const std::vector<int>::const_iterator& first,const std::vector<int>::const_iterator& last) noexcept;
-    static void insert_back(const AbstractNode* node,std::shared_ptr<AbstractNode> new_child);
+    static AbstractNode* insert_back(const AbstractNode* node,std::unique_ptr<AbstractNode>&& new_child);
+    static AbstractNode* insert_back(const ReferenceNode* node,AbstractNode* new_child);
+
+    //"child" must be already put in NodeManager. If this NodeManager and "child" hasn't owner, then "child" become pure child of "node"
+    //else ReferenceNode created and "child" is refered by it
+    static AbstractNode* insert_back(const AbstractNode* node,const std::unique_ptr<AbstractNode>& child);
     //insert before value at id
-    static std::shared_ptr<AbstractNode> insert(const AbstractNode* node,size_t id,std::shared_ptr<AbstractNode> new_child);
-    static std::shared_ptr<AbstractNode> replace(const AbstractNode* node, size_t id,std::shared_ptr<AbstractNode> new_child);
-    
+    static AbstractNode* insert(const AbstractNode* node,size_t id,std::unique_ptr<AbstractNode>&& new_child);
+    static AbstractNode* replace(const AbstractNode* node, size_t id,std::unique_ptr<AbstractNode>&& new_child);
+
+    //does not delete the replaced pointer's node
+    template<typename T>
+    static AbstractNode* replace_child_wo_delete_in_owner_by(const AbstractNode* owner, size_t id, T* val){
+        owner->relation_manager()->childs_.at(owner).at(id)=val;
+        return val;
+    }
+    static AbstractNode* add_node(NodeManager*,std::unique_ptr<AbstractNode>&& node);
+    static const std::unique_ptr<AbstractNode>& get_node(NodeManager*, const AbstractNode*);
     static bool has_references(const AbstractNode* node) noexcept;
     static bool has_owner(const AbstractNode* node) noexcept;
     static void refresh_parent_links(const AbstractNode* node) noexcept;
-    static std::set<std::shared_ptr<VariableNode>> refer_to_vars(const AbstractNode* node) noexcept;
-    static std::set<std::shared_ptr<AbstractNode>> refer_to_node_of_type(const AbstractNode* node, NODE_TYPE type) noexcept;
+    static std::set<const VariableNode*> refer_to_vars(const AbstractNode* node) noexcept;
+    static std::set<const AbstractNode*> refer_to_node_of_type(const AbstractNode* node, NODE_TYPE type) noexcept;
     static bool has_childs(const AbstractNode* node) noexcept;
     static bool has_child(const AbstractNode* node, size_t id) noexcept;
     static void release_childs(const AbstractNode* node) noexcept;
@@ -90,5 +101,6 @@ class RelationManager{
     static void copy_childs(AbstractNode* node, const Childs_t& childs);
     private:
     static void __erase_reference__(AbstractNode* from_node, const AbstractNode* parent);
-    static void __add_reference__(AbstractNode* node_to_add, const AbstractNode* ref_node, int index) noexcept;
+    static void __add_reference__(const AbstractNode* node_to_add, ReferenceNode* ref_node, int index) noexcept;
+    static void __add_owner__(const AbstractNode* node_to_add, const AbstractNode* owner, int index) noexcept;
 };

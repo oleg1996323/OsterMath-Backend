@@ -50,10 +50,6 @@ bool Result::is_warning() const{
     return is_event()?(dynamic_cast<warnings::Warning*>(get<std::shared_ptr<AbstractEvent>>().get())?true:false):false;
 }
 
-bool Result::is_array_result() const{
-    return std::holds_alternative<std::shared_ptr<ArrayNode>>(*this);
-}
-
 Result Result::operator+(const Result& other){
     if(is_error())
         return this->get_exception();
@@ -191,12 +187,12 @@ bool operator==(const std::string& val, const Result& res){
 bool operator==(const Result& res,const std::string& val){
     return res.is_string() && val == res.get_string();
 }
-bool operator==(std::shared_ptr<ArrayNode> val, const Result& res){
-    return res.is_array_result() && ::functions::auxiliary::equal_morphology_nodes(std::vector<std::shared_ptr<AbstractNode>>{val,res.get_array_result()});
-}
-bool operator==(const Result& res,std::shared_ptr<ArrayNode> val){
-    return res.is_array_result() && ::functions::auxiliary::equal_morphology_nodes(std::vector<std::shared_ptr<AbstractNode>>{val,res.get_array_result()});
-}
+// bool operator==(std::shared_ptr<ArrayNode> val, const Result& res){
+//     return res.is_array_result() && ::functions::auxiliary::equal_morphology_nodes(std::vector<std::shared_ptr<AbstractNode>>{val,res.get_array_result()});
+// }
+// bool operator==(const Result& res,std::shared_ptr<ArrayNode> val){
+//     return res.is_array_result() && ::functions::auxiliary::equal_morphology_nodes(std::vector<std::shared_ptr<AbstractNode>>{val,res.get_array_result()});
+// }
 
 std::ostream& Result::operator<<(std::ostream& os) const
 {
