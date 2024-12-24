@@ -126,14 +126,16 @@ TYPE_VAL ArrayNode::type_val() const{
 #include "range_node.h"
 
 template<>
-AbstractNode* ArrayNode::replace_in_owner_by_array(StringNode* val){
+std::unique_ptr<ArrayNode>&& ArrayNode::implement_by(StringNode* val) noexcept{
     if(val){
         //replace child in owner by array
+        // do it safely by anonymous NodeManager
         INFO_NODE tmp_owner = val->owner();
         assert(tmp_owner.is_valid());
         std::unique_ptr<ArrayNode> tmp = std::make_unique<ArrayNode>(0);
-        tmp->set_relation_manager(val->relation_manager());
+        NodeManager::begin(val->relation_manager());
         AbstractNode* result = NodeManager::add_node(tmp_owner.parent->relation_manager(),std::move(tmp));
+        
         tmp_owner.parent->relation_manager()->replace_child_wo_delete_in_owner_by(
                 tmp_owner.parent,
                 tmp_owner.id,
@@ -141,6 +143,8 @@ AbstractNode* ArrayNode::replace_in_owner_by_array(StringNode* val){
         );
         assert(result);
         result->insert_back(std::move(val));
+        NodeManager::end();
+        tmp->set_relation_manager(val->relation_manager()); //setting same NodeManager as value
     }
     return result;
 }

@@ -44,7 +44,7 @@ public:
         std::is_same_v<RangeOperationNode,T> ||
         std::is_same_v<FunctionNode,T> ||
         std::is_same_v<ReferenceNode,T>)
-    static AbstractNode* replace_in_owner_by_array(T* val);
+    static std::unique_ptr<ArrayNode>&& implement_by(T* val) noexcept;
 
     virtual NODE_TYPE type() const override{
         return NODE_TYPE::ARRAY;

@@ -19,6 +19,7 @@ class NodeManager{
     private:
     std::unordered_map<const AbstractNode*,INFO_NODE> owner_; //parent, which own this node
     std::unordered_set<std::unique_ptr<AbstractNode>,NodeHash<std::unique_ptr<AbstractNode>>,NodeEq<std::unique_ptr<AbstractNode>>> nodes_;
+    mutable bool modificate_ = false;
     static const Childs_t empty_childs_;
     static const References_t empty_references_;
     int constructed = 0;
@@ -61,6 +62,12 @@ class NodeManager{
             return node->relation_manager()->childs_.at(node);
         else return empty_childs_;
     }
+    //TODO (maybe)
+    static void begin(NodeManager*); //use anonymous NodeManager for safe inclusions
+    static void end(NodeManager*); //safe_merge if no one exception was thrown
+    void begin(); //use anonymous NodeManager for safe inclusions
+    void end(); //safe_merge if no one exception was thrown
+
     static void reserve_childs(const AbstractNode* node,size_t size);
     static void erase_child(const AbstractNode* node, size_t id) noexcept;
     static void empty_child(const AbstractNode* node, size_t id) noexcept;
@@ -69,7 +76,7 @@ class NodeManager{
     static AbstractNode* child(AbstractNode* node,size_t id);
     static INFO_NODE child(AbstractNode* node,const std::vector<int>::const_iterator& first,const std::vector<int>::const_iterator& last) noexcept;
     static AbstractNode* insert_back(const AbstractNode* node,std::unique_ptr<AbstractNode>&& new_child);
-    static AbstractNode* insert_back(const ReferenceNode* node,AbstractNode* new_child);
+    static AbstractNode* insert_back_ref(const ReferenceNode* node,AbstractNode* new_child);
 
     //"child" must be already put in NodeManager. If this NodeManager and "child" hasn't owner, then "child" become pure child of "node"
     //else ReferenceNode created and "child" is refered by it
@@ -79,8 +86,8 @@ class NodeManager{
     static AbstractNode* replace(const AbstractNode* node, size_t id,std::unique_ptr<AbstractNode>&& new_child);
 
     //does not delete the replaced pointer's node
-    template<typename T>
-    static AbstractNode* replace_child_wo_delete_in_owner_by(const AbstractNode* owner, size_t id, T* val){
+    static AbstractNode* replace_child_wo_delete_in_owner_by(const AbstractNode* owner, size_t id, AbstractNode* val){
+        assert(val && owner && owner->has_child(id) && val->relation_manager()==owner->relation_manager());
         owner->relation_manager()->childs_.at(owner).at(id)=val;
         return val;
     }
@@ -99,7 +106,10 @@ class NodeManager{
     static void swap_childs(const AbstractNode* lhs, const AbstractNode* rhs);
     static void copy_parents(const AbstractNode* from, const AbstractNode* to);
     static void copy_childs(AbstractNode* node, const Childs_t& childs);
+
     private:
+    void __clear__();
+    void __safe_merge__(NodeManager* from) noexcept;
     static void __erase_reference__(AbstractNode* from_node, const AbstractNode* parent);
     static void __add_reference__(const AbstractNode* node_to_add, ReferenceNode* ref_node, int index) noexcept;
     static void __add_owner__(const AbstractNode* node_to_add, const AbstractNode* owner, int index) noexcept;

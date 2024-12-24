@@ -71,7 +71,7 @@ const std::unique_ptr<AbstractNode>& NodeManager::get_node(NodeManager* rel_mng,
     }
 }
 
-AbstractNode* NodeManager::insert_back(const ReferenceNode* node,AbstractNode* new_child){
+AbstractNode* NodeManager::insert_back_ref(const ReferenceNode* node,AbstractNode* new_child){
     if(node && new_child){
         assert(node->type()==NODE_TYPE::REF);
         if(node->has_child(0))
@@ -142,7 +142,7 @@ AbstractNode* NodeManager::insert_back(const AbstractNode* node,std::unique_ptr<
 
 //"child" must be already put in NodeManager. If this NodeManager and "child" hasn't owner, then "child" become pure child of "node"
 //else ReferenceNode created and "child" is refered by it
-static AbstractNode* NodeManager::insert_back(const AbstractNode* node,const std::unique_ptr<AbstractNode>& child){
+AbstractNode* NodeManager::insert_back(const AbstractNode* node,const std::unique_ptr<AbstractNode>& child){
     if(child->owner().is_valid()){
         //node and child must have same NodeManagers
     }
@@ -421,4 +421,41 @@ void NodeManager::copy_childs(AbstractNode* node, const Childs_t& childs){
             }
         }
     }
+}
+void NodeManager::__safe_merge__(NodeManager* from) noexcept{
+    nodes_.merge(from->nodes_);
+    for(auto& pair:from->references_)
+        references_[pair.first].merge(pair.second);
+    for(auto& pair:from->childs_){
+        assert(!childs_.contains(pair.first));
+        std::move(pair.second.begin(),pair.second.end(),childs_[pair.first].begin());
+    }
+    owner_.merge(from->owner_);
+    from->__clear__();
+}
+void NodeManager::__clear__(){
+    nodes_.clear();
+    references_.clear();
+    childs_.clear();
+    owner_.clear();
+}
+//use anonymous NodeManager for safe inclusions
+void NodeManager::begin(NodeManager* mng){
+    assert(mng);
+    mng->begin();
+}
+//safe_merge if no one exception was thrown
+void NodeManager::end(NodeManager* mng){
+    assert(mng);
+    mng->end();
+}
+
+void NodeManager::begin(){
+    assert(!modificate_);
+    modificate_ = true;
+}
+void NodeManager::end(){
+    assert(modificate_);
+    __safe_merge__(BaseData::get_anonymous_relation_manager());
+    modificate_ = false;
 }
