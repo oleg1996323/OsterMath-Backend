@@ -449,13 +449,15 @@ void NodeManager::end(NodeManager* mng){
     assert(mng);
     mng->end();
 }
-
+bool NodeManager::is_modifying(NodeManager* from){
+    return from->modifyable_node_mng_;
+}
 void NodeManager::begin(){
-    assert(!modificate_);
-    modificate_ = true;
+    assert(!modifyable_node_mng_);
+    modifyable_node_mng_ = BaseData::get_anonymous_relation_manager();
 }
 void NodeManager::end(){
-    assert(modificate_);
-    __safe_merge__(BaseData::get_anonymous_relation_manager());
-    modificate_ = false;
+    assert(modifyable_node_mng_);
+    __safe_merge__(modifyable_node_mng_);
+    modifyable_node_mng_ = nullptr;
 }

@@ -19,13 +19,13 @@ class NodeManager{
     private:
     std::unordered_map<const AbstractNode*,INFO_NODE> owner_; //parent, which own this node
     std::unordered_set<std::unique_ptr<AbstractNode>,NodeHash<std::unique_ptr<AbstractNode>>,NodeEq<std::unique_ptr<AbstractNode>>> nodes_;
-    mutable bool modificate_ = false;
     static const Childs_t empty_childs_;
     static const References_t empty_references_;
     int constructed = 0;
     int refered = 0;
     int destructed = 0;
     const BaseData* bd_ = nullptr;
+    NodeManager* modifyable_node_mng_ = nullptr;
     public:
     NodeManager() = default;
     NodeManager(const BaseData* bd):bd_(bd){}
