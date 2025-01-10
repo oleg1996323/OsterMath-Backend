@@ -132,9 +132,10 @@ std::unique_ptr<ArrayNode>&& ArrayNode::implement_by(StringNode* val) noexcept{
         // do it safely by anonymous NodeManager
         INFO_NODE tmp_owner = val->owner();
         assert(tmp_owner.is_valid());
-        std::unique_ptr<ArrayNode> tmp = std::make_unique<ArrayNode>(0);
-        NodeManager::begin(val->relation_manager());
-        AbstractNode* result = NodeManager::add_node(tmp_owner.parent->relation_manager(),std::move(tmp));
+        assert(BaseData::get_anonymous_relation_manager()->is_empty()); //not modified and all fields are empty
+        val->relation_manager()->begin();
+        AbstractNode* result = NodeManager::add_node(BaseData::get_anonymous_relation_manager(),
+        std::move(std::make_unique<ArrayNode>(0)));
         
         tmp_owner.parent->relation_manager()->replace_child_wo_delete_in_owner_by(
                 tmp_owner.parent,
@@ -143,8 +144,8 @@ std::unique_ptr<ArrayNode>&& ArrayNode::implement_by(StringNode* val) noexcept{
         );
         assert(result);
         result->insert_back(std::move(val));
-        NodeManager::end();
-        tmp->set_relation_manager(val->relation_manager()); //setting same NodeManager as value
+        val->relation_manager()->end();
+        result->set_relation_manager(val->relation_manager()); //setting same NodeManager as value
     }
     return result;
 }

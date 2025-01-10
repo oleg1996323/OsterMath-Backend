@@ -235,7 +235,7 @@ AbstractNode* NodeManager::replace(const AbstractNode* node, size_t id,std::uniq
 void NodeManager::__add_owner__(const AbstractNode* node_to_add, const AbstractNode* owner, int index) noexcept{
     assert(node_to_add->type()!=NODE_TYPE::VARIABLE);
     assert(!node_to_add->relation_manager()->owner_.contains(node_to_add));
-    ++node_to_add->relation_manager()->constructed;
+    //++node_to_add->relation_manager()->constructed;
     INFO_NODE info;
     info.parent = const_cast<AbstractNode*>(owner);
     info.id = index;
@@ -327,7 +327,7 @@ void NodeManager::erase_child(const AbstractNode* node, size_t id) noexcept{
 }
 #include <cassert>
 void NodeManager::delete_node(const AbstractNode* node){
-    ++node->relation_manager()->destructed;
+    //++node->relation_manager()->destructed;
     for(auto& ref:node->relation_manager()->references_[node])
         erase_child(ref,0);
     node->relation_manager()->references_.erase(node);
@@ -450,14 +450,14 @@ void NodeManager::end(NodeManager* mng){
     mng->end();
 }
 bool NodeManager::is_modifying(NodeManager* from){
-    return from->modifyable_node_mng_;
+    return from->modifyable_;
 }
 void NodeManager::begin(){
-    assert(!modifyable_node_mng_);
-    modifyable_node_mng_ = BaseData::get_anonymous_relation_manager();
+    assert(!modifyable_);
+    modifyable_ = true;
 }
 void NodeManager::end(){
-    assert(modifyable_node_mng_);
-    __safe_merge__(modifyable_node_mng_);
-    modifyable_node_mng_ = nullptr;
+    assert(modifyable_);
+    __safe_merge__(BaseData::get_anonymous_relation_manager());
+    modifyable_ = false;
 }

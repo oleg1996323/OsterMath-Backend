@@ -21,11 +21,12 @@ class NodeManager{
     std::unordered_set<std::unique_ptr<AbstractNode>,NodeHash<std::unique_ptr<AbstractNode>>,NodeEq<std::unique_ptr<AbstractNode>>> nodes_;
     static const Childs_t empty_childs_;
     static const References_t empty_references_;
-    int constructed = 0;
-    int refered = 0;
-    int destructed = 0;
+    // int constructed = 0;
+    // int refered = 0;
+    // int destructed = 0;
     const BaseData* bd_ = nullptr;
-    NodeManager* modifyable_node_mng_ = nullptr;
+    bool modifyable_=false;
+    //NodeManager* modifyable_node_mng_ = nullptr; make static maybe?
     public:
     NodeManager() = default;
     NodeManager(const BaseData* bd):bd_(bd){}
@@ -43,9 +44,9 @@ class NodeManager{
     owner_(std::move(other.owner_)){}
 
     void log_state() const{
-        std::cout<<"Constructed: "<<constructed<<std::endl;
-        std::cout<<"Refered: "<<refered<<std::endl;
-        std::cout<<"Destructed: "<<destructed<<std::endl;
+        // std::cout<<"Constructed: "<<constructed<<std::endl;
+        // std::cout<<"Refered: "<<refered<<std::endl;
+        // std::cout<<"Destructed: "<<destructed<<std::endl;
         std::cout<<"references_ size: "<<references_.size()<<std::endl;
         std::cout<<"childs_ size: "<<childs_.size()<<std::endl;
         std::cout<<"owner_ size: "<<owner_.size()<<std::endl;
@@ -71,7 +72,6 @@ class NodeManager{
     static void reserve_childs(const AbstractNode* node,size_t size);
     static void erase_child(const AbstractNode* node, size_t id) noexcept;
     static void empty_child(const AbstractNode* node, size_t id) noexcept;
-    static void delete_node(const AbstractNode* node);
     static AbstractNode* child(const AbstractNode* node,size_t id);
     static AbstractNode* child(AbstractNode* node,size_t id);
     static INFO_NODE child(AbstractNode* node,const std::vector<int>::const_iterator& first,const std::vector<int>::const_iterator& last) noexcept;
@@ -92,6 +92,7 @@ class NodeManager{
         return val;
     }
     static AbstractNode* add_node(NodeManager*,std::unique_ptr<AbstractNode>&& node);
+    static void delete_node(const AbstractNode* node);
     static const std::unique_ptr<AbstractNode>& get_node(NodeManager*, const AbstractNode*);
     static bool has_references(const AbstractNode* node) noexcept;
     static bool has_owner(const AbstractNode* node) noexcept;
@@ -106,7 +107,13 @@ class NodeManager{
     static void swap_childs(const AbstractNode* lhs, const AbstractNode* rhs);
     static void copy_parents(const AbstractNode* from, const AbstractNode* to);
     static void copy_childs(AbstractNode* node, const Childs_t& childs);
-
+    static bool is_modifying(NodeManager* from);
+    bool is_empty() const{
+        return owner_.empty()
+        && childs_.empty()
+        && references_.empty()
+        && nodes_.empty();
+    }
     private:
     void __clear__();
     void __safe_merge__(NodeManager* from) noexcept;
