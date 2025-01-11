@@ -16,11 +16,23 @@ using namespace node_range_operation;
 class EmptyNode:public AbstractNode{
 public:
     EmptyNode();
+    EmptyNode(const EmptyNode& other):AbstractNode(other){}
+    EmptyNode(EmptyNode&& other):AbstractNode(other){}
+    EmptyNode* copy_from(const EmptyNode* other){
+        if(this!=other){
+            return static_cast<EmptyNode*>(AbstractNode::copy_from(other));
+        }
+        return this;
+    }
+    EmptyNode* move_from(EmptyNode* other) noexcept{
+        if(this!=other){
+            return static_cast<EmptyNode*>(AbstractNode::move_from(other));
+        }
+        return this;
+    }
     ~EmptyNode();
     virtual TYPE_VAL type_val() const override;    
-    virtual NODE_TYPE type() const override{
-        return NODE_TYPE::UNDEF;
-    }
+    virtual NODE_TYPE type() const override;
     virtual Result execute() const override;
     virtual Result execute_for_array_variables(const execute_for_array_variables_t&) const override;
     inline virtual Result cached_result() const{

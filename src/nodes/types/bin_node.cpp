@@ -6,7 +6,12 @@
 #include "aux_functions.h"
 
 BinaryNode::~BinaryNode(){
+    std::cout<<"BinaryNode deleted"<<std::endl;
     rel_mng_->delete_node(this);
+}
+
+NODE_TYPE BinaryNode::type() const{
+    return NODE_TYPE::BINARY;
 }
 
 Result BinaryNode::execute() const{
@@ -71,6 +76,7 @@ Result BinaryNode::execute_for_array_variables(const execute_for_array_variables
     return Result();
 }
 
+#include "empty_node.h"
 void BinaryNode::print_text(std::ostream& stream) const{
     if(has_child(0))
         childs().at(0)->print_text(stream);

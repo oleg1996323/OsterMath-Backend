@@ -9,8 +9,26 @@ ArrayNode::ArrayNode(size_t sz):
     AbstractNode(sz)
 {}
 
+ArrayNode::ArrayNode(const ArrayNode& arr):AbstractNode(arr){
+    if(this!=&arr){
+        rel_mng_->copy_childs(this,arr.childs());
+        cache_ = arr.cache_;
+    }
+}
+ArrayNode::ArrayNode(ArrayNode&& arr):AbstractNode(arr){
+    if(this!=&arr){
+        rel_mng_->swap_childs(this,&arr);
+        std::swap(cache_,arr.cache_);
+    }
+}
+
 ArrayNode::~ArrayNode(){
+    std::cout<<"ArrayNode deleted"<<std::endl;
     rel_mng_->delete_node(this);
+}
+
+NODE_TYPE ArrayNode::type() const{
+    return NODE_TYPE::ARRAY;
 }
 
 Result ArrayNode::execute() const{
@@ -125,27 +143,64 @@ TYPE_VAL ArrayNode::type_val() const{
 #include "func_node.h"
 #include "range_node.h"
 
-template<>
-std::unique_ptr<ArrayNode>&& ArrayNode::implement_by(StringNode* val) noexcept{
-    if(val){
-        //replace child in owner by array
-        // do it safely by anonymous NodeManager
+//discard from arraynode to one value (string,value_t or other)
+AbstractNode* discard(){
+
+}
+
+#include "core/system.h"
+#include "core/sys_exceptions.h"
+#include "array_node.h"
+
+ArrayNode* ArrayNodeNMProxy::__implementation__(AbstractNode* val){
+    ArrayNode* array = nullptr;
+    try{
+        if(!val)
+            throw kernel::FatalError(std::string("Undefined node at ")+__func__,kernel::codes::NULLPTR_AT_NODE_ARG);
         INFO_NODE tmp_owner = val->owner();
-        assert(tmp_owner.is_valid());
-        assert(BaseData::get_anonymous_relation_manager()->is_empty()); //not modified and all fields are empty
-        val->relation_manager()->begin();
-        AbstractNode* result = NodeManager::add_node(BaseData::get_anonymous_relation_manager(),
-        std::move(std::make_unique<ArrayNode>(0)));
-        
-        tmp_owner.parent->relation_manager()->replace_child_wo_delete_in_owner_by(
-                tmp_owner.parent,
-                tmp_owner.id,
-                result
-        );
-        assert(result);
-        result->insert_back(std::move(val));
-        val->relation_manager()->end();
-        result->set_relation_manager(val->relation_manager()); //setting same NodeManager as value
+        if(!tmp_owner.is_valid())
+            throw kernel::FatalError(std::string("Undefined owner at node of type ")+nodes_types[(size_t)val->type()],kernel::codes::OWNER_UNDEFINED);
+        NodeManager* active_node_manager = val->relation_manager();
+        array = static_cast<ArrayNode*>(NodeManager::add_node(active_node_manager,
+        std::move(std::make_unique<ArrayNode>(1))));
+        if(!array)
+            throw std::bad_alloc();
+        active_node_manager->childs_[array].push_back(val);
+        active_node_manager->owner_[array]=tmp_owner;
+        active_node_manager->childs_.at(tmp_owner.parent).at(tmp_owner.id)=array;
+        active_node_manager->owner_.at(val)=INFO_NODE{array,0};
+        array->set_relation_manager(active_node_manager);
     }
-    return result;
+    catch(const std::bad_alloc& alloc_err){
+        kernel::System::get_logger().log_error_and_exit(alloc_err.what(),kernel::codes::BAD_NODE_CREATION);
+    }
+    catch(const kernel::FatalError& err){}
+    return array;
+}
+
+ArrayNode* ArrayNodeNMProxy::__implement_by_var__(AbstractNode* array_owner, int id,VariableNode* var){
+    ArrayNode* array = nullptr;
+    try{
+        if(!var || !array_owner)
+            throw kernel::FatalError(std::string("Undefined node at ")+__func__,kernel::codes::NULLPTR_AT_NODE_ARG);
+        if(!var->has_owner())
+            throw kernel::FatalError(std::string("Unexpected owner at ")+nodes_types[(size_t)NODE_TYPE::VARIABLE],kernel::codes::OWNER_UNEXPECTED_DEFINITION);
+        NodeManager* active_node_manager = array_owner->relation_manager();
+        array = static_cast<ArrayNode*>(NodeManager::add_node(active_node_manager,
+        std::move(std::make_unique<ArrayNode>(1))));
+        if(!array)
+            throw std::bad_alloc();
+        array->set_relation_manager(active_node_manager);
+        //make new reference
+        array->insert_back_ref(var);
+        //delete node of reference
+        active_node_manager->nodes_.erase(active_node_manager->nodes_.find(active_node_manager->childs_.at(array_owner).at(id)));
+        //assign new child at id of deleted reference
+        active_node_manager->childs_.at(array_owner).at(id)=array;
+    }
+    catch(const std::bad_alloc& alloc_err){
+        kernel::System::get_logger().log_error_and_exit(alloc_err.what(),kernel::codes::BAD_NODE_CREATION);
+    }
+    catch(const kernel::FatalError& err){}
+    return array;
 }

@@ -1,5 +1,5 @@
 #include "def.h"
-#include "node.h"
+#include "abstract_node.h"
 #include "func_node.h"
 #include "function_node/math_functions.h"
 #include "function_node/print_functions.h"
@@ -18,17 +18,22 @@ array_type_function(other.array_type_function){
 }
 
 FunctionNode::~FunctionNode(){
+    std::cout<<"FunctionNode deleted"<<std::endl;
     rel_mng_->delete_node(this);
 }
 
+NODE_TYPE FunctionNode::type() const{
+    return NODE_TYPE::FUNCTION;
+}
+
 bool FunctionNode::is_numeric() const{
-    return std::all_of(childs().begin(),childs().end(),[](const AbstractNode* child){
+    return std::all_of(childs().begin(),childs().end(),[](const auto& child){
         return child->is_numeric();
     });
 }
 
 bool FunctionNode::is_string() const{
-    return std::all_of(childs().begin(),childs().end(),[](const AbstractNode* child){
+    return std::all_of(childs().begin(),childs().end(),[](const auto& child){
         return child->is_string();
     });
 }

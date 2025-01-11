@@ -23,12 +23,12 @@
 //     return pool;
 // }
 
-// void SerialData::insert_var(uint64_t var_id, const std::shared_ptr<VariableNode>& node) noexcept{
+// void SerialData::insert_var(uint64_t var_id, VariableNode* node) noexcept{
 //     if(node)
 //         nodes_[var_id]=node;
 
 //     for(auto ref:node->references()){
-//         //add_dependency((uint64_t)parent,var_id);
+//         add_dependency((uint64_t)parent,var_id);
 //     }
 //     if(node->childs().size()>0)
 //         nodes_dependencies_[var_id].reserve(node->childs().size());
@@ -73,14 +73,14 @@
 //                 ++sz;
 //             };
 
-//             std::function<void(const std::shared_ptr<AbstractNode>&)> nodes_to_header;
+//             std::function<void(AbstractNode*)> nodes_to_header;
 //             nodes_to_header=[this](const std::shared_ptr<AbstractNode>& node)->void
 //             {
 //                 if(node){
 //                     NodeProperties props;
 //                     props.id = (uint64_t)node.get();
 //                     for(auto child:node->childs()){
-//                         add_dependency(props.id,(uint64_t)child.get());
+//                         add_dependency(props.id,(uint64_t)child);
 //                     }
 //                     props.type = (uint8_t)node->type();
 //                     props.sz = node->childs().size();
@@ -120,7 +120,7 @@
 //                 VarProperties props;
 
 //                 //variable name size and variable name
-//                 props.id = (uint64_t)var->node().get();
+//                 props.id = (uint64_t)var->node();
 //                 props.sz_name = var_name.size();
 
 //                 data_stream_.write(reinterpret_cast<const char*>(&props),sizeof(props));
@@ -131,7 +131,7 @@
 //                     nodes_dependencies_[props.id].reserve(var->node()->childs().size());
 
 //                 for(const auto& child:var->node()->childs()){
-//                     nodes_dependencies_[(uint64_t)var->node().get()].push_back((uint64_t)child.get());
+//                     nodes_dependencies_[(uint64_t)var->node()].push_back((uint64_t)child);
 //                 }
 
 //                 uint32_t sz_domains = var->get_domains().get_domains().size();

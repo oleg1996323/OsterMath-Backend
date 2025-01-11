@@ -110,7 +110,7 @@ bool AbstractNode::is_string() const{
     return false;
 }
 
-bool AbstractNode::refer_to(std::string_view var_name) const{
+bool AbstractNode::refer_to_var(std::string_view var_name) const{
     if(childs().empty()){
         return false;
     }
@@ -119,7 +119,7 @@ bool AbstractNode::refer_to(std::string_view var_name) const{
             if(child->type()==NODE_TYPE::VARIABLE && 
                 static_cast<const VariableNode*>(child)->variable()->name()==var_name)
                 return true;
-            else return child->refer_to(var_name);
+            else return child->refer_to_var(var_name);
         });
     }
 }
@@ -168,6 +168,9 @@ void AbstractNode::refresh_parent_links() const{
 
 const References_t& AbstractNode::references() const{
     return rel_mng_->references(this);
+}
+bool AbstractNode::is_reference_of(AbstractNode* node) const{
+    return rel_mng_->is_reference_of(this,node);
 }
 AbstractNode* AbstractNode::insert_back(std::unique_ptr<AbstractNode>&& node){
     return rel_mng_->insert_back(this, std::move(node));
@@ -223,17 +226,32 @@ AbstractNode::AbstractNode(AbstractNode&& other):
 rel_mng_(std::move(other.rel_mng_)),
 caller_(other.caller_)
 {}
-AbstractNode& AbstractNode::operator=(const AbstractNode& other){
-    if(&other!=this)
-        rel_mng_->copy_childs(this,other.childs());
-    return *this;
-}
-AbstractNode& AbstractNode::operator=(AbstractNode&& other){
-    if(&other!=this){
-        rel_mng_->swap_childs(this,&other);
-        caller_ = other.caller_;
+
+//only copies childs. The owner and references will be set manually by insert/replace methods
+AbstractNode* AbstractNode::copy_from(const AbstractNode* other){
+    try{
+        if(!other)
+            throw kernel::FatalError("Nullptr node argument", kernel::codes::NULLPTR_AT_NODE_ARG);
+        if(other!=this){
+            rel_mng_->copy_childs(this,other->childs());
+            caller_ = other->caller_;
+        }
     }
-    return *this;
+    catch(const kernel::FatalError& err){}
+    return this;
+}
+
+AbstractNode* AbstractNode::move_from(AbstractNode* other) noexcept{
+    try{
+        if(!other)
+            throw kernel::FatalError("Nullptr node argument", kernel::codes::NULLPTR_AT_NODE_ARG);
+        if(other!=this){
+            rel_mng_->swap_childs(this,other);
+            caller_ = other->caller_;
+        }
+    }
+    catch(const kernel::FatalError& err){}
+    return this;
 }
 
 void AbstractNode::erase_child(size_t id) const{

@@ -52,15 +52,15 @@ class BaseData{
     std::shared_ptr<VariableBase> get_buffer() const;
     uint16_t id() const;
     template<typename T>
-    static std::shared_ptr<T> make_node(T&& node_val,const NodeManager& rel_mng);
+    static std::unique_ptr<T>&& make_node(T&& node_val,const NodeManager& rel_mng);
     template<typename T>
-    static std::shared_ptr<T> make_node(T&& node_val,const BaseData& bd){
+    static std::unique_ptr<T> make_node(T&& node_val,const BaseData& bd){
         node_val.set_relation_manager(&bd.rel_mng_);
-        return std::shared_ptr<T>(std::forward<T>(node_val));
+        return std::make_unique<T>(std::forward<T>(node_val));
     }
     template<typename T, typename... ARGS>
-    std::shared_ptr<T> make_node(ARGS&&... node_val) const{
-        std::shared_ptr<T> n_res = std::make_shared<T>(std::forward<ARGS>(node_val)...);
+    std::unique_ptr<T> make_node(ARGS&&... node_val) const{
+        std::unique_ptr<T> n_res = std::make_unique<T>(std::forward<ARGS>(node_val)...);
         n_res->set_relation_manager(relation_manager());
         return n_res;
     }
@@ -75,7 +75,7 @@ class BaseData{
     std::unordered_map<std::string_view,std::shared_ptr<VariableBase>> vars_;
     std::unordered_set<std::string> var_names_;
     std::string_view name_;
-    std::unique_ptr<Parser> parser_;
+    //std::unique_ptr<Parser> parser_;
     mutable std::shared_ptr<VariableBase> buffer_;
     DataPool* pool_;
     std::string generate_hash_name();

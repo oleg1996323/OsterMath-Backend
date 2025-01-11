@@ -3,7 +3,11 @@
 #include "node_manager.h"
 
 ValueNode::~ValueNode(){
+    std::cout<<"ValueNode deleted"<<std::endl;
     rel_mng_->delete_node(this);
+}
+NODE_TYPE ValueNode::type() const{
+    return NODE_TYPE::VALUE;
 }
 void ValueNode::print_text(std::ostream& stream) const{
     stream<<cache_;

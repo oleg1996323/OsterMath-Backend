@@ -91,16 +91,16 @@ void BaseData::remove_variables(){
 #include "expr_parser.h"
 
 void BaseData::setstream(std::istream& stream){
-    if(parser_)
-        parser_->set_stream(stream);
-    else{
-        parser_=std::make_unique<Parser>(stream,this);
-    }
+    // if(parser_)
+    //     parser_->set_stream(stream);
+    // else{
+    //     parser_=std::make_unique<Parser>(stream,this);
+    // }
 }
 
 void BaseData::read_new(){
-    if(parser_)
-        parser_->parse_entry();
+    // if(parser_)
+    //     parser_->parse_entry();
 }
 
 void BaseData::set_pool(DataPool* pool){

@@ -3,7 +3,7 @@
 #include <vector>
 #include <numeric>
 #include <gtest/gtest.h>
-#include "test/test/array_node.h"
+#include "test/test/array_node_test.h"
 #include "array_node.h"
 #include "val_node.h"
 #include "func_node.h"
@@ -22,16 +22,14 @@ TEST(RangeFunctionNode_test,Example_1){
     std::unique_ptr<RangeOperationNode> sum_func = std::make_unique<RangeOperationNode>(RANGE_OP::SUM);
     std::unique_ptr<RangeOperationNode> prod_func = std::make_unique<RangeOperationNode>(RANGE_OP::PROD);
     
-    sum_func->set_expression(prod_func);
-    
     std::unique_ptr<BinaryNode> adding = std::make_unique<BinaryNode>(BINARY_OP::ADD);
     std::unique_ptr<BinaryNode> multiplication = std::make_unique<BinaryNode>(BINARY_OP::MUL);
     std::unique_ptr<BinaryNode> power = std::make_unique<BinaryNode>(BINARY_OP::POW);
 
+    prod_func->set_expression(std::move(adding));
     
-
-    adding->insert_back(multiplication);
-    adding->insert_back(power);
+    adding->insert_back(std::move(multiplication));
+    adding->insert_back(std::move(power));
     
     std::vector<Value_t> values(10);
     std::iota(values.begin(),values.end(),0);
@@ -40,7 +38,7 @@ TEST(RangeFunctionNode_test,Example_1){
 
     //setting reversed order
 
-    multiplication->insert_back(A_var->node());
+    multiplication->insert_back_ref(A_var->node());
     multiplication->insert_back(std::make_unique<ValueNode>(10));
 
     power->insert_back(std::make_unique<ValueNode>(10));
@@ -49,18 +47,21 @@ TEST(RangeFunctionNode_test,Example_1){
     std::unique_ptr<ArrayNode> arr_1 = std::make_unique<ArrayNode>(10);
     std::unique_ptr<ArrayNode> arr_2 = std::make_unique<ArrayNode>(10);
     int count = 0;
+    AbstractNode* arr_2_ptr;
     for(const auto& val:values){
-        arr_1->insert_back(arr_2); //same_values
+        if(arr_2_ptr)
+            arr_2_ptr = arr_1->insert_back(std::move(arr_2)); //same_values
+        else arr_1->insert_back_ref(arr_2_ptr);
         //if(count<5)
             arr_2->insert_back(std::make_unique<ValueNode>(val));
         ++count;
     }
-    A_var->node()->insert_back(arr_1);
+    A_var->node()->insert_back(std::move(arr_1));
     EXPECT_TRUE(sum_func->execute().is_error());
 
     sum_func->set_variable_order(A_var->node(),2);
     prod_func->set_variable_order(A_var->node(),1);
-    prod_func->set_expression(adding);
+    sum_func->set_expression(std::move(prod_func));
     EXPECT_TRUE(sum_func->execute().is_value());
     std::cout<<"Range_Node result: "<<sum_func->get_result()<<std::endl;
     Value_t result_1=0;
@@ -94,29 +95,32 @@ TEST(RangeFunctionNode_test,Example_2){
     std::shared_ptr<VariableBase> A_var = bd->add_variable("A");
     std::shared_ptr<VariableBase> B_var = bd->add_variable("B");
     
-    adding->insert_back(B_var->node());
-    adding->insert_back(prod_func);
-    sum_func->set_expression(adding);
+    adding->insert_back_ref(B_var->node());
+    RangeOperationNode* prod_func_ptr = static_cast<RangeOperationNode*>(adding->insert_back(std::move(prod_func)));
+    sum_func->set_expression(std::move(adding));
 
-    multiplication->insert_back(A_var->node());
+    multiplication->insert_back_ref(A_var->node());
     multiplication->insert_back(std::make_unique<ValueNode>(1));
 
     std::unique_ptr<ArrayNode> arr_1 = std::make_unique<ArrayNode>(100);
     std::unique_ptr<ArrayNode> arr_2 = std::make_unique<ArrayNode>(100);
     int count = 0;
+    AbstractNode* arr_2_ptr;
     for(const auto& val:values){
         //if(count<10000)
-        arr_1->insert_back(arr_2); //same_values
+        if(!arr_2_ptr)
+            arr_2_ptr = arr_1->insert_back(std::move(arr_2)); //same_values
+        else arr_1->insert_back_ref(arr_2_ptr);
         arr_2->insert_back(std::make_unique<ValueNode>(val));
         ++count;
     }
-    A_var->node()->insert_back(arr_1);
-    B_var->node()->insert_back(arr_2);
+    A_var->node()->insert_back(std::move(arr_1));
+    B_var->node()->insert_back_ref(arr_2_ptr);
     EXPECT_TRUE(sum_func->execute().is_error());
     std::cout<<"Range_Node result: "<<sum_func->get_result()<<std::endl;
     sum_func->set_variable_order(A_var->node(),2);
-    prod_func->set_variable_order(A_var->node(),1);
-    prod_func->set_expression(multiplication);
+    prod_func_ptr->set_variable_order(A_var->node(),1);
+    prod_func_ptr->set_expression(std::move(multiplication));
 
     //not defined index for B variable
     EXPECT_TRUE(sum_func->execute().is_error());
@@ -167,20 +171,23 @@ TEST(RangeFunctionNode_test,DifferentSizeVars){
     std::shared_ptr<VariableBase> B_var = bd->add_variable("B");
     
     adding->insert_back_ref(B_var->node());
-    adding->insert_back(A_var->node());
-    sum_func->set_expression(adding);
+    adding->insert_back_ref(A_var->node());
+    sum_func->set_expression(std::move(adding));
 
     std::unique_ptr<ArrayNode> arr_1 = std::make_unique<ArrayNode>(10);
     std::unique_ptr<ArrayNode> arr_2 = std::make_unique<ArrayNode>(5);
     int count = 0;
+    AbstractNode* arr_2_ptr;
     for(const auto& val:values){
-        arr_1->insert_back(arr_2); //same_values
+        if(!arr_2_ptr)
+            arr_2_ptr = arr_1->insert_back(std::move(arr_2)); //same_values
+        else arr_1->insert_back_ref(arr_2_ptr);
         if(count<5)
             arr_2->insert_back(std::make_unique<ValueNode>(val));
         ++count;
     }
-    A_var->node()->insert_back(arr_1);
-    B_var->node()->insert_back(arr_2);
+    A_var->node()->insert_back(std::move(arr_1));
+    B_var->node()->insert_back_ref(arr_2_ptr);
     sum_func->set_variable_order(A_var->node(),1);
     sum_func->set_variable_order(B_var->node(),1);
     EXPECT_TRUE(sum_func->execute().is_error());
@@ -194,14 +201,17 @@ TEST(RangeFunctionNode_test,EmptyArrayVar){
     
     std::shared_ptr<BaseData> bd = std::make_shared<BaseData>("BD");
     std::shared_ptr<VariableBase> A_var = bd->add_variable("A");
-    adding->insert_back(A_var->node());
+    adding->insert_back_ref(A_var->node());
     adding->insert_back(std::make_unique<ValueNode>(1));
-    sum_func->set_expression(adding);
+    sum_func->set_expression(std::move(adding));
     std::unique_ptr<ArrayNode> arr_1 = std::make_unique<ArrayNode>(10);
     std::unique_ptr<ArrayNode> arr_2 = std::make_unique<ArrayNode>(10);
-    A_var->node()->insert_back(arr_1);
+    auto arr_1_ptr = A_var->node()->insert_back(std::move(arr_1));
+    AbstractNode* arr_2_ptr;
     for(int count = 0; count<10;++count)
-        arr_1->insert_back(arr_2); //same_values
+        if(!arr_2_ptr)
+            arr_1_ptr->insert_back(std::move(arr_2)); //same_values
+        else arr_1_ptr->insert_back_ref(std::move(arr_2_ptr));
     sum_func->set_variable_order(A_var->node(),1);
     EXPECT_TRUE(sum_func->execute().is_error());
     if(sum_func->cached_result().is_error())
@@ -220,30 +230,35 @@ TEST(RangeFunctionNode_test,TwinEmptyArraysVars){
     std::shared_ptr<VariableBase> A_var = bd->add_variable("A");
     std::shared_ptr<VariableBase> B_var = bd->add_variable("B");
     
-    adding->insert_back(B_var->node());
-    adding->insert_back(prod_func);
-    sum_func->set_expression(adding);
+    adding->insert_back_ref(B_var->node());
+    RangeOperationNode* prod_func_ptr = static_cast<RangeOperationNode*>(adding->insert_back(std::move(prod_func)));
+    sum_func->set_expression(std::move(adding));
 
-    multiplication->insert_back(A_var->node());
+    multiplication->insert_back_ref(A_var->node());
     multiplication->insert_back(std::make_unique<ValueNode>(1));
 
     std::unique_ptr<ArrayNode> arr_1 = std::make_unique<ArrayNode>(1000);
     std::unique_ptr<ArrayNode> arr_2 = std::make_unique<ArrayNode>(1000);
     std::unique_ptr<ArrayNode> arr_3 = std::make_unique<ArrayNode>(1000);
+    AbstractNode* arr_2_ptr;
     for(int i=0;i<1000;++i){
         //if(count<1000)
-        arr_1->insert_back(arr_2); //same_values
+        if(!arr_2_ptr)
+            arr_2_ptr = arr_1->insert_back(std::move(arr_2)); //same_values
+        else arr_1->insert_back_ref(arr_2_ptr);
     }
-    A_var->node()->insert_back(arr_1);
-    B_var->node()->insert_back(arr_3);
+    auto arr_1_ptr = A_var->node()->insert_back(std::move(arr_1));
+    auto arr_3_ptr = B_var->node()->insert_back(std::move(arr_3));
     for(int i=0;i<1000;++i){
         //if(count<1000)
-        arr_1->insert_back(arr_2);
-        arr_3->insert_back(i); //same_values
+        if(!arr_2_ptr)
+            arr_1_ptr->insert_back(std::move(arr_2));
+        else arr_1_ptr->insert_back_ref(arr_2_ptr);
+        arr_3_ptr->insert_back(i); //same_values
     }
     sum_func->set_variable_order(A_var->node(),2);
-    prod_func->set_variable_order(A_var->node(),1);
-    prod_func->set_expression(multiplication);
+    prod_func_ptr->set_variable_order(A_var->node(),1);
+    prod_func_ptr->set_expression(std::move(multiplication));
     sum_func->set_variable_order(B_var->node(),1);
     //not defined index for B variable
     EXPECT_TRUE(sum_func->execute().is_error());
@@ -281,9 +296,9 @@ TEST(RangeFunctionNode_test,NotDefined_1_DimensionsTwinArrayVars){
     std::shared_ptr<VariableBase> A_var = bd->add_variable("A");
     std::shared_ptr<VariableBase> B_var = bd->add_variable("B");
     
-    adding->insert_back(B_var->node());
-    adding->insert_back(A_var->node());
-    sum_func->set_expression(adding);
+    adding->insert_back_ref(B_var->node());
+    adding->insert_back_ref(A_var->node());
+    sum_func->set_expression(std::move(adding));
 
     std::unique_ptr<ArrayNode> arr_1 = std::make_unique<ArrayNode>(10);
     std::unique_ptr<ArrayNode> arr_2 = std::make_unique<ArrayNode>(10);
@@ -293,8 +308,8 @@ TEST(RangeFunctionNode_test,NotDefined_1_DimensionsTwinArrayVars){
         arr_1->insert_back(i); //same_values
         arr_2->insert_back(i);
     }
-    A_var->node()->insert_back(arr_1);
-    B_var->node()->insert_back(arr_2);
+    A_var->node()->insert_back(std::move(arr_1));
+    B_var->node()->insert_back(std::move(arr_2));
     sum_func->set_variable_order(A_var->node());
     sum_func->set_variable_order(B_var->node());
 

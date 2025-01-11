@@ -3,7 +3,7 @@
 #include <vector>
 #include <memory>
 #include <string>
-#include "node.h"
+#include "abstract_node.h"
 #include "node/hash.h"
 #include "ref_node.h"
 
@@ -13,6 +13,7 @@ using References_t = std::unordered_set<ReferenceNode*>;
 using Childs_t = std::vector<AbstractNode*>;
 
 class NodeManager{
+    friend class ArrayNodeNMProxy;
     std::unordered_map<const AbstractNode*,References_t> references_; //referencing, but not owning parents
     public:
     std::unordered_map<const AbstractNode*,Childs_t> childs_;
@@ -52,11 +53,7 @@ class NodeManager{
         std::cout<<"owner_ size: "<<owner_.size()<<std::endl;
     }
 
-    static INFO_NODE owner(const AbstractNode* node) noexcept{
-        if(node->relation_manager()->owner_.contains(node))
-            return node->relation_manager()->owner_.at(node);
-        else return INFO_NODE();
-    }
+    static INFO_NODE owner(const AbstractNode* node) noexcept;
 
     static const Childs_t& childs(const AbstractNode* node) noexcept{
         if(node->relation_manager()->childs_.contains(node))
@@ -78,9 +75,6 @@ class NodeManager{
     static AbstractNode* insert_back(const AbstractNode* node,std::unique_ptr<AbstractNode>&& new_child);
     static AbstractNode* insert_back_ref(const ReferenceNode* node,AbstractNode* new_child);
 
-    //"child" must be already put in NodeManager. If this NodeManager and "child" hasn't owner, then "child" become pure child of "node"
-    //else ReferenceNode created and "child" is refered by it
-    static AbstractNode* insert_back(const AbstractNode* node,const std::unique_ptr<AbstractNode>& child);
     //insert before value at id
     static AbstractNode* insert(const AbstractNode* node,size_t id,std::unique_ptr<AbstractNode>&& new_child);
     static AbstractNode* replace(const AbstractNode* node, size_t id,std::unique_ptr<AbstractNode>&& new_child);
@@ -95,6 +89,7 @@ class NodeManager{
     static void delete_node(const AbstractNode* node);
     static const std::unique_ptr<AbstractNode>& get_node(NodeManager*, const AbstractNode*);
     static bool has_references(const AbstractNode* node) noexcept;
+    static bool is_reference_of(const AbstractNode* from, AbstractNode* node);
     static bool has_owner(const AbstractNode* node) noexcept;
     static void refresh_parent_links(const AbstractNode* node) noexcept;
     static std::set<const VariableNode*> refer_to_vars(const AbstractNode* node) noexcept;

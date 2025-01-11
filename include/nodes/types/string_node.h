@@ -23,12 +23,24 @@ class StringNode:public AbstractNode{
     inline StringNode(const StringNode& other):AbstractNode(other){
         cache_ = other.cache_;
     }
-    StringNode(StringNode&&) = delete;
+    StringNode(StringNode&& other):AbstractNode(other){
+        cache_.swap(other.cache_);
+    }
+    StringNode* copy_from(const StringNode* other){
+        if(other!=this){
+            cache_=other->cache_;
+            return static_cast<StringNode*>(AbstractNode::copy_from(other));
+        }
+    }
+    StringNode* move_from(StringNode* other) noexcept{
+        if(other!=this){
+            std::swap(cache_,other->cache_);
+            return static_cast<StringNode*>(AbstractNode::move_from(other));
+        }
+    }
     ~StringNode();
 
-    virtual NODE_TYPE type() const override{
-        return NODE_TYPE::STRING;
-    }
+    virtual NODE_TYPE type() const override;
     inline virtual Result execute() const override{
         return cache_;
     }

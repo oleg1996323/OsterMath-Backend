@@ -16,6 +16,10 @@ operation_(other.operation_)
 #include "types.h"
 #include "test/log_duration.h"
 
+NODE_TYPE RangeOperationNode::type() const{
+    return NODE_TYPE::RANGEOP;
+}
+
 Result RangeOperationNode::execute() const{
     using namespace ::functions::auxiliary;
     flush_cache();
@@ -58,6 +62,7 @@ Result RangeOperationNode::execute() const{
     return execute_for_array_variables(structure);
 }
 
+#include "empty_node.h"
 void RangeOperationNode::print_text(std::ostream& stream) const{
     if(operation_==RANGE_OP::PROD)
         stream<<"product_i(";

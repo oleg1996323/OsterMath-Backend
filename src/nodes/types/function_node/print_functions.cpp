@@ -1,6 +1,6 @@
 #include "function_node/print_functions.h"
 #include "func_node.h"
-#include "node.h"
+#include "empty_node.h"
 
 void node_function::functions::print::print_text(const FunctionNode* node,std::ostream& stream){
     switch (node->operation()){

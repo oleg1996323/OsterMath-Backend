@@ -109,7 +109,9 @@ TYPE_VAL VariableBase::type() const{
         return TYPE_VAL::UNKNOWN;
 }
 
-VariableBase::~VariableBase(){}
+VariableBase::~VariableBase(){
+    std::cout<<name()<<" deleted"<<std::endl;
+}
 
 void VariableBase::add_domain(Domain&& domain){
     domains_.add_domain(std::move(domain));

@@ -4,12 +4,15 @@
 ReferenceNode::ReferenceNode(AbstractNode* reference):AbstractNode(reference->relation_manager()){
     relation_manager()->insert_back_ref(this,reference);
 }
-
+NODE_TYPE ReferenceNode::type() const{
+    return NODE_TYPE::REF;
+}
 ReferenceNode::ReferenceNode(const ReferenceNode& other):AbstractNode(){//should refer the same node as "other" (node should not be copied)
     if(other.has_child(0))
         relation_manager()->insert_back_ref(this,other.child(0));
 }
 ReferenceNode::~ReferenceNode(){
+    std::cout<<"ReferenceNode deleted"<<std::endl;
     rel_mng_->delete_node(this);
 }
 Result ReferenceNode::execute() const{

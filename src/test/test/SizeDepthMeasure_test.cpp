@@ -3,7 +3,7 @@
 #include <vector>
 #include <numeric>
 #include <gtest/gtest.h>
-#include "test/test/array_node.h"
+#include "test/test/array_node_test.h"
 #include "array_node.h"
 #include "val_node.h"
 #include "func_node.h"

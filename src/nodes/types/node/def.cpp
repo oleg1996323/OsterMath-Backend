@@ -1,5 +1,5 @@
 #include "node/def.h"
-#include "node.h"
+#include "abstract_node.h"
 
 AbstractNode* INFO_NODE::node() const{
     if(has_node())

@@ -19,7 +19,6 @@ class FunctionNode:public AbstractNode{
     {
         if(array_type_function)
             throw std::runtime_error("Incorrect constructor. Prompt: function is array-type.");
-        //std::cout<<(int)NUMBER_OF_ARGUMENT[(int)op]<<std::endl;
     }
     inline FunctionNode(FUNCTION_OP op, size_t arr_sz):
     AbstractNode(arr_sz),
@@ -28,18 +27,32 @@ class FunctionNode:public AbstractNode{
     {
         if(!array_type_function)
             throw std::runtime_error("Incorrect constructor. Prompt: function is not array-type.");
-        //std::cout<<(int)NUMBER_OF_ARGUMENT[(int)op]<<std::endl;
     }
     FunctionNode(const FunctionNode& other);
+    FunctionNode* copy_from(const FunctionNode* other){
+        if(this!=other){
+            cache_ = other->cache_;
+            operation_ = other->operation_;
+            array_type_function = other->array_type_function;
+            return static_cast<FunctionNode*>(AbstractNode::copy_from(other));
+        }
+        return this;
+    }
+    FunctionNode* move_from(FunctionNode* other) noexcept{
+        if(this!=other){
+            cache_.swap(other->cache_);
+            operation_ = other->operation_;
+            array_type_function = other->array_type_function;
+            return static_cast<FunctionNode*>(AbstractNode::move_from(other));
+        }
+        return this;
+    }
     FunctionNode(FunctionNode&&) = delete;
     ~FunctionNode();
-    virtual NODE_TYPE type() const override{
-        return NODE_TYPE::FUNCTION;
-    }
+    virtual NODE_TYPE type() const override;
     bool is_array_function() const{
         return array_type_function;
     }
-    //virtual void insert_back(std::shared_ptr<Node> node) override;
     virtual Result execute() const override;
     virtual void print_text(std::ostream& stream) const override;
     virtual void print_result(std::ostream& stream) const override;

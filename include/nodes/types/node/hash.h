@@ -22,6 +22,10 @@ struct NodeHash<std::unique_ptr<AbstractNode>>
     size_t operator()(const std::unique_ptr<AbstractNode>& node_ptr) const{
         return std::hash<AbstractNode*>{}(node_ptr.get());
     }
+
+    size_t operator()(const AbstractNode* node_ptr) const{
+        return std::hash<const AbstractNode*>{}(node_ptr);
+    }
 };
 
 template<>

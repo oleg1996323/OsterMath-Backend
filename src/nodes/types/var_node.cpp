@@ -7,17 +7,18 @@ VariableNode::VariableNode(VariableBase* variable):AbstractNode(),
     var_(variable){}
 
 VariableNode::~VariableNode(){
+    std::cout<<"VariableNode deleted"<<std::endl;
     rel_mng_->delete_node(this);
 }
-
+NODE_TYPE VariableNode::type() const{
+    return NODE_TYPE::VARIABLE;
+}
 const VariableBase* VariableNode::variable() const noexcept{
     return var_;
 }
-
 VariableBase* VariableNode::variable() noexcept{
     return var_;
 }
-
 Result VariableNode::execute() const{
     flush_cache();
     if(!is_not_cycled())
@@ -26,7 +27,6 @@ Result VariableNode::execute() const{
         return childs().at(0)->execute();
     else return AbstractNode::execute();
 }
-
 inline Result VariableNode::cached_result() const{
     if(!is_not_cycled())
         cache_=std::make_shared<exceptions::CyclicReference>(var_->name());
@@ -35,11 +35,9 @@ inline Result VariableNode::cached_result() const{
     }
     else return AbstractNode::execute();
 }
-
 void VariableNode::flush_cache() const{
     cache_.reset();
 }
-
 bool VariableNode::is_empty() const{
     return childs().size()==0;
 }

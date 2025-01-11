@@ -3,7 +3,12 @@
 #include "node_manager.h"
 
 UnaryNode::~UnaryNode(){
+    std::cout<<"UnaryNode deleted"<<std::endl;
     rel_mng_->delete_node(this);
+}
+
+NODE_TYPE UnaryNode::type() const{
+    return NODE_TYPE::UNARY;
 }
 
 void UnaryNode::print_text(std::ostream& stream) const{

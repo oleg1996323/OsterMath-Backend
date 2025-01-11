@@ -1,4 +1,4 @@
-#include "node.h"
+#include "empty_node.h"
 #include "var_node.h"
 #include "types.h"
 #include "events_errors/exception.h"
@@ -12,8 +12,13 @@ TYPE_VAL EmptyNode::type_val() const{
     return TYPE_VAL::UNKNOWN;
 }
 EmptyNode::~EmptyNode(){
+    std::cout<<"EmptyNode deleted"<<std::endl;
     //rel_mng_-> call delete method for destructed node
     rel_mng_->delete_node(this);
+}
+
+NODE_TYPE EmptyNode::type() const{
+    return NODE_TYPE::UNDEF;
 }
 
 Result EmptyNode::execute() const{

@@ -34,13 +34,32 @@ class RangeOperationNode:public AbstractNode{
 
     RangeOperationNode(const RangeOperationNode& other);
     RangeOperationNode(RangeOperationNode&&) = delete;
+    RangeOperationNode* copy_from(const RangeOperationNode* other){
+        if(this!=other){
+            cache_ = other->cache_;
+            var_ids_ = other->var_ids_;
+            sz_iteration = other->sz_iteration;
+            operation_ = other->operation_;
+            return static_cast<RangeOperationNode*>(AbstractNode::copy_from(other));
+        }
+        return this;
+    }
+    RangeOperationNode* move_from(RangeOperationNode* other) noexcept{
+        if(this!=other){
+            cache_.swap(other->cache_);
+            var_ids_.swap(other->var_ids_);
+            sz_iteration = other->sz_iteration;
+            operation_ = other->operation_;
+            return static_cast<RangeOperationNode*>(AbstractNode::move_from(other));
+        }
+        return this;
+    }
     ~RangeOperationNode(){
+        std::cout<<"RangeOperationNode deleted"<<std::endl;
         rel_mng_->delete_node(this);
     }
 
-    virtual NODE_TYPE type() const override{
-        return NODE_TYPE::RANGEOP;
-    }
+    virtual NODE_TYPE type() const override;
 
     virtual Result execute() const override;
     inline virtual Result cached_result() const override{
@@ -55,6 +74,9 @@ class RangeOperationNode:public AbstractNode{
     virtual bool is_empty() const override;
     inline void set_expression(std::unique_ptr<AbstractNode>&& expr){
         insert_back(std::move(expr));
+    }
+    inline void set_expression(VariableNode* expr_var){
+        insert_back_ref(expr_var);
     }
     inline void set_expression_ref(AbstractNode* expr){
         insert_back_ref(expr);

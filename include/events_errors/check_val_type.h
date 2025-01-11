@@ -39,7 +39,7 @@ const char* generate_string_exception(T value){
 template<typename... ARGS>
 concept SameTypeArguments = (std::is_same_v<ARGS,ARGS...> && ...);
 
-#include "node.h"
+#include "abstract_node.h"
 
 //Checking for rvalue- or lvalue-type having size() method
 template<typename T>

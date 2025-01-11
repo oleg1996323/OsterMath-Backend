@@ -4,6 +4,27 @@
 #include <type_traits>
 #include "abstract_node.h"
 #include "func_node.h"
+#include "concept.h"
+
+class ArrayNodeNMProxy{
+    friend ArrayNode;
+    template<typename T>
+    requires __Array_Impl_By_Val__<T>
+    static ArrayNode* __implement_by__(T* val);
+
+    static ArrayNode* __implement_by_var__(AbstractNode* array_owner,int id,VariableNode* var);
+
+    static ArrayNode* __implementation__(AbstractNode* val);
+};
+
+#include "core/system.h"
+#include "core/sys_exceptions.h"
+
+template<typename T>
+    requires __Array_Impl_By_Val__<T>
+ArrayNode* ArrayNodeNMProxy::__implement_by__(T* val){
+    return __implementation__(val);
+}
 
 class ArrayNode:public AbstractNode{
     mutable Result cache_;
@@ -11,44 +32,30 @@ public:
     typedef AbstractNode* value_type;
     ArrayNode(size_t sz);
 
-    inline ArrayNode(const ArrayNode& arr):AbstractNode(arr){
-        ArrayNode::operator=(arr);
+    ArrayNode(const ArrayNode& arr);
+    ArrayNode(ArrayNode&& arr);
+    inline ArrayNode* copy_from(const ArrayNode* other){
+        return static_cast<ArrayNode*>(AbstractNode::copy_from(other));
     }
-
-    inline ArrayNode(ArrayNode&& arr):AbstractNode(arr){
-        ArrayNode::operator=(arr);
-    }
-
-    inline ArrayNode& operator=(const ArrayNode& arr){
-        if(this!=&arr){
-            AbstractNode::operator=(arr);
-            cache_ = arr.cache_;
-        }
-        return *this;
-    }
-
-    inline ArrayNode& operator=(ArrayNode&& arr){
-        if(this!=&arr){
-            AbstractNode::operator=(arr);
-            std::swap(cache_,arr.cache_);
-        }
-        return *this;
+    inline ArrayNode* move_from(ArrayNode* other) noexcept{
+        return static_cast<ArrayNode*>(AbstractNode::move_from(other));
     }
     ~ArrayNode();
 
     //return the replaced ArrayNode pointer
     template<typename T>
-    requires (
-        std::is_same_v<StringNode,T> || 
-        std::is_same_v<ValueNode,T> ||
-        std::is_same_v<RangeOperationNode,T> ||
-        std::is_same_v<FunctionNode,T> ||
-        std::is_same_v<ReferenceNode,T>)
-    static std::unique_ptr<ArrayNode>&& implement_by(T* val) noexcept;
-
-    virtual NODE_TYPE type() const override{
-        return NODE_TYPE::ARRAY;
+    requires __Array_Impl_By_Val__<T>
+    static ArrayNode* implement_by(T* val){
+        return ArrayNodeNMProxy::__implement_by__(val);
     }
+
+    static ArrayNode* implement_by_var(AbstractNode* array_owner,int id,VariableNode* var){
+        return ArrayNodeNMProxy::__implement_by_var__(array_owner,id,var);
+    }
+    
+    AbstractNode* discard();
+
+    virtual NODE_TYPE type() const override;
     virtual Result execute() const override;
     inline virtual Result cached_result() const override{
         return cache_;

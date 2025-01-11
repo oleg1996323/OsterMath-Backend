@@ -39,3 +39,13 @@ concept __container_array_node_req__ = requires (CONT<T> container, T arg){
     container.cend();
     {arg->size()}->std::convertible_to<size_t>;
 };
+
+template<typename T>
+concept __Array_Impl_By_Val__ = requires (){
+        std::is_same_v<StringNode,T> || 
+        std::is_same_v<ValueNode,T> ||
+        std::is_same_v<RangeOperationNode,T> ||
+        std::is_same_v<FunctionNode,T> ||
+        std::is_same_v<ReferenceNode,T> ||
+        std::is_same_v<ArrayNode,T>;
+};

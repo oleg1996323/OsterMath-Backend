@@ -6,10 +6,14 @@ class ReferenceNode:public AbstractNode{
     ReferenceNode(AbstractNode* reference);
     ReferenceNode(const ReferenceNode& other);
     ReferenceNode(ReferenceNode&&) = delete;
-
-    virtual NODE_TYPE type() const override{
-        return NODE_TYPE::REF;
+    ReferenceNode* copy_from(const ReferenceNode* other){
+        return static_cast<ReferenceNode*>(AbstractNode::copy_from(other));
     }
+    ReferenceNode* move_from(ReferenceNode* other) noexcept{
+        return static_cast<ReferenceNode*>(AbstractNode::move_from(other));
+    }
+
+    virtual NODE_TYPE type() const override;
     ~ReferenceNode();
     //virtual void insert_back(std::shared_ptr<Node> node) override;
     virtual Result execute() const override;

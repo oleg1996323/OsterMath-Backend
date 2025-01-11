@@ -3,9 +3,12 @@
 #include "node_manager.h"
 
 StringNode::~StringNode(){
+    std::cout<<"StringNode deleted"<<std::endl;
     rel_mng_->delete_node(this);
 }
-
+NODE_TYPE StringNode::type() const{
+    return NODE_TYPE::STRING;
+}
 void StringNode::print_text(std::ostream& stream) const{
     stream<<"\""<<cache_<<"\"";
 }

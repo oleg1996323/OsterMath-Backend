@@ -31,6 +31,22 @@ enum class NODE_TYPE{
     CUSTOM
 };
 
+constexpr const char* nodes_types[(size_t)NODE_TYPE::CUSTOM+1] = {
+    "Unary",
+    "Binary",
+    "Value",
+    "Variable",
+    "RangeOp",
+    "Function",
+    "Array",
+    "String",
+    "Undef",
+    "Ref",
+    "Custom"
+};
+
+//TODO: create class AbstractNodeNMProxy for copying and moving childs
+
 using namespace node_range_operation;
 class AbstractNode{
 public:
@@ -40,9 +56,8 @@ public:
 
     AbstractNode(const AbstractNode& other);
     AbstractNode(AbstractNode&& other);
-    AbstractNode& operator=(const AbstractNode& other);
-    AbstractNode& operator=(AbstractNode&& other);
-
+    AbstractNode* copy_from(const AbstractNode* other);
+    AbstractNode* move_from(AbstractNode* other) noexcept;
 
     AbstractNode* child(size_t id) const;
     AbstractNode* child(size_t id);
@@ -78,7 +93,8 @@ public:
     void refresh_parent_links() const;
     void refresh() const;
     const References_t& references() const;
-    bool refer_to(std::string_view var_name) const;
+    bool refer_to_var(std::string_view var_name) const;
+    bool is_reference_of(AbstractNode* node) const;
     bool is_not_cycled() const;
     std::set<const VariableNode*> refer_to_vars() const;
     std::set<const AbstractNode*> refer_to_node_of_type(NODE_TYPE) const;

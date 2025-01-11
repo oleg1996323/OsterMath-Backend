@@ -1,4 +1,4 @@
-#include <node.h>
+#include "abstract_node.h"
 #include "domain.h"
 #include "types.h"
 #include "arithmetic_types.h"

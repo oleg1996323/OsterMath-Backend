@@ -36,6 +36,11 @@
 },
 {
   "directory": "/home/oster/OsterMath-Backend",
+  "command": "/usr/bin/g++ -DANTLR4CPP_STATIC -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS -I/home/oster/OsterMath-Backend/antlr4cpp_generated_src/head_interactor -I/home/oster/OsterMath-Backend/antlr4cpp_generated_src/detect_type_function -I/home/oster/OsterMath-Backend/grammar/antlr4_runtime/runtime/src -I/home/oster/OsterMath-Backend/detector/include -I/home/oster/OsterMath-Backend -I/home/oster/OsterMath-Backend/include/core  -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -g -std=gnu++20 -o CMakeFiles/core.dir/src/core/system.cpp.o -c /home/oster/OsterMath-Backend/src/core/system.cpp",
+  "file": "/home/oster/OsterMath-Backend/src/core/system.cpp"
+},
+{
+  "directory": "/home/oster/OsterMath-Backend",
   "command": "/usr/bin/g++ -DANTLR4CPP_STATIC -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS -I/home/oster/OsterMath-Backend/antlr4cpp_generated_src/head_interactor -I/home/oster/OsterMath-Backend/antlr4cpp_generated_src/detect_type_function -I/home/oster/OsterMath-Backend/grammar/antlr4_runtime/runtime/src -I/home/oster/OsterMath-Backend/detector/include -I/home/oster/OsterMath-Backend -I/home/oster/OsterMath-Backend/include/events_errors  -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -g -std=gnu++20 -o CMakeFiles/warnings.dir/src/events_errors/warning.cpp.o -c /home/oster/OsterMath-Backend/src/events_errors/warning.cpp",
   "file": "/home/oster/OsterMath-Backend/src/events_errors/warning.cpp"
 },
@@ -83,6 +88,11 @@
   "directory": "/home/oster/OsterMath-Backend",
   "command": "/usr/bin/g++ -DANTLR4CPP_STATIC -DDEBUG -DUSER_INTERFACE -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS -I/home/oster/OsterMath-Backend/antlr4cpp_generated_src/head_interactor -I/home/oster/OsterMath-Backend/antlr4cpp_generated_src/detect_type_function -I/home/oster/OsterMath-Backend/grammar/antlr4_runtime/runtime/src -I/home/oster/OsterMath-Backend/detector/include -I/home/oster/OsterMath-Backend -I/home/oster/OsterMath-Backend/include -I/home/oster/OsterMath-Backend/include/core -I/home/oster/OsterMath-Backend/include/nodes -I/home/oster/OsterMath-Backend/include/nodes/types -I/home/oster/OsterMath-Backend/include/head_interactor -I/home/oster/OsterMath-Backend/antlr4cpp_generated_src/main_lexics -I/home/oster/OsterMath-Backend/include/events_errors  -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -g -fPIC -std=gnu++20 -o CMakeFiles/ostermath_be.dir/src/core/settings.cpp.o -c /home/oster/OsterMath-Backend/src/core/settings.cpp",
   "file": "/home/oster/OsterMath-Backend/src/core/settings.cpp"
+},
+{
+  "directory": "/home/oster/OsterMath-Backend",
+  "command": "/usr/bin/g++ -DANTLR4CPP_STATIC -DDEBUG -DUSER_INTERFACE -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS -I/home/oster/OsterMath-Backend/antlr4cpp_generated_src/head_interactor -I/home/oster/OsterMath-Backend/antlr4cpp_generated_src/detect_type_function -I/home/oster/OsterMath-Backend/grammar/antlr4_runtime/runtime/src -I/home/oster/OsterMath-Backend/detector/include -I/home/oster/OsterMath-Backend -I/home/oster/OsterMath-Backend/include -I/home/oster/OsterMath-Backend/include/core -I/home/oster/OsterMath-Backend/include/nodes -I/home/oster/OsterMath-Backend/include/nodes/types -I/home/oster/OsterMath-Backend/include/head_interactor -I/home/oster/OsterMath-Backend/antlr4cpp_generated_src/main_lexics -I/home/oster/OsterMath-Backend/include/events_errors  -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -g -fPIC -std=gnu++20 -o CMakeFiles/ostermath_be.dir/src/core/system.cpp.o -c /home/oster/OsterMath-Backend/src/core/system.cpp",
+  "file": "/home/oster/OsterMath-Backend/src/core/system.cpp"
 },
 {
   "directory": "/home/oster/OsterMath-Backend",
@@ -181,6 +191,11 @@
 },
 {
   "directory": "/home/oster/OsterMath-Backend",
+  "command": "/usr/bin/g++ -DANTLR4CPP_STATIC -DDEBUG -DUSER_INTERFACE -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS -I/home/oster/OsterMath-Backend/antlr4cpp_generated_src/head_interactor -I/home/oster/OsterMath-Backend/antlr4cpp_generated_src/detect_type_function -I/home/oster/OsterMath-Backend/grammar/antlr4_runtime/runtime/src -I/home/oster/OsterMath-Backend/detector/include -I/home/oster/OsterMath-Backend -I/home/oster/OsterMath-Backend/include -I/home/oster/OsterMath-Backend/include/core -I/home/oster/OsterMath-Backend/include/nodes -I/home/oster/OsterMath-Backend/include/nodes/types -I/home/oster/OsterMath-Backend/include/head_interactor -I/home/oster/OsterMath-Backend/antlr4cpp_generated_src/main_lexics -I/home/oster/OsterMath-Backend/include/events_errors  -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -g -fPIC -std=gnu++20 -o CMakeFiles/ostermath_be.dir/src/nodes/types/empty_node.cpp.o -c /home/oster/OsterMath-Backend/src/nodes/types/empty_node.cpp",
+  "file": "/home/oster/OsterMath-Backend/src/nodes/types/empty_node.cpp"
+},
+{
+  "directory": "/home/oster/OsterMath-Backend",
   "command": "/usr/bin/g++ -DANTLR4CPP_STATIC -DDEBUG -DUSER_INTERFACE -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS -I/home/oster/OsterMath-Backend/antlr4cpp_generated_src/head_interactor -I/home/oster/OsterMath-Backend/antlr4cpp_generated_src/detect_type_function -I/home/oster/OsterMath-Backend/grammar/antlr4_runtime/runtime/src -I/home/oster/OsterMath-Backend/detector/include -I/home/oster/OsterMath-Backend -I/home/oster/OsterMath-Backend/include -I/home/oster/OsterMath-Backend/include/core -I/home/oster/OsterMath-Backend/include/nodes -I/home/oster/OsterMath-Backend/include/nodes/types -I/home/oster/OsterMath-Backend/include/head_interactor -I/home/oster/OsterMath-Backend/antlr4cpp_generated_src/main_lexics -I/home/oster/OsterMath-Backend/include/events_errors  -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -g -fPIC -std=gnu++20 -o CMakeFiles/ostermath_be.dir/src/nodes/types/func_node.cpp.o -c /home/oster/OsterMath-Backend/src/nodes/types/func_node.cpp",
   "file": "/home/oster/OsterMath-Backend/src/nodes/types/func_node.cpp"
 },
@@ -198,11 +213,6 @@
   "directory": "/home/oster/OsterMath-Backend",
   "command": "/usr/bin/g++ -DANTLR4CPP_STATIC -DDEBUG -DUSER_INTERFACE -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS -I/home/oster/OsterMath-Backend/antlr4cpp_generated_src/head_interactor -I/home/oster/OsterMath-Backend/antlr4cpp_generated_src/detect_type_function -I/home/oster/OsterMath-Backend/grammar/antlr4_runtime/runtime/src -I/home/oster/OsterMath-Backend/detector/include -I/home/oster/OsterMath-Backend -I/home/oster/OsterMath-Backend/include -I/home/oster/OsterMath-Backend/include/core -I/home/oster/OsterMath-Backend/include/nodes -I/home/oster/OsterMath-Backend/include/nodes/types -I/home/oster/OsterMath-Backend/include/head_interactor -I/home/oster/OsterMath-Backend/antlr4cpp_generated_src/main_lexics -I/home/oster/OsterMath-Backend/include/events_errors  -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -g -fPIC -std=gnu++20 -o CMakeFiles/ostermath_be.dir/src/nodes/types/function_node/string_functions.cpp.o -c /home/oster/OsterMath-Backend/src/nodes/types/function_node/string_functions.cpp",
   "file": "/home/oster/OsterMath-Backend/src/nodes/types/function_node/string_functions.cpp"
-},
-{
-  "directory": "/home/oster/OsterMath-Backend",
-  "command": "/usr/bin/g++ -DANTLR4CPP_STATIC -DDEBUG -DUSER_INTERFACE -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS -I/home/oster/OsterMath-Backend/antlr4cpp_generated_src/head_interactor -I/home/oster/OsterMath-Backend/antlr4cpp_generated_src/detect_type_function -I/home/oster/OsterMath-Backend/grammar/antlr4_runtime/runtime/src -I/home/oster/OsterMath-Backend/detector/include -I/home/oster/OsterMath-Backend -I/home/oster/OsterMath-Backend/include -I/home/oster/OsterMath-Backend/include/core -I/home/oster/OsterMath-Backend/include/nodes -I/home/oster/OsterMath-Backend/include/nodes/types -I/home/oster/OsterMath-Backend/include/head_interactor -I/home/oster/OsterMath-Backend/antlr4cpp_generated_src/main_lexics -I/home/oster/OsterMath-Backend/include/events_errors  -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -g -fPIC -std=gnu++20 -o CMakeFiles/ostermath_be.dir/src/nodes/types/node.cpp.o -c /home/oster/OsterMath-Backend/src/nodes/types/node.cpp",
-  "file": "/home/oster/OsterMath-Backend/src/nodes/types/node.cpp"
 },
 {
   "directory": "/home/oster/OsterMath-Backend",
