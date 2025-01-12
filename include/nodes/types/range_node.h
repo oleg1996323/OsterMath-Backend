@@ -34,28 +34,8 @@ class RangeOperationNode:public AbstractNode{
 
     RangeOperationNode(const RangeOperationNode& other);
     RangeOperationNode(RangeOperationNode&&) = delete;
-    RangeOperationNode* copy_from(const RangeOperationNode* other){
-        if(this!=other){
-            cache_ = other->cache_;
-            var_ids_ = other->var_ids_;
-            sz_iteration = other->sz_iteration;
-            operation_ = other->operation_;
-            return static_cast<RangeOperationNode*>(AbstractNode::copy_from(other));
-        }
-        return this;
-    }
-    RangeOperationNode* move_from(RangeOperationNode* other) noexcept{
-        if(this!=other){
-            cache_.swap(other->cache_);
-            var_ids_.swap(other->var_ids_);
-            sz_iteration = other->sz_iteration;
-            operation_ = other->operation_;
-            return static_cast<RangeOperationNode*>(AbstractNode::move_from(other));
-        }
-        return this;
-    }
     ~RangeOperationNode(){
-        std::cout<<"RangeOperationNode deleted"<<std::endl;
+        std::cout<<"RangeOperationNode deleted: "<<this<<std::endl;
         rel_mng_->delete_node(this);
     }
 

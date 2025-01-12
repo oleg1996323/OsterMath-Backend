@@ -1,6 +1,10 @@
 #include "ref_node.h"
 #include "node_manager.h"
 
+void ReferenceNodeNMProxy::__delete_reference_from_child__(AbstractNode* node){
+    node->child(0)->relation_manager()->references_.at(node->child(0)).erase(static_cast<ReferenceNode*>(node->child(0)));
+}
+
 ReferenceNode::ReferenceNode(AbstractNode* reference):AbstractNode(reference->relation_manager()){
     relation_manager()->insert_back_ref(this,reference);
 }
@@ -12,7 +16,8 @@ ReferenceNode::ReferenceNode(const ReferenceNode& other):AbstractNode(){//should
         relation_manager()->insert_back_ref(this,other.child(0));
 }
 ReferenceNode::~ReferenceNode(){
-    std::cout<<"ReferenceNode deleted"<<std::endl;
+    std::cout<<"ReferenceNode deleted: "<<this<<std::endl;
+    ReferenceNodeNMProxy::__delete_reference_from_child__(this);
     rel_mng_->delete_node(this);
 }
 Result ReferenceNode::execute() const{

@@ -16,18 +16,6 @@ class ValueNode:public AbstractNode{
     ValueNode(ValueNode&& value):AbstractNode(value){
         cache_.swap(value.cache_);
     }
-    ValueNode* copy_from(const ValueNode* other){
-        if(other!=this){
-            cache_ = other->cache_;
-            return static_cast<ValueNode*>(AbstractNode::copy_from(other));
-        }
-    }
-    ValueNode* move_from(ValueNode* other) noexcept{
-        if(other!=this){
-            std::swap(cache_,other->cache_);
-            return static_cast<ValueNode*>(AbstractNode::move_from(other));
-        }
-    }
     ValueNode(Value_t&& value):AbstractNode(){
         cache_ = std::move(value);
     }

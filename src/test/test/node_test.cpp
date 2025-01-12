@@ -49,7 +49,7 @@ TEST(Node_test,TestCopyConstruct){
                 node_2->insert_back(bd->make_node<ValueNode>(values_2.at(i)));
             }
             tmp_node_1_ptr = var_tmp->node()->insert_back(std::move(std::make_unique<ArrayNode>(*node_1)));
-            node_1->copy_from(node_2.get());
+            node_1->copy_paste(node_2.get());
         }
 
         EXPECT_TRUE(&node_1);

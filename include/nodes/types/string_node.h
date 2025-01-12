@@ -26,18 +26,6 @@ class StringNode:public AbstractNode{
     StringNode(StringNode&& other):AbstractNode(other){
         cache_.swap(other.cache_);
     }
-    StringNode* copy_from(const StringNode* other){
-        if(other!=this){
-            cache_=other->cache_;
-            return static_cast<StringNode*>(AbstractNode::copy_from(other));
-        }
-    }
-    StringNode* move_from(StringNode* other) noexcept{
-        if(other!=this){
-            std::swap(cache_,other->cache_);
-            return static_cast<StringNode*>(AbstractNode::move_from(other));
-        }
-    }
     ~StringNode();
 
     virtual NODE_TYPE type() const override;

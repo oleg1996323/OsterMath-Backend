@@ -18,18 +18,6 @@ public:
     EmptyNode();
     EmptyNode(const EmptyNode& other):AbstractNode(other){}
     EmptyNode(EmptyNode&& other):AbstractNode(other){}
-    EmptyNode* copy_from(const EmptyNode* other){
-        if(this!=other){
-            return static_cast<EmptyNode*>(AbstractNode::copy_from(other));
-        }
-        return this;
-    }
-    EmptyNode* move_from(EmptyNode* other) noexcept{
-        if(this!=other){
-            return static_cast<EmptyNode*>(AbstractNode::move_from(other));
-        }
-        return this;
-    }
     ~EmptyNode();
     virtual TYPE_VAL type_val() const override;    
     virtual NODE_TYPE type() const override;

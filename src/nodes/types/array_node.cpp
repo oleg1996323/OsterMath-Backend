@@ -11,19 +11,19 @@ ArrayNode::ArrayNode(size_t sz):
 
 ArrayNode::ArrayNode(const ArrayNode& arr):AbstractNode(arr){
     if(this!=&arr){
-        rel_mng_->copy_childs(this,arr.childs());
+        rel_mng_->copy_node(this,&arr);
         cache_ = arr.cache_;
     }
 }
 ArrayNode::ArrayNode(ArrayNode&& arr):AbstractNode(arr){
     if(this!=&arr){
-        rel_mng_->swap_childs(this,&arr);
+        rel_mng_->swap_node(this,&arr);
         std::swap(cache_,arr.cache_);
     }
 }
 
 ArrayNode::~ArrayNode(){
-    std::cout<<"ArrayNode deleted"<<std::endl;
+    std::cout<<"ArrayNode deleted: "<<this<<std::endl;
     rel_mng_->delete_node(this);
 }
 

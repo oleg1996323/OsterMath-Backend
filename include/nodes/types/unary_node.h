@@ -29,25 +29,13 @@ class UnaryNode:public AbstractNode{
     UnaryNode(const UnaryNode& other):AbstractNode(other){
         if(&other!=this){
             operation_ = other.operation_;
-            rel_mng_->copy_childs(this,other.childs());
+            rel_mng_->copy_node(this,&other);
         }
     }
     UnaryNode(UnaryNode&& other):AbstractNode(other){
         if(&other!=this){
             operation_ = other.operation_;
-            rel_mng_->swap_childs(this,&other);
-        }
-    }
-    UnaryNode* copy_from(const UnaryNode* other){
-        if(other!=this){
-            operation_ = other->operation_;
-            return static_cast<UnaryNode*>(AbstractNode::copy_from(other));
-        }
-    }
-    UnaryNode* move_from(UnaryNode* other) noexcept{
-        if(other!=this){
-            operation_ = other->operation_;
-            return static_cast<UnaryNode*>(AbstractNode::move_from(other));
+            rel_mng_->swap_node(this,&other);
         }
     }
     ~UnaryNode();

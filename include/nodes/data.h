@@ -52,10 +52,13 @@ class BaseData{
     std::shared_ptr<VariableBase> get_buffer() const;
     uint16_t id() const;
     template<typename T>
-    static std::unique_ptr<T>&& make_node(T&& node_val,const NodeManager& rel_mng);
+    static std::unique_ptr<T> make_node(T&& node_val,NodeManager* rel_mng){
+        node_val.set_relation_manager(rel_mng);
+        return std::make_unique<T>(std::forward<T>(node_val));
+    }
     template<typename T>
-    static std::unique_ptr<T> make_node(T&& node_val,const BaseData& bd){
-        node_val.set_relation_manager(&bd.rel_mng_);
+    static std::unique_ptr<T> make_node(T&& node_val,BaseData* bd){
+        node_val.set_relation_manager(&bd->rel_mng_);
         return std::make_unique<T>(std::forward<T>(node_val));
     }
     template<typename T, typename... ARGS>

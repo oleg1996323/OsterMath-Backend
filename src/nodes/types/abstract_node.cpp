@@ -182,13 +182,13 @@ AbstractNode* AbstractNode::replace(size_t id,std::unique_ptr<AbstractNode>&& no
     return rel_mng_->replace(this,id,std::move(node));
 }
 AbstractNode* AbstractNode::insert_back_ref(AbstractNode* ref_child){
-    return insert_back(std::move(std::make_unique<ReferenceNode>(ref_child)));
+    return insert_back(rel_mng_->make_node<ReferenceNode>(ref_child));
 }
 AbstractNode* AbstractNode::insert_ref(size_t id,AbstractNode* ref_child){
-    return insert(id,std::move(std::make_unique<ReferenceNode>(ref_child)));
+    return insert(id,rel_mng_->make_node<ReferenceNode>(ref_child));
 }
 AbstractNode* AbstractNode::replace_ref(size_t id,AbstractNode* ref_child){
-    return replace(id,std::move(std::make_unique<ReferenceNode>(ref_child)));
+    return replace(id,rel_mng_->make_node<ReferenceNode>(ref_child));
 }
 void AbstractNode::print_text(std::ostream& stream) const{
 }
@@ -198,17 +198,18 @@ void AbstractNode::print_result(std::ostream& stream) const{
 INFO_NODE AbstractNode::child(const std::vector<int>::const_iterator& first,const std::vector<int>::const_iterator& last){
     return rel_mng_->child(this,first,last);
 }
+#include "data.h"
 AbstractNode* AbstractNode::__insert_back_string_node__(const std::string& string){
-    return insert_back(std::move(std::make_unique<StringNode>(string)));
+    return insert_back(std::move(rel_mng_->make_node<StringNode>(string)));
 }
 AbstractNode* AbstractNode::__insert_back_string_node__(std::string&& string){
-    return insert_back(std::move(std::make_unique<StringNode>(std::move(string))));
+    return insert_back(std::move(rel_mng_->make_node<StringNode>(std::move(string))));
 }
 AbstractNode* AbstractNode::__insert_back_value_node__(const Value_t& val){
-    return insert_back(std::move(std::make_unique<ValueNode>(val)));
+    return insert_back(std::move(rel_mng_->make_node<ValueNode>(val)));
 }
 AbstractNode* AbstractNode::__insert_back_value_node__(Value_t&& val){
-    return insert_back(std::move(std::make_unique<ValueNode>(std::move(val))));
+    return insert_back(std::move(rel_mng_->make_node<ValueNode>(std::move(val))));
 }
 
 #include "func_node.h"
@@ -228,12 +229,12 @@ caller_(other.caller_)
 {}
 
 //only copies childs. The owner and references will be set manually by insert/replace methods
-AbstractNode* AbstractNode::copy_from(const AbstractNode* other){
+AbstractNode* AbstractNode::copy_paste(const AbstractNode* other){
     try{
         if(!other)
             throw kernel::FatalError("Nullptr node argument", kernel::codes::NULLPTR_AT_NODE_ARG);
         if(other!=this){
-            rel_mng_->copy_childs(this,other->childs());
+            rel_mng_->copy_node(this,other);
             caller_ = other->caller_;
         }
     }
@@ -241,12 +242,12 @@ AbstractNode* AbstractNode::copy_from(const AbstractNode* other){
     return this;
 }
 
-AbstractNode* AbstractNode::move_from(AbstractNode* other) noexcept{
+AbstractNode* AbstractNode::cut_paste(AbstractNode* other) noexcept{
     try{
         if(!other)
             throw kernel::FatalError("Nullptr node argument", kernel::codes::NULLPTR_AT_NODE_ARG);
         if(other!=this){
-            rel_mng_->swap_childs(this,other);
+            rel_mng_->swap_node(this,other);
             caller_ = other->caller_;
         }
     }

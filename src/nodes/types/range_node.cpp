@@ -9,7 +9,7 @@ sz_iteration(other.sz_iteration),
 operation_(other.operation_)
 {
     if(this!=&other){
-        rel_mng_->copy_childs(this,other.childs());
+        rel_mng_->copy_node(this,&other);
     }
 }
 

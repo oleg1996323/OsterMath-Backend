@@ -34,12 +34,6 @@ public:
 
     ArrayNode(const ArrayNode& arr);
     ArrayNode(ArrayNode&& arr);
-    inline ArrayNode* copy_from(const ArrayNode* other){
-        return static_cast<ArrayNode*>(AbstractNode::copy_from(other));
-    }
-    inline ArrayNode* move_from(ArrayNode* other) noexcept{
-        return static_cast<ArrayNode*>(AbstractNode::move_from(other));
-    }
     ~ArrayNode();
 
     //return the replaced ArrayNode pointer

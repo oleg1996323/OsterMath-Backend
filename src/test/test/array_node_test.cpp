@@ -91,7 +91,8 @@ TEST_F(DataBaseDefault,MoveConstructor){
     for(const auto& val:values)
         arr_1_ptr->insert_back(db_->make_node<ValueNode>(val));
     ArrayNode* arr_2_ptr = static_cast<ArrayNode*>(var_2->node()->insert_back(db_->make_node<ArrayNode>(10)));
-    arr_2_ptr->move_from(arr_1_ptr);
+    arr_2_ptr->cut_paste(arr_1_ptr);
+    EXPECT_TRUE(arr_1_ptr);
     EXPECT_EQ(arr_1_ptr->size(),0);
     EXPECT_EQ(arr_2_ptr->size(),10);
     for(auto iter = arr_2_ptr->begin();iter!=arr_2_ptr->end();++iter){
@@ -104,12 +105,15 @@ TEST_F(DataBaseDefault,Operator_Eq_copy){
     {
     std::cout<<"Run test operator equal copy"<<std::endl;
     EXPECT_TRUE(std::is_copy_constructible_v<ArrayNode>);
-    std::unique_ptr<ArrayNode> arr_1 = db_->make_node<ArrayNode>(1);
+    auto var_1 = db_->add_variable("arr_1");
+    auto var_2 = db_->add_variable("arr_2");
+    ArrayNode* arr_1 = static_cast<ArrayNode*>(var_1->node()->insert_back(db_->make_node<ArrayNode>(1)));
     arr_1->insert_back(std::move(db_->make_node<ValueNode>(1)));
-    std::unique_ptr<ArrayNode> arr_2 = db_->make_node<ArrayNode>(2);
+    ArrayNode* arr_2 = static_cast<ArrayNode*>(var_2->node()->insert_back(db_->make_node<ArrayNode>(2)));
     arr_2->insert_back(std::move(db_->make_node<ValueNode>(2)));
     arr_2->insert_back(std::move(db_->make_node<ValueNode>(3)));
-    arr_1->copy_from(arr_2.get());
+    arr_1->copy_paste(arr_2);
+    EXPECT_TRUE(arr_2);
     EXPECT_EQ(arr_1->size(),2);
     EXPECT_EQ(arr_1->childs().capacity(),2);
     }
@@ -120,15 +124,17 @@ TEST_F(DataBaseDefault,Operator_Eq_move){
     {
     std::cout<<"Run test operator equal"<<std::endl;
     EXPECT_TRUE(std::is_move_constructible_v<ArrayNode>);
-    std::shared_ptr<VariableBase> var = db_->add_variable("A");
-    ArrayNode* arr_1 = static_cast<ArrayNode*>(var->node()->insert_back(db_->make_node<ArrayNode>(1)));
+    auto var_1 = db_->add_variable("arr_1");
+    auto var_2 = db_->add_variable("arr_2");
+    ArrayNode* arr_1 = static_cast<ArrayNode*>(var_1->node()->insert_back(db_->make_node<ArrayNode>(1)));
     arr_1->insert_back(db_->make_node<ValueNode>(1));
     AbstractNode* val_2 = arr_1->insert_back(db_->make_node<ValueNode>(2));
     ArrayNode* arr_2 = ArrayNode::implement_by(val_2);
     size_t sz = arr_2->size();
     size_t cap = arr_2->childs().capacity();
-    arr_1->move_from(arr_2);
+    arr_1->copy_paste(arr_2);
     //EXPECT_EQ(arr_1->child(0)->execute().get_value(),2);
+    EXPECT_TRUE(arr_1);
     EXPECT_EQ(arr_1->size(),sz);
     EXPECT_EQ(arr_1->childs().capacity(),cap);
     }

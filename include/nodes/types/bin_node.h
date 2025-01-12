@@ -25,25 +25,11 @@ class BinaryNode:public AbstractNode{
     BinaryNode(BINARY_OP op):operation_(op){}
     BinaryNode(const BinaryNode& other):AbstractNode(other),operation_(other.operation_){
         if(this!=&other)
-            rel_mng_->copy_childs(this,other.childs());
+            rel_mng_->copy_node(this,&other);
     }
     BinaryNode(BinaryNode&& other):AbstractNode(other),operation_(other.operation_){
         if(this!=&other)
-            rel_mng_->swap_childs(this,&other);
-    }
-    BinaryNode* copy_from(const BinaryNode* other){
-        if(this!=other){
-            operation_ = other->operation_;
-            return static_cast<BinaryNode*>(AbstractNode::copy_from(other));
-        }
-        return this;
-    }
-    BinaryNode* move_from(BinaryNode* other) noexcept{
-        if(this!=other){
-            operation_ = other->operation_;
-            return static_cast<BinaryNode*>(AbstractNode::move_from(other));
-        }
-        return this;
+            rel_mng_->swap_node(this,&other);
     }
     ~BinaryNode();
     virtual NODE_TYPE type() const override;

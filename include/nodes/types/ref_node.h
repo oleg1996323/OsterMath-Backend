@@ -1,18 +1,18 @@
 #pragma once
 #include "abstract_node.h"
 
+class ReferenceNode;
+
+class ReferenceNodeNMProxy{
+    friend ReferenceNode;
+    static void __delete_reference_from_child__(AbstractNode* node);
+};
+
 class ReferenceNode:public AbstractNode{
     public:
     ReferenceNode(AbstractNode* reference);
     ReferenceNode(const ReferenceNode& other);
     ReferenceNode(ReferenceNode&&) = delete;
-    ReferenceNode* copy_from(const ReferenceNode* other){
-        return static_cast<ReferenceNode*>(AbstractNode::copy_from(other));
-    }
-    ReferenceNode* move_from(ReferenceNode* other) noexcept{
-        return static_cast<ReferenceNode*>(AbstractNode::move_from(other));
-    }
-
     virtual NODE_TYPE type() const override;
     ~ReferenceNode();
     //virtual void insert_back(std::shared_ptr<Node> node) override;

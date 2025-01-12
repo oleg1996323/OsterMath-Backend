@@ -7,7 +7,7 @@ VariableNode::VariableNode(VariableBase* variable):AbstractNode(),
     var_(variable){}
 
 VariableNode::~VariableNode(){
-    std::cout<<"VariableNode deleted"<<std::endl;
+    std::cout<<"VariableNode deleted: "<<this<<std::endl;
     rel_mng_->delete_node(this);
 }
 NODE_TYPE VariableNode::type() const{

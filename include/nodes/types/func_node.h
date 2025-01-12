@@ -29,24 +29,6 @@ class FunctionNode:public AbstractNode{
             throw std::runtime_error("Incorrect constructor. Prompt: function is not array-type.");
     }
     FunctionNode(const FunctionNode& other);
-    FunctionNode* copy_from(const FunctionNode* other){
-        if(this!=other){
-            cache_ = other->cache_;
-            operation_ = other->operation_;
-            array_type_function = other->array_type_function;
-            return static_cast<FunctionNode*>(AbstractNode::copy_from(other));
-        }
-        return this;
-    }
-    FunctionNode* move_from(FunctionNode* other) noexcept{
-        if(this!=other){
-            cache_.swap(other->cache_);
-            operation_ = other->operation_;
-            array_type_function = other->array_type_function;
-            return static_cast<FunctionNode*>(AbstractNode::move_from(other));
-        }
-        return this;
-    }
     FunctionNode(FunctionNode&&) = delete;
     ~FunctionNode();
     virtual NODE_TYPE type() const override;

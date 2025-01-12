@@ -56,8 +56,8 @@ public:
 
     AbstractNode(const AbstractNode& other);
     AbstractNode(AbstractNode&& other);
-    AbstractNode* copy_from(const AbstractNode* other);
-    AbstractNode* move_from(AbstractNode* other) noexcept;
+    AbstractNode* copy_paste(const AbstractNode* other);
+    AbstractNode* cut_paste(AbstractNode* other) noexcept;
 
     AbstractNode* child(size_t id) const;
     AbstractNode* child(size_t id);
@@ -109,8 +109,8 @@ public:
         return rel_mng_;
     }
     void erase_child(size_t id) const;
-    void set_relation_manager(NodeManager* manager){
-        rel_mng_ = manager;
+    void set_relation_manager(const NodeManager* manager){
+        rel_mng_ = const_cast<NodeManager*>(manager);
     }
 
     virtual Result execute_for_array_variables(const execute_for_array_variables_t&) const;

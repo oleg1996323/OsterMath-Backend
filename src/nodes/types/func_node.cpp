@@ -14,11 +14,11 @@ AbstractNode(other),
 operation_(other.operation_),
 array_type_function(other.array_type_function){
     if(this!=&other)
-        rel_mng_->copy_childs(this,other.childs());
+        rel_mng_->copy_node(this,&other);
 }
 
 FunctionNode::~FunctionNode(){
-    std::cout<<"FunctionNode deleted"<<std::endl;
+    std::cout<<"FunctionNode deleted: "<<this<<std::endl;
     rel_mng_->delete_node(this);
 }
 
