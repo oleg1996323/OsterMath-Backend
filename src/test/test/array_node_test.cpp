@@ -17,6 +17,7 @@ using namespace functions::auxiliary;
 #include "include/test/test/fixtures.h"
 
 TEST_F(DataBaseDefault,Insert_Back){
+    TestLogger::instance() = TestLogger(std::filesystem::current_path()/"test_logs",this->test_info_->name());
     {
         std::cout<<"Run test insert back"<<std::endl;
         

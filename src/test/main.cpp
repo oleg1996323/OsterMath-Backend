@@ -5,6 +5,7 @@
 #include "data.h"
 #include "arithmetic_types.h"
 #include "test/testing.h"
+#include "include/test/test_log.h"
 
 #ifdef DEBUG
 

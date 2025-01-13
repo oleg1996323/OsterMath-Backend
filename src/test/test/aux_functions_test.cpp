@@ -254,17 +254,17 @@ TEST(AuxiliaryFunctions,Find_first_node_not_variable_by_ids){
     auto var_2 = bd->add_variable("Var_2");
     auto var_3 = bd->add_variable("Var_3");
     EXPECT_FALSE(first_node_not_var(var_1->node()));
-    auto arr_1 = static_cast<ArrayNode*>(var_1->node()->insert_back(std::make_unique<ArrayNode>(5)));
+    auto arr_1 = static_cast<ArrayNode*>(var_1->node()->insert_back(bd->make_node<ArrayNode>(5)));
     arr_1->insert_back_ref(var_2->node());
     for(int i = 0;i<4;++i){
-        arr_1->insert_back(std::make_unique<ValueNode>(i));
+        arr_1->insert_back(arr_1->relation_manager()->make_node<ValueNode>(i));
     }
-    auto arr_2 = static_cast<ArrayNode*>(var_2->node()->insert_back(std::make_unique<ArrayNode>(5)));
+    auto arr_2 = static_cast<ArrayNode*>(var_2->node()->insert_back(bd->make_node<ArrayNode>(5)));
     arr_2->insert_back_ref(var_3->node());
     for(int i = 0;i<4;++i){
-        arr_2->insert_back(std::make_unique<ValueNode>(i));
+        arr_2->insert_back(arr_2->relation_manager()->make_node<ValueNode>(i));
     }
-    var_3->node()->insert_back(std::make_unique<ValueNode>(1));
+    var_3->node()->insert_back(var_3->node()->relation_manager()->make_node<ValueNode>(1));
     std::vector<size_t> tmp_1{0,0};
     auto node = first_node_not_var_by_ids(var_1->node(),tmp_1.begin(),tmp_1.end()); //arr_1(initial node) -> arr_2(0) -> arr_2(0) value
     EXPECT_TRUE(node);

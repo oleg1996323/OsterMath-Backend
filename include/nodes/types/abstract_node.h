@@ -5,6 +5,9 @@
 #include "range_node/def.h"
 #include "node/def.h"
 #include "node/hash.h"
+#ifdef DEBUG
+#include "include/test/test_log.h"
+#endif
 
 class EmptyNode;
 class UnaryNode;

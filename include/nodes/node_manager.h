@@ -124,7 +124,7 @@ class NodeManager{
     private:
     void __clear__();
     void __safe_merge__(NodeManager* from) noexcept;
-    static void __erase_reference__(AbstractNode* from_node, const AbstractNode* parent);
+    static void __erase_reference__(AbstractNode* from_node, ReferenceNode* ref) noexcept;
     static void __add_reference__(const AbstractNode* node_to_add, ReferenceNode* ref_node) noexcept;
     static void __add_owner__(const AbstractNode* node_to_add, const AbstractNode* owner, int index) noexcept;
 };

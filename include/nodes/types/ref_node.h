@@ -5,7 +5,7 @@ class ReferenceNode;
 
 class ReferenceNodeNMProxy{
     friend ReferenceNode;
-    static void __delete_reference_from_child__(AbstractNode* node);
+    static void __delete_reference_from_child__(ReferenceNode* ref);
 };
 
 class ReferenceNode:public AbstractNode{

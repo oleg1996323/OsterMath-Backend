@@ -29,7 +29,7 @@ class RangeOperationNode:public AbstractNode{
 
     RangeOperationNode(RANGE_OP op, AbstractNode* expr):
     operation_(op){
-        set_expression_ref(expr);
+        set_expression(expr);
     }
 
     RangeOperationNode(const RangeOperationNode& other);
@@ -52,14 +52,14 @@ class RangeOperationNode:public AbstractNode{
     virtual bool is_string() const override;
     virtual bool is_array() const override;
     virtual bool is_empty() const override;
-    inline void set_expression(std::unique_ptr<AbstractNode>&& expr){
-        insert_back(std::move(expr));
+    inline AbstractNode* set_expression(std::unique_ptr<AbstractNode>&& expr){
+        return insert_back(std::move(expr));
     }
-    inline void set_expression(VariableNode* expr_var){
-        insert_back_ref(expr_var);
+    inline AbstractNode* set_expression(VariableNode* expr_var){
+        return insert_back_ref(expr_var);
     }
-    inline void set_expression_ref(AbstractNode* expr){
-        insert_back_ref(expr);
+    inline AbstractNode* set_expression(AbstractNode* expr){
+        return insert_back_ref(expr);
     }
     inline bool has_expression() const{
         return has_child(0) && child(0);

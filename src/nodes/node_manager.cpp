@@ -557,6 +557,10 @@ void NodeManager::copy_node(AbstractNode* to_replace_by_copy, const AbstractNode
     for(size_t id=0;id<tmp_nodes.size();++id)
         to_replace_by_copy->insert_back(std::move(tmp_nodes.at(id)));
 }
+void NodeManager::__erase_reference__(AbstractNode* from_node, ReferenceNode* ref) noexcept{
+    from_node->relation_manager()->references_.at(from_node).erase(
+        from_node->relation_manager()->references_.at(from_node).find(ref));
+}
 void NodeManager::__safe_merge__(NodeManager* from) noexcept{
     nodes_.merge(from->nodes_);
     for(auto& pair:from->references_)
