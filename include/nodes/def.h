@@ -24,9 +24,9 @@ using Childs_t = std::vector<AbstractNode*>;
 
 enum TYPE_VAL{
     UNKNOWN = 0x00,
-    VALUE = 0x01,
-    STRING = 0x04,
-    ARRAY = 0x08,
+    VALUE = 1L << 0,
+    STRING = 1L << 1,
+    ARRAY = 1L << 2,
     STRING_ARRAY = ARRAY | STRING,
     NUMERIC_ARRAY = ARRAY | VALUE
 };

@@ -5,14 +5,21 @@
 #include <string>
 #include <filesystem>
 #include <cassert>
+#include <vector>
+#include "shared_stream.h"
 
 class TestLogger{
     static TestLogger test_logger;
     static std::filesystem::directory_entry log_dir_;
+    static FILE* c_out_buf;
+    static FILE* c_err_buf;
+
     static std::streambuf* out_buf;
     static std::streambuf* err_buf;
     static std::streambuf* log_buf;
+    SharedStream sh_buf_;
     std::unique_ptr<std::ostream> stream_;
+    FILE* cf = nullptr;
     public:
     TestLogger(std::ostream& stream);
     TestLogger(const TestLogger& logger) = delete;
@@ -24,6 +31,9 @@ class TestLogger{
         std::cout.rdbuf(out_buf);
         std::cerr.rdbuf(err_buf);
         std::clog.rdbuf(log_buf);
+        fclose(cf);
+        stdout = c_out_buf;
+        stderr = c_err_buf;
     }
     TestLogger(const std::filesystem::path& log_dir, const char* test_name);
     static TestLogger& instance();
@@ -32,9 +42,9 @@ class TestLogger{
     void set_log_stream(std::ostream& stream);
     void set_log_directory(const std::filesystem::path& directory);
     template<typename T>
-    std::ostream& operator<<(T item){
+    TestLogger& operator<<(T item){
         assert(stream_);
-        *stream_.get()<<item;
-        return *stream_.get();
+        stream_.get()<<item;
+        return *this;
     }
 };

@@ -1,217 +1,217 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites tests="47" failures="6" disabled="0" errors="0" time="9.649" timestamp="2025-01-14T03:21:02.965" name="AllTests">
-  <testsuite name="SizeDepthMeasure_test" tests="6" failures="0" disabled="0" skipped="0" errors="0" time="0" timestamp="2025-01-14T03:21:02.965">
-    <testcase name="PushDepth" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:02.965" classname="SizeDepthMeasure_test" />
-    <testcase name="GetDimensions" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:02.965" classname="SizeDepthMeasure_test" />
-    <testcase name="IsIterable" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:02.965" classname="SizeDepthMeasure_test" />
-    <testcase name="CurrentIteratorAtDepth" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:02.965" classname="SizeDepthMeasure_test" />
-    <testcase name="SequencedIterator" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:02.965" classname="SizeDepthMeasure_test" />
-    <testcase name="ResetIterator" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:02.965" classname="SizeDepthMeasure_test" />
+<testsuites tests="47" failures="6" disabled="0" errors="0" time="41.351" timestamp="2025-01-14T14:13:08.961" name="AllTests">
+  <testsuite name="SizeDepthMeasure_test" tests="6" failures="0" disabled="0" skipped="0" errors="0" time="0" timestamp="2025-01-14T14:13:08.961">
+    <testcase name="PushDepth" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:08.961" classname="SizeDepthMeasure_test" />
+    <testcase name="GetDimensions" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:08.961" classname="SizeDepthMeasure_test" />
+    <testcase name="IsIterable" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:08.961" classname="SizeDepthMeasure_test" />
+    <testcase name="CurrentIteratorAtDepth" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:08.961" classname="SizeDepthMeasure_test" />
+    <testcase name="SequencedIterator" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:08.961" classname="SizeDepthMeasure_test" />
+    <testcase name="ResetIterator" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:08.961" classname="SizeDepthMeasure_test" />
   </testsuite>
-  <testsuite name="DataBaseDefault" tests="25" failures="0" disabled="0" skipped="0" errors="0" time="9.23" timestamp="2025-01-14T03:21:02.965">
-    <testcase name="Insert_Back" status="run" result="completed" time="2.077" timestamp="2025-01-14T03:21:02.965" classname="DataBaseDefault" />
-    <testcase name="Insert" status="run" result="completed" time="6.32" timestamp="2025-01-14T03:21:05.042" classname="DataBaseDefault" />
-    <testcase name="Replace" status="run" result="completed" time="0.46" timestamp="2025-01-14T03:21:11.363" classname="DataBaseDefault" />
-    <testcase name="Begins" status="run" result="completed" time="0.369" timestamp="2025-01-14T03:21:11.823" classname="DataBaseDefault" />
-    <testcase name="Ends" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:12.193" classname="DataBaseDefault" />
-    <testcase name="CopyConstructor" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:12.193" classname="DataBaseDefault" />
-    <testcase name="MoveConstructor" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:12.193" classname="DataBaseDefault" />
-    <testcase name="Operator_Eq_copy" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:12.194" classname="DataBaseDefault" />
-    <testcase name="Operator_Eq_move" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:12.194" classname="DataBaseDefault" />
-    <testcase name="Type_Numeric_Array" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:12.194" classname="DataBaseDefault" />
-    <testcase name="Type_String_Array" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:12.194" classname="DataBaseDefault" />
-    <testcase name="Type_Array" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:12.194" classname="DataBaseDefault" />
-    <testcase name="ExecuteCorrect" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:12.194" classname="DataBaseDefault" />
-    <testcase name="ExecuteError" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:12.194" classname="DataBaseDefault" />
-    <testcase name="ExecuteCorrect_id" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:12.194" classname="DataBaseDefault" />
-    <testcase name="ExecuteError_id" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:12.194" classname="DataBaseDefault" />
-    <testcase name="Cached_Result_With_Correct" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:12.194" classname="DataBaseDefault" />
-    <testcase name="Cached_Result_With_Error" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:12.194" classname="DataBaseDefault" />
-    <testcase name="Cached_Result_id" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:12.194" classname="DataBaseDefault" />
-    <testcase name="is_Numeric" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:12.195" classname="DataBaseDefault" />
-    <testcase name="is_String" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:12.195" classname="DataBaseDefault" />
-    <testcase name="is_Array" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:12.195" classname="DataBaseDefault" />
-    <testcase name="Print_Text" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:12.195" classname="DataBaseDefault" />
-    <testcase name="Print_Result" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:12.195" classname="DataBaseDefault" />
-    <testcase name="StringRectangleF" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:12.195" classname="DataBaseDefault" />
+  <testsuite name="DataBaseDefault" tests="25" failures="0" disabled="0" skipped="0" errors="0" time="0.002" timestamp="2025-01-14T14:13:08.961">
+    <testcase name="Insert_Back" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:08.961" classname="DataBaseDefault" />
+    <testcase name="Insert" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:08.962" classname="DataBaseDefault" />
+    <testcase name="Replace" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:08.962" classname="DataBaseDefault" />
+    <testcase name="Begins" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:08.962" classname="DataBaseDefault" />
+    <testcase name="Ends" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:08.962" classname="DataBaseDefault" />
+    <testcase name="CopyConstructor" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:08.962" classname="DataBaseDefault" />
+    <testcase name="MoveConstructor" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:08.962" classname="DataBaseDefault" />
+    <testcase name="Operator_Eq_copy" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:08.962" classname="DataBaseDefault" />
+    <testcase name="Operator_Eq_move" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:08.962" classname="DataBaseDefault" />
+    <testcase name="Type_Numeric_Array" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:08.963" classname="DataBaseDefault" />
+    <testcase name="Type_String_Array" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:08.963" classname="DataBaseDefault" />
+    <testcase name="Type_Array" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:08.963" classname="DataBaseDefault" />
+    <testcase name="ExecuteCorrect" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:08.963" classname="DataBaseDefault" />
+    <testcase name="ExecuteError" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:08.963" classname="DataBaseDefault" />
+    <testcase name="ExecuteCorrect_id" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:08.963" classname="DataBaseDefault" />
+    <testcase name="ExecuteError_id" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:08.963" classname="DataBaseDefault" />
+    <testcase name="Cached_Result_With_Correct" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:08.963" classname="DataBaseDefault" />
+    <testcase name="Cached_Result_With_Error" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:08.963" classname="DataBaseDefault" />
+    <testcase name="Cached_Result_id" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:08.963" classname="DataBaseDefault" />
+    <testcase name="is_Numeric" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:08.963" classname="DataBaseDefault" />
+    <testcase name="is_String" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:08.963" classname="DataBaseDefault" />
+    <testcase name="is_Array" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:08.963" classname="DataBaseDefault" />
+    <testcase name="Print_Text" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:08.963" classname="DataBaseDefault" />
+    <testcase name="Print_Result" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:08.963" classname="DataBaseDefault" />
+    <testcase name="StringRectangleF" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:08.963" classname="DataBaseDefault" />
   </testsuite>
-  <testsuite name="ComplexNode_1" tests="3" failures="1" disabled="0" skipped="0" errors="0" time="0.003" timestamp="2025-01-14T03:21:12.195">
-    <testcase name="Find_first_node_not_variable" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:12.195" classname="ComplexNode_1" />
-    <testcase name="CompareArrays_UniversalFunction_1" status="run" result="completed" time="0.001" timestamp="2025-01-14T03:21:12.196" classname="ComplexNode_1" />
-    <testcase name="IsRectNodeMorphology" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:12.197" classname="ComplexNode_1">
-      <failure message="/home/oster/OsterMath-Backend/src/test/test/aux_functions_test.cpp:293&#x0A;Value of: is_rectangle_array_node(rect_nodes_.rect_array())&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/OsterMath-Backend/src/test/test/aux_functions_test.cpp:293
+  <testsuite name="ComplexNode_1" tests="3" failures="1" disabled="0" skipped="0" errors="0" time="0.002" timestamp="2025-01-14T14:13:08.963">
+    <testcase name="Find_first_node_not_variable" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:08.963" classname="ComplexNode_1" />
+    <testcase name="CompareArrays_UniversalFunction_1" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:08.964" classname="ComplexNode_1" />
+    <testcase name="IsRectNodeMorphology" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:08.965" classname="ComplexNode_1">
+      <failure message="/home/oster/Electrolisys/src/test/test/aux_functions_test.cpp:293&#x0A;Value of: is_rectangle_array_node(rect_nodes_.rect_array())&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/Electrolisys/src/test/test/aux_functions_test.cpp:293
 Value of: is_rectangle_array_node(rect_nodes_.rect_array())
   Actual: false
 Expected: true]]></failure>
     </testcase>
   </testsuite>
-  <testsuite name="AuxiliaryFunctions" tests="1" failures="0" disabled="0" skipped="0" errors="0" time="0" timestamp="2025-01-14T03:21:12.198">
-    <testcase name="Find_first_node_not_variable_by_ids" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:12.198" classname="AuxiliaryFunctions" />
+  <testsuite name="AuxiliaryFunctions" tests="1" failures="0" disabled="0" skipped="0" errors="0" time="0" timestamp="2025-01-14T14:13:08.966">
+    <testcase name="Find_first_node_not_variable_by_ids" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:08.966" classname="AuxiliaryFunctions" />
   </testsuite>
-  <testsuite name="Node_test" tests="3" failures="1" disabled="0" skipped="0" errors="0" time="0" timestamp="2025-01-14T03:21:12.198">
-    <testcase name="TestDefaultConstruct" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:12.198" classname="Node_test" />
-    <testcase name="TestCopyConstruct" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:12.198" classname="Node_test">
-      <failure message="/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:60&#x0A;Value of: node_1_ptr-&gt;child(i)-&gt;get_result()==boost::multiprecision::to_string(values_2.at(i))&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:60
+  <testsuite name="Node_test" tests="3" failures="1" disabled="0" skipped="0" errors="0" time="39.898" timestamp="2025-01-14T14:13:08.966">
+    <testcase name="TestDefaultConstruct" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:08.966" classname="Node_test" />
+    <testcase name="TestCopyConstruct" status="run" result="completed" time="39.898" timestamp="2025-01-14T14:13:08.966" classname="Node_test">
+      <failure message="/home/oster/Electrolisys/src/test/test/node_test.cpp:60&#x0A;Value of: node_1_ptr-&gt;child(i)-&gt;get_result()==boost::multiprecision::to_string(values_2.at(i))&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/Electrolisys/src/test/test/node_test.cpp:60
 Value of: node_1_ptr->child(i)->get_result()==boost::multiprecision::to_string(values_2.at(i))
   Actual: false
 Expected: true]]></failure>
-      <failure message="/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:60&#x0A;Value of: node_1_ptr-&gt;child(i)-&gt;get_result()==boost::multiprecision::to_string(values_2.at(i))&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:60
+      <failure message="/home/oster/Electrolisys/src/test/test/node_test.cpp:60&#x0A;Value of: node_1_ptr-&gt;child(i)-&gt;get_result()==boost::multiprecision::to_string(values_2.at(i))&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/Electrolisys/src/test/test/node_test.cpp:60
 Value of: node_1_ptr->child(i)->get_result()==boost::multiprecision::to_string(values_2.at(i))
   Actual: false
 Expected: true]]></failure>
-      <failure message="/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:60&#x0A;Value of: node_1_ptr-&gt;child(i)-&gt;get_result()==boost::multiprecision::to_string(values_2.at(i))&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:60
+      <failure message="/home/oster/Electrolisys/src/test/test/node_test.cpp:60&#x0A;Value of: node_1_ptr-&gt;child(i)-&gt;get_result()==boost::multiprecision::to_string(values_2.at(i))&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/Electrolisys/src/test/test/node_test.cpp:60
 Value of: node_1_ptr->child(i)->get_result()==boost::multiprecision::to_string(values_2.at(i))
   Actual: false
 Expected: true]]></failure>
-      <failure message="/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:60&#x0A;Value of: node_1_ptr-&gt;child(i)-&gt;get_result()==boost::multiprecision::to_string(values_2.at(i))&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:60
+      <failure message="/home/oster/Electrolisys/src/test/test/node_test.cpp:60&#x0A;Value of: node_1_ptr-&gt;child(i)-&gt;get_result()==boost::multiprecision::to_string(values_2.at(i))&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/Electrolisys/src/test/test/node_test.cpp:60
 Value of: node_1_ptr->child(i)->get_result()==boost::multiprecision::to_string(values_2.at(i))
   Actual: false
 Expected: true]]></failure>
-      <failure message="/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:60&#x0A;Value of: node_1_ptr-&gt;child(i)-&gt;get_result()==boost::multiprecision::to_string(values_2.at(i))&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:60
+      <failure message="/home/oster/Electrolisys/src/test/test/node_test.cpp:60&#x0A;Value of: node_1_ptr-&gt;child(i)-&gt;get_result()==boost::multiprecision::to_string(values_2.at(i))&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/Electrolisys/src/test/test/node_test.cpp:60
 Value of: node_1_ptr->child(i)->get_result()==boost::multiprecision::to_string(values_2.at(i))
   Actual: false
 Expected: true]]></failure>
-      <failure message="/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:60&#x0A;Value of: node_1_ptr-&gt;child(i)-&gt;get_result()==boost::multiprecision::to_string(values_2.at(i))&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:60
+      <failure message="/home/oster/Electrolisys/src/test/test/node_test.cpp:60&#x0A;Value of: node_1_ptr-&gt;child(i)-&gt;get_result()==boost::multiprecision::to_string(values_2.at(i))&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/Electrolisys/src/test/test/node_test.cpp:60
 Value of: node_1_ptr->child(i)->get_result()==boost::multiprecision::to_string(values_2.at(i))
   Actual: false
 Expected: true]]></failure>
-      <failure message="/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:60&#x0A;Value of: node_1_ptr-&gt;child(i)-&gt;get_result()==boost::multiprecision::to_string(values_2.at(i))&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:60
+      <failure message="/home/oster/Electrolisys/src/test/test/node_test.cpp:60&#x0A;Value of: node_1_ptr-&gt;child(i)-&gt;get_result()==boost::multiprecision::to_string(values_2.at(i))&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/Electrolisys/src/test/test/node_test.cpp:60
 Value of: node_1_ptr->child(i)->get_result()==boost::multiprecision::to_string(values_2.at(i))
   Actual: false
 Expected: true]]></failure>
-      <failure message="/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:60&#x0A;Value of: node_1_ptr-&gt;child(i)-&gt;get_result()==boost::multiprecision::to_string(values_2.at(i))&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:60
+      <failure message="/home/oster/Electrolisys/src/test/test/node_test.cpp:60&#x0A;Value of: node_1_ptr-&gt;child(i)-&gt;get_result()==boost::multiprecision::to_string(values_2.at(i))&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/Electrolisys/src/test/test/node_test.cpp:60
 Value of: node_1_ptr->child(i)->get_result()==boost::multiprecision::to_string(values_2.at(i))
   Actual: false
 Expected: true]]></failure>
-      <failure message="/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:60&#x0A;Value of: node_1_ptr-&gt;child(i)-&gt;get_result()==boost::multiprecision::to_string(values_2.at(i))&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:60
+      <failure message="/home/oster/Electrolisys/src/test/test/node_test.cpp:60&#x0A;Value of: node_1_ptr-&gt;child(i)-&gt;get_result()==boost::multiprecision::to_string(values_2.at(i))&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/Electrolisys/src/test/test/node_test.cpp:60
 Value of: node_1_ptr->child(i)->get_result()==boost::multiprecision::to_string(values_2.at(i))
   Actual: false
 Expected: true]]></failure>
-      <failure message="/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:60&#x0A;Value of: node_1_ptr-&gt;child(i)-&gt;get_result()==boost::multiprecision::to_string(values_2.at(i))&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:60
+      <failure message="/home/oster/Electrolisys/src/test/test/node_test.cpp:60&#x0A;Value of: node_1_ptr-&gt;child(i)-&gt;get_result()==boost::multiprecision::to_string(values_2.at(i))&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/Electrolisys/src/test/test/node_test.cpp:60
 Value of: node_1_ptr->child(i)->get_result()==boost::multiprecision::to_string(values_2.at(i))
   Actual: false
 Expected: true]]></failure>
-      <failure message="/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:69&#x0A;Expected equality of these values:&#x0A;  tmp_node_1_ptr-&gt;references().size()&#x0A;    Which is: 0&#x0A;  1" type=""><![CDATA[/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:69
+      <failure message="/home/oster/Electrolisys/src/test/test/node_test.cpp:69&#x0A;Expected equality of these values:&#x0A;  tmp_node_1_ptr-&gt;references().size()&#x0A;    Which is: 0&#x0A;  1" type=""><![CDATA[/home/oster/Electrolisys/src/test/test/node_test.cpp:69
 Expected equality of these values:
   tmp_node_1_ptr->references().size()
     Which is: 0
   1]]></failure>
-      <failure message="/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:71&#x0A;Expected equality of these values:&#x0A;  bd-&gt;get(&quot;A&quot;)-&gt;node()-&gt;child(0)&#x0A;    Which is: 0x555555798870&#x0A;  tmp_node_1_ptr&#x0A;    Which is: 0x555555798c90" type=""><![CDATA[/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:71
+      <failure message="/home/oster/Electrolisys/src/test/test/node_test.cpp:71&#x0A;Expected equality of these values:&#x0A;  bd-&gt;get(&quot;A&quot;)-&gt;node()-&gt;child(0)&#x0A;    Which is: 0x555555797370&#x0A;  tmp_node_1_ptr&#x0A;    Which is: 0x555555797790" type=""><![CDATA[/home/oster/Electrolisys/src/test/test/node_test.cpp:71
 Expected equality of these values:
   bd->get("A")->node()->child(0)
-    Which is: 0x555555798870
+    Which is: 0x555555797370
   tmp_node_1_ptr
-    Which is: 0x555555798c90]]></failure>
+    Which is: 0x555555797790]]></failure>
     </testcase>
-    <testcase name="TestGetTypeVal" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:12.199" classname="Node_test" />
+    <testcase name="TestGetTypeVal" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:48.864" classname="Node_test" />
   </testsuite>
-  <testsuite name="NodeTest" tests="2" failures="2" disabled="0" skipped="0" errors="0" time="0" timestamp="2025-01-14T03:21:12.199">
-    <testcase name="TestChildInfoByIndexesConst" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:12.199" classname="NodeTest">
-      <failure message="/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:119&#x0A;Expected equality of these values:&#x0A;  B-&gt;node()-&gt;child(0)-&gt;child(0)-&gt;child(0)-&gt;child(0)-&gt;child(0)&#x0A;    Which is: 0x55555579ad20&#x0A;  info.node()&#x0A;    Which is: 0x555555797e40" type=""><![CDATA[/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:119
+  <testsuite name="NodeTest" tests="2" failures="2" disabled="0" skipped="0" errors="0" time="0" timestamp="2025-01-14T14:13:48.864">
+    <testcase name="TestChildInfoByIndexesConst" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:48.864" classname="NodeTest">
+      <failure message="/home/oster/Electrolisys/src/test/test/node_test.cpp:119&#x0A;Expected equality of these values:&#x0A;  B-&gt;node()-&gt;child(0)-&gt;child(0)-&gt;child(0)-&gt;child(0)-&gt;child(0)&#x0A;    Which is: 0x555555799640&#x0A;  info.node()&#x0A;    Which is: 0x555555796990" type=""><![CDATA[/home/oster/Electrolisys/src/test/test/node_test.cpp:119
 Expected equality of these values:
   B->node()->child(0)->child(0)->child(0)->child(0)->child(0)
-    Which is: 0x55555579ad20
+    Which is: 0x555555799640
   info.node()
-    Which is: 0x555555797e40]]></failure>
-      <failure message="/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:120&#x0A;Expected equality of these values:&#x0A;  value_3_ptr&#x0A;    Which is: 0x55555579bd70&#x0A;  info.node()&#x0A;    Which is: 0x555555797e40" type=""><![CDATA[/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:120
+    Which is: 0x555555796990]]></failure>
+      <failure message="/home/oster/Electrolisys/src/test/test/node_test.cpp:120&#x0A;Expected equality of these values:&#x0A;  value_3_ptr&#x0A;    Which is: 0x55555579a690&#x0A;  info.node()&#x0A;    Which is: 0x555555796990" type=""><![CDATA[/home/oster/Electrolisys/src/test/test/node_test.cpp:120
 Expected equality of these values:
   value_3_ptr
-    Which is: 0x55555579bd70
+    Which is: 0x55555579a690
   info.node()
-    Which is: 0x555555797e40]]></failure>
-      <failure message="/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:131&#x0A;Expected equality of these values:&#x0A;  B-&gt;node()-&gt;child(0)-&gt;child(1)-&gt;child(0)&#x0A;    Which is: 0x55555579e560&#x0A;  add_ptr&#x0A;    Which is: 0x555555798740" type=""><![CDATA[/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:131
+    Which is: 0x555555796990]]></failure>
+      <failure message="/home/oster/Electrolisys/src/test/test/node_test.cpp:131&#x0A;Expected equality of these values:&#x0A;  B-&gt;node()-&gt;child(0)-&gt;child(1)-&gt;child(0)&#x0A;    Which is: 0x55555579ce80&#x0A;  add_ptr&#x0A;    Which is: 0x555555797240" type=""><![CDATA[/home/oster/Electrolisys/src/test/test/node_test.cpp:131
 Expected equality of these values:
   B->node()->child(0)->child(1)->child(0)
-    Which is: 0x55555579e560
+    Which is: 0x55555579ce80
   add_ptr
-    Which is: 0x555555798740]]></failure>
-      <failure message="/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:132&#x0A;Expected equality of these values:&#x0A;  B-&gt;node()-&gt;child(0)-&gt;child(1)-&gt;child(0)&#x0A;    Which is: 0x55555579e560&#x0A;  info.node()&#x0A;    Which is: 0x55555579cfb0" type=""><![CDATA[/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:132
+    Which is: 0x555555797240]]></failure>
+      <failure message="/home/oster/Electrolisys/src/test/test/node_test.cpp:132&#x0A;Expected equality of these values:&#x0A;  B-&gt;node()-&gt;child(0)-&gt;child(1)-&gt;child(0)&#x0A;    Which is: 0x55555579ce80&#x0A;  info.node()&#x0A;    Which is: 0x55555579b8d0" type=""><![CDATA[/home/oster/Electrolisys/src/test/test/node_test.cpp:132
 Expected equality of these values:
   B->node()->child(0)->child(1)->child(0)
-    Which is: 0x55555579e560
+    Which is: 0x55555579ce80
   info.node()
-    Which is: 0x55555579cfb0]]></failure>
-      <failure message="/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:133&#x0A;Value of: info.node()-&gt;type()==NODE_TYPE::BINARY&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:133
+    Which is: 0x55555579b8d0]]></failure>
+      <failure message="/home/oster/Electrolisys/src/test/test/node_test.cpp:133&#x0A;Value of: info.node()-&gt;type()==NODE_TYPE::BINARY&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/Electrolisys/src/test/test/node_test.cpp:133
 Value of: info.node()->type()==NODE_TYPE::BINARY
   Actual: false
 Expected: true]]></failure>
-      <failure message="/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:138&#x0A;Expected equality of these values:&#x0A;  B-&gt;node()-&gt;child(0)-&gt;child(2)-&gt;child(0)&#x0A;    Which is: 0x55555579d1e0&#x0A;  un_minus_ptr&#x0A;    Which is: 0x555555798520" type=""><![CDATA[/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:138
+      <failure message="/home/oster/Electrolisys/src/test/test/node_test.cpp:138&#x0A;Expected equality of these values:&#x0A;  B-&gt;node()-&gt;child(0)-&gt;child(2)-&gt;child(0)&#x0A;    Which is: 0x5555557960d0&#x0A;  un_minus_ptr&#x0A;    Which is: 0x555555797020" type=""><![CDATA[/home/oster/Electrolisys/src/test/test/node_test.cpp:138
 Expected equality of these values:
   B->node()->child(0)->child(2)->child(0)
-    Which is: 0x55555579d1e0
+    Which is: 0x5555557960d0
   un_minus_ptr
-    Which is: 0x555555798520]]></failure>
-      <failure message="/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:139&#x0A;Expected equality of these values:&#x0A;  B-&gt;node()-&gt;child(0)-&gt;child(2)-&gt;child(0)&#x0A;    Which is: 0x55555579d1e0&#x0A;  info.node()&#x0A;    Which is: 0x55555579d830" type=""><![CDATA[/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:139
+    Which is: 0x555555797020]]></failure>
+      <failure message="/home/oster/Electrolisys/src/test/test/node_test.cpp:139&#x0A;Expected equality of these values:&#x0A;  B-&gt;node()-&gt;child(0)-&gt;child(2)-&gt;child(0)&#x0A;    Which is: 0x5555557960d0&#x0A;  info.node()&#x0A;    Which is: 0x55555579c150" type=""><![CDATA[/home/oster/Electrolisys/src/test/test/node_test.cpp:139
 Expected equality of these values:
   B->node()->child(0)->child(2)->child(0)
-    Which is: 0x55555579d1e0
+    Which is: 0x5555557960d0
   info.node()
-    Which is: 0x55555579d830]]></failure>
-      <failure message="/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:140&#x0A;Value of: info.node()-&gt;type()==NODE_TYPE::UNARY&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:140
+    Which is: 0x55555579c150]]></failure>
+      <failure message="/home/oster/Electrolisys/src/test/test/node_test.cpp:140&#x0A;Value of: info.node()-&gt;type()==NODE_TYPE::UNARY&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/Electrolisys/src/test/test/node_test.cpp:140
 Value of: info.node()->type()==NODE_TYPE::UNARY
   Actual: false
 Expected: true]]></failure>
     </testcase>
-    <testcase name="TestReleaseChilds" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:12.199" classname="NodeTest">
-      <failure message="/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:164&#x0A;Value of: var_A-&gt;node()-&gt;owner()==array.get()&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:164
+    <testcase name="TestReleaseChilds" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:48.865" classname="NodeTest">
+      <failure message="/home/oster/Electrolisys/src/test/test/node_test.cpp:164&#x0A;Value of: var_A-&gt;node()-&gt;owner()==array.get()&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/Electrolisys/src/test/test/node_test.cpp:164
 Value of: var_A->node()->owner()==array.get()
   Actual: false
 Expected: true]]></failure>
-      <failure message="/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:165&#x0A;Value of: var_B-&gt;node()-&gt;owner()==array.get()&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:165
+      <failure message="/home/oster/Electrolisys/src/test/test/node_test.cpp:165&#x0A;Value of: var_B-&gt;node()-&gt;owner()==array.get()&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/Electrolisys/src/test/test/node_test.cpp:165
 Value of: var_B->node()->owner()==array.get()
   Actual: false
 Expected: true]]></failure>
-      <failure message="/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:166&#x0A;Value of: var_C-&gt;node()-&gt;owner()==array.get()&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:166
+      <failure message="/home/oster/Electrolisys/src/test/test/node_test.cpp:166&#x0A;Value of: var_C-&gt;node()-&gt;owner()==array.get()&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/Electrolisys/src/test/test/node_test.cpp:166
 Value of: var_C->node()->owner()==array.get()
   Actual: false
 Expected: true]]></failure>
-      <failure message="/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:167&#x0A;Value of: var_D-&gt;node()-&gt;owner()==array.get()&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:167
+      <failure message="/home/oster/Electrolisys/src/test/test/node_test.cpp:167&#x0A;Value of: var_D-&gt;node()-&gt;owner()==array.get()&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/Electrolisys/src/test/test/node_test.cpp:167
 Value of: var_D->node()->owner()==array.get()
   Actual: false
 Expected: true]]></failure>
-      <failure message="/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:168&#x0A;Value of: var_E-&gt;node()-&gt;owner()==array.get()&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:168
+      <failure message="/home/oster/Electrolisys/src/test/test/node_test.cpp:168&#x0A;Value of: var_E-&gt;node()-&gt;owner()==array.get()&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/Electrolisys/src/test/test/node_test.cpp:168
 Value of: var_E->node()->owner()==array.get()
   Actual: false
 Expected: true]]></failure>
-      <failure message="/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:169&#x0A;Value of: var_F-&gt;node()-&gt;owner()==var_E-&gt;node()&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:169
+      <failure message="/home/oster/Electrolisys/src/test/test/node_test.cpp:169&#x0A;Value of: var_F-&gt;node()-&gt;owner()==var_E-&gt;node()&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/Electrolisys/src/test/test/node_test.cpp:169
 Value of: var_F->node()->owner()==var_E->node()
   Actual: false
 Expected: true]]></failure>
-      <failure message="/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:181&#x0A;Value of: var_F-&gt;node()-&gt;owner() == var_E-&gt;node()&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/OsterMath-Backend/src/test/test/node_test.cpp:181
+      <failure message="/home/oster/Electrolisys/src/test/test/node_test.cpp:181&#x0A;Value of: var_F-&gt;node()-&gt;owner() == var_E-&gt;node()&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/Electrolisys/src/test/test/node_test.cpp:181
 Value of: var_F->node()->owner() == var_E->node()
   Actual: false
 Expected: true]]></failure>
     </testcase>
   </testsuite>
-  <testsuite name="RangeFunctionNode_test" tests="7" failures="2" disabled="0" skipped="0" errors="0" time="0.414" timestamp="2025-01-14T03:21:12.200">
-    <testcase name="Example_1" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:12.200" classname="RangeFunctionNode_test">
-      <failure message="/home/oster/OsterMath-Backend/src/test/test/range_node_test.cpp:67&#x0A;Value of: sum_func-&gt;execute().is_value()&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/OsterMath-Backend/src/test/test/range_node_test.cpp:67
+  <testsuite name="RangeFunctionNode_test" tests="7" failures="2" disabled="0" skipped="0" errors="0" time="1.447" timestamp="2025-01-14T14:13:48.865">
+    <testcase name="Example_1" status="run" result="completed" time="0.705" timestamp="2025-01-14T14:13:48.865" classname="RangeFunctionNode_test">
+      <failure message="/home/oster/Electrolisys/src/test/test/range_node_test.cpp:67&#x0A;Value of: sum_func-&gt;execute().is_value()&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/Electrolisys/src/test/test/range_node_test.cpp:67
 Value of: sum_func->execute().is_value()
   Actual: false
 Expected: true]]></failure>
-      <failure message="/home/oster/OsterMath-Backend/src/test/test/range_node_test.cpp:80&#x0A;Expected equality of these values:&#x0A;  sum_func-&gt;cached_result()&#x0A;    Which is: #ERR!&#x0A;  result_1&#x0A;    Which is: 1.39187e+23" type=""><![CDATA[/home/oster/OsterMath-Backend/src/test/test/range_node_test.cpp:80
+      <failure message="/home/oster/Electrolisys/src/test/test/range_node_test.cpp:80&#x0A;Expected equality of these values:&#x0A;  sum_func-&gt;cached_result()&#x0A;    Which is: #ERR!&#x0A;  result_1&#x0A;    Which is: 1.39187e+23" type=""><![CDATA[/home/oster/Electrolisys/src/test/test/range_node_test.cpp:80
 Expected equality of these values:
   sum_func->cached_result()
     Which is: #ERR!
   result_1
     Which is: 1.39187e+23]]></failure>
     </testcase>
-    <testcase name="Example_2" status="run" result="completed" time="0.017" timestamp="2025-01-14T03:21:12.201" classname="RangeFunctionNode_test">
-      <failure message="/home/oster/OsterMath-Backend/src/test/test/range_node_test.cpp:137&#x0A;Value of: sum_func-&gt;execute().is_value()&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/OsterMath-Backend/src/test/test/range_node_test.cpp:137
+    <testcase name="Example_2" status="run" result="completed" time="0.436" timestamp="2025-01-14T14:13:49.570" classname="RangeFunctionNode_test">
+      <failure message="/home/oster/Electrolisys/src/test/test/range_node_test.cpp:137&#x0A;Value of: sum_func-&gt;execute().is_value()&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/oster/Electrolisys/src/test/test/range_node_test.cpp:137
 Value of: sum_func->execute().is_value()
   Actual: false
 Expected: true]]></failure>
-      <failure message="/home/oster/OsterMath-Backend/src/test/test/range_node_test.cpp:159&#x0A;Expected equality of these values:&#x0A;  sum_func-&gt;cached_result()&#x0A;    Which is: #ERR!&#x0A;  result_1&#x0A;    Which is: 5.72114e+199" type=""><![CDATA[/home/oster/OsterMath-Backend/src/test/test/range_node_test.cpp:159
+      <failure message="/home/oster/Electrolisys/src/test/test/range_node_test.cpp:159&#x0A;Expected equality of these values:&#x0A;  sum_func-&gt;cached_result()&#x0A;    Which is: #ERR!&#x0A;  result_1&#x0A;    Which is: 5.72114e+199" type=""><![CDATA[/home/oster/Electrolisys/src/test/test/range_node_test.cpp:159
 Expected equality of these values:
   sum_func->cached_result()
     Which is: #ERR!
   result_1
     Which is: 5.72114e+199]]></failure>
     </testcase>
-    <testcase name="DifferentSizeVars" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:12.218" classname="RangeFunctionNode_test" />
-    <testcase name="EmptyArrayVar" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:12.218" classname="RangeFunctionNode_test" />
-    <testcase name="TwinEmptyArraysVars" status="run" result="completed" time="0.395" timestamp="2025-01-14T03:21:12.218" classname="RangeFunctionNode_test" />
-    <testcase name="NotArrayVar" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:12.613" classname="RangeFunctionNode_test" />
-    <testcase name="NotDefined_1_DimensionsTwinArrayVars" status="run" result="completed" time="0" timestamp="2025-01-14T03:21:12.614" classname="RangeFunctionNode_test" />
+    <testcase name="DifferentSizeVars" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:50.006" classname="RangeFunctionNode_test" />
+    <testcase name="EmptyArrayVar" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:50.007" classname="RangeFunctionNode_test" />
+    <testcase name="TwinEmptyArraysVars" status="run" result="completed" time="0.304" timestamp="2025-01-14T14:13:50.007" classname="RangeFunctionNode_test" />
+    <testcase name="NotArrayVar" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:50.312" classname="RangeFunctionNode_test" />
+    <testcase name="NotDefined_1_DimensionsTwinArrayVars" status="run" result="completed" time="0" timestamp="2025-01-14T14:13:50.312" classname="RangeFunctionNode_test" />
   </testsuite>
 </testsuites>

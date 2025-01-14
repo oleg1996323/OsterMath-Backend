@@ -23,7 +23,7 @@ ArrayNode::ArrayNode(ArrayNode&& arr):AbstractNode(arr){
 }
 
 ArrayNode::~ArrayNode(){
-    TestLogger::instance()<<"ArrayNode deleted: "<<this<<std::endl;
+    std::cout<<"ArrayNode deleted: "<<this<<std::endl;
     rel_mng_->delete_node(this);
 }
 
