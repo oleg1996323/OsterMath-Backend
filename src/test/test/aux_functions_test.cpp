@@ -24,8 +24,8 @@ public:
         auto var_1_base = bd->add_variable("Var_1_case_1");
         auto var_2_base = bd->add_variable("Var_2_case_1");
         auto var_3_base = bd->add_variable("Var_3_case_1");
-        std::unique_ptr<ArrayNode> arr_1 = std::make_unique<ArrayNode>(5);
-        std::unique_ptr<ArrayNode> arr_2 = std::make_unique<ArrayNode>(5);
+        std::unique_ptr<ArrayNode> arr_1 = bd->make_node<ArrayNode>(5);
+        std::unique_ptr<ArrayNode> arr_2 = bd->make_node<ArrayNode>(5);
         VariableNode* var_1 = var_1_base->node();
         VariableNode* var_2 = var_2_base->node();
         VariableNode* var_3 = var_3_base->node();

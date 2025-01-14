@@ -1,6 +1,11 @@
 {
     "tasks": [
         {
+            "type": "process",
+            "label": "make test log directory",
+            "command": "mkdir test_logs",
+        },
+        {
             "type": "cppbuild",
             "label": "C/C++: g++ build active file",
             "command": "/usr/bin/g++",

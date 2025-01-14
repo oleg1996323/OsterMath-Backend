@@ -275,13 +275,14 @@ TEST(RangeFunctionNode_test,TwinEmptyArraysVars){
 TEST(RangeFunctionNode_test,NotArrayVar){
     //SUM_I(#B+PROD_I(#A*1;#A;1);#A;2;#B;1)
     std::cout<<"Run test not array variable"<<std::endl;
-    std::unique_ptr<RangeOperationNode> sum_func = std::make_unique<RangeOperationNode>(RANGE_OP::SUM);
-    std::unique_ptr<RangeOperationNode> prod_func = std::make_unique<RangeOperationNode>(RANGE_OP::PROD);
-    
-    std::unique_ptr<BinaryNode> adding = std::make_unique<BinaryNode>(BINARY_OP::ADD);
-    std::unique_ptr<BinaryNode> multiplication = std::make_unique<BinaryNode>(BINARY_OP::MUL);
-    
     std::shared_ptr<BaseData> bd = std::make_shared<BaseData>("BD");
+    std::unique_ptr<RangeOperationNode> sum_func = bd->make_node<RangeOperationNode>(RANGE_OP::SUM);
+    std::unique_ptr<RangeOperationNode> prod_func = bd->make_node<RangeOperationNode>(RANGE_OP::PROD);
+    
+    std::unique_ptr<BinaryNode> adding = bd->make_node<BinaryNode>(BINARY_OP::ADD);
+    std::unique_ptr<BinaryNode> multiplication = bd->make_node<BinaryNode>(BINARY_OP::MUL);
+    
+
     std::shared_ptr<VariableBase> A_var = bd->add_variable("A");
     A_var->node()->insert_back(1);
     
@@ -295,10 +296,10 @@ TEST(RangeFunctionNode_test,NotArrayVar){
 TEST(RangeFunctionNode_test,NotDefined_1_DimensionsTwinArrayVars){
     //SUM_I(#B+#A;#B;1;#A;1)
     std::cout<<"Run test not defined 1 dimension twin arrays variables"<<std::endl;
-    std::unique_ptr<RangeOperationNode> sum_func = std::make_unique<RangeOperationNode>(RANGE_OP::SUM);    
-    std::unique_ptr<BinaryNode> adding = std::make_unique<BinaryNode>(BINARY_OP::ADD);
-    
     std::shared_ptr<BaseData> bd = std::make_shared<BaseData>("BD");
+    std::unique_ptr<RangeOperationNode> sum_func = bd->make_node<RangeOperationNode>(RANGE_OP::SUM);    
+    std::unique_ptr<BinaryNode> adding = bd->make_node<BinaryNode>(BINARY_OP::ADD);
+    
     std::shared_ptr<VariableBase> A_var = bd->add_variable("A");
     std::shared_ptr<VariableBase> B_var = bd->add_variable("B");
     
@@ -306,8 +307,8 @@ TEST(RangeFunctionNode_test,NotDefined_1_DimensionsTwinArrayVars){
     adding->insert_back_ref(A_var->node());
     sum_func->set_expression(std::move(adding));
 
-    std::unique_ptr<ArrayNode> arr_1 = std::make_unique<ArrayNode>(10);
-    std::unique_ptr<ArrayNode> arr_2 = std::make_unique<ArrayNode>(10);
+    std::unique_ptr<ArrayNode> arr_1 = bd->make_node<ArrayNode>(10);
+    std::unique_ptr<ArrayNode> arr_2 = bd->make_node<ArrayNode>(10);
 
     for(int i=0;i<10;++i){
         //if(count<1000)

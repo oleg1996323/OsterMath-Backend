@@ -34,14 +34,17 @@ TEST_F(DataBaseDefault,Insert_Back){
     BaseData::get_anonymous_relation_manager()->log_state();
 }
 TEST_F(DataBaseDefault,Insert){
+    TestLogger::instance() = TestLogger(std::filesystem::current_path()/"test_logs",this->test_info_->name());
     std::cout<<"Run test insert at position"<<std::endl;
     //TODO need to check construction - destruction
 }
 TEST_F(DataBaseDefault,Replace){
+    TestLogger::instance() = TestLogger(std::filesystem::current_path()/"test_logs",this->test_info_->name());
     std::cout<<"Run test replace at position"<<std::endl;
 }
 TEST_F(DataBaseDefault,Begins){
     {
+    TestLogger::instance() = TestLogger(std::filesystem::current_path()/"test_logs",this->test_info_->name());
     std::cout<<"Run test begin"<<std::endl;
     std::unique_ptr<ArrayNode> arr = db_->make_node<ArrayNode>(0);
     EXPECT_EQ(arr->childs().begin(), arr->begin());
