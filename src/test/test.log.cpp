@@ -18,6 +18,7 @@ TestLogger::TestLogger(std::ostream& stream){
 TestLogger::TestLogger(const std::filesystem::path& log_dir, const char* test_name){
     set_log_directory(log_dir);
     set_log_stream(test_name);
+    sh_buf_ = SharedStream((log_dir/test_name).c_str());
     //TODO: combine FILE* and std::fstream/std::iostream (rdbuf or struct - see more later)
 }
 
