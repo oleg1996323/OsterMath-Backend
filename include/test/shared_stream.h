@@ -97,38 +97,39 @@ private:
 };*/
 
 class SharedStream : public std::streambuf {
-    // struct __C_F__{
-    //     FILE& old_f_data_;
-    //     FILE* f_ = nullptr;
-    // };
-    // struct __CPP_F__{
-    //     std::iostream& stream_;
-    //     std::streambuf* old_buf_ = nullptr;
-    // };
-    // std::vector<__C_F__> c_fs_;
-    // std::vector<__CPP_F__> cpp_fs_;
-    std::unordered_map<FILE*,FILE&> c_;
-    std::unordered_map<std::streambuf*,std::iostream&> cpp_;
+    struct __C_F__{
+        FILE& old_f_data_;
+        FILE** f_ = nullptr;
+        int use_count = 1;
+    };
+    struct __CPP_F__{
+        std::iostream& stream_;
+        std::iostream** old_buf_ = nullptr;
+        int use_count = 1;
+    };
+    std::unordered_map<FILE*,__C_F__> c_;
+    std::unordered_map<std::iostream*,__CPP_F__> cpp_;
     std::shared_ptr<std::vector<char_type>> buf_; // Можно организовать свой буфер
 protected:
     FILE* f_;
 private:
     std::streampos pos_base;
-    int use_count_;
 public:
     explicit SharedStream(FILE*& stream);
     SharedStream(const SharedStream& other);
     SharedStream& operator=(const SharedStream& other);
     SharedStream() = default;
+    SharedStream(SharedStream&& other);
+    SharedStream& operator=(SharedStream&& other);
     explicit SharedStream(const std::string& filename, std::ios_base::openmode om = std::ios_base::out | std::ios_base::in);
     explicit SharedStream(const char* filename, std::ios_base::openmode om = std::ios_base::out | std::ios_base::in);
     ~SharedStream();
     bool is_opened() const;
-    void add_stream(FILE* c_stream);
+    void add_stream(FILE*& c_stream);
     void add_stream(std::iostream& stream);
     void release();
-    FILE* release_stream(FILE* c_stream);
-    std::iostream& release_(std::iostream& stream);
+    FILE* release_stream(FILE*& c_stream);
+    std::iostream* release_stream(std::iostream& stream);
 protected:
     // Запись одного символа
     virtual int_type overflow(int_type ch) override;

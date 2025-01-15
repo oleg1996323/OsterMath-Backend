@@ -70,36 +70,80 @@ const char* cpp_to_c_openmode(std::ios_base::openmode om){
 #include <stdexcept>
 SharedStream::SharedStream(FILE*& stream):
 use_count_(1){
-    c_.insert({stream,*stream});
-    newbuf();
-    std::setbuf(f_,buf_->data()); //f_ is nullptr (must be implemented as memory or filebuf)
-    std::setbuf(stream,buf_->data());
+    if(stream){
+        c_.insert({stream,__C_F__{*stream,&stream}});
+        newbuf();
+        if(!f_)
+            f_ = stream;
+        std::setbuf(f_,buf_->data()); //f_ is nullptr (must be implemented as memory or filebuf)
+        std::setbuf(stream,buf_->data());
+    }
 }
 SharedStream::SharedStream(const SharedStream& other):
 std::streambuf(other),
-buf_(other.buf_){
-    if(this!=&other)
-        use_count_ = other.use_count_;
-}
-
+buf_(other.buf_){}
 SharedStream& SharedStream::operator=(const SharedStream& other){
     if(&other!=this){
         std::streambuf::operator=(other);
         buf_=other.buf_;
+        release();
+        for(auto& [ptr,dt]:other.c_){
+            if(*dt.f_)
+                c_[ptr] = __C_F__{dt.old_f_data_,&dt.ptr,++dt.use_count}; //make reference to structure of streams
+                std::setbuf(ptr,buf_->data());
+            else 
+        }
+        for(auto& [ptr,dt]:cpp_)
+
     }
     return *this;
 }
+SharedStream::SharedStream(SharedStream&& other):{
 
+}
+SharedStream& SharedStream::operator=(SharedStream&& other){
+
+}
 SharedStream::~SharedStream(){
     for(auto& [c_f,c_dt]:c_)
-        *c_f = c_dt;
-    
+        if(*c_dt.f_)
+            *c_f = c_dt.old_f_data_;
 }
 // bool SharedStream::is_opened() const{
 //     return fs.;
 // }
 #include <iostream>
 #include <stdexcept>
+
+void SharedStream::add_stream(FILE*& c_stream){
+    if(c_stream){
+        c_.insert({c_stream,__C_F__{*c_stream,&c_stream}});
+        newbuf();
+        if(!f_)
+            f_ = c_stream;
+        std::setbuf(f_,buf_->data()); //f_ is nullptr (must be implemented as memory or filebuf)
+        std::setbuf(c_stream,buf_->data());
+    }
+}
+void SharedStream::add_stream(std::iostream& stream){
+
+}
+void SharedStream::release(){
+    //TODO: add condition if use_count is more than 1. Else restore previous buffers
+    for(auto& [c_f,c_dt]:c_)
+        if(*c_dt.f_)
+            *c_f = c_dt.old_f_data_;
+}
+FILE* SharedStream::release_stream(FILE*& c_stream){
+    if(c_stream && c_.contains(c_stream))
+        return c_.extract(c_stream).key();
+    else return nullptr;
+}
+std::iostream* SharedStream::release_stream(std::iostream& stream){
+    if(cpp_.contains(&stream))
+        return &cpp_.extract(&stream).mapped().stream_;
+    else return nullptr;
+}
 
 // Запись одного символа
 std::streambuf::int_type SharedStream::overflow(int_type ch){
@@ -111,17 +155,15 @@ std::streambuf::int_type SharedStream::overflow(int_type ch){
     }
     return ch;
 }
-
 // Синхронизация (например, при std::endl)
 int SharedStream::sync(){
     if(f_)
-        std::fflush(f_) == 0 ? 0 : -1;
-
+        return std::fflush(f_) == 0 ? 0 : -1;
+    return -1;
 }
-
 std::streambuf::pos_type SharedStream::seekoff(off_type off, std::ios_base::seekdir dir,
     std::ios_base::openmode which = std::ios_base::in | std::ios_base::out){
-    if (!(buf_ || which & std::ios_base::in))
+    if (!(buf_ || which & std::ios_base::in || which & std::ios_base::out))
         return off_type(-1);
     
     switch (off){
@@ -131,12 +173,13 @@ std::streambuf::pos_type SharedStream::seekoff(off_type off, std::ios_base::seek
         case std::ios_base::end: return __read_init__(off, SEEK_END);
     }
 }
-
 std::streambuf::pos_type SharedStream::seekpos(pos_type pos,
         std::ios_base::openmode which = std::ios_base::in | std::ios_base::out){
-    
-}
+    if (!(buf_ || which & std::ios_base::in || which & std::ios_base::out))
+        return off_type(-1);
 
+    return __read_init__(pos);
+}
 int SharedStream::pbackfail(int c){
     //символ не совпал
     if (pos_base <= 0 || gptr() > eback())

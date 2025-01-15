@@ -1,25 +1,32 @@
 #include "include/test/test_log.h"
 #include <cstdio>
 #include <stdio.h>
+#include "include/test/shared_fstream.h"
 
 std::filesystem::directory_entry TestLogger::log_dir_ = {std::filesystem::directory_entry(std::filesystem::current_path())};
-std::streambuf* TestLogger::out_buf = std::cout.rdbuf();
-std::streambuf* TestLogger::err_buf = std::cerr.rdbuf();
-std::streambuf* TestLogger::log_buf = std::clog.rdbuf();
-FILE* TestLogger::c_out_buf = stdout;
-FILE* TestLogger::c_err_buf = stderr;
 
 TestLogger TestLogger::test_logger = TestLogger(std::cout);
 
-TestLogger::TestLogger(std::ostream& stream){
+TestLogger::TestLogger(std::ostream& stream):stream_(&sh_buf_){
     set_log_stream(stream);
+    sh_buf_.add_stream(stdout);
+    sh_buf_.add_stream(stderr);
 }
 
-TestLogger::TestLogger(const std::filesystem::path& log_dir, const char* test_name){
+TestLogger::TestLogger(const std::filesystem::path& log_dir, const char* test_name):stream_(&sh_buf_){
     set_log_directory(log_dir);
     set_log_stream(test_name);
-    sh_buf_ = SharedStream((log_dir/test_name).c_str());
+    sh_buf_ = SharedFstream((log_dir/test_name).string().c_str());
+    sh_buf_.add_stream(stdout);
+    sh_buf_.add_stream(stderr);
     //TODO: combine FILE* and std::fstream/std::iostream (rdbuf or struct - see more later)
+}
+
+TestLogger& TestLogger::operator=(TestLogger&& logger){
+    if(this!=&logger){
+        std::swap(sh_buf_,logger.sh_buf_);
+    }
+    return *this;
 }
 
 TestLogger& TestLogger::instance(){
@@ -32,17 +39,11 @@ void TestLogger::set_log_stream(const std::string& test_name){
 
 void TestLogger::set_log_stream(const char* test_name){
     if(decltype(log_dir_)(log_dir_.path().filename()).exists() && decltype(log_dir_)(log_dir_.path().filename()).is_directory()){
-        cf = fopen((log_dir_.path()/test_name).c_str(),"w");
-        assert(cf);
-        std::unique_ptr<std::ofstream> fstream = std::make_unique<std::ofstream>(log_dir_.path()/test_name,std::ostream::trunc);
-        assert(fstream->is_open());
+        SharedFstream fstream;
+        fstream.open(log_dir_.path()/test_name,std::ostream::trunc);
+        assert(fstream.is_open());
         std::cout<<"Opened log file: "<<log_dir_.path()/test_name<<std::endl;
-        std::cout.rdbuf(fstream->rdbuf());
-        std::cerr.rdbuf(fstream->rdbuf());
-        std::clog.rdbuf(fstream->rdbuf());
-        stdout = cf;
-        stderr = cf;
-        stream_ = std::move(fstream);
+        sh_buf_ = std::move(fstream);
     }
     else std::cerr<<"Incorrect directory name: "<<log_dir_.path()<<std::endl;
 }

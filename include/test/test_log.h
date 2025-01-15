@@ -11,30 +11,14 @@
 class TestLogger{
     static TestLogger test_logger;
     static std::filesystem::directory_entry log_dir_;
-    static FILE* c_out_buf;
-    static FILE* c_err_buf;
-
-    static std::streambuf* out_buf;
-    static std::streambuf* err_buf;
-    static std::streambuf* log_buf;
     SharedStream sh_buf_;
-    std::unique_ptr<std::ostream> stream_;
-    FILE* cf = nullptr;
+    std::ostream stream_;
     public:
     TestLogger(std::ostream& stream);
     TestLogger(const TestLogger& logger) = delete;
-    TestLogger(TestLogger&& logger) = default;
+    TestLogger(TestLogger&& logger);
     TestLogger& operator=(const TestLogger& logger) = delete;
-    TestLogger& operator=(TestLogger&& logger) = default;
-    ~TestLogger(){
-        stream_.reset();
-        std::cout.rdbuf(out_buf);
-        std::cerr.rdbuf(err_buf);
-        std::clog.rdbuf(log_buf);
-        fclose(cf);
-        stdout = c_out_buf;
-        stderr = c_err_buf;
-    }
+    TestLogger& operator=(TestLogger&& logger);
     TestLogger(const std::filesystem::path& log_dir, const char* test_name);
     static TestLogger& instance();
     void set_log_stream(const std::string& test_name);
@@ -43,8 +27,7 @@ class TestLogger{
     void set_log_directory(const std::filesystem::path& directory);
     template<typename T>
     TestLogger& operator<<(T item){
-        assert(stream_);
-        stream_.get()<<item;
+        stream_<<item;
         return *this;
     }
 };
