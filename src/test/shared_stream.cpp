@@ -68,8 +68,7 @@ const char* cpp_to_c_openmode(std::ios_base::openmode om){
     }
 }
 #include <stdexcept>
-SharedStream::SharedStream(FILE*& stream):
-use_count_(1){
+SharedStream::SharedStream(FILE*& stream){
     if(stream){
         c_.insert({stream,__C_F__{*stream,&stream}});
         newbuf();
@@ -88,10 +87,12 @@ SharedStream& SharedStream::operator=(const SharedStream& other){
         buf_=other.buf_;
         release();
         for(auto& [ptr,dt]:other.c_){
-            if(*dt.f_)
-                c_[ptr] = __C_F__{dt.old_f_data_,&dt.ptr,++dt.use_count}; //make reference to structure of streams
+            if(*dt.f_){
+                //not copy (use reference on existing __C_F__ if correct)
+                c_[ptr] = __C_F__{dt.old_f_data_,&dt.ptr,dt.use_count_}; //make reference to structure of streams
                 std::setbuf(ptr,buf_->data());
-            else 
+            }
+            else{}
         }
         for(auto& [ptr,dt]:cpp_)
 

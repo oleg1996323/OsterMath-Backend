@@ -100,16 +100,17 @@ class SharedStream : public std::streambuf {
     struct __C_F__{
         FILE& old_f_data_;
         FILE** f_ = nullptr;
-        int use_count = 1;
+        int use_count_ = 0;
     };
     struct __CPP_F__{
         std::iostream& stream_;
         std::iostream** old_buf_ = nullptr;
-        int use_count = 1;
+        int use_count_ = 0;
     };
     std::unordered_map<FILE*,__C_F__> c_;
     std::unordered_map<std::iostream*,__CPP_F__> cpp_;
     std::shared_ptr<std::vector<char_type>> buf_; // Можно организовать свой буфер
+    SharedStream* ref_ = nullptr;
 protected:
     FILE* f_;
 private:
