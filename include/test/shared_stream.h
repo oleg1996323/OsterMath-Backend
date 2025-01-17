@@ -6,6 +6,7 @@
 #include <string>
 #include <memory>
 #include <unordered_map>
+#include <iostream>
 
 const char* cpp_to_c_openmode(std::ios_base::openmode om);
 
@@ -95,6 +96,37 @@ private:
 
     int  _M_use_count;     // #shared
 };*/
+
+class Cstream{
+    public:
+    Cstream()=default;
+    Cstream(const Cstream&) = delete;
+    Cstream(Cstream&&) = delete;
+    Cstream& operator=(const Cstream&) = delete;
+    Cstream& operator=(Cstream&&) = delete;
+
+    bool open(const char* filename, const char* openmode){
+        descriptor = fopen(filename,openmode);
+        if(f){
+            tag_ = fileno(descriptor);
+            return true;
+        }
+        return false;
+    }
+
+    bool is_open() const{
+        return tag_>0 && (bool)descriptor;
+    }
+    
+    void close(){
+        if(descriptor)
+            fclose(descriptor);
+    }
+
+    private:
+    FILE* descriptor = nullptr;
+    int tag_ = -1;
+};
 
 template<typename T>
 class __STREAM_DATA__
