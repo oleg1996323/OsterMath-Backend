@@ -68,7 +68,7 @@ const char* cpp_to_c_openmode(std::ios_base::openmode om){
     }
 }
 #include <stdexcept>
-SharedStream::SharedStream(FILE*& stream){
+SharedStream::SharedStream(FILE*& stream):ref_(std::make_shared<char_type>()){
     if(stream){
         c_.insert({stream,__C_F__{*stream,&stream}});
         newbuf();
@@ -79,23 +79,13 @@ SharedStream::SharedStream(FILE*& stream){
     }
 }
 SharedStream::SharedStream(const SharedStream& other):
-std::streambuf(other),
-buf_(other.buf_){}
+std::streambuf(other){
+    
+}
 SharedStream& SharedStream::operator=(const SharedStream& other){
     if(&other!=this){
         std::streambuf::operator=(other);
-        buf_=other.buf_;
-        release();
-        for(auto& [ptr,dt]:other.c_){
-            if(*dt.f_){
-                //not copy (use reference on existing __C_F__ if correct)
-                c_[ptr] = __C_F__{dt.old_f_data_,&dt.ptr,dt.use_count_}; //make reference to structure of streams
-                std::setbuf(ptr,buf_->data());
-            }
-            else{}
-        }
-        for(auto& [ptr,dt]:cpp_)
-
+        ref_ = other.ref_?ref_:std::make_shared<__STREAM_DATA__<char_type>>();
     }
     return *this;
 }

@@ -6,13 +6,15 @@
 #include <filesystem>
 #include <cassert>
 #include <vector>
-#include "shared_stream.h"
+//#include "shared_stream.h"
+
+class SharedStream{};
 
 class TestLogger{
     static TestLogger test_logger;
     static std::filesystem::directory_entry log_dir_;
     SharedStream sh_buf_;
-    std::ostream stream_;
+    //std::ostream stream_;
     public:
     TestLogger(std::ostream& stream);
     TestLogger(const TestLogger& logger) = delete;
@@ -27,7 +29,7 @@ class TestLogger{
     void set_log_directory(const std::filesystem::path& directory);
     template<typename T>
     TestLogger& operator<<(T item){
-        stream_<<item;
+        //stream_<<item;
         return *this;
     }
 };

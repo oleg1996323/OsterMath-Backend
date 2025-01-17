@@ -96,38 +96,63 @@ private:
     int  _M_use_count;     // #shared
 };*/
 
-class SharedStream : public std::streambuf {
+template<typename T>
+class __STREAM_DATA__
+{
+    friend class SharedStream;
+    std::vector<T> buf_;
     struct __C_F__{
         FILE& old_f_data_;
-        FILE** f_ = nullptr;
         int use_count_ = 0;
     };
     struct __CPP_F__{
         std::iostream& stream_;
-        std::iostream** old_buf_ = nullptr;
         int use_count_ = 0;
     };
+    __STREAM_DATA__() = default;
+    __STREAM_DATA__(size_t sz):buf_([sz](){std::vector<T> v;v.resize(sz);return v;}()){}
+    __STREAM_DATA__(const __STREAM_DATA__<T>& other){
+        for(auto& [ptr,dt]:other.c_){
+            if(*dt.f_){
+                //not copy (use reference on existing __C_F__ if correct)
+                c_[ptr] = __C_F__{dt.old_f_data_,dt.use_count_}; //make reference to structure of streams
+                std::setbuf(ptr,buf_->data());
+            }
+            else{}
+        }
+        for(auto& [ptr,dt]:cpp_){
+
+        }
+    }
+    
+    void __add_stream__(FILE*& c_stream);
+    void __add_stream__(std::iostream& stream);
+    void __merge_streams_from__(const __STREAM_DATA__& other);
+    void __release__();
+    FILE* __release_stream__(FILE*& c_stream);
+    std::iostream* __release_stream__(std::iostream& stream);
     std::unordered_map<FILE*,__C_F__> c_;
     std::unordered_map<std::iostream*,__CPP_F__> cpp_;
-    std::shared_ptr<std::vector<char_type>> buf_; // Можно организовать свой буфер
-    SharedStream* ref_ = nullptr;
+    
+};  
+
+class SharedStream : public std::streambuf {
+    std::shared_ptr<__STREAM_DATA__<char_type>> ref_;
 protected:
     FILE* f_;
 private:
     std::streampos pos_base;
 public:
-    explicit SharedStream(FILE*& stream);
     SharedStream(const SharedStream& other);
     SharedStream& operator=(const SharedStream& other);
     SharedStream() = default;
     SharedStream(SharedStream&& other);
     SharedStream& operator=(SharedStream&& other);
-    explicit SharedStream(const std::string& filename, std::ios_base::openmode om = std::ios_base::out | std::ios_base::in);
-    explicit SharedStream(const char* filename, std::ios_base::openmode om = std::ios_base::out | std::ios_base::in);
     ~SharedStream();
     bool is_opened() const;
     void add_stream(FILE*& c_stream);
     void add_stream(std::iostream& stream);
+
     void release();
     FILE* release_stream(FILE*& c_stream);
     std::iostream* release_stream(std::iostream& stream);
@@ -142,11 +167,6 @@ protected:
     virtual pos_type seekpos(pos_type pos,
         std::ios_base::openmode which) override;
     virtual int pbackfail(int c) override;
-    SharedStream* newbuf(std::streamsize sz = BUFSIZ);
-    SharedStream* setbuf(const SharedStream& sh_b);
-    bool has_buf() const{
-        return buf_.get();
-    }
 private:
     std::streampos __read_init__(std::streampos newpos, int dir = SEEK_SET);
 };
