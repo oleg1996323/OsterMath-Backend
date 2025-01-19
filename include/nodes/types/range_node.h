@@ -22,9 +22,10 @@ class RangeOperationNode:public AbstractNode{
     public:
     RangeOperationNode(RANGE_OP op):operation_(op){}
 
-    RangeOperationNode(RANGE_OP op, std::unique_ptr<AbstractNode>&& expr):
+    template<typename T,typename... ARGS>
+    RangeOperationNode(RANGE_OP op, ARGS&&... expr):
     operation_(op){
-        set_expression(std::move(expr));
+        set_expression<T>(std::forward<ARGS>(expr)...);
     }
 
     RangeOperationNode(RANGE_OP op, AbstractNode* expr):
@@ -34,10 +35,7 @@ class RangeOperationNode:public AbstractNode{
 
     RangeOperationNode(const RangeOperationNode& other);
     RangeOperationNode(RangeOperationNode&&) = delete;
-    ~RangeOperationNode(){
-        std::cout<<"RangeOperationNode deleted: "<<this<<std::endl;
-        rel_mng_->delete_node(this);
-    }
+    ~RangeOperationNode();
 
     virtual NODE_TYPE type() const override;
 
@@ -52,11 +50,9 @@ class RangeOperationNode:public AbstractNode{
     virtual bool is_string() const override;
     virtual bool is_array() const override;
     virtual bool is_empty() const override;
-    inline AbstractNode* set_expression(std::unique_ptr<AbstractNode>&& expr){
-        return insert_back(std::move(expr));
-    }
-    inline AbstractNode* set_expression(VariableNode* expr_var){
-        return insert_back_ref(expr_var);
+    template<typename T,typename... ARGS>
+    inline T* set_expression(ARGS&&... args){
+        return insert_back<T>(std::forward<ARGS>(args)...);
     }
     inline AbstractNode* set_expression(AbstractNode* expr){
         return insert_back_ref(expr);

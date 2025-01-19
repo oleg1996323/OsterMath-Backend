@@ -9,7 +9,6 @@ class VariableNode:public AbstractNode{
     VariableBase* var_;
     public:
     using AbstractNode::operator=;
-    using AbstractNode::insert_back;
     VariableNode(VariableBase* variable);
     VariableNode(const VariableNode& other) = delete;
     VariableNode(VariableNode&&) = delete;

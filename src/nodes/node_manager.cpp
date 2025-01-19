@@ -22,14 +22,16 @@ AbstractNode* NodeManager::child(const AbstractNode* node,size_t id){
 AbstractNode* NodeManager::child(AbstractNode* node,size_t id){
     return node->relation_manager()->childs_.at(node).at(id);
 }
+#include "var_node.h"
 //get the node which is not intermediate (ValueNode, StringNode, RangeNode, FunctionNode, VariableNode, ArrayNode)
 INFO_NODE NodeManager::child(AbstractNode* node,const std::vector<int>::const_iterator& first,const std::vector<int>::const_iterator& last) noexcept{
-    if(node->type()==NODE_TYPE::VARIABLE || node->type()==NODE_TYPE::ARRAY){ //only valuable node
+    if(node->type()==NODE_TYPE::VARIABLE || node->type()==NODE_TYPE::ARRAY || node->type()==NODE_TYPE::REF){ //only valuable node
         INFO_NODE info{node,*first};
-        std::vector<int>::const_iterator iter;
-        for(iter=first;iter<last;++iter){
-            if(info.parent->type()==NODE_TYPE::VARIABLE){
-                while (info.parent->type()==NODE_TYPE::VARIABLE)
+        for(std::vector<int>::const_iterator iter=first;iter<last;++iter){
+            if(info.parent->type()==NODE_TYPE::VARIABLE || info.parent->type()==NODE_TYPE::REF){
+                while (info.parent->type()==NODE_TYPE::VARIABLE || info.parent->type()==NODE_TYPE::REF){
+                    if(info.parent->type()==NODE_TYPE::REF)
+                        assert(info.parent->has_child(0));
                     if(info.parent->has_child(0)){
                         info.parent = info.parent->child(0);
                         info.id = *iter;
@@ -39,6 +41,7 @@ INFO_NODE NodeManager::child(AbstractNode* node,const std::vector<int>::const_it
                     }
                     else
                         return INFO_NODE();
+                }
             }
             else{
                 if(info.has_node()){
@@ -51,6 +54,14 @@ INFO_NODE NodeManager::child(AbstractNode* node,const std::vector<int>::const_it
             }
             assert(info.has_node());
         }
+        //ignoring the variables sequence. TODO: check cyclic references
+        while(info.has_node() && 
+        info.node()->type()==NODE_TYPE::REF && 
+        static_cast<ReferenceNode*>(info.node())->child(0)->type()==NODE_TYPE::VARIABLE){
+            info.parent = static_cast<VariableNode*>(static_cast<ReferenceNode*>(info.node())->child(0));
+            info.id = 0;
+        }
+
         if(kernel::settings::Model::show_through_var_nodes()){
             while (info.node()->type()==NODE_TYPE::VARIABLE)
                 if(info.node()->has_child(0)){
@@ -70,7 +81,6 @@ const std::unique_ptr<AbstractNode>& NodeManager::get_node(NodeManager* rel_mng,
         return *rel_mng->nodes_.find(node_ptr);
     }
 }
-
 AbstractNode* NodeManager::insert_back_ref(ReferenceNode* node,AbstractNode* new_child){
     if(node && new_child){
         assert(node->type()==NODE_TYPE::REF);
@@ -83,6 +93,17 @@ AbstractNode* NodeManager::insert_back_ref(ReferenceNode* node,AbstractNode* new
     }
     else
         return nullptr;
+}
+#include "empty_node.h"
+AbstractNode* NodeManager::insert_back_move(AbstractNode* at_insert_back, AbstractNode* inserted){
+    AbstractNode* tmp = at_insert_back->insert_back<EmptyNode>();
+    move_node(tmp,inserted);
+    return inserted;
+}
+AbstractNode* NodeManager::insert_back_copy(AbstractNode* at_insert_back, AbstractNode* inserted){
+    AbstractNode* tmp = at_insert_back->insert_back<EmptyNode>();
+    copy_node(tmp,inserted);
+    return inserted;
 }
 AbstractNode* NodeManager::insert_back(AbstractNode* node,std::unique_ptr<AbstractNode>&& new_child){
     if(node){
@@ -98,8 +119,10 @@ AbstractNode* NodeManager::insert_back(AbstractNode* node,std::unique_ptr<Abstra
             case NODE_TYPE::RANGEOP:{
                 if(node->has_childs()){
                     if(node->child(0)!=new_child.get()){
-                        if(new_child->type()!=NODE_TYPE::REF || new_child->child(0)!=node->child(0))
-                            node->child(0)->relation_manager()->nodes_.erase(node->child(0)->relation_manager()->nodes_.find(node->child(0)));
+                        if(new_child->type()!=NODE_TYPE::REF || new_child->child(0)!=node->child(0)){
+                            assert(node->relation_manager()->nodes_.erase(get_node(node->relation_manager(),node->child(0)))
+                            ==1); //only 1 child is deleted (refer to end())
+                        }
                         else return node->child(0);
                     }
                     else break;
@@ -332,14 +355,22 @@ const References_t& NodeManager::references(const AbstractNode* node) noexcept{
     else return NodeManager::empty_references_;
 }
 void NodeManager::erase_child(const AbstractNode* node, size_t id) noexcept{
-    if(node->has_child(id)) //TODO: check if it is reference or owned node (then must be deleted)
-        node->relation_manager()->childs_.at(node).erase(node->relation_manager()->childs_.at(node).cbegin()+id);
+    if(node->has_child(id)){ //TODO: check if it is reference or owned node (then must be deleted)
+        if(node->type()!=NODE_TYPE::REF)
+            assert(node->relation_manager()->nodes_.erase(
+                node->relation_manager()->get_node(node->relation_manager(),node->child(id)))==1);
+        else{
+            node->owner().parent->replace<EmptyNode>(node->owner().id);
+            static_cast<const ReferenceNode*>(node)->child(0)->relation_manager()->references_.at(node->child(0)).erase((ReferenceNode*)node);
+            node->relation_manager()->childs_.erase(node);
+        }
+    }
 }
 #include <cassert>
 void NodeManager::delete_node(const AbstractNode* node){
     //++node->relation_manager()->destructed;
-    for(auto& ref:node->relation_manager()->references_[node])
-        erase_child(ref,0);
+    for(auto ref:node->relation_manager()->references_[node])
+        erase_child(ref,0); //the refs may be already deleted (should be deleted in references_ of childs in release_childs())
     node->relation_manager()->references_.erase(node);
     release_childs(node);
     node->relation_manager()->owner_.erase(node);
@@ -356,7 +387,17 @@ bool NodeManager::is_directly_owned_by(const AbstractNode* owner, const Abstract
         else return is_directly_owned_by(owner,node->owner().parent);
     else return false;
 }
-
+bool NodeManager::is_refered_by(const AbstractNode* ref_owner, const AbstractNode* refered) noexcept{
+    assert(ref_owner);
+    assert(refered);
+    if(!refered->relation_manager()->references_.contains(refered))
+        return false;
+    for(auto ref:refered->relation_manager()->references_.at(refered))
+        if(ref->owner().parent==ref_owner)
+            return true;
+        else continue;
+    return false;
+}
 void NodeManager::move_node(AbstractNode* at_move, AbstractNode* to_move){
     assert(to_move->type()!=NODE_TYPE::VARIABLE && at_move->type()!=NODE_TYPE::VARIABLE);
     if(at_move && to_move && at_move!=to_move){
@@ -555,7 +596,7 @@ void NodeManager::copy_node(AbstractNode* to_replace_by_copy, const AbstractNode
     }
     release_childs(to_replace_by_copy);
     for(size_t id=0;id<tmp_nodes.size();++id)
-        to_replace_by_copy->insert_back(std::move(tmp_nodes.at(id)));
+        insert_back(to_replace_by_copy,std::move(tmp_nodes.at(id)));
 }
 void NodeManager::__erase_reference__(AbstractNode* from_node, ReferenceNode* ref) noexcept{
     from_node->relation_manager()->references_.at(from_node).erase(

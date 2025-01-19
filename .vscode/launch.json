@@ -5,7 +5,7 @@
             "name": "Debug",
             "type": "cppdbg",
             "request": "launch",
-            "args": ["--gtest_output=\"xml:./test_logs/out.xml\""],
+            "args": ["--file_output"],
             "program": "${workspaceRoot}/bin/nodes_test",
             "cwd": "${workspaceRoot}",
             "logging": {"engineLogging":"warning",

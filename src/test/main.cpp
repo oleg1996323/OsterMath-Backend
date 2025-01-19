@@ -54,6 +54,11 @@ int main(int argc, char **argv){
     return RUN_ALL_TESTS();
 }
 
+// This sample shows how to use Google Test listener API to implement
+// an alternative console output and how to use the UnitTest reflection API
+// to enumerate test cases and tests and to inspect their results.
+
+
 #else 
 
 int main(){

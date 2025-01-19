@@ -4,6 +4,7 @@
 
 ValueNode::~ValueNode(){
     std::cout<<"ValueNode deleted: "<<this<<std::endl;
+    std::cout<<"Internal ReadBuf: "<<std::cout.rdbuf()<<std::endl;
     rel_mng_->delete_node(this);
 }
 NODE_TYPE ValueNode::type() const{

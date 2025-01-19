@@ -32,24 +32,22 @@ TEST(Node_test,TestCopyConstruct){
         std::shared_ptr<VariableBase> var_tmp = bd->add_variable("tmp");
         std::shared_ptr<VariableBase> var_A = bd->add_variable("A");
         std::shared_ptr<VariableBase> var_B = bd->add_variable("B");
-        std::unique_ptr<ArrayNode> node_1 = bd->make_node<ArrayNode>(10);
-        AbstractNode* tmp_node_1_ptr;
+        ArrayNode* tmp_node_1_ptr = nullptr;
         std::vector<Value_t> values_1;
         std::vector<Value_t> values_2;
-        ArrayNode* node_1_ptr = static_cast<ArrayNode*>(var_A->node()->insert_back(std::move(node_1)));
-        decltype(node_1_ptr) node_2_ptr;
+        ArrayNode* node_1_ptr = var_A->node()->insert_back<ArrayNode>(10);
+        ArrayNode* node_2_ptr;
         {
-            std::unique_ptr<ArrayNode> node_2 = bd->make_node<ArrayNode>(10);
-            node_2_ptr = static_cast<ArrayNode*>(var_B->node()->insert_back(std::move(node_2)));
+            node_2_ptr = var_B->node()->insert_back<ArrayNode>(10);
             for(int i=0;i<10;++i){
                 if(i<9){
                     values_1.emplace_back(i+10);
-                    static_cast<ValueNode*>(node_1_ptr->insert_back(bd->make_node<ValueNode>(values_1.back())));
+                    node_1_ptr->insert_back<ValueNode>(values_1.back());
                 }
                 values_2.emplace_back(i);
-                node_2_ptr->insert_back(bd->make_node<ValueNode>(values_2.back()));
+                node_2_ptr->insert_back<ValueNode>(values_2.back());
             }
-            tmp_node_1_ptr = var_tmp->node()->insert_back(var_tmp->node()->relation_manager()->make_node<ArrayNode>(*node_1_ptr));
+            tmp_node_1_ptr = var_tmp->node()->insert_back<ArrayNode>(*node_1_ptr);
             node_1_ptr->copy_paste(node_2_ptr);
         }
 
@@ -57,24 +55,26 @@ TEST(Node_test,TestCopyConstruct){
         for(size_t i=0;i<values_2.size();++i){
             EXPECT_TRUE(node_1_ptr->has_child(i));
             if(node_1_ptr->has_child(i)){
-                EXPECT_TRUE(node_1_ptr->child(i)->get_result()==boost::multiprecision::to_string(values_2.at(i)));
+                EXPECT_EQ(node_1_ptr->child(i)->cached_result(),values_2.at(i));
                 if(i<9){
-                    EXPECT_TRUE(node_1_ptr->child(i)->get_result()!=boost::multiprecision::to_string(values_1.at(i)));
+                    EXPECT_NE(node_1_ptr->child(i)->cached_result(),values_1.at(i));
                 }
-                std::cout<<node_1_ptr->child(i)->get_result()<<std::endl;
+                std::cout<<node_1_ptr->child(i)->cached_result()<<std::endl;
             }
         }
         EXPECT_EQ(node_1_ptr->references().size(),0);
         EXPECT_EQ(node_1_ptr->childs().size(),values_2.size());
-        EXPECT_EQ(tmp_node_1_ptr->references().size(),1);
+        EXPECT_EQ(tmp_node_1_ptr->references().size(),0);
+        EXPECT_TRUE(tmp_node_1_ptr->has_owner());
         //EXPECT_EQ(tmp_node_1->references().begin()->first,bd->get("A")->node().get());
-        EXPECT_EQ(bd->get("A")->node()->child(0),tmp_node_1_ptr);
+        EXPECT_EQ(var_A->node()->child(0),node_1_ptr);
+        EXPECT_EQ(var_tmp->node()->child(0),tmp_node_1_ptr);
     }
 }
 TEST(Node_test,TestGetTypeVal){
     //virtual TYPE_VAL type_val() const;
     EmptyNode node;
-    EXPECT_TRUE(node.type_val()==TYPE_VAL::UNKNOWN);
+    EXPECT_EQ(node.type_val(),TYPE_VAL::UNKNOWN);
 }
 #include "unary_node.h"
 #include "core/settings.h"
@@ -88,37 +88,37 @@ TEST(NodeTest,TestChildInfoByIndexesConst){
     auto D = bd->add_variable("D");
     auto E = bd->add_variable("E");
     auto F = bd->add_variable("F");
-    std::unique_ptr<ArrayNode> array_1 = bd->make_node<ArrayNode>(3);
-    std::unique_ptr<ValueNode> value_1 = bd->make_node<ValueNode>(1);
-    std::unique_ptr<ValueNode> value_2 = bd->make_node<ValueNode>(2);
-    std::unique_ptr<ValueNode> value_3 = bd->make_node<ValueNode>(3);
-    bd->get("D")->node()->insert_back_ref(bd->get("C")->node());
-    bd->get("C")->node()->insert_back_ref(bd->get("A")->node());
-    auto value_3_ptr = bd->get("A")->node()->insert_back(std::move(value_3));
+    ArrayNode* array_1 = B->node()->insert_back<ArrayNode>(3);
+
+    D->node()->insert_back_ref(C->node());
+    C->node()->insert_back_ref(A->node());
+
+    ValueNode* value_3 = A->node()->insert_back<ValueNode>(3);
+
     array_1->insert_back_ref(D->node());
-    std::unique_ptr<BinaryNode> add = bd->make_node<BinaryNode>(BINARY_OP::ADD);
-    add->insert_back(std::move(value_1));
-    auto value_2_ptr = add->insert_back(std::move(value_2));
+    BinaryNode* add = E->node()->insert_back<BinaryNode>(BINARY_OP::ADD);
+    UnaryNode* un_minus = F->node()->insert_back<UnaryNode>(UNARY_OP::SUB);
+    add->insert_back<ValueNode>(1);
+    ValueNode* value_2 = add->insert_back<ValueNode>(2);
     array_1->insert_back_ref(E->node());
-    auto add_ptr = E->node()->insert_back(std::move(add));
-    std::unique_ptr<UnaryNode> un_minus = bd->make_node<UnaryNode>(UNARY_OP::SUB);
-    un_minus->insert_back_ref(value_2_ptr);
+
+    un_minus->insert_back_ref(value_2);
     array_1->insert_back_ref(F->node());
-    auto un_minus_ptr = F->node()->insert_back(std::move(un_minus));
-    auto array_1_ptr = B->node()->insert_back(std::move(array_1));
+
     std::vector<int> indexes{0};
-    assert(array_1_ptr->childs().size()==3);
+    assert(array_1->childs().size()==3);
     INFO_NODE info = B->node()->child(indexes.begin(),indexes.end());
     EXPECT_TRUE(info.has_node());
     if(!kernel::settings::Model::show_through_var_nodes()){
         EXPECT_EQ(B->node()->child(0)->child(0),info.node());
         EXPECT_EQ(A->node(),info.node());
-        EXPECT_TRUE(info.node()->type()==NODE_TYPE::VARIABLE);
+        EXPECT_EQ(info.node()->type(),NODE_TYPE::VARIABLE); //A
     }
     else{
-        EXPECT_EQ(B->node()->child(0)->child(0)->child(0)->child(0)->child(0),info.node());
-        EXPECT_EQ(value_3_ptr,info.node());
-        EXPECT_TRUE(info.node()->type()!=NODE_TYPE::VARIABLE);
+        EXPECT_EQ(B->node()->child(0)->child(0)->child(0)->child(0)->child(0)->child(0)->child(0)->child(0),info.node());
+        EXPECT_EQ(B->node()->child(0)->child(0)->child(0)->child(0)->child(0)->child(0)->child(0),A->node());
+        EXPECT_EQ(value_3,info.node());
+        EXPECT_EQ(info.node()->type(),NODE_TYPE::VALUE); //value_3
     }
 
     indexes = {0,1};
@@ -128,57 +128,56 @@ TEST(NodeTest,TestChildInfoByIndexesConst){
     indexes = {1};
     info = B->node()->child(indexes.begin(),indexes.end());
     EXPECT_TRUE(info.has_node());
-    EXPECT_EQ(B->node()->child(0)->child(1)->child(0),add_ptr);
-    EXPECT_EQ(B->node()->child(0)->child(1)->child(0),info.node());
+    EXPECT_EQ(B->node()->child(0)->child(1)->child(0)->child(0),add);
+    EXPECT_EQ(add,info.node());
     EXPECT_TRUE(info.node()->type()==NODE_TYPE::BINARY);
 
     indexes = {2};
     info = B->node()->child(indexes.begin(),indexes.end());
     EXPECT_TRUE(info.has_node());
-    EXPECT_EQ(B->node()->child(0)->child(2)->child(0),un_minus_ptr);
-    EXPECT_EQ(B->node()->child(0)->child(2)->child(0),info.node());
-    EXPECT_TRUE(info.node()->type()==NODE_TYPE::UNARY);
+    EXPECT_EQ(B->node()->child(0)->child(2)->child(0)->child(0),un_minus);
+    EXPECT_EQ(un_minus,info.node());
+    EXPECT_EQ(info.node()->type(),NODE_TYPE::UNARY);
 }   
 TEST(NodeTest,TestReleaseChilds){
     //void release_childs();
     std::shared_ptr<BaseData> bd = std::make_shared<BaseData>("bd");
+    auto root_ = bd->add_variable("root");
     std::shared_ptr<VariableBase> var_A = bd->add_variable("A");
     std::shared_ptr<VariableBase> var_B = bd->add_variable("B");
     std::shared_ptr<VariableBase> var_C = bd->add_variable("C");
     std::shared_ptr<VariableBase> var_D = bd->add_variable("D");
     std::shared_ptr<VariableBase> var_E = bd->add_variable("E");
     std::shared_ptr<VariableBase> var_F = bd->add_variable("F");
-    std::unique_ptr<ValueNode> value_1 = bd->make_node<ValueNode>(1);
-    std::unique_ptr<ValueNode> value_2 = bd->make_node<ValueNode>(2);
-    std::unique_ptr<ValueNode> value_3 = bd->make_node<ValueNode>(3);
-    std::unique_ptr<ArrayNode> array = bd->make_node<ArrayNode>(7);
+
+    ArrayNode* array = root_->node()->insert_back<ArrayNode>(7);
     array->insert_back_ref(var_A->node());
     array->insert_back_ref(var_B->node());
     array->insert_back_ref(var_C->node());
     array->insert_back_ref(var_D->node());
     array->insert_back_ref(var_E->node());
     var_E->node()->insert_back_ref(var_F->node());
-    ValueNode* value_1_ptr = static_cast<ValueNode*>(var_F->node()->insert_back(std::move(value_1)));
-    ValueNode* value_2_ptr = static_cast<ValueNode*>(array->insert_back(std::move(value_2)));
-    ValueNode* value_3_ptr = static_cast<ValueNode*>(array->insert_back(std::move(value_3)));
-    EXPECT_TRUE(var_A->node()->owner()==array.get());
-    EXPECT_TRUE(var_B->node()->owner()==array.get());
-    EXPECT_TRUE(var_C->node()->owner()==array.get());
-    EXPECT_TRUE(var_D->node()->owner()==array.get());
-    EXPECT_TRUE(var_E->node()->owner()==array.get());
-    EXPECT_TRUE(var_F->node()->owner()==var_E->node());
-    EXPECT_TRUE(value_1_ptr->owner() == var_F->node());
-    EXPECT_TRUE(value_2_ptr->owner() == array.get());
-    EXPECT_TRUE(value_3_ptr->owner() == array.get());
+    ValueNode* value_1 = var_F->node()->insert_back<ValueNode>(1);
+    ValueNode* value_2 = array->insert_back<ValueNode>(2);
+    ValueNode* value_3 = array->insert_back<ValueNode>(3);
+    EXPECT_TRUE(var_A->node()->is_refered_by(array));
+    EXPECT_TRUE(var_B->node()->is_refered_by(array));
+    EXPECT_TRUE(var_C->node()->is_refered_by(array));
+    EXPECT_TRUE(var_D->node()->is_refered_by(array));
+    EXPECT_TRUE(var_E->node()->is_refered_by(array));
+    EXPECT_TRUE(var_F->node()->is_refered_by(var_E->node()));
+    EXPECT_TRUE(value_1->owner() == var_F->node());
+    EXPECT_TRUE(value_2->owner() == array);
+    EXPECT_TRUE(value_3->owner() == array);
     EXPECT_EQ(array->size(),7);
-    array->relation_manager()->release_childs(array.get());
+    array->relation_manager()->release_childs(array);
     EXPECT_EQ(array->size(),0);
-    EXPECT_FALSE(var_A->node()->owner() == array.get());
-    EXPECT_FALSE(var_B->node()->owner() == array.get());
-    EXPECT_FALSE(var_C->node()->owner() == array.get());
-    EXPECT_FALSE(var_D->node()->owner() == array.get());
-    EXPECT_FALSE(var_E->node()->owner() == array.get());
-    EXPECT_TRUE(var_F->node()->owner() == var_E->node());
+    EXPECT_FALSE(var_A->node()->is_refered_by(array));
+    EXPECT_FALSE(var_B->node()->is_refered_by(array));
+    EXPECT_FALSE(var_C->node()->is_refered_by(array));
+    EXPECT_FALSE(var_D->node()->is_refered_by(array));
+    EXPECT_FALSE(var_E->node()->is_refered_by(array));
+    EXPECT_TRUE(var_F->node()->is_refered_by(var_E->node()));
     EXPECT_FALSE(array->has_childs());
 }
 // TEST(NodeTest,TestNodeType){

@@ -5,6 +5,16 @@
 #include "string_node.h"
 #include "node_manager.h"
 
+AbstractNode* AbstractNodeNMProxy::__insert_back_internal__(AbstractNode* node, std::unique_ptr<AbstractNode>&& val){
+    return node->relation_manager()->insert_back(node,std::move(val));
+}
+
+AbstractNode* AbstractNodeNMProxy::__insert_internal__(AbstractNode* node, size_t id,std::unique_ptr<AbstractNode>&& new_child){
+    return node->relation_manager()->insert(node,id,std::move(new_child));
+}
+AbstractNode* AbstractNodeNMProxy::__replace_internal__(AbstractNode* node, size_t id,std::unique_ptr<AbstractNode>&& new_child){
+    return node->relation_manager()->replace(node,id,std::move(new_child));
+}
 AbstractNode::AbstractNode():
 rel_mng_(BaseData::get_anonymous_relation_manager()){}
 
@@ -173,13 +183,13 @@ bool AbstractNode::is_reference_of(AbstractNode* node) const{
     return rel_mng_->is_reference_of(this,node);
 }
 AbstractNode* AbstractNode::insert_back(std::unique_ptr<AbstractNode>&& node){
-    return rel_mng_->insert_back(this, std::move(node));
+    return AbstractNodeNMProxy::__insert_back_internal__(this,std::move(node));
 }
 AbstractNode* AbstractNode::insert(size_t id,std::unique_ptr<AbstractNode>&& node){
-    return rel_mng_->insert(this, id, std::move(node));
+    return AbstractNodeNMProxy::__insert_internal__(this,id,std::move(node));
 }
 AbstractNode* AbstractNode::replace(size_t id,std::unique_ptr<AbstractNode>&& node){
-    return rel_mng_->replace(this,id,std::move(node));
+    return AbstractNodeNMProxy::__replace_internal__(this,id,std::move(node));
 }
 AbstractNode* AbstractNode::insert_back_ref(AbstractNode* ref_child){
     return insert_back(rel_mng_->make_node<ReferenceNode>(ref_child));
@@ -210,6 +220,9 @@ AbstractNode* AbstractNode::__insert_back_value_node__(const Value_t& val){
 }
 AbstractNode* AbstractNode::__insert_back_value_node__(Value_t&& val){
     return insert_back(std::move(rel_mng_->make_node<ValueNode>(std::move(val))));
+}
+bool AbstractNode::is_refered_by(const AbstractNode* ref_owner) noexcept{
+    return NodeManager::is_refered_by(ref_owner,this);
 }
 
 #include "func_node.h"
@@ -259,9 +272,4 @@ void AbstractNode::erase_child(size_t id) const{
     if(childs().size()>id)
         rel_mng_->erase_child(this,id);
     else throw std::invalid_argument("Invalid id for child delete");
-}
-
-void AbstractNode::__rel_tmp_forward_insert_back__(std::unique_ptr<AbstractNode>&& node){
-    //assert(!std::is_abstract_v<std::decay_t<decltype(*this)>>);
-    rel_mng_->insert_back(this,std::move(node));
 }

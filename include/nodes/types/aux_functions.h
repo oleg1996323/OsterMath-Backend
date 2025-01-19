@@ -46,9 +46,9 @@ namespace functions{
         bool has_cyclic_references(const AbstractNode* checked) noexcept;
         bool has_cyclic_references(const AbstractNode* node) noexcept;
         const AbstractNode* first_node_not_var(const AbstractNode* node) noexcept;
-        const AbstractNode* first_node_not_var(const AbstractNode* node) noexcept;
-        const AbstractNode* first_node_not_var_by_ids(const AbstractNode* node, const std::vector<size_t>::const_iterator& first,const std::vector<size_t>::const_iterator& last) noexcept;
-        const AbstractNode* first_node_not_var_by_ids(const AbstractNode* node, const SizeDepthMeasure& seq_iterators) noexcept;
+        AbstractNode* first_node_not_var(AbstractNode* node) noexcept;
+        AbstractNode* first_node_not_var_by_ids(AbstractNode* node, const std::vector<size_t>::const_iterator& first,const std::vector<size_t>::const_iterator& last) noexcept;
+        AbstractNode* first_node_not_var_by_ids(AbstractNode* node, const SizeDepthMeasure& seq_iterators) noexcept;
         const AbstractNode* first_node_not_var_by_ids(const AbstractNode* node, const std::vector<size_t>::const_iterator& first,const std::vector<size_t>::const_iterator& last) noexcept;
         const AbstractNode* first_node_not_var_by_ids(const AbstractNode* node, const SizeDepthMeasure& seq_iterators) noexcept;
 

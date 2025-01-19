@@ -24,17 +24,15 @@ public:
         auto var_1_base = bd->add_variable("Var_1_case_1");
         auto var_2_base = bd->add_variable("Var_2_case_1");
         auto var_3_base = bd->add_variable("Var_3_case_1");
-        std::unique_ptr<ArrayNode> arr_1 = bd->make_node<ArrayNode>(5);
-        std::unique_ptr<ArrayNode> arr_2 = bd->make_node<ArrayNode>(5);
         VariableNode* var_1 = var_1_base->node();
         VariableNode* var_2 = var_2_base->node();
         VariableNode* var_3 = var_3_base->node();
         EXPECT_FALSE(first_node_not_var(var_1));
-        auto arr_1_ptr = var_1->insert_back(std::move(arr_1));
-        arr_1_ptr->insert_back_ref(var_2);
-        auto arr_2_ptr = var_2->insert_back(std::move(arr_2));
-        arr_2_ptr->insert_back_ref(var_3);
-        var_3->insert_back(var_3->relation_manager()->make_node<ValueNode>(1));
+        ArrayNode* arr_1 = var_1->insert_back<ArrayNode>(5);
+        arr_1->insert_back_ref(var_2);
+        ArrayNode* arr_2 = var_2->insert_back<ArrayNode>(5);
+        arr_2->insert_back_ref(var_3);
+        var_3->insert_back<ValueNode>(1);
         node_1_ = var_1_base->node();
     }
 
@@ -60,84 +58,87 @@ public:
         auto var_1 = bd_2->add_variable("var_1_case_2");
         auto var_2 = bd_2->add_variable("var_2_case_2");
         auto var_3 = bd_2->add_variable("var_3_case_2");
-        node_2_ = static_cast<ArrayNode*>(root_1->node()->insert_back(root_1->node()->relation_manager()->make_node<ArrayNode>(5)));
-        node_2_with_vars_ = static_cast<ArrayNode*>(root_2->node()->insert_back(root_2->node()->relation_manager()->make_node<ArrayNode>(5)));
-        std::unique_ptr<ArrayNode> subarr_1 = node_2_->relation_manager()->make_node<ArrayNode>(5);
-        std::unique_ptr<ArrayNode> subarr_2 = node_2_with_vars_->relation_manager()->make_node<ArrayNode>(5);
-        std::unique_ptr<ArrayNode> subarr_10 = subarr_1->relation_manager()->make_node<ArrayNode>(5);
-        std::unique_ptr<ArrayNode> subarr_20 = subarr_2->relation_manager()->make_node<ArrayNode>(5);
-        std::unique_ptr<ArrayNode> subarr_11 = subarr_1->relation_manager()->make_node<ArrayNode>(5);
-        std::unique_ptr<ArrayNode> subarr_21 = subarr_2->relation_manager()->make_node<ArrayNode>(5);
-        std::unique_ptr<ArrayNode> subarr_114 = subarr_11->relation_manager()->make_node<ArrayNode>(5);
-        std::unique_ptr<ArrayNode> subarr_214 = subarr_21->relation_manager()->make_node<ArrayNode>(5);
-        ArrayNode* subarr_1_ptr = subarr_1.get();
-        ArrayNode* subarr_2_ptr = subarr_2.get();
-        ArrayNode* subarr_10_ptr = subarr_10.get();
-        ArrayNode* subarr_20_ptr = subarr_20.get();
-        ArrayNode* subarr_11_ptr = subarr_11.get();
-        ArrayNode* subarr_21_ptr = subarr_21.get();
-        ArrayNode* subarr_114_ptr = subarr_114.get();
-        ArrayNode* subarr_214_ptr = subarr_214.get();
+        arr = root_1->node()->insert_back<ArrayNode>(5);
+        arr_with_vars_ = root_2->node()->insert_back<ArrayNode>(5);
+        ArrayNode* subarr_1 = nullptr;
+        ArrayNode* subarr_2 = nullptr;
+        ArrayNode* subarr_10 = nullptr;
+        ArrayNode* subarr_20 = nullptr;
+        ArrayNode* subarr_11 = nullptr;
+        ArrayNode* subarr_21 = nullptr;
+        ArrayNode* subarr_114 = nullptr;
+        ArrayNode* subarr_214 = nullptr;
+
+        for(int i=0;i<5;++i){
+            if(i!=1 && i!=0){
+                arr->insert_back<ValueNode>(i);
+                arr_with_vars_->insert_back<ValueNode>(i);
+                subarr_1->insert_back<ValueNode>(i);
+                subarr_2->insert_back<ValueNode>(i);
+            }
+            else if(i==1){
+                if(!subarr_1)
+                    subarr_1 = arr->insert_back<ArrayNode>(5);
+                else arr->insert_back_ref(subarr_1);
+                arr_with_vars_->insert_back_ref(var_1->node());
+                if(!subarr_2)
+                    subarr_2 = var_1->node()->insert_back<ArrayNode>(5);
+                else var_1->node()->insert_back_ref(subarr_2);
+            }
+        }
+
+        for(int i=0;i<5;++i){
+            if(i==0){
+                if(!subarr_10)
+                    subarr_10 = subarr_1->insert_back<ArrayNode>(5);
+                else subarr_1->insert_back_ref(subarr_10);
+                if(!subarr_20)
+                    subarr_20 = subarr_2->insert_back<ArrayNode>(5);
+                else subarr_2->insert_back_ref(subarr_20);
+            }
+            if(i==1){
+                if(!subarr_11)
+                    subarr_11 = subarr_1->insert_back<ArrayNode>(5);
+                else subarr_1->insert_back_ref(subarr_11);
+                subarr_2->insert_back_ref(var_2->node());
+                if(!subarr_21)
+                    subarr_21 = var_2->node()->insert_back<ArrayNode>(5);
+                else var_2->node()->insert_back_ref(subarr_21);
+            }
+        }
 
         for(int i=0;i<5;++i){
             if(i!=4){
-                subarr_11_ptr->insert_back(subarr_11_ptr->relation_manager()->make_node<ValueNode>(i));
-                subarr_21_ptr->insert_back(subarr_21_ptr->relation_manager()->make_node<ValueNode>(i));
+                subarr_11->insert_back<ValueNode>(i);
+                subarr_21->insert_back<ValueNode>(i);
             }
             else{
-                if(subarr_114)
-                    subarr_11_ptr->insert_back(std::move(subarr_114));
+                if(!subarr_114)
+                    subarr_114 = subarr_11->insert_back<ArrayNode>(5);
                 else
-                    subarr_11_ptr->insert_back_ref(std::move(subarr_114_ptr));
-                subarr_21_ptr->insert_back_ref(var_3->node());
-                if(subarr_214)
-                    var_3->node()->insert_back(std::move(subarr_214));
-                else var_3->node()->insert_back_ref(subarr_214_ptr);
+                    subarr_11->insert_back_ref(subarr_114);
+                subarr_21->insert_back_ref(var_3->node());
+                if(!subarr_214)
+                    subarr_214 = var_3->node()->insert_back<ArrayNode>(5);
+                else var_3->node()->insert_back_ref(subarr_214);
             }
-            if(i!=1 && i!=0){
-                node_2_->insert_back(node_2_->relation_manager()->make_node<ValueNode>(i));
-                node_2_with_vars_->insert_back(node_2_with_vars_->relation_manager()->make_node<ValueNode>(i));
-                subarr_1_ptr->insert_back(subarr_1_ptr->relation_manager()->make_node<ValueNode>(i));
-                subarr_2_ptr->insert_back(subarr_2_ptr->relation_manager()->make_node<ValueNode>(i));
-            }
-            else if(i==1){
-                if(subarr_1)
-                    node_2_->insert_back(std::move(subarr_1));
-                else node_2_->insert_back_ref(subarr_1_ptr);
-                node_2_with_vars_->insert_back_ref(var_1->node());
-                if(subarr_2)
-                    var_1->node()->insert_back(std::move(subarr_2));
-                else var_1->node()->insert_back_ref(subarr_2_ptr);
-                if(subarr_11)
-                    subarr_1_ptr->insert_back(std::move(subarr_11));
-                else subarr_1_ptr->insert_back_ref(subarr_11_ptr);
-                subarr_2_ptr->insert_back_ref(var_2->node());
-                if(subarr_21)
-                    var_2->node()->insert_back(std::move(subarr_21));
-                else var_2->node()->insert_back_ref(subarr_21_ptr);
-            }
-            else{
-                if(subarr_10)
-                    subarr_1_ptr->insert_back(std::move(subarr_10));
-                else subarr_1_ptr->insert_back_ref(subarr_10_ptr);
-                if(subarr_20)
-                    subarr_2_ptr->insert_back(std::move(subarr_20));
-                else subarr_2_ptr->insert_back_ref(subarr_20_ptr);
-            }
-            subarr_114_ptr->insert_back(subarr_114_ptr->relation_manager()->make_node<ValueNode>(i));
-            AbstractNode* bin_node = subarr_214_ptr->insert_back(subarr_214_ptr->relation_manager()->make_node<BinaryNode>(BINARY_OP::ADD));
-            bin_node->insert_back(bin_node->relation_manager()->make_node<ValueNode>(i));
-            bin_node->insert_back(bin_node->relation_manager()->make_node<ValueNode>(i));
+        }
+
+        for(int i=0;i<5;++i){            
+            subarr_114->insert_back<ValueNode>(i);
+            BinaryNode* bin_node = subarr_214->insert_back<BinaryNode>(BINARY_OP::ADD);
+            bin_node->insert_back<ValueNode>(i);
+            bin_node->insert_back<ValueNode>(i);
 
         }
     }
 
     AbstractNode* node_2(){
-        return node_2_;
+        return arr;
     }
 
     AbstractNode* node_2_with_vars(){
-        return node_2_with_vars_;
+        return arr_with_vars_;
     }
 
     ~Initial_Complex_Node_2(){
@@ -145,8 +146,8 @@ public:
     }
 
 private:
-    ArrayNode* node_2_;
-    ArrayNode* node_2_with_vars_;
+    ArrayNode* arr;
+    ArrayNode* arr_with_vars_;
     std::shared_ptr<BaseData> bd_1;
     std::shared_ptr<BaseData> bd_2;
 };
@@ -160,41 +161,36 @@ public:
         auto var_rect_node = bd->add_variable("rect");
         auto var_not_rect_node = bd->add_variable("not rect");
         auto var_1 = bd->add_variable("var_1_case_3");
-        rect_node = var_rect_node->node()->insert_back(bd->make_node<ArrayNode>(5));
-        not_rect_node = var_not_rect_node->node()->insert_back(bd->make_node<ArrayNode>(5));
-        std::unique_ptr<ArrayNode> rect_node_1 = var_1->node()->relation_manager()->make_node<ArrayNode>(5);
-        std::unique_ptr<ArrayNode> not_rect_node_1 = not_rect_node->relation_manager()->make_node<ArrayNode>(5);
-        std::unique_ptr<ArrayNode> rect_node_10 = rect_node_1->relation_manager()->make_node<ArrayNode>(5);
-        std::unique_ptr<ArrayNode> not_rect_node_10 = bd->make_node<ArrayNode>(5);
-        ArrayNode* rect_node_1_ptr = rect_node_1.get();
-        ArrayNode* not_rect_node_1_ptr = not_rect_node_1.get();
-        ArrayNode* rect_node_10_ptr = rect_node_10.get();
-        ArrayNode* not_rect_node_10_ptr = not_rect_node_10.get();
+        rect_node = var_rect_node->node()->insert_back<ArrayNode>(5);
+        not_rect_node = var_not_rect_node->node()->insert_back<ArrayNode>(5);
+        ArrayNode* rect_node_1 = nullptr;
+        ArrayNode* not_rect_node_1 = nullptr;
+        ArrayNode* rect_node_10 = nullptr;
+        ArrayNode* not_rect_node_10 = nullptr;
         for(int i=0;i<5;++i){
             if(i!=2){
                 rect_node->insert_back_ref(var_1->node());
-                if(rect_node_1)
-                    var_1->node()->insert_back(std::move(rect_node_1));
-                else var_1->node()->insert_back_ref(rect_node_1_ptr);
+                if(!rect_node_1)
+                    rect_node_1 = var_1->node()->insert_back<ArrayNode>(5);
             }
-            if(not_rect_node_1)
-                not_rect_node->insert_back(std::move(not_rect_node_1));
+            if(!not_rect_node_1)
+                not_rect_node_1 = not_rect_node->insert_back<ArrayNode>(5);
             else
-                not_rect_node->insert_back_ref(not_rect_node_1_ptr);
+                not_rect_node->insert_back_ref(not_rect_node_1); //
             if(i==0){
-                if(not_rect_node_10)
-                    not_rect_node_1_ptr->insert_back(std::move(not_rect_node_10));
-                else not_rect_node_1_ptr->insert_back_ref(not_rect_node_10_ptr);
+                if(!not_rect_node_10)
+                    not_rect_node_10 = not_rect_node_1->insert_back<ArrayNode>(5);
+                else not_rect_node_1->insert_back_ref(not_rect_node_10);
             }
-            else not_rect_node_1_ptr->insert_back(bd->make_node<ValueNode>(i));
-            not_rect_node_10_ptr->insert_back(bd->make_node<ValueNode>(i));
+            else not_rect_node_1->insert_back<ValueNode>(i);
+            not_rect_node_10->insert_back<ValueNode>(i);
 
-            if(rect_node_10)
-                rect_node_1_ptr->insert_back(std::move(rect_node_10));
+            if(!rect_node_10)
+                rect_node_10 = rect_node_1->insert_back<ArrayNode>(5);
             else 
-                rect_node_1_ptr->insert_back_ref(rect_node_10_ptr);
+                rect_node_1->insert_back_ref(rect_node_10);
 
-            rect_node_10_ptr->insert_back(bd->make_node<ValueNode>(i));
+            rect_node_10->insert_back<ValueNode>(i);
         }
     }
 
@@ -207,8 +203,8 @@ public:
     }
 
 private:
-    AbstractNode* rect_node;
-    AbstractNode* not_rect_node;
+    AbstractNode* rect_node = nullptr;
+    AbstractNode* not_rect_node = nullptr;
     std::shared_ptr<BaseData> bd;
 };
 
@@ -254,17 +250,17 @@ TEST(AuxiliaryFunctions,Find_first_node_not_variable_by_ids){
     auto var_2 = bd->add_variable("Var_2");
     auto var_3 = bd->add_variable("Var_3");
     EXPECT_FALSE(first_node_not_var(var_1->node()));
-    auto arr_1 = static_cast<ArrayNode*>(var_1->node()->insert_back(bd->make_node<ArrayNode>(5)));
+    ArrayNode* arr_1 = var_1->node()->insert_back<ArrayNode>(5);
     arr_1->insert_back_ref(var_2->node());
     for(int i = 0;i<4;++i){
-        arr_1->insert_back(arr_1->relation_manager()->make_node<ValueNode>(i));
+        arr_1->insert_back<ValueNode>(i);
     }
-    auto arr_2 = static_cast<ArrayNode*>(var_2->node()->insert_back(bd->make_node<ArrayNode>(5)));
+    ArrayNode* arr_2 = var_2->node()->insert_back<ArrayNode>(5);
     arr_2->insert_back_ref(var_3->node());
     for(int i = 0;i<4;++i){
-        arr_2->insert_back(arr_2->relation_manager()->make_node<ValueNode>(i));
+        arr_2->insert_back<ValueNode>(i);
     }
-    var_3->node()->insert_back(var_3->node()->relation_manager()->make_node<ValueNode>(1));
+    var_3->node()->insert_back<ValueNode>(1);
     std::vector<size_t> tmp_1{0,0};
     auto node = first_node_not_var_by_ids(var_1->node(),tmp_1.begin(),tmp_1.end()); //arr_1(initial node) -> arr_2(0) -> arr_2(0) value
     EXPECT_TRUE(node);

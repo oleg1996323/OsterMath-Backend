@@ -15,6 +15,7 @@ using Childs_t = std::vector<AbstractNode*>;
 class NodeManager{
     friend class ArrayNodeNMProxy;
     friend class ReferenceNodeNMProxy;
+    friend class AbstractNodeNMProxy;
     std::unordered_map<const AbstractNode*,References_t> references_; //referencing, but not owning parents
     public:
     std::unordered_map<const AbstractNode*,Childs_t> childs_;
@@ -73,22 +74,17 @@ class NodeManager{
     static AbstractNode* child(const AbstractNode* node,size_t id);
     static AbstractNode* child(AbstractNode* node,size_t id);
     static INFO_NODE child(AbstractNode* node,const std::vector<int>::const_iterator& first,const std::vector<int>::const_iterator& last) noexcept;
-    static AbstractNode* insert_back(AbstractNode* node,std::unique_ptr<AbstractNode>&& new_child);
+    
+    template<typename T, typename... ARGS>
+    static T* insert_back(AbstractNode* node, ARGS&&... val){
+        assert(node->relation_manager());
+        return node->relation_manager()->insert_back(node,std::make_unique<T>(std::forward<ARGS>(val)...));
+    }
+    static AbstractNode* insert_back_move(AbstractNode* at_insert_back, AbstractNode* inserted);
+    static AbstractNode* insert_back_copy(AbstractNode* at_insert_back, AbstractNode* inserted);
     static AbstractNode* insert_back_ref(ReferenceNode* node,AbstractNode* new_child);
 
-    //insert before value at id
-    static AbstractNode* insert(AbstractNode* node,size_t id,std::unique_ptr<AbstractNode>&& new_child);
-    static AbstractNode* replace(AbstractNode* node, size_t id,std::unique_ptr<AbstractNode>&& new_child);
-
-    //does not delete the replaced pointer's node
-    static AbstractNode* replace_child_wo_delete_in_owner_by(const AbstractNode* owner, size_t id, AbstractNode* val){
-        assert(val && owner && owner->has_child(id) && val->relation_manager()==owner->relation_manager());
-        owner->relation_manager()->childs_.at(owner).at(id)=val;
-        return val;
-    }
-    static AbstractNode* add_node(NodeManager*,std::unique_ptr<AbstractNode>&& node);
     static void delete_node(const AbstractNode* node);
-    static const std::unique_ptr<AbstractNode>& get_node(NodeManager*, const AbstractNode*);
     static bool has_references(const AbstractNode* node) noexcept;
     static bool is_reference_of(const AbstractNode* from, AbstractNode* node);
     static bool has_owner(const AbstractNode* node) noexcept;
@@ -115,13 +111,22 @@ class NodeManager{
         node_val.set_relation_manager(rel_mng);
         return std::make_unique<T>(std::forward<T>(node_val));
     }
+    static bool is_refered_by(const AbstractNode* ref_owner, const AbstractNode* refered) noexcept;
     template<typename T, typename... ARGS>
     std::unique_ptr<T> make_node(ARGS&&... node_val) const{
         std::unique_ptr<T> n_res = std::make_unique<T>(std::forward<ARGS>(node_val)...);
         n_res->set_relation_manager(this);
         return n_res;
     }
+    protected:
+    static AbstractNode* insert_back(AbstractNode* node,std::unique_ptr<AbstractNode>&& new_child);
+    //insert before value at id
+    static AbstractNode* insert(AbstractNode* node,size_t id,std::unique_ptr<AbstractNode>&& new_child);
+    static AbstractNode* replace(AbstractNode* node, size_t id,std::unique_ptr<AbstractNode>&& new_child);
+
+    static AbstractNode* add_node(NodeManager*,std::unique_ptr<AbstractNode>&& node);
     private:
+    static const std::unique_ptr<AbstractNode>& get_node(NodeManager*, const AbstractNode*);
     void __clear__();
     void __safe_merge__(NodeManager* from) noexcept;
     static void __erase_reference__(AbstractNode* from_node, ReferenceNode* ref) noexcept;

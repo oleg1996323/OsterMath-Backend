@@ -37,12 +37,11 @@ const ArrayNode* functions::auxiliary::to_array_node(const AbstractNode* node) n
 const ValueNode* functions::auxiliary::to_value_node(const AbstractNode* node) noexcept{
     return static_cast<const ValueNode*>(node);
 }
-
-const AbstractNode* functions::auxiliary::first_node_not_var(const AbstractNode* node) noexcept{
+AbstractNode* functions::auxiliary::first_node_not_var(AbstractNode* node) noexcept{
     if(node){
         if(node->type()!=NODE_TYPE::VARIABLE && node->type()!=NODE_TYPE::REF)
             return node;
-        const AbstractNode* child;
+        AbstractNode* child;
         if(node->has_child(0))
             child = node->child(0);
         else return nullptr;
@@ -56,9 +55,8 @@ const AbstractNode* functions::auxiliary::first_node_not_var(const AbstractNode*
     }
     return nullptr;
 }
-
-const AbstractNode* functions::auxiliary::first_node_not_var_by_ids(const AbstractNode* node, const std::vector<size_t>::const_iterator& first,const std::vector<size_t>::const_iterator& last) noexcept{
-    const AbstractNode* child = first_node_not_var(node);
+AbstractNode* functions::auxiliary::first_node_not_var_by_ids(AbstractNode* node, const std::vector<size_t>::const_iterator& first,const std::vector<size_t>::const_iterator& last) noexcept{
+    AbstractNode* child = first_node_not_var(node);
     if(child){
         for(auto i = first;i<last;++i){
             if(child->has_child(*i))
@@ -72,9 +70,8 @@ const AbstractNode* functions::auxiliary::first_node_not_var_by_ids(const Abstra
     }
     return nullptr;
 }
-
-const AbstractNode* functions::auxiliary::first_node_not_var_by_ids(const AbstractNode* node, const SizeDepthMeasure& seq_iterators) noexcept{
-    const AbstractNode* child = first_node_not_var(node);
+AbstractNode* functions::auxiliary::first_node_not_var_by_ids(AbstractNode* node, const SizeDepthMeasure& seq_iterators) noexcept{
+    AbstractNode* child = first_node_not_var(node);
     if(child){
         for(const size_iterator& i:seq_iterators){
             if(child->has_child(i.current_iterator_))
@@ -88,7 +85,15 @@ const AbstractNode* functions::auxiliary::first_node_not_var_by_ids(const Abstra
     }
     return nullptr;
 }
-
+const AbstractNode* functions::auxiliary::first_node_not_var(const AbstractNode* node) noexcept{
+    return first_node_not_var(const_cast<AbstractNode*>(node));
+}
+const AbstractNode* functions::auxiliary::first_node_not_var_by_ids(const AbstractNode* node, const std::vector<size_t>::const_iterator& first,const std::vector<size_t>::const_iterator& last) noexcept{
+    return first_node_not_var_by_ids(const_cast<AbstractNode*>(node),first,last);
+}
+const AbstractNode* functions::auxiliary::first_node_not_var_by_ids(const AbstractNode* node, const SizeDepthMeasure& seq_iterators) noexcept{
+    return first_node_not_var_by_ids(const_cast<AbstractNode*>(node),seq_iterators);
+}
 #include "test/log_duration.h"
 //check if array has rectangular morphology (all childs have same sizes in all dimensions)
 bool functions::auxiliary::is_rectangle_array_node(const AbstractNode* node) noexcept{
@@ -99,7 +104,15 @@ bool functions::auxiliary::is_rectangle_array_node(const AbstractNode* node) noe
         return true;
 
     return std::all_of(first_node->childs().begin(),first_node->childs().end(),[first_node](const AbstractNode* child){
-        if(first_node->child(0)->childs().size() == child->childs().size() && is_rectangle_array_node(child))
+        if(!first_node->has_childs())
+            return false;
+        const AbstractNode* internal_first_node = first_node_not_var(first_node->child(0)); //help ignore refs
+        if(!internal_first_node)
+            return false;
+        const AbstractNode* internal_child = first_node_not_var(child);
+        if(!internal_child)
+            return false;
+        if(internal_first_node->childs().size() == internal_child->childs().size() && is_rectangle_array_node(child))
             return true;
         return false;
     });
@@ -132,7 +145,21 @@ bool functions::auxiliary::is_filled_rectangle_array_node_of_type(TYPE_VAL type_
             return false;
         else{
             return std::all_of(first_node->childs().begin(),first_node->childs().end(),[first_node, type_value](const AbstractNode* child){
-                return first_node->child(0)->childs().size() == child->childs().size() && type_value&child->type_val() && is_filled_rectangle_array_node_of_type(type_value,child);
+                if(!first_node->has_childs())
+                    return false;
+                const AbstractNode* internal_first_node = first_node_not_var(first_node->child(0)); //help ignore refs
+                if(!internal_first_node)
+                    return false;
+                const AbstractNode* internal_child = first_node_not_var(child);
+                if(!internal_child)
+                    return false;
+                if(internal_first_node->childs().size() != internal_child->childs().size())
+                    return false;
+                if(!(type_value&internal_child->type_val()))
+                    return false;
+                if(!is_filled_rectangle_array_node_of_type(type_value,internal_child))
+                    return false;
+                return true;
             });
         }
     }
@@ -140,10 +167,9 @@ bool functions::auxiliary::is_filled_rectangle_array_node_of_type(TYPE_VAL type_
 
 bool functions::auxiliary::has_cyclic_references(const AbstractNode* node) noexcept{
     if(node->is_not_cycled()){
-        for(const AbstractNode* child: node->childs()){
+        for(const AbstractNode* child: node->childs())
             if(has_cyclic_references(child))
                 return true;
-        }
         return false;
     }
     else return true;

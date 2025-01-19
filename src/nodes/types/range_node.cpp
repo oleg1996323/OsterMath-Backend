@@ -20,6 +20,11 @@ NODE_TYPE RangeOperationNode::type() const{
     return NODE_TYPE::RANGEOP;
 }
 
+RangeOperationNode::~RangeOperationNode(){
+    std::cout<<"RangeOperationNode deleted: "<<this<<std::endl;
+    rel_mng_->delete_node(this);
+}
+
 Result RangeOperationNode::execute() const{
     using namespace ::functions::auxiliary;
     flush_cache();
@@ -35,15 +40,15 @@ Result RangeOperationNode::execute() const{
     
     {
         LOG_DURATION("Checking arrays");
-    for(const VariableNode* var_id:ref_vars){
-        if(var_id && ((is_filled_rectangle_array_node_of_type(TYPE_VAL::NUMERIC_ARRAY,var_id)) || check_arguments(TYPE_VAL::VALUE,var_id)))
-            continue;
-        else{
-            cache_ = std::make_shared<exceptions::InvalidTypeOfArgument>(std::string()+
-            "variable with numeric value or filled numeric rectangle array");
-            return cache_;
+        for(const VariableNode* var_id:ref_vars){
+            if(var_id && ((is_filled_rectangle_array_node_of_type(TYPE_VAL::NUMERIC_ARRAY,var_id)) || check_arguments(TYPE_VAL::VALUE,var_id)))
+                continue;
+            else{
+                cache_ = std::make_shared<exceptions::InvalidTypeOfArgument>(std::string()+
+                "variable with numeric value or filled numeric rectangle array");
+                return cache_;
+            }
         }
-    }
     }
     execute_for_array_variables_t structure;
     if(!check_variables_sizes_and_define_size_iteration(0,structure)){
