@@ -5,36 +5,12 @@
 
 class SharedFstream: public SharedStream{
 public:
-    SharedFstream(const SharedFstream& other):
-    SharedStream(other){}
-
-    SharedFstream(const std::string& filename, std::ios_base::openmode om):SharedStream(){
-        open(filename,om);
-        ;
-    }
-    SharedFstream(const char* filename, std::ios_base::openmode om):SharedStream(){
-        open(filename,om);
-    }
-
+    SharedFstream();
+    SharedFstream(const SharedFstream& other);
+    SharedFstream(const std::string& filename, std::ios_base::openmode om = std::ios_base::out | std::ios_base::in);
+    SharedFstream(const char* filename, std::ios_base::openmode om = std::ios_base::out | std::ios_base::in);
+    ~SharedFstream();
     bool is_open() const;
-    bool open(const char* filename, std::ios_base::openmode om = std::ios_base::in){
-        if(f_)
-            std::fclose(f_);
-
-        f_ = std::fopen(filename,cpp_to_c_openmode(om));
-        if(f_){
-            try{
-                if(!has_buf())
-                    newbuf();
-                return true;
-            }
-            catch(const std::bad_alloc& err){
-                std::cerr << err.what();
-            }
-        }
-        return false;
-    }
-    bool open(const std::string& filename, std::ios_base::openmode om = std::ios_base::in){
-        return open(filename.c_str());
-    }
+    bool open(const char* filename, std::ios_base::openmode om = std::ios_base::in);
+    bool open(const std::string& filename, std::ios_base::openmode = std::ios_base::in);
 };
