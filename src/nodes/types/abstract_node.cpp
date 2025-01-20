@@ -15,6 +15,9 @@ AbstractNode* AbstractNodeNMProxy::__insert_internal__(AbstractNode* node, size_
 AbstractNode* AbstractNodeNMProxy::__replace_internal__(AbstractNode* node, size_t id,std::unique_ptr<AbstractNode>&& new_child){
     return node->relation_manager()->replace(node,id,std::move(new_child));
 }
+void AbstractNodeNMProxy::__reserve_childs_internal__(AbstractNode* node, size_t sz){
+    return node->relation_manager()->__reserve_childs__(node,sz);
+}
 AbstractNode::AbstractNode():
 rel_mng_(BaseData::get_anonymous_relation_manager()){}
 
@@ -40,7 +43,7 @@ INFO_NODE AbstractNode::owner() const{
 
 AbstractNode::AbstractNode(size_t sz):
 rel_mng_(BaseData::get_anonymous_relation_manager()){
-    rel_mng_->reserve_childs(this,sz);
+    AbstractNodeNMProxy::__reserve_childs_internal__(this,sz);
 }
 
 void AbstractNode::refresh() const{

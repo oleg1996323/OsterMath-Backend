@@ -63,6 +63,7 @@ class AbstractNodeNMProxy{
     //insert before value at id
     static AbstractNode* __insert_internal__(AbstractNode* node, size_t,std::unique_ptr<AbstractNode>&& new_child);
     static AbstractNode* __replace_internal__(AbstractNode* node, size_t,std::unique_ptr<AbstractNode>&& new_child);
+    static void __reserve_childs_internal__(AbstractNode*, size_t id);
 };
 
 using namespace node_range_operation;
@@ -174,7 +175,7 @@ public:
     bool is_refered_by(const AbstractNode* ref_owner) noexcept;
 protected:
 
-    mutable NodeManager* rel_mng_; //parent, which own this node
+    mutable NodeManager* rel_mng_ = nullptr; //parent, which own this node
     mutable bool caller_ = false;
     AbstractNode(size_t sz);
     virtual bool __is_not_cycled__(const AbstractNode*) const;

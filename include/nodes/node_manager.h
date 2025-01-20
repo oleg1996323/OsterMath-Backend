@@ -68,9 +68,7 @@ class NodeManager{
     void begin(); //use anonymous NodeManager for safe inclusions
     void end(); //safe_merge if no one exception was thrown
 
-    static void reserve_childs(const AbstractNode* node,size_t size);
     static void erase_child(const AbstractNode* node, size_t id) noexcept;
-    static void empty_child(const AbstractNode* node, size_t id) noexcept;
     static AbstractNode* child(const AbstractNode* node,size_t id);
     static AbstractNode* child(AbstractNode* node,size_t id);
     static INFO_NODE child(AbstractNode* node,const std::vector<int>::const_iterator& first,const std::vector<int>::const_iterator& last) noexcept;
@@ -129,7 +127,9 @@ class NodeManager{
     static const std::unique_ptr<AbstractNode>& get_node(NodeManager*, const AbstractNode*);
     void __clear__();
     void __safe_merge__(NodeManager* from) noexcept;
-    static void __erase_reference__(AbstractNode* from_node, ReferenceNode* ref) noexcept;
-    static void __add_reference__(const AbstractNode* node_to_add, ReferenceNode* ref_node) noexcept;
+    static ReferenceNode* __erase_reference__(const AbstractNode* from_node, ReferenceNode* ref) noexcept;
+    static ReferenceNode* __add_reference__(const AbstractNode* node_to_add, ReferenceNode* ref_node) noexcept;
     static void __add_owner__(const AbstractNode* node_to_add, const AbstractNode* owner, int index) noexcept;
+    static void __reserve_childs__(const AbstractNode* node,size_t size);
+
 };
