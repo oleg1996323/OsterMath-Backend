@@ -8,22 +8,22 @@ class StringNode:public AbstractNode{
     std::string cache_;
     public:
     inline StringNode()=default;
-    inline StringNode(Value_t&& value){
+    inline StringNode(Value_t&& value,NodeManager* mng):AbstractNode(mng){
         cache_ = value.str();
     }
-    inline StringNode(const Value_t& value){
+    inline StringNode(const Value_t& value,NodeManager* mng):AbstractNode(mng){
         cache_ = value.str();
     }
-    inline StringNode(const std::string& str){
+    inline StringNode(const std::string& str,NodeManager* mng):AbstractNode(mng){
         cache_ = str;
     }
-    inline StringNode(std::string&& str){
+    inline StringNode(std::string&& str,NodeManager* mng):AbstractNode(mng){
         cache_ = str;
     }
-    inline StringNode(const StringNode& other):AbstractNode(other){
+    inline StringNode(const StringNode& other,NodeManager* mng):AbstractNode(other,mng){
         cache_ = other.cache_;
     }
-    StringNode(StringNode&& other):AbstractNode(other){
+    StringNode(StringNode&& other,NodeManager* mng):AbstractNode(other,mng){
         cache_.swap(other.cache_);
     }
     ~StringNode();

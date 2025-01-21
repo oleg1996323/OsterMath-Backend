@@ -30,7 +30,7 @@ TEST(RangeFunctionNode_test,Example_1){
     
     std::vector<Value_t> values(10);
     std::iota(values.begin(),values.end(),0);
-    std::shared_ptr<VariableBase> A_var = bd->add_variable("A");
+    VariableBase* A_var = bd->add_variable("A");
 
     //setting reversed order
 
@@ -85,14 +85,14 @@ TEST(RangeFunctionNode_test,Example_2){
     RangeOperationNode* sum_func = root_->node()->insert_back<RangeOperationNode>(RANGE_OP::SUM);
     BinaryNode* adding = sum_func->set_expression<BinaryNode>(BINARY_OP::ADD);
 
-    std::shared_ptr<VariableBase> B_var = bd->add_variable("B");
+    VariableBase* B_var = bd->add_variable("B");
     adding->insert_back_ref(B_var->node());
 
     RangeOperationNode* prod_func = adding->insert_back<RangeOperationNode>(RANGE_OP::PROD);
     
     BinaryNode* multiplication = prod_func->set_expression<BinaryNode>(BINARY_OP::MUL);
     
-    std::shared_ptr<VariableBase> A_var = bd->add_variable("A");
+    VariableBase* A_var = bd->add_variable("A");
     multiplication->insert_back_ref(A_var->node());
     multiplication->insert_back<ValueNode>(1);
 
@@ -163,8 +163,8 @@ TEST(RangeFunctionNode_test,DifferentSizeVars){
     std::vector<Value_t> values(10);
     std::iota(values.begin(),values.end(),0);
 
-    std::shared_ptr<VariableBase> A_var = bd->add_variable("A");
-    std::shared_ptr<VariableBase> B_var = bd->add_variable("B");
+    VariableBase* A_var = bd->add_variable("A");
+    VariableBase* B_var = bd->add_variable("B");
     
     adding->insert_back_ref(B_var->node());
     adding->insert_back_ref(A_var->node());
@@ -195,7 +195,7 @@ TEST(RangeFunctionNode_test,EmptyArrayVar){
     RangeOperationNode* sum_func = root_->node()->insert_back<RangeOperationNode>(RANGE_OP::SUM);
     BinaryNode* adding = sum_func->set_expression<BinaryNode>(BINARY_OP::ADD);
 
-    std::shared_ptr<VariableBase> A_var = bd->add_variable("A");
+    VariableBase* A_var = bd->add_variable("A");
     adding->insert_back_ref(A_var->node());
     adding->insert_back<ValueNode>(1);
     ArrayNode* arr_1 = A_var->node()->insert_back<ArrayNode>(10);
@@ -217,12 +217,12 @@ TEST(RangeFunctionNode_test,TwinEmptyArraysVars){
     RangeOperationNode* sum_func = root_->node()->insert_back<RangeOperationNode>(RANGE_OP::SUM);
     BinaryNode* adding = sum_func->set_expression<BinaryNode>(BINARY_OP::ADD);
 
-    std::shared_ptr<VariableBase> B_var = bd->add_variable("B");
+    VariableBase* B_var = bd->add_variable("B");
     adding->insert_back_ref(B_var->node());
     RangeOperationNode* prod_func = adding->insert_back<RangeOperationNode>(RANGE_OP::PROD);
     
     BinaryNode* multiplication = prod_func->set_expression<BinaryNode>(BINARY_OP::MUL);
-    std::shared_ptr<VariableBase> A_var = bd->add_variable("A");
+    VariableBase* A_var = bd->add_variable("A");
     multiplication->insert_back_ref(A_var->node());
     multiplication->insert_back<ValueNode>(1);
 
@@ -263,7 +263,7 @@ TEST(RangeFunctionNode_test,NotArrayVar){
     std::unique_ptr<BinaryNode> multiplication = bd->make_node<BinaryNode>(BINARY_OP::MUL);
     
 
-    std::shared_ptr<VariableBase> A_var = bd->add_variable("A");
+    VariableBase* A_var = bd->add_variable("A");
     A_var->node()->insert_back<ValueNode>(1);
     
     sum_func->set_expression(A_var->node());
@@ -281,8 +281,8 @@ TEST(RangeFunctionNode_test,NotDefined_1_DimensionsTwinArrayVars){
     RangeOperationNode* sum_func = root_->node()->insert_back<RangeOperationNode>(RANGE_OP::SUM);    
     BinaryNode* adding = sum_func->set_expression<BinaryNode>(BINARY_OP::ADD);
     
-    std::shared_ptr<VariableBase> A_var = bd->add_variable("A");
-    std::shared_ptr<VariableBase> B_var = bd->add_variable("B");
+    VariableBase* A_var = bd->add_variable("A");
+    VariableBase* B_var = bd->add_variable("B");
     
     adding->insert_back_ref(B_var->node());
     adding->insert_back_ref(A_var->node());

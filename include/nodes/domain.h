@@ -19,7 +19,7 @@ enum class COMP_T{
 struct Domain{
     mutable AbstractNode* lhs_;
     mutable AbstractNode* rhs_;
-    std::unique_ptr<AbstractNode> value_if_true_ = std::make_unique<ValueNode>(0);
+    std::unique_ptr<AbstractNode> value_if_true_ = std::make_unique<ValueNode>(0,nullptr); //TODO
     COMP_T type_;
 
     bool is() const;

@@ -3,7 +3,7 @@
 #include "node_manager.h"
 
 UnaryNode::~UnaryNode(){
-    std::cout<<"UnaryNode deleted: "<<this<<std::endl;
+    //std::cout<<"UnaryNode deleted: "<<this<<std::endl;
     rel_mng_->delete_node(this);
 }
 

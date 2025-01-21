@@ -5,17 +5,17 @@
 #include <memory>
 #include "node_manager.h"
 
-ArrayNode::ArrayNode(size_t sz):
-    AbstractNode(sz)
+ArrayNode::ArrayNode(size_t sz, NodeManager* mng):
+    AbstractNode(sz, mng)
 {}
 
-ArrayNode::ArrayNode(const ArrayNode& arr):AbstractNode(arr){
+ArrayNode::ArrayNode(const ArrayNode& arr,NodeManager* mng):AbstractNode(arr,mng){
     if(this!=&arr){
         rel_mng_->copy_node(this,&arr);
         cache_ = arr.cache_;
     }
 }
-ArrayNode::ArrayNode(ArrayNode&& arr):AbstractNode(arr){
+ArrayNode::ArrayNode(ArrayNode&& arr,NodeManager* mng):AbstractNode(arr,mng){
     if(this!=&arr){
         rel_mng_->swap_node(this,&arr);
         std::swap(cache_,arr.cache_);
@@ -23,8 +23,9 @@ ArrayNode::ArrayNode(ArrayNode&& arr):AbstractNode(arr){
 }
 
 ArrayNode::~ArrayNode(){
-    std::cout<<"ArrayNode deleted: "<<this<<std::endl;
-    rel_mng_->delete_node(this);
+    //std::cout<<"ArrayNode deleted: "<<this<<std::endl;
+    if(rel_mng_)
+        rel_mng_->delete_node(this);
 }
 
 NODE_TYPE ArrayNode::type() const{
@@ -162,7 +163,7 @@ ArrayNode* ArrayNodeNMProxy::__implementation__(AbstractNode* val){
             throw kernel::FatalError(std::string("Undefined owner at node of type ")+nodes_types[(size_t)val->type()],kernel::codes::OWNER_UNDEFINED);
         NodeManager* active_node_manager = val->relation_manager();
         array = static_cast<ArrayNode*>(NodeManager::add_node(active_node_manager,
-        std::move(std::make_unique<ArrayNode>(1))));
+        std::move(std::make_unique<ArrayNode>(1,active_node_manager))));
         if(!array)
             throw std::bad_alloc();
         active_node_manager->childs_[array].push_back(val);
@@ -187,7 +188,7 @@ ArrayNode* ArrayNodeNMProxy::__implement_by_var__(AbstractNode* array_owner, int
             throw kernel::FatalError(std::string("Unexpected owner at ")+nodes_types[(size_t)NODE_TYPE::VARIABLE],kernel::codes::OWNER_UNEXPECTED_DEFINITION);
         NodeManager* active_node_manager = array_owner->relation_manager();
         array = static_cast<ArrayNode*>(NodeManager::add_node(active_node_manager,
-        std::move(std::make_unique<ArrayNode>(1))));
+        std::move(std::make_unique<ArrayNode>(1,active_node_manager))));
         if(!array)
             throw std::bad_alloc();
         array->set_relation_manager(active_node_manager);

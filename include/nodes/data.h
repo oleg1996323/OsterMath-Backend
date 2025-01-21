@@ -28,14 +28,14 @@ class BaseData{
     void set_name(std::string_view name);
     bool exists(std::string_view name) const;
     bool defined(std::string_view name) const;
-    std::shared_ptr<VariableBase>& add_variable(std::string&& name);
+    VariableBase* add_variable(std::string&& name);
     template<typename T>
-    std::shared_ptr<VariableBase>& add_variable(std::string&& name, T&& value);
-    std::shared_ptr<VariableBase>& add_anonymous_var();
+    VariableBase* add_variable(std::string&& name, T&& value);
+    VariableBase* add_anonymous_var();
     template<typename T>
-    std::shared_ptr<VariableBase>& add_anonymous_var(T&& value);
-    template<typename T>
-    void define(std::string_view name, T&& value);
+    VariableBase* add_anonymous_var(T&& value);
+    //template<typename T>
+    //void define(std::string_view name, T&& value);
     void erase(std::string_view var_name);
     void setstream(std::istream& stream);
     void set_pool(DataPool* pool);
@@ -47,9 +47,9 @@ class BaseData{
     void deserialize(serialization::SerialData& serial_data);
     void serialize_header(serialization::SerialData& serial_data) const;
     void deserialize_header(serialization::SerialData& serial_data);
-    const std::unordered_map<std::string_view,std::shared_ptr<VariableBase>> variables() const;
+    const std::unordered_map<std::string_view,std::unique_ptr<VariableBase>>& variables() const;
     void remove_variables();
-    std::shared_ptr<VariableBase> get_buffer() const;
+    VariableBase* get_buffer() const;
     uint16_t id() const;
     template<typename T>
     static std::unique_ptr<T> make_node(T&& node_val,NodeManager* rel_mng){
@@ -63,7 +63,7 @@ class BaseData{
     }
     template<typename T, typename... ARGS>
     std::unique_ptr<T> make_node(ARGS&&... node_val) const{
-        std::unique_ptr<T> n_res = std::make_unique<T>(std::forward<ARGS>(node_val)...);
+        std::unique_ptr<T> n_res = std::make_unique<T>(std::forward<ARGS>(node_val)...,&rel_mng_);
         n_res->set_relation_manager(relation_manager());
         return n_res;
     }
@@ -75,11 +75,11 @@ class BaseData{
     }
     private:
     mutable NodeManager rel_mng_;
-    std::unordered_map<std::string_view,std::shared_ptr<VariableBase>> vars_;
+    std::unordered_map<std::string_view,std::unique_ptr<VariableBase>> vars_;
     std::unordered_set<std::string> var_names_;
     std::string_view name_;
     //std::unique_ptr<Parser> parser_;
-    mutable std::shared_ptr<VariableBase> buffer_;
+    mutable std::unique_ptr<VariableBase> buffer_;
     DataPool* pool_;
     std::string generate_hash_name();
     uint16_t data_count;
@@ -127,27 +127,28 @@ using namespace std::string_literals;
 #include "types.h"
 
 template<typename T>
-std::shared_ptr<VariableBase>& BaseData::add_variable(std::string&& name, T&& value){
+VariableBase* BaseData::add_variable(std::string&& name, T&& value){
     if(!exists(name)){
         auto str_name = var_names_.emplace(name).first;
-        return vars_.emplace(
-            *str_name,
-            std::make_shared<VariableBase>(*str_name,std::forward<T>(value),this)).first->second;
+        auto tmp_u_var = std::make_unique<VariableBase>(*str_name,std::forward<T>(value),this);
+        auto var = tmp_u_var.get();
+        vars_[*str_name]=std::move(tmp_u_var);
+        return var;
     }
-    else return vars_.find(name)->second;
+    else return vars_.at(name).get();
 }
 
-template<typename T>
-void BaseData::define(std::string_view name, T&& value){
-    if(exists(name)){
-        if(!defined(name)){
-            auto ref = vars_.find(name);
-            ref->second = std::shared_ptr<VariableBase>(ref->first,std::forward<T>(value));
+// template<typename T>
+// void BaseData::define(std::string_view name, T&& value){
+//     if(exists(name)){
+//         if(!defined(name)){
+//             auto ref = vars_.find(name);
+//             ref->second = std::shared_ptr<VariableBase>(ref->first,std::forward<T>(value));
 
-            return;
-        }
-        else
-            throw std::logic_error("Variable "s+std::string(name)+" already defined."s);
-    }
-    else throw std::logic_error("Variable "s+std::string(name)+" don't exists."s);
-}
+//             return;
+//         }
+//         else
+//             throw std::logic_error("Variable "s+std::string(name)+" already defined."s);
+//     }
+//     else throw std::logic_error("Variable "s+std::string(name)+" don't exists."s);
+// }

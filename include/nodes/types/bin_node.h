@@ -22,12 +22,12 @@ class BinaryNode:public AbstractNode{
     friend ValueNode;
     friend VariableNode;
     public:
-    BinaryNode(BINARY_OP op):operation_(op){}
-    BinaryNode(const BinaryNode& other):AbstractNode(other),operation_(other.operation_){
+    BinaryNode(BINARY_OP op,NodeManager* mng):AbstractNode(mng),operation_(op){}
+    BinaryNode(const BinaryNode& other,NodeManager* mng):AbstractNode(other),operation_(other.operation_){
         if(this!=&other)
             rel_mng_->copy_node(this,&other);
     }
-    BinaryNode(BinaryNode&& other):AbstractNode(other),operation_(other.operation_){
+    BinaryNode(BinaryNode&& other, NodeManager* mng):AbstractNode(other),operation_(other.operation_){
         if(this!=&other)
             rel_mng_->swap_node(this,&other);
     }

@@ -20,20 +20,24 @@ class RangeOperationNode:public AbstractNode{
     mutable size_t sz_iteration = 0;
     RANGE_OP operation_;
     public:
-    RangeOperationNode(RANGE_OP op):operation_(op){}
+    RangeOperationNode(RANGE_OP op,NodeManager* mng):
+    AbstractNode(mng),
+    operation_(op){}
 
     template<typename T,typename... ARGS>
-    RangeOperationNode(RANGE_OP op, ARGS&&... expr):
+    RangeOperationNode(RANGE_OP op, ARGS&&... expr,NodeManager* mng):
+    AbstractNode(mng),
     operation_(op){
         set_expression<T>(std::forward<ARGS>(expr)...);
     }
 
-    RangeOperationNode(RANGE_OP op, AbstractNode* expr):
+    RangeOperationNode(RANGE_OP op, AbstractNode* expr,NodeManager* mng):
+    AbstractNode(mng),
     operation_(op){
         set_expression(expr);
     }
 
-    RangeOperationNode(const RangeOperationNode& other);
+    RangeOperationNode(const RangeOperationNode& other,NodeManager* mng);
     RangeOperationNode(RangeOperationNode&&) = delete;
     ~RangeOperationNode();
 

@@ -6,8 +6,9 @@
 #include "aux_functions.h"
 
 BinaryNode::~BinaryNode(){
-    std::cout<<"BinaryNode deleted: "<<this<<std::endl;
-    rel_mng_->delete_node(this);
+    //std::cout<<"BinaryNode deleted: "<<this<<std::endl;
+    if(rel_mng_)
+        rel_mng_->delete_node(this);
 }
 
 NODE_TYPE BinaryNode::type() const{
@@ -81,14 +82,14 @@ void BinaryNode::print_text(std::ostream& stream) const{
     if(has_child(0))
         childs().at(0)->print_text(stream);
     else{
-        EmptyNode node;
+        EmptyNode node(nullptr);
         node.print_text(stream);
     }
     stream<<(char)operation_;
     if(has_child(1))
         childs().at(1)->print_text(stream);
     else {
-        EmptyNode node;
+        EmptyNode node(nullptr);
         node.print_text(stream);
     }
 }

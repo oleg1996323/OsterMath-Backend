@@ -7,6 +7,11 @@ const References_t NodeManager::empty_references_{};
 
 NodeManager::~NodeManager(){
     std::cout<<"NodeManager deleted"<<std::endl;
+    nodes_.clear();
+    log_state();
+    assert(references_.empty());
+    assert(childs_.empty());
+    assert(owner_.empty());
 }
 
 void NodeManager::__reserve_childs__(const AbstractNode* node,size_t size){
@@ -344,8 +349,9 @@ void NodeManager::release_childs(const AbstractNode* node) noexcept{
                 node->relation_manager()->childs_.at(node).at(i)->relation_manager()->nodes_.erase(found);
             }
         }
-        node->relation_manager()->childs_.erase(node);
+        node->relation_manager()->childs_.erase(node); //value contains childs (need to check)
     }
+    node->relation_manager()->childs_.erase(node); //value contains childs (need to check)
 }
 const References_t& NodeManager::references(const AbstractNode* node) noexcept{
     if(node->relation_manager()->references_.contains(node))
@@ -369,9 +375,12 @@ void NodeManager::erase_child(const AbstractNode* node, size_t id) noexcept{
 #include <cassert>
 void NodeManager::delete_node(const AbstractNode* node){
     //++node->relation_manager()->destructed;
-    for(auto ref:node->relation_manager()->references_[node])
-        erase_child(__erase_reference__(node,ref),0); //the refs may be already deleted (should be deleted in references_ of childs in release_childs())
-    node->relation_manager()->references_.erase(node);
+    auto found = node->relation_manager()->references_.find(node);
+    if(found!=node->relation_manager()->references_.end()){
+        for(auto ref:found->second)
+            ref->relation_manager()->childs_.at(ref).resize(0); //the refs may be already deleted (should be deleted in references_ of childs in release_childs())
+        node->relation_manager()->references_.erase(node);
+    }
     release_childs(node);
     node->relation_manager()->owner_.erase(node);
 }

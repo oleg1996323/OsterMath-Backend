@@ -30,10 +30,10 @@ class ArrayNode:public AbstractNode{
     mutable Result cache_;
 public:
     typedef AbstractNode* value_type;
-    ArrayNode(size_t sz);
+    ArrayNode(size_t sz, NodeManager* mng);
 
-    ArrayNode(const ArrayNode& arr);
-    ArrayNode(ArrayNode&& arr);
+    ArrayNode(const ArrayNode& arr, NodeManager* mng);
+    ArrayNode(ArrayNode&& arr, NodeManager* mng);
     ~ArrayNode();
 
     //return the replaced ArrayNode pointer

@@ -9,7 +9,14 @@ using namespace std::string_literals;
 uint16_t BaseData::counter = 0;
 NodeManager BaseData::anonymous_nodes{};
 
-BaseData::BaseData(std::string_view name):rel_mng_(this),name_(name), buffer_(std::make_shared<VariableBase>("buffer",this)), data_count(counter++){}
+BaseData::BaseData(std::string_view name):
+rel_mng_(this),
+name_(name),
+buffer_(std::make_unique<VariableBase>("buffer",this)),
+data_count(counter++)
+{
+    buffer_->node()->set_relation_manager(&rel_mng_);
+}
 
 BaseData::~BaseData(){
     vars_.clear();
@@ -23,7 +30,10 @@ VariableBase* BaseData::get(std::string_view name){
 };
 
 const VariableBase* BaseData::get(std::string_view name) const{
-    return get(name); 
+    if(!exists(name))
+        throw std::invalid_argument("Variable "s + std::string(name) + " don't exists.\n");
+    else
+        return vars_.at(name)?vars_.at(name).get():nullptr;
 };
 
 bool BaseData::exists(std::string_view name) const{
@@ -49,24 +59,25 @@ bool BaseData::defined(std::string_view name) const{
 
 void BaseData::rename_var(const std::string& current_name,const std::string& new_name){
     if(exists(current_name)){
-        auto var = vars_.at(current_name);
-        vars_.erase(current_name);
+        auto var = vars_.at(current_name).get();
+        vars_.at(current_name).swap(vars_[new_name]);
         var_names_.erase(current_name);
-        var->set_name(vars_.emplace(*var_names_.emplace(new_name).first, var).first->first);
+        var->set_name(*var_names_.emplace(new_name).first);
     }
+    else assert(false);
 }
 
 //TODO: make add variable to relation manager of BaseData
-std::shared_ptr<VariableBase>& BaseData::add_variable(std::string&& name){
+VariableBase* BaseData::add_variable(std::string&& name){
     if(!exists(name)){
         auto str_name = var_names_.emplace(name).first;
-        std::shared_ptr<VariableBase>& var = vars_.emplace(
-            *str_name,
-            std::make_shared<VariableBase>(*str_name,this)).first->second;
+        auto tmp_u_var = std::make_unique<VariableBase>(*str_name,this);
+        auto var = tmp_u_var.get();
+        vars_[*str_name]=std::move(tmp_u_var);
         var->node()->set_relation_manager(&this->rel_mng_);
         return var;
     }
-    else return vars_.find(name)->second;
+    else return vars_.at(name).get();
 }
 
 
@@ -115,12 +126,12 @@ DataPool* BaseData::get_pool(){
     return pool_;
 }
 
-const std::unordered_map<std::string_view,std::shared_ptr<VariableBase>> BaseData::variables() const{
+const std::unordered_map<std::string_view,std::unique_ptr<VariableBase>>& BaseData::variables() const{
     return vars_;
 }
 
-std::shared_ptr<VariableBase> BaseData::get_buffer() const{
-    return buffer_;
+VariableBase* BaseData::get_buffer() const{
+    return buffer_.get();
 }
 
 DataPool::DataPool(const std::string& name):name_(name){}

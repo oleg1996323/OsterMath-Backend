@@ -2,8 +2,8 @@
 #include "def.h"
 #include <memory>
 
-RangeOperationNode::RangeOperationNode(const RangeOperationNode& other):
-AbstractNode(other),
+RangeOperationNode::RangeOperationNode(const RangeOperationNode& other,NodeManager* mng):
+AbstractNode(other,mng),
 cache_(other.cache_),
 sz_iteration(other.sz_iteration),
 operation_(other.operation_)
@@ -21,8 +21,9 @@ NODE_TYPE RangeOperationNode::type() const{
 }
 
 RangeOperationNode::~RangeOperationNode(){
-    std::cout<<"RangeOperationNode deleted: "<<this<<std::endl;
-    rel_mng_->delete_node(this);
+    //std::cout<<"RangeOperationNode deleted: "<<this<<std::endl;
+    if(rel_mng_)
+        rel_mng_->delete_node(this);
 }
 
 Result RangeOperationNode::execute() const{
@@ -78,7 +79,7 @@ void RangeOperationNode::print_text(std::ostream& stream) const{
     if(has_expression())
         get_expression()->print_text(stream);
     else {
-        EmptyNode node;
+        EmptyNode node(nullptr);
         node.print_text(stream);
     }
     stream<<")";

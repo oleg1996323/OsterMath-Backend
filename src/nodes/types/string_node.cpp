@@ -3,8 +3,9 @@
 #include "node_manager.h"
 
 StringNode::~StringNode(){
-    std::cout<<"StringNode deleted: "<<this<<std::endl;
-    rel_mng_->delete_node(this);
+    //std::cout<<"StringNode deleted: "<<this<<std::endl;
+    if(rel_mng_)
+        rel_mng_->delete_node(this);
 }
 NODE_TYPE StringNode::type() const{
     return NODE_TYPE::STRING;

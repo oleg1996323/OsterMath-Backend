@@ -10,19 +10,19 @@ class ValueNode:public AbstractNode{
     public:
     ValueNode()=default;
 
-    ValueNode(const ValueNode& value):AbstractNode(value){
+    ValueNode(const ValueNode& value,NodeManager* mng):AbstractNode(value,mng){
         cache_ = value.cache_;
     }
-    ValueNode(ValueNode&& value):AbstractNode(value){
+    ValueNode(ValueNode&& value,NodeManager* mng):AbstractNode(value,mng){
         cache_.swap(value.cache_);
     }
-    ValueNode(Value_t&& value):AbstractNode(){
+    ValueNode(Value_t&& value,NodeManager* mng):AbstractNode(mng){
         cache_ = std::move(value);
     }
-    ValueNode(const Value_t& value):AbstractNode(){
+    ValueNode(const Value_t& value,NodeManager* mng):AbstractNode(mng){
         cache_ = value;
     }
-    ValueNode(std::string&& value):AbstractNode(){
+    ValueNode(std::string&& value,NodeManager* mng):AbstractNode(mng){
         cache_ = Value_t(value);
     }
     ~ValueNode();

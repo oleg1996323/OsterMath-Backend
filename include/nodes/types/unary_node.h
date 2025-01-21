@@ -25,14 +25,14 @@ class UnaryNode:public AbstractNode{
     friend ValueNode;
     friend VariableNode;
     public:
-    UnaryNode(UNARY_OP op):operation_(op){}
-    UnaryNode(const UnaryNode& other):AbstractNode(other){
+    UnaryNode(UNARY_OP op,NodeManager* mng):AbstractNode(mng),operation_(op){}
+    UnaryNode(const UnaryNode& other,NodeManager* mng):AbstractNode(other,mng){
         if(&other!=this){
             operation_ = other.operation_;
             rel_mng_->copy_node(this,&other);
         }
     }
-    UnaryNode(UnaryNode&& other):AbstractNode(other){
+    UnaryNode(UnaryNode&& other,NodeManager* mng):AbstractNode(other,mng){
         if(&other!=this){
             operation_ = other.operation_;
             rel_mng_->swap_node(this,&other);

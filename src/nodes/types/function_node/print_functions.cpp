@@ -118,7 +118,7 @@ void node_function::functions::print::print_text(const FunctionNode* node,std::o
             child->print_text(stream);
         }
     else {
-        EmptyNode node;
+        EmptyNode node(nullptr);
         node.print_text(stream);
     }
     stream<<")";

@@ -9,8 +9,8 @@
 #include <boost/math/statistics/bivariate_statistics.hpp>
 #include <boost/math/special_functions/gamma.hpp>
 
-FunctionNode::FunctionNode(const FunctionNode& other):
-AbstractNode(other),
+FunctionNode::FunctionNode(const FunctionNode& other,NodeManager* mng):
+AbstractNode(other,mng),
 operation_(other.operation_),
 array_type_function(other.array_type_function){
     if(this!=&other)
@@ -18,8 +18,9 @@ array_type_function(other.array_type_function){
 }
 
 FunctionNode::~FunctionNode(){
-    std::cout<<"FunctionNode deleted: "<<this<<std::endl;
-    rel_mng_->delete_node(this);
+    //std::cout<<"FunctionNode deleted: "<<this<<std::endl;
+    if(rel_mng_)
+        rel_mng_->delete_node(this);
 }
 
 NODE_TYPE FunctionNode::type() const{

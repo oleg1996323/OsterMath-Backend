@@ -69,12 +69,12 @@ class AbstractNodeNMProxy{
 using namespace node_range_operation;
 class AbstractNode{
 public:
-    AbstractNode();
+    AbstractNode() = default;
     AbstractNode(const std::shared_ptr<BaseData>& bd);
     AbstractNode(NodeManager* rel_mng);
 
-    AbstractNode(const AbstractNode& other);
-    AbstractNode(AbstractNode&& other);
+    AbstractNode(const AbstractNode& other, NodeManager* mng);
+    AbstractNode(AbstractNode&& other, NodeManager* mng);
     AbstractNode* copy_paste(const AbstractNode* other);
     AbstractNode* cut_paste(AbstractNode* other) noexcept;
 
@@ -177,7 +177,7 @@ protected:
 
     mutable NodeManager* rel_mng_ = nullptr; //parent, which own this node
     mutable bool caller_ = false;
-    AbstractNode(size_t sz);
+    AbstractNode(size_t, NodeManager*);
     virtual bool __is_not_cycled__(const AbstractNode*) const;
 private:
     AbstractNode* insert_back(std::unique_ptr<AbstractNode>&& new_child);
@@ -234,7 +234,7 @@ requires (std::is_base_of_v<AbstractNode,T> &&
 #endif
 )
 T* AbstractNode::insert_back(ARGS&&... arg){
-    return static_cast<T*>(AbstractNodeNMProxy::__insert_back_internal__<T,ARGS...>(this,std::forward<ARGS>(arg)...));
+    return static_cast<T*>(AbstractNodeNMProxy::__insert_back_internal__<T,ARGS...>(this,std::forward<ARGS>(arg)...,rel_mng_));
 }
 
 template<typename T, typename... ARGS>

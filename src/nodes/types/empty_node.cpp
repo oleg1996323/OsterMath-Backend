@@ -5,16 +5,17 @@
 #include "string_node.h"
 #include "node_manager.h"
 
-EmptyNode::EmptyNode():
-AbstractNode(BaseData::get_anonymous_relation_manager()){}
+EmptyNode::EmptyNode(NodeManager* mng):
+AbstractNode(mng){}
 
 TYPE_VAL EmptyNode::type_val() const{
     return TYPE_VAL::UNKNOWN;
 }
 EmptyNode::~EmptyNode(){
-    std::cout<<"EmptyNode deleted: "<<this<<std::endl;
+    //std::cout<<"EmptyNode deleted: "<<this<<std::endl;
     //rel_mng_-> call delete method for destructed node
-    rel_mng_->delete_node(this);
+    if(rel_mng_)
+        rel_mng_->delete_node(this);
 }
 
 NODE_TYPE EmptyNode::type() const{

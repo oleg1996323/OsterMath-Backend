@@ -107,13 +107,12 @@ class NodeManager{
     template<typename T>
     static std::unique_ptr<T>&& make_node(T&& node_val,NodeManager* rel_mng){
         node_val.set_relation_manager(rel_mng);
-        return std::make_unique<T>(std::forward<T>(node_val));
+        return std::make_unique<T>(std::forward<T>(node_val),rel_mng);
     }
     static bool is_refered_by(const AbstractNode* ref_owner, const AbstractNode* refered) noexcept;
     template<typename T, typename... ARGS>
-    std::unique_ptr<T> make_node(ARGS&&... node_val) const{
-        std::unique_ptr<T> n_res = std::make_unique<T>(std::forward<ARGS>(node_val)...);
-        n_res->set_relation_manager(this);
+    std::unique_ptr<T> make_node(ARGS&&... node_val){
+        std::unique_ptr<T> n_res = std::make_unique<T>(std::forward<ARGS>(node_val)...,(NodeManager*)this);
         return n_res;
     }
     protected:

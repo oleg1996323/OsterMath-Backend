@@ -10,8 +10,8 @@ class ReferenceNodeNMProxy{
 
 class ReferenceNode:public AbstractNode{
     public:
-    ReferenceNode(AbstractNode* reference);
-    ReferenceNode(const ReferenceNode& other);
+    ReferenceNode(AbstractNode* reference,NodeManager* mng);
+    ReferenceNode(const ReferenceNode& other,NodeManager* mng);
     ReferenceNode(ReferenceNode&&) = delete;
     virtual NODE_TYPE type() const override;
     ~ReferenceNode();

@@ -152,11 +152,11 @@ private:
     std::shared_ptr<BaseData> bd_2;
 };
 
-class Initial_Rect_ArrayNode{
+class Initial_Rect_ArrayNode_1{
 
 public:
 
-    Initial_Rect_ArrayNode(){
+    Initial_Rect_ArrayNode_1(){
         bd = std::make_shared<BaseData>("bd_3");
         auto var_rect_node = bd->add_variable("rect");
         auto var_not_rect_node = bd->add_variable("not rect");
@@ -208,6 +208,105 @@ private:
     std::shared_ptr<BaseData> bd;
 };
 
+class Initial_Rect_ArrayNode_2{
+
+public:
+
+    Initial_Rect_ArrayNode_2(){
+        const int nodes = 3;
+        const int at_exclude = 2;
+        bd = std::make_shared<BaseData>("bd_3");
+        auto var_rect_node = bd->add_variable("rect");
+        auto var_not_rect_node = bd->add_variable("not rect");
+        rect_node = var_rect_node->node()->insert_back<ArrayNode>(nodes);
+        not_rect_node = var_not_rect_node->node()->insert_back<ArrayNode>(nodes);
+        for(int i=0;i<nodes;++i){
+            ArrayNode* rect_arr_1 = rect_node->insert_back<ArrayNode>(nodes);
+            ArrayNode* not_rect_arr_2 = not_rect_node->insert_back<ArrayNode>(nodes);
+            for(int j=0;j<nodes;++j){
+                ArrayNode* not_rect_arr_22 = not_rect_arr_2->insert_back<ArrayNode>(nodes);
+                ArrayNode* rect_arr_11 = rect_arr_1->insert_back<ArrayNode>(nodes);
+                for(int k=0;k<nodes;++k){
+                    ArrayNode* not_rect_arr_222;
+                    if(k==at_exclude)
+                        not_rect_arr_222 = not_rect_arr_22->insert_back<ArrayNode>(at_exclude);
+                    else not_rect_arr_222 = not_rect_arr_22->insert_back<ArrayNode>(nodes);
+                    ArrayNode* rect_arr_111 = rect_arr_11->insert_back<ArrayNode>(nodes);
+                    for(int m=0;m<nodes;++m){
+                        if(k==at_exclude && m<at_exclude)
+                            not_rect_arr_222->insert_back<ValueNode>(m);
+                        else
+                            not_rect_arr_222->insert_back<ValueNode>(m);
+                        rect_arr_111->insert_back<ValueNode>(m);
+                    }
+                }
+            }
+        }
+    }
+
+    AbstractNode* rect_array(){
+        return rect_node;
+    }
+
+    AbstractNode* not_rect_array(){
+        return not_rect_node;
+    }
+
+private:
+    AbstractNode* rect_node = nullptr;
+    AbstractNode* not_rect_node = nullptr;
+    std::shared_ptr<BaseData> bd;
+};
+
+class Initial_Filled_ArrayNode{
+
+public:
+
+    Initial_Filled_ArrayNode(){
+        const int nodes = 3;
+        const int at_exclude = 2;
+        bd = std::make_shared<BaseData>("bd_3");
+        auto var_filled_array_node = bd->add_variable("rect");
+        auto var_not_filled_array_node = bd->add_variable("not rect");
+        filled_array_node = var_filled_array_node->node()->insert_back<ArrayNode>(nodes);
+        not_filled_array_node = var_not_filled_array_node->node()->insert_back<ArrayNode>(nodes);
+        for(int i=0;i<nodes;++i){
+            ArrayNode* rect_arr_1 = filled_array_node->insert_back<ArrayNode>(nodes);
+            ArrayNode* not_rect_arr_2 = not_filled_array_node->insert_back<ArrayNode>(nodes);
+            for(int j=0;j<nodes;++j){
+                ArrayNode* not_rect_arr_22 = not_rect_arr_2->insert_back<ArrayNode>(nodes);
+                ArrayNode* rect_arr_11 = rect_arr_1->insert_back<ArrayNode>(nodes);
+                for(int k=0;k<nodes;++k){
+                    ArrayNode* not_rect_arr_222;
+                    if(k==at_exclude)
+                        not_rect_arr_222 = not_rect_arr_22->insert_back<ArrayNode>(2);
+                    else not_rect_arr_222 = not_rect_arr_22->insert_back<ArrayNode>(nodes);
+                    ArrayNode* rect_arr_111 = rect_arr_11->insert_back<ArrayNode>(nodes);
+                    for(int m=0;m<nodes;++m){
+                        if(k==at_exclude && m<at_exclude){}
+                        else
+                            not_rect_arr_222->insert_back<ValueNode>(m);
+                        rect_arr_111->insert_back<ValueNode>(m);
+                    }
+                }
+            }
+        }
+    }
+
+    AbstractNode* filled_array(){
+        return filled_array_node;
+    }
+
+    AbstractNode* not_filled_array(){
+        return not_filled_array_node;
+    }
+
+private:
+    AbstractNode* filled_array_node = nullptr;
+    AbstractNode* not_filled_array_node = nullptr;
+    std::shared_ptr<BaseData> bd;
+};
+
 class ComplexNode_1 : public ::testing::Test
 {
 protected:
@@ -217,7 +316,36 @@ protected:
 	{	}
     Initial_Complex_Node_1 node_1_;
     Initial_Complex_Node_2 node_2_;
-    Initial_Rect_ArrayNode rect_nodes_;
+};
+
+class RectNode_1: public ::testing::Test
+{
+protected:
+    void SetUp()
+	{	}
+	void TearDown()
+	{	}
+    Initial_Rect_ArrayNode_1 fixture_;
+};
+
+class RectNode_2: public ::testing::Test
+{
+protected:
+    void SetUp()
+	{	}
+	void TearDown()
+	{	}
+    Initial_Rect_ArrayNode_2 fixture_;
+};
+
+class FilledArrayNode: public ::testing::Test
+{
+protected:
+    void SetUp()
+	{	}
+	void TearDown()
+	{	}
+    Initial_Filled_ArrayNode fixture_;
 };
 
 TEST_F(ComplexNode_1,Find_first_node_not_variable){
@@ -285,7 +413,21 @@ TEST_F(ComplexNode_1,CompareArrays_UniversalFunction_1){
     EXPECT_FALSE(equal_morphology_nodes(nodes));
 }
 
-TEST_F(ComplexNode_1,IsRectNodeMorphology){
-    EXPECT_TRUE(is_rectangle_array_node(rect_nodes_.rect_array()));
-    EXPECT_FALSE(is_rectangle_array_node(rect_nodes_.not_rect_array()));
+TEST_F(RectNode_1,IsRectNodeMorphology_1){
+    EXPECT_TRUE(is_rectangle_array_node(fixture_.rect_array()));
+    EXPECT_FALSE(is_rectangle_array_node(fixture_.not_rect_array()));
+}
+
+TEST_F(RectNode_2,IsRectNodeMorphology_2){
+    EXPECT_TRUE(is_rectangle_array_node(fixture_.rect_array()));
+    EXPECT_FALSE(is_rectangle_array_node(fixture_.not_rect_array()));
+}
+
+TEST_F(FilledArrayNode,IsFilledArrayNode_1){
+    EXPECT_TRUE(is_filled_array_node(fixture_.filled_array()));
+    fixture_.filled_array()->print_text(std::cout);
+    std::cout<<std::endl;
+    EXPECT_FALSE(is_filled_array_node(fixture_.not_filled_array()));
+    fixture_.not_filled_array()->print_text(std::cout);
+    std::cout<<std::endl;
 }

@@ -18,14 +18,12 @@ AbstractNode* AbstractNodeNMProxy::__replace_internal__(AbstractNode* node, size
 void AbstractNodeNMProxy::__reserve_childs_internal__(AbstractNode* node, size_t sz){
     return node->relation_manager()->__reserve_childs__(node,sz);
 }
-AbstractNode::AbstractNode():
-rel_mng_(BaseData::get_anonymous_relation_manager()){}
 
 AbstractNode::AbstractNode(const std::shared_ptr<BaseData>& bd):
 rel_mng_(bd->relation_manager()){}
 
 AbstractNode::AbstractNode(NodeManager* rel_mng):
-rel_mng_(rel_mng?rel_mng:BaseData::get_anonymous_relation_manager()){}
+rel_mng_(rel_mng){}
 
 AbstractNode* AbstractNode::child(size_t id) const{
     return rel_mng_->child(this,id);
@@ -41,8 +39,8 @@ INFO_NODE AbstractNode::owner() const{
     return rel_mng_->owner(this);
 }
 
-AbstractNode::AbstractNode(size_t sz):
-rel_mng_(BaseData::get_anonymous_relation_manager()){
+AbstractNode::AbstractNode(size_t sz, NodeManager* mng){
+    rel_mng_ = mng;
     AbstractNodeNMProxy::__reserve_childs_internal__(this,sz);
 }
 
@@ -234,13 +232,13 @@ bool AbstractNode::is_refered_by(const AbstractNode* ref_owner) noexcept{
 #include "unary_node.h"
 
 //only copies childs. The owner and references will be set manually by insert/replace methods
-AbstractNode::AbstractNode(const AbstractNode& other):
-rel_mng_(other.rel_mng_),
+AbstractNode::AbstractNode(const AbstractNode& other, NodeManager* mng):
+rel_mng_(mng),
 caller_(other.caller_)
 {}
 
-AbstractNode::AbstractNode(AbstractNode&& other):
-rel_mng_(std::move(other.rel_mng_)),
+AbstractNode::AbstractNode(AbstractNode&& other, NodeManager* mng):
+rel_mng_(mng),
 caller_(other.caller_)
 {}
 

@@ -139,19 +139,18 @@ TEST_F(DataBaseDefault,Operator_Eq_move){
     BaseData::get_anonymous_relation_manager()->log_state();
 }
 TEST_F(DataBaseDefault,Type_Numeric_Array){
-    {
     std::cout<<"Run test operator equal"<<std::endl;
-    root_->insert_back<ArrayNode>(3);
+    ArrayNode* arr_1 = root_->insert_back<ArrayNode>(3);
     ArrayNode* arr = root_->insert_back<ArrayNode>(3);
-    arr->insert_back<ValueNode>(1);
-    arr->insert_back<ValueNode>(2);
-    arr->insert_back<ValueNode>(100000000);
+    auto val_1 = arr->insert_back<ValueNode>(1);
+    auto val_2 = arr->insert_back<ValueNode>(2);
+    auto val_3 = arr->insert_back<ValueNode>(100000000);
     EXPECT_EQ(arr->type_val(),TYPE_VAL::NUMERIC_ARRAY);
     EXPECT_TRUE(arr->type_val()&TYPE_VAL::VALUE);
     EXPECT_TRUE(arr->type_val()&TYPE_VAL::ARRAY);
     EXPECT_TRUE(arr->type_val()&TYPE_VAL::NUMERIC_ARRAY);
-    }
     BaseData::get_anonymous_relation_manager()->log_state();
+    db_.reset();
 }
 TEST_F(DataBaseDefault,Type_String_Array){
     //TODO: develop string node

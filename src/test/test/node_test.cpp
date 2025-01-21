@@ -20,7 +20,7 @@ using namespace functions::auxiliary;
 
 TEST(Node_test,TestDefaultConstruct){
     //Node()=default;
-    EmptyNode node;
+    EmptyNode node(nullptr);
     EXPECT_TRUE(&node);
 }
 TEST(Node_test,TestCopyConstruct){
@@ -29,9 +29,9 @@ TEST(Node_test,TestCopyConstruct){
     }*/
     {
         std::shared_ptr<BaseData> bd = std::make_shared<BaseData>("bd");
-        std::shared_ptr<VariableBase> var_tmp = bd->add_variable("tmp");
-        std::shared_ptr<VariableBase> var_A = bd->add_variable("A");
-        std::shared_ptr<VariableBase> var_B = bd->add_variable("B");
+        VariableBase* var_tmp = bd->add_variable("tmp");
+        VariableBase* var_A = bd->add_variable("A");
+        VariableBase* var_B = bd->add_variable("B");
         ArrayNode* tmp_node_1_ptr = nullptr;
         std::vector<Value_t> values_1;
         std::vector<Value_t> values_2;
@@ -143,12 +143,12 @@ TEST(NodeTest,TestReleaseChilds){
     //void release_childs();
     std::shared_ptr<BaseData> bd = std::make_shared<BaseData>("bd");
     auto root_ = bd->add_variable("root");
-    std::shared_ptr<VariableBase> var_A = bd->add_variable("A");
-    std::shared_ptr<VariableBase> var_B = bd->add_variable("B");
-    std::shared_ptr<VariableBase> var_C = bd->add_variable("C");
-    std::shared_ptr<VariableBase> var_D = bd->add_variable("D");
-    std::shared_ptr<VariableBase> var_E = bd->add_variable("E");
-    std::shared_ptr<VariableBase> var_F = bd->add_variable("F");
+    VariableBase* var_A = bd->add_variable("A");
+    VariableBase* var_B = bd->add_variable("B");
+    VariableBase* var_C = bd->add_variable("C");
+    VariableBase* var_D = bd->add_variable("D");
+    VariableBase* var_E = bd->add_variable("E");
+    VariableBase* var_F = bd->add_variable("F");
 
     ArrayNode* array = root_->node()->insert_back<ArrayNode>(7);
     array->insert_back_ref(var_A->node());

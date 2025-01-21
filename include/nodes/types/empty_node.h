@@ -15,7 +15,7 @@
 using namespace node_range_operation;
 class EmptyNode:public AbstractNode{
 public:
-    EmptyNode();
+    EmptyNode(NodeManager* mng = nullptr);
     EmptyNode(const EmptyNode& other):AbstractNode(other){}
     EmptyNode(EmptyNode&& other):AbstractNode(other){}
     ~EmptyNode();
