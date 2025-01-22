@@ -243,3 +243,63 @@ bool functions::auxiliary::equal_morphology_nodes(const std::vector<AbstractNode
     std::cout<<count<<std::endl;
     return true;
 }
+
+//independent form of nodes (compare value types, number childs, number depth)
+//add exclusion of function, range_function nodes
+//may be exception if cyclic reference
+bool functions::auxiliary::is_filled_array_node(const AbstractNode* node) noexcept{
+    assert(node);
+    const AbstractNode* first_node = first_node_not_var(node);
+    std::vector<size_t> seq_iterators;
+    std::vector<const AbstractNode*> ex_nodes;
+    size_t count = 0;
+    if(!first_node)
+        return false;
+    if(first_node->has_childs() && first_node->type_val()&TYPE_VAL::ARRAY)
+        seq_iterators.push_back(0);
+    if(!seq_iterators.empty())
+        while(seq_iterators.front()<first_node->childs().size()){
+            for(size_t iter = 1;iter<node->childs().size();++iter){
+                const AbstractNode* seq_node_child = first_node_not_var_by_ids(first_node,seq_iterators.begin(),seq_iterators.end());
+                if(!seq_node_child)
+                    return false;
+
+                std::equal_range(seq_node_child->childs().begin()+1,seq_node_child->childs().end(),[](const AbstractNode* child){
+                    
+                });
+                if(seq_node_child->type_val() != other_child_node->type_val() || (other_child_node->type_val()&TYPE_VAL::ARRAY &&
+                seq_node_child->type_val()&TYPE_VAL::ARRAY &&
+                    other_child_node->childs().size()!=seq_node_child->childs().size())){
+                    return false;
+                }
+                ++count;
+            }
+            const AbstractNode* tmp_node = first_node_not_var_by_ids(first_node,seq_iterators.begin(),seq_iterators.end());
+            if(seq_iterators.empty() && first_node->has_childs() && 
+            first_node->type_val()&TYPE_VAL::ARRAY){
+                seq_iterators.push_back(0);
+                ex_nodes.push_back(tmp_node);
+            }
+            else if((tmp_node = first_node_not_var_by_ids(first_node,seq_iterators.begin(),seq_iterators.end())))
+                if(tmp_node->has_childs() && 
+                    tmp_node->type_val()&TYPE_VAL::ARRAY){
+                    seq_iterators.push_back(0);
+                    ex_nodes.push_back(tmp_node);
+                }
+                else{
+                    if(!ex_nodes.empty() && seq_iterators.back()+1<ex_nodes.back()->childs().size())
+                        ++seq_iterators.back();
+                    else{
+                        while(!(ex_nodes.empty() || !(seq_iterators.back()+1>=ex_nodes.back()->childs().size()) || !(seq_iterators.size()>1))){
+                            seq_iterators.pop_back();
+                            ex_nodes.pop_back();
+                        }
+                        ++seq_iterators.back();
+                    }
+                }
+            else
+                return false;
+        }
+    std::cout<<count<<std::endl;
+    return true;
+}
