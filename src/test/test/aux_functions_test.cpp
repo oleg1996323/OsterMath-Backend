@@ -233,10 +233,67 @@ public:
                     else not_rect_arr_222 = not_rect_arr_22->insert_back<ArrayNode>(nodes);
                     ArrayNode* rect_arr_111 = rect_arr_11->insert_back<ArrayNode>(nodes);
                     for(int m=0;m<nodes;++m){
-                        if(k==at_exclude && m<at_exclude)
-                            not_rect_arr_222->insert_back<ValueNode>(m);
+                        if(k==at_exclude){
+                            if(m<at_exclude)
+                                not_rect_arr_222->insert_back<ValueNode>(m);
+                        }
                         else
                             not_rect_arr_222->insert_back<ValueNode>(m);
+                        rect_arr_111->insert_back<ValueNode>(m);
+                    }
+                }
+            }
+        }
+    }
+
+    AbstractNode* rect_array(){
+        return rect_node;
+    }
+
+    AbstractNode* not_rect_array(){
+        return not_rect_node;
+    }
+
+private:
+    AbstractNode* rect_node = nullptr;
+    AbstractNode* not_rect_node = nullptr;
+    std::shared_ptr<BaseData> bd;
+};
+
+class Initial_Rect_ArrayNode_3{
+
+public:
+
+    Initial_Rect_ArrayNode_3(){
+        const int nodes = 3;
+        const int at_exclude = 2;
+        bd = std::make_shared<BaseData>("bd_3");
+        auto var_rect_node = bd->add_variable("rect");
+        auto var_not_rect_node = bd->add_variable("not rect");
+        rect_node = var_rect_node->node()->insert_back<ArrayNode>(nodes);
+        not_rect_node = var_not_rect_node->node()->insert_back<ArrayNode>(nodes);
+        for(int i=0;i<nodes;++i){
+            ArrayNode* rect_arr_1 = rect_node->insert_back<ArrayNode>(nodes);
+            ArrayNode* not_rect_arr_2 = not_rect_node->insert_back<ArrayNode>(nodes);
+            for(int j=0;j<nodes;++j){
+                
+                ArrayNode* not_rect_arr_22;
+                FunctionNode* func_n;
+                ArrayNode* rect_arr_11 = rect_arr_1->insert_back<ArrayNode>(nodes);
+                if(j==at_exclude){
+                    func_n = not_rect_arr_2->insert_back<FunctionNode>(FUNCTION_OP::SUM);
+                }
+                else{
+                    not_rect_arr_22 = not_rect_arr_2->insert_back<ArrayNode>(nodes);
+                }
+                for(int k=0;k<nodes;++k){
+                    ArrayNode* not_rect_arr_222;
+                    if(j==at_exclude)
+                        not_rect_arr_222 = func_n->insert_back<ArrayNode>(nodes);
+                    else not_rect_arr_222 = not_rect_arr_22->insert_back<ArrayNode>(nodes);
+                    ArrayNode* rect_arr_111 = rect_arr_11->insert_back<ArrayNode>(nodes);
+                    for(int m=0;m<nodes;++m){
+                        not_rect_arr_222->insert_back<ValueNode>(m);
                         rect_arr_111->insert_back<ValueNode>(m);
                     }
                 }
@@ -283,7 +340,7 @@ public:
                     else not_rect_arr_222 = not_rect_arr_22->insert_back<ArrayNode>(nodes);
                     ArrayNode* rect_arr_111 = rect_arr_11->insert_back<ArrayNode>(nodes);
                     for(int m=0;m<nodes;++m){
-                        if(k==at_exclude && m<at_exclude){}
+                        if(k==at_exclude){}
                         else
                             not_rect_arr_222->insert_back<ValueNode>(m);
                         rect_arr_111->insert_back<ValueNode>(m);
@@ -336,6 +393,16 @@ protected:
 	void TearDown()
 	{	}
     Initial_Rect_ArrayNode_2 fixture_;
+};
+
+class RectNode_3: public ::testing::Test
+{
+protected:
+    void SetUp()
+	{	}
+	void TearDown()
+	{	}
+    Initial_Rect_ArrayNode_3 fixture_;
 };
 
 class FilledArrayNode: public ::testing::Test
@@ -419,6 +486,11 @@ TEST_F(RectNode_1,IsRectNodeMorphology_1){
 }
 
 TEST_F(RectNode_2,IsRectNodeMorphology_2){
+    EXPECT_TRUE(is_rectangle_array_node(fixture_.rect_array()));
+    EXPECT_FALSE(is_rectangle_array_node(fixture_.not_rect_array()));
+}
+
+TEST_F(RectNode_3,IsRectNodeMorphology_3){
     EXPECT_TRUE(is_rectangle_array_node(fixture_.rect_array()));
     EXPECT_FALSE(is_rectangle_array_node(fixture_.not_rect_array()));
 }

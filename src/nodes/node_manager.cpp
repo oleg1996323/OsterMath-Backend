@@ -112,6 +112,7 @@ AbstractNode* NodeManager::insert_back_copy(AbstractNode* at_insert_back, Abstra
     copy_node(tmp,inserted);
     return inserted;
 }
+#include "func_node.h"
 AbstractNode* NodeManager::insert_back(AbstractNode* node,std::unique_ptr<AbstractNode>&& new_child){
     if(node){
         node->flush_cache();
@@ -147,9 +148,13 @@ AbstractNode* NodeManager::insert_back(AbstractNode* node,std::unique_ptr<Abstra
                 break;
             }
             case NODE_TYPE::FUNCTION:{
-                if(node->relation_manager()->childs_[node].size()<node->relation_manager()->childs_[node].capacity())
-                    return_ptr = node->relation_manager()->childs_[node].emplace_back(new_child.get());
-                else throw std::logic_error("Invalid inserting. Prompt: Unvalailable to insert node to full defined function node");
+                if(!static_cast<FunctionNode*>(node)->is_array_function())
+                    if(node->relation_manager()->childs_[node].size()<node->relation_manager()->childs_[node].capacity()){
+                        return_ptr = node->relation_manager()->childs_[node].emplace_back(new_child.get());
+                        break;
+                    }
+                    else throw std::logic_error("Invalid inserting. Prompt: Unvalailable to insert node to full defined function node");
+                else return_ptr = node->relation_manager()->childs_[node].emplace_back(new_child.get());
                 break;
             }
             case NODE_TYPE::VALUE:

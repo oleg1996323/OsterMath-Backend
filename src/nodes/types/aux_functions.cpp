@@ -96,27 +96,27 @@ const AbstractNode* functions::auxiliary::first_node_not_var_by_ids(const Abstra
 }
 #include "test/log_duration.h"
 //check if array has rectangular morphology (all childs have same sizes in all dimensions)
-bool functions::auxiliary::is_rectangle_array_node(const AbstractNode* node) noexcept{
-    const AbstractNode* first_node = first_node_not_var(node);
-    if(!first_node)
-        return false;
-    if(first_node->type()!=NODE_TYPE::ARRAY || first_node->childs().size()==0)
-        return true;
+// bool functions::auxiliary::is_rectangle_array_node(const AbstractNode* node) noexcept{
+//     const AbstractNode* first_node = first_node_not_var(node);
+//     if(!first_node)
+//         return false;
+//     if(first_node->type()!=NODE_TYPE::ARRAY || first_node->childs().size()==0)
+//         return true;
 
-    return std::all_of(first_node->childs().begin(),first_node->childs().end(),[first_node](const AbstractNode* child){
-        if(!first_node->has_childs())
-            return false;
-        const AbstractNode* internal_first_node = first_node_not_var(first_node->child(0)); //help ignore refs
-        if(!internal_first_node)
-            return false;
-        const AbstractNode* internal_child = first_node_not_var(child);
-        if(!internal_child)
-            return false;
-        if(internal_first_node->childs().size() == internal_child->childs().size() && is_rectangle_array_node(child))
-            return true;
-        return false;
-    });
-}
+//     return std::all_of(first_node->childs().begin(),first_node->childs().end(),[first_node](const AbstractNode* child){
+//         if(!first_node->has_childs())
+//             return false;
+//         const AbstractNode* internal_first_node = first_node_not_var(first_node->child(0)); //help ignore refs
+//         if(!internal_first_node)
+//             return false;
+//         const AbstractNode* internal_child = first_node_not_var(child);
+//         if(!internal_child)
+//             return false;
+//         if(internal_first_node->childs().size() == internal_child->childs().size() && is_rectangle_array_node(child))
+//             return true;
+//         return false;
+//     });
+// }
 
 bool functions::auxiliary::is_filled_array_node(const AbstractNode* node) noexcept{
     const AbstractNode* first_node = first_node_not_var(node);
@@ -254,16 +254,57 @@ bool functions::auxiliary::is_rectangle_array_node(const AbstractNode* node) noe
         return false;
     if(first_node->type()!=NODE_TYPE::ARRAY)
         return true;
-    std::vector<size_t> seq_iterators;
-    if(first_node->has_childs())
-        seq_iterators.push_back(0);
-    else return true;
-    std::vector<size_t> comparable_iterator;
+    if(!first_node->has_childs())
+        return true;
+    std::vector<const AbstractNode*> seq_nodes; //sequence of childs of @node for effective iteration
+    seq_nodes.push_back(first_node);
+    while(first_node->childs().size()==1){ //pass first 0'index childs of first_node before branching to tree (we don't compare childs sizes)
+        first_node = first_node_not_var(first_node);
+        seq_nodes.back() = first_node;
+        if(!(first_node || check_arguments(TYPE_VAL::ARRAY,first_node))){
+            return true;
+        }}
+    std::vector<size_t> seq_iterator; //iteration indexes for @seq_nodes childs
     if(first_node->has_child(1))
-        comparable_iterator.push_back(1);
-    else comparable_iterator.push_back(0);
-    while(comparable_iterator.back()<first_node->childs().size()){
-        
+        seq_iterator.push_back(1);
+    else assert(false); //have to have child of index (1) at this moment, else @return true
+    std::vector<size_t> childs_sizes; //sizes of first valuable childs of @node
+    { //temporal construction for @childs definition
+        SizeDepthMeasure sz_d_m = init_sz_depth_measure(first_node);
+        for(size_t i = 0; i<sz_d_m.dimensions();++i)
+            childs_sizes.push_back(sz_d_m.size(i));
+    }
+    while(seq_iterator.front()<first_node->childs().size()){ //correct
+        if(seq_iterator.size()>childs_sizes.size()) //compare depths
+            return false;
+        AbstractNode* tmp = first_node_not_var(seq_nodes.back()->child(seq_iterator.back()));
+        if(seq_iterator.size()<childs_sizes.size()){
+            if(!tmp)
+                return false;
+            if(!check_arguments(TYPE_VAL::ARRAY,tmp)) //defined in first, but not defined in other child
+                return false;
+        }
+        if(check_arguments(TYPE_VAL::ARRAY,tmp)){
+            if(tmp->childs().size() == childs_sizes.at(seq_iterator.size())){
+                seq_nodes.push_back(tmp);
+                seq_iterator.push_back(0);
+            }
+            else return false;
+        }
+        else{
+            ++seq_iterator.back();
+            while(seq_iterator.size()>0 && seq_nodes.size()>0 && seq_iterator.back()==seq_nodes.back()->childs().size()){
+                seq_iterator.pop_back();
+                seq_nodes.pop_back();
+                if(!seq_iterator.empty())
+                    ++seq_iterator.back();
+            }
+            if(seq_iterator.size()==0 || seq_nodes.size()==0){
+                assert(seq_iterator.empty());
+                assert(seq_nodes.empty());
+                return true;
+            }
+        }
     }
     return true;
 }

@@ -14,11 +14,18 @@ class FunctionNode:public AbstractNode{
     public:
     inline FunctionNode(FUNCTION_OP op, NodeManager* mng):
     AbstractNode(mng),
-    operation_(op),
-    array_type_function(ARRAY_TYPE_FUNCTION[int(op)])
+    operation_(op)
     {
-        if(array_type_function)
-            throw std::runtime_error("Incorrect constructor. Prompt: function is array-type.");
+        // if(array_type_function)
+        //     throw std::runtime_error("Incorrect constructor. Prompt: function is array-type.");
+    }
+
+    inline FunctionNode(FUNCTION_OP op, NodeManager* mng, size_t sz):
+    AbstractNode(sz,mng),
+    operation_(op)
+    {
+        // if(array_type_function)
+        //     throw std::runtime_error("Incorrect constructor. Prompt: function is array-type.");
     }
 
     FunctionNode(const FunctionNode& other,NodeManager* mng);
@@ -26,7 +33,7 @@ class FunctionNode:public AbstractNode{
     ~FunctionNode();
     virtual NODE_TYPE type() const override;
     bool is_array_function() const{
-        return array_type_function;
+        return ARRAY_TYPE_FUNCTION[int(operation_)];
     }
     virtual Result execute() const override;
     virtual void print_text(std::ostream& stream) const override;

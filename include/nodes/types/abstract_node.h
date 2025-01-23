@@ -201,12 +201,20 @@ private:
 //         return __insert_back_string_node__(std::forward<T>(arg));
 // }
 
+#include "function_node/def.h"
 class FunctionNode;
 class RangeOperationNode;
 
 template<typename T, typename... ARGS>
 AbstractNode* AbstractNodeNMProxy::__insert_back_internal__(AbstractNode* node, ARGS&&... val){
-    std::unique_ptr<T> tmp = std::make_unique<T>(std::forward<ARGS>(val)...);
+    std::unique_ptr<T> tmp;
+    if constexpr (std::is_same_v<FunctionNode,T>){
+        auto func_op = std::get<0>(std::forward_as_tuple(std::forward<ARGS>(val)...));
+        if(NUMBER_OF_ARGUMENT[(int)func_op]>-1)
+            tmp = std::make_unique<T>(std::forward<ARGS>(val)...,NUMBER_OF_ARGUMENT[(int)func_op]);
+        else tmp = std::make_unique<T>(std::forward<ARGS>(val)...);
+    }
+    else tmp = std::make_unique<T>(std::forward<ARGS>(val)...);
     tmp->set_relation_manager(node->relation_manager());
     return __insert_back_internal__(node,std::move(tmp));
 }

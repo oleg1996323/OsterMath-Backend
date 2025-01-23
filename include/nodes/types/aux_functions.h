@@ -64,12 +64,12 @@ template<typename CHECK_VAL,typename... ARGS>
 requires __comparable_check_values_ptr__<CHECK_VAL, ARGS...> || __comparable_check_values_val__<CHECK_VAL, ARGS...>
 bool functions::auxiliary::check_arguments(CHECK_VAL check, ARGS&&... args){
     if constexpr (__comparable_check_values_ptr__<CHECK_VAL,ARGS...>){
-        if(((check == args->type_val()) && ...))
+        if(((check & args->type_val()) && ...))
             return true;
         else return false;
     }
     else{
-        if(((check == args.type_val()) && ...))
+        if(((check & args.type_val()) && ...))
             return true;
         else return false;
     }
