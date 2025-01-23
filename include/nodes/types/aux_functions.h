@@ -54,7 +54,7 @@ namespace functions{
 
         const ArrayNode* to_array_node(const AbstractNode* node) noexcept;
         const ValueNode* to_value_node(const AbstractNode* node) noexcept;
-        //TODO: StringNode* to_string_node(const std::shared_ptr<Node>& node);
+        const StringNode* to_string_node(const AbstractNode* node);
 
     }
 }
@@ -100,25 +100,6 @@ SizeDepthMeasure functions::auxiliary::init_sz_depth_measure(T array){
     return sz_depth_measure;
 }
 
-// void functions::auxiliary::init_sz_depth_measure(SizeDepthMeasure& sz_depth_measure, std::shared_ptr<Node> array){
-//     std::shared_ptr<Node> node = first_node_not_var(array);
-//     if(!node)
-//         return;
-//     else node = array;
-//     while(node->type()==NODE_TYPE::ARRAY && node->childs().size()!=0){
-//         sz_depth_measure.push_depth(node->childs().size());
-//         node = first_node_not_var_by_ids(node,{0});
-//     }
-// }
-
 bool same_result_type(const Result& first,const Result& second);
-
-// template<typename T>
-// requires std::is_base_of_v<AbstractNode,T>
-// bool functions::auxiliary::equal_morphology_nodes(const std::set<T*>& nodes) noexcept{
-//     std::vector<const AbstractNode*> tmp;
-//     std::copy(nodes.begin(),nodes.end(),std::back_inserter(tmp));
-//     return equal_morphology_nodes(tmp);
-// }
 
 #endif

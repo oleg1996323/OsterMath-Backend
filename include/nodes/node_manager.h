@@ -11,6 +11,7 @@ class BaseData;
 
 using References_t = std::unordered_set<ReferenceNode*>;
 using Childs_t = std::vector<AbstractNode*>;
+using Nodes_t = std::unordered_set<std::unique_ptr<AbstractNode>,NodeHash<std::unique_ptr<AbstractNode>>,NodeEq<std::unique_ptr<AbstractNode>>>;
 
 class NodeManager{
     friend class ArrayNodeNMProxy;
@@ -21,7 +22,7 @@ class NodeManager{
     std::unordered_map<const AbstractNode*,Childs_t> childs_;
     private:
     std::unordered_map<const AbstractNode*,INFO_NODE> owner_; //parent, which own this node
-    std::unordered_set<std::unique_ptr<AbstractNode>,NodeHash<std::unique_ptr<AbstractNode>>,NodeEq<std::unique_ptr<AbstractNode>>> nodes_;
+    Nodes_t nodes_;
     static const Childs_t empty_childs_;
     static const References_t empty_references_;
     // int constructed = 0;
@@ -68,7 +69,12 @@ class NodeManager{
     void begin(); //use anonymous NodeManager for safe inclusions
     void end(); //safe_merge if no one exception was thrown
 
+    const Nodes_t& nodes() const{
+        return nodes_;
+    }
+
     static void erase_child(const AbstractNode* node, size_t id) noexcept;
+    static void erase_childs(const AbstractNode* node, size_t first_id, size_t last_id) noexcept;
     static AbstractNode* child(const AbstractNode* node,size_t id);
     static AbstractNode* child(AbstractNode* node,size_t id);
     static INFO_NODE child(AbstractNode* node,const std::vector<int>::const_iterator& first,const std::vector<int>::const_iterator& last) noexcept;

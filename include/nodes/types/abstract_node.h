@@ -91,9 +91,9 @@ public:
     !std::is_same_v<T,VariableNode> &&
     !std::is_same_v<T,ReferenceNode> 
     #ifndef DEBUG
-    &&
-    !std::is_same_v<T,UnaryNode> &&
-    !std::is_same_v<T,BinaryNode>
+    //&&
+    //!std::is_same_v<T,UnaryNode> &&
+    //!std::is_same_v<T,BinaryNode>
     #endif
     )
     T* insert_back(ARGS&&... arg);
@@ -103,9 +103,9 @@ public:
     !std::is_same_v<T,VariableNode> &&
     !std::is_same_v<T,ReferenceNode> 
     #ifndef DEBUG
-    &&
-    !std::is_same_v<T,UnaryNode> &&
-    !std::is_same_v<T,BinaryNode>
+    //&&
+    //!std::is_same_v<T,UnaryNode> &&
+    //!std::is_same_v<T,BinaryNode>
     #endif
     )
     T* insert(size_t id,ARGS&&... arg);
@@ -115,9 +115,9 @@ public:
     !std::is_same_v<T,VariableNode> &&
     !std::is_same_v<T,ReferenceNode> 
     #ifndef DEBUG
-    &&
-    !std::is_same_v<T,UnaryNode> &&
-    !std::is_same_v<T,BinaryNode>
+    //&&
+    //!std::is_same_v<T,UnaryNode> &&
+    //!std::is_same_v<T,BinaryNode>
     #endif
     )
     T* replace(size_t id,ARGS&&... arg);
@@ -133,8 +133,6 @@ public:
     bool has_owner() const;
     INFO_NODE owner() const;
 
-    //void replace_move_child_to(Node*,size_t,size_t);
-    //void replace_copy_child_to(Node*,size_t,size_t);
     void refresh_parent_links() const;
     void refresh() const;
     const References_t& references() const;
@@ -153,7 +151,8 @@ public:
     NodeManager* relation_manager() const{
         return rel_mng_;
     }
-    void erase_child(size_t id) const;
+    void erase_child(size_t id);
+    void erase_childs(size_t first_id, size_t last_id);
     void set_relation_manager(const NodeManager* manager){
         rel_mng_ = const_cast<NodeManager*>(manager);
     }
@@ -236,9 +235,9 @@ requires (std::is_base_of_v<AbstractNode,T> &&
 !std::is_same_v<T,VariableNode> &&
 !std::is_same_v<T,ReferenceNode> 
 #ifndef DEBUG
-    &&
-    !std::is_same_v<T,UnaryNode> &&
-    !std::is_same_v<T,BinaryNode>
+    //&&
+    //!std::is_same_v<T,UnaryNode> &&
+    //!std::is_same_v<T,BinaryNode>
 #endif
 )
 T* AbstractNode::insert_back(ARGS&&... arg){
@@ -250,9 +249,9 @@ requires (std::is_base_of_v<AbstractNode,T> &&
 !std::is_same_v<T,VariableNode> &&
 !std::is_same_v<T,ReferenceNode> 
 #ifndef DEBUG
-&&
-!std::is_same_v<T,UnaryNode> &&
-!std::is_same_v<T,BinaryNode>
+//&&
+//!std::is_same_v<T,UnaryNode> &&
+//!std::is_same_v<T,BinaryNode>
 #endif
 )
 T* AbstractNode::insert(size_t id,ARGS&&... arg){
@@ -264,9 +263,9 @@ requires (std::is_base_of_v<AbstractNode,T> &&
 !std::is_same_v<T,VariableNode> &&
 !std::is_same_v<T,ReferenceNode> 
 #ifndef DEBUG
-&&
-!std::is_same_v<T,UnaryNode> &&
-!std::is_same_v<T,BinaryNode>
+//&&
+//!std::is_same_v<T,UnaryNode> &&
+//!std::is_same_v<T,BinaryNode>
 #endif
 )
 T* AbstractNode::replace(size_t id,ARGS&&... arg){

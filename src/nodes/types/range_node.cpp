@@ -19,13 +19,11 @@ operation_(other.operation_)
 NODE_TYPE RangeOperationNode::type() const{
     return NODE_TYPE::RANGEOP;
 }
-
 RangeOperationNode::~RangeOperationNode(){
     //std::cout<<"RangeOperationNode deleted: "<<this<<std::endl;
     if(rel_mng_)
         rel_mng_->delete_node(this);
 }
-
 Result RangeOperationNode::execute() const{
     using namespace ::functions::auxiliary;
     flush_cache();
@@ -38,7 +36,6 @@ Result RangeOperationNode::execute() const{
         return cache_;
     }
     std::set<const VariableNode*> ref_vars = define_array_type_variables();
-    
     {
         LOG_DURATION("Checking arrays");
         for(const VariableNode* var_id:ref_vars){
@@ -287,7 +284,7 @@ std::set<const AbstractNode*> RangeOperationNode::define_range_node_range_nodes(
 std::set<const VariableNode*> RangeOperationNode::define_array_type_variables() const{
     std::set<const VariableNode*> ref_vars = get_expression()->refer_to_vars();
     std::erase_if(ref_vars,[](const VariableNode* var){
-                return ::functions::auxiliary::check_arguments(TYPE_VAL::VALUE,var);
+                return !::functions::auxiliary::check_arguments(TYPE_VAL::ARRAY,var);
     });
     return ref_vars;
 }

@@ -109,12 +109,14 @@ TEST(NodeTest,TestChildInfoByIndexesConst){
     assert(array_1->childs().size()==3);
     INFO_NODE info = B->node()->child(indexes.begin(),indexes.end());
     EXPECT_TRUE(info.has_node());
+    kernel::settings::Model::set_show_through_var_nodes(false);
     if(!kernel::settings::Model::show_through_var_nodes()){
-        EXPECT_EQ(B->node()->child(0)->child(0),info.node());
-        EXPECT_EQ(A->node(),info.node());
+        EXPECT_EQ(B->node()->child(0)->child(0)->child(0)->child(0)->child(0)->child(0)->child(0),info.node());
+        EXPECT_EQ(A->node(),B->node()->child(0)->child(0)->child(0)->child(0)->child(0)->child(0));
         EXPECT_EQ(info.node()->type(),NODE_TYPE::VARIABLE); //A
     }
-    else{
+    kernel::settings::Model::set_show_through_var_nodes(true);
+    if(kernel::settings::Model::show_through_var_nodes()){
         EXPECT_EQ(B->node()->child(0)->child(0)->child(0)->child(0)->child(0)->child(0)->child(0)->child(0),info.node());
         EXPECT_EQ(B->node()->child(0)->child(0)->child(0)->child(0)->child(0)->child(0)->child(0),A->node());
         EXPECT_EQ(value_3,info.node());
@@ -179,6 +181,33 @@ TEST(NodeTest,TestReleaseChilds){
     EXPECT_FALSE(var_E->node()->is_refered_by(array));
     EXPECT_TRUE(var_F->node()->is_refered_by(var_E->node()));
     EXPECT_FALSE(array->has_childs());
+}
+TEST(NodeTest,TestEraseChilds){
+    std::shared_ptr<BaseData> bd = std::make_shared<BaseData>("any");
+    VariableBase* A = bd->add_variable("A");
+    VariableBase* B = bd->add_variable("B");
+    B->node()->insert_back<ValueNode>(10);
+    ArrayNode* arr = A->node()->insert_back<ArrayNode>(20);
+    for(int i = 0;i<20;++i){
+        if(i==10)
+            arr->insert_back_ref(B->node());
+        else
+            arr->insert_back<ValueNode>(i);
+    }
+    EXPECT_TRUE(arr->has_childs());
+    EXPECT_EQ(arr->childs().size(),20);
+    EXPECT_EQ(arr->relation_manager()->nodes().size(),22);
+    EXPECT_EQ(B->node()->references().size(),1);
+    arr->erase_childs(5,10);
+    EXPECT_TRUE(arr->has_childs());
+    EXPECT_EQ(arr->childs().size(),15);
+    EXPECT_EQ(arr->relation_manager()->nodes().size(),17);
+    EXPECT_EQ(B->node()->references().size(),1);
+    arr->erase_childs(5,6);
+    EXPECT_TRUE(arr->has_childs());
+    EXPECT_EQ(arr->childs().size(),14);
+    EXPECT_EQ(arr->relation_manager()->nodes().size(),16);
+    EXPECT_EQ(B->node()->references().size(),0);
 }
 // TEST(NodeTest,TestNodeType){
 //     //virtual NODE_TYPE type() const;

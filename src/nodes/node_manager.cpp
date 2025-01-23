@@ -66,7 +66,6 @@ INFO_NODE NodeManager::child(AbstractNode* node,const std::vector<int>::const_it
             info.parent = static_cast<VariableNode*>(static_cast<ReferenceNode*>(info.node())->child(0));
             info.id = 0;
         }
-
         if(kernel::settings::Model::show_through_var_nodes()){
             while (info.node()->type()==NODE_TYPE::VARIABLE)
                 if(info.node()->has_child(0)){
@@ -363,6 +362,7 @@ const References_t& NodeManager::references(const AbstractNode* node) noexcept{
         return node->relation_manager()->references_.at(node);
     else return NodeManager::empty_references_;
 }
+//TODO: write test
 void NodeManager::erase_child(const AbstractNode* node, size_t id) noexcept{
     if(node->has_child(id)){ //TODO: check if it is reference or owned node (then must be deleted)
         if(node->type()!=NODE_TYPE::REF){
@@ -377,7 +377,29 @@ void NodeManager::erase_child(const AbstractNode* node, size_t id) noexcept{
         }
     }
 }
-#include <cassert>
+//TODO: write test (compare childs before and childs after, nodes before and after)
+void NodeManager::erase_childs(const AbstractNode* node, size_t first_id, size_t last_id) noexcept{
+    assert(node);
+    NodeManager* rel_mng = node->relation_manager();
+    auto childs_iter = rel_mng->childs_.find(node);
+    if(childs_iter!=rel_mng->childs_.end()){
+        Childs_t& childs = childs_iter->second;
+        if(first_id>last_id)
+            std::swap(first_id,last_id);
+        Childs_t::const_iterator first_iter = first_id<(size_t)std::distance(childs.begin(),childs.end())?childs.begin()+first_id:childs.end();
+        Childs_t::const_iterator last_iter = first_iter!=childs.end() && last_id<(size_t)std::distance(childs.begin(),childs.end())?childs.begin()+last_id:childs.end();
+        Childs_t tmp;
+        std::cout<<std::distance(first_iter,last_iter)<<std::endl;
+        if(std::distance(first_iter,last_iter)>0){
+            tmp.resize(std::distance(first_iter,last_iter));
+            std::copy(first_iter,last_iter,tmp.begin());
+        }
+        childs.erase(first_iter,last_iter);
+        for(auto to_delete:tmp)
+            rel_mng->nodes_.erase(get_node(rel_mng,to_delete));
+    }
+    else return;
+}
 void NodeManager::delete_node(const AbstractNode* node){
     //++node->relation_manager()->destructed;
     auto found = node->relation_manager()->references_.find(node);

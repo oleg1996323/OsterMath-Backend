@@ -269,8 +269,12 @@ AbstractNode* AbstractNode::cut_paste(AbstractNode* other) noexcept{
     return this;
 }
 
-void AbstractNode::erase_child(size_t id) const{
+void AbstractNode::erase_child(size_t id){
     if(childs().size()>id)
         rel_mng_->erase_child(this,id);
     else throw std::invalid_argument("Invalid id for child delete");
+}
+
+void AbstractNode::erase_childs(size_t first_id, size_t last_id){
+    rel_mng_->erase_childs(this,first_id,last_id);
 }

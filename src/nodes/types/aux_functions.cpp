@@ -261,7 +261,7 @@ bool functions::auxiliary::is_rectangle_array_node(const AbstractNode* node) noe
     while(first_node->childs().size()==1){ //pass first 0'index childs of first_node before branching to tree (we don't compare childs sizes)
         first_node = first_node_not_var(first_node);
         seq_nodes.back() = first_node;
-        if(!(first_node || check_arguments(TYPE_VAL::ARRAY,first_node))){
+        if(!first_node || !check_arguments(TYPE_VAL::ARRAY,first_node)){
             return true;
         }}
     std::vector<size_t> seq_iterator; //iteration indexes for @seq_nodes childs
