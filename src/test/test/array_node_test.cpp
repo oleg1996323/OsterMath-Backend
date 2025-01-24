@@ -89,7 +89,7 @@ TEST_F(DataBaseDefault,MoveConstructor){
     for(const auto& val:values)
         arr_1->insert_back<ValueNode>(val);
     ArrayNode* arr_2 = var_2->node()->insert_back<ArrayNode>(10);
-    arr_2->cut_paste(arr_1);
+    arr_1->cut_paste(arr_2);
     EXPECT_TRUE(arr_1);
     EXPECT_EQ(arr_1->size(),0);
     EXPECT_EQ(arr_2->size(),10);
@@ -118,33 +118,75 @@ TEST_F(DataBaseDefault,Operator_Eq_copy){
     BaseData::get_anonymous_relation_manager()->log_state();
     //EXPECT_EQ(arr_1->child(0)->execute().get_value(),2);
 }
-TEST_F(DataBaseDefault,Operator_Eq_move){
+TEST_F(DataBaseDefault,Operator_Eq_copy_2){
     {
     std::cout<<"Run test operator equal"<<std::endl;
     EXPECT_TRUE(std::is_move_constructible_v<ArrayNode>);
-    auto var_1 = db_->add_variable("arr_1");
-    auto var_2 = db_->add_variable("arr_2");
-    ArrayNode* arr_1 = var_1->node()->insert_back<ArrayNode>(1);
+    VariableBase* var = db_->add_variable("arr_2");
+    ArrayNode* arr_1 = root_->insert_back<ArrayNode>(1);
     arr_1->insert_back<ValueNode>(1);
-    ValueNode* val_2 = arr_1->insert_back<ValueNode>(2);
-    ArrayNode* arr_2 = ArrayNode::implement_by(val_2);
+    arr_1->insert_back<ValueNode>(2);
+    ArrayNode* arr_2 = var->node()->insert_back<ArrayNode>(2);
+    arr_2->insert_back<ValueNode>(1);
     size_t sz = arr_2->size();
-    size_t cap = arr_2->childs().capacity();
+    size_t cap = arr_2->childs().size();
     arr_1->copy_paste(arr_2);
-    //EXPECT_EQ(arr_1->child(0)->execute().get_value(),2);
+    EXPECT_EQ(arr_1->child(0)->execute().get_value(),arr_2->child(0)->execute().get_value());
     EXPECT_TRUE(arr_1);
     EXPECT_EQ(arr_1->size(),sz);
     EXPECT_EQ(arr_1->childs().capacity(),cap);
     }
     BaseData::get_anonymous_relation_manager()->log_state();
 }
+TEST_F(DataBaseDefault,Operator_Eq_move){
+    {
+    std::cout<<"Run test operator equal"<<std::endl;
+    EXPECT_TRUE(std::is_move_constructible_v<ArrayNode>);
+    VariableBase* var = db_->add_variable("arr_2");
+    ArrayNode* arr_1 = root_->insert_back<ArrayNode>(1);
+    arr_1->insert_back<ValueNode>(1);
+    arr_1->insert_back<ValueNode>(2);
+    ArrayNode* arr_2 = var->node()->insert_back<ArrayNode>(2);
+    arr_2->insert_back<ValueNode>(10);
+    size_t sz = arr_2->size();
+    size_t cap = arr_2->childs().capacity();
+    arr_2->cut_paste(arr_1);
+    EXPECT_FALSE(!var->node()->has_childs());
+    EXPECT_EQ(arr_1->child(0)->execute().get_value(),10);
+    EXPECT_TRUE(arr_1);
+    EXPECT_EQ(arr_1->size(),sz);
+    EXPECT_EQ(arr_1->childs().capacity(),cap);
+    }
+    BaseData::get_anonymous_relation_manager()->log_state();
+}
+TEST_F(DataBaseDefault,Array_implement_by){
+    ArrayNode* arr_1 = root_->insert_back<ArrayNode>(10);
+    for(int i=0;i<10;++i)
+        arr_1->insert_back<ValueNode>(i);
+    size_t sz_1 = arr_1->size();
+    ValueNode* val = arr_1->child<ValueNode>(5);
+    ArrayNode* arr_2 = ArrayNode::implement_by(val);
+    size_t sz_2 = arr_1->size();
+    EXPECT_EQ(sz_1,sz_2);
+    EXPECT_EQ(arr_2->size(),1);
+    EXPECT_EQ(arr_2->owner().parent,arr_1);
+    size_t cap = arr_2->childs().capacity();
+    size_t nodes_before = arr_1->relation_manager()->nodes().size();
+    size_t sz_arr_2_before = arr_2->size();
+    arr_1->cut_paste(arr_2);
+    EXPECT_EQ(nodes_before - sz_2 -1,arr_1->relation_manager()->nodes().size());
+    EXPECT_EQ(arr_1->relation_manager()->nodes().find(arr_2),arr_1->relation_manager()->nodes().end());
+    //EXPECT_EQ(arr_1->child(0)->execute().get_value(),2);
+    EXPECT_TRUE(arr_1);
+    EXPECT_EQ(arr_1->size(),sz_arr_2_before);
+    EXPECT_EQ(arr_1->childs().capacity(),cap);
+}
 TEST_F(DataBaseDefault,Type_Numeric_Array){
     std::cout<<"Run test operator equal"<<std::endl;
-    ArrayNode* arr_1 = root_->insert_back<ArrayNode>(3);
     ArrayNode* arr = root_->insert_back<ArrayNode>(3);
-    auto val_1 = arr->insert_back<ValueNode>(1);
-    auto val_2 = arr->insert_back<ValueNode>(2);
-    auto val_3 = arr->insert_back<ValueNode>(100000000);
+    arr->insert_back<ValueNode>(1);
+    arr->insert_back<ValueNode>(2);
+    arr->insert_back<ValueNode>(100000000);
     EXPECT_EQ(arr->type_val(),TYPE_VAL::NUMERIC_ARRAY);
     EXPECT_TRUE(arr->type_val()&TYPE_VAL::VALUE);
     EXPECT_TRUE(arr->type_val()&TYPE_VAL::ARRAY);

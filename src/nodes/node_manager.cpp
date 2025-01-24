@@ -434,10 +434,15 @@ bool NodeManager::is_refered_by(const AbstractNode* ref_owner, const AbstractNod
         else continue;
     return false;
 }
+//@at_move - which is removed; @to_move - which is moved to position of at_move
 void NodeManager::move_node(AbstractNode* at_move, AbstractNode* to_move){
     assert(to_move->type()!=NODE_TYPE::VARIABLE && at_move->type()!=NODE_TYPE::VARIABLE);
     if(at_move && to_move && at_move!=to_move){
-        std::function<void(const AbstractNode*, const AbstractNode*)> update_child = [&update_child](const AbstractNode* child, const AbstractNode* owner){
+        References_t loc_references_; //referencing, but not owning parents
+        Childs_t loc_childs_;
+        std::unordered_map<const AbstractNode*,INFO_NODE> loc_owner; //parent, which own this node
+        Nodes_t loc_nodes_;
+        std::function<void(const AbstractNode*, const AbstractNode*)> update_child = [&update_child,&loc_owner](const AbstractNode* child, const AbstractNode* owner){
             if(child->type()!=NODE_TYPE::VARIABLE){
                 assert(child->relation_manager()->owner_.contains(child) && child->relation_manager()->owner_.at(child).is_valid());
                 child->relation_manager()->owner_.at(child).parent = const_cast<AbstractNode*>(owner);
@@ -454,35 +459,35 @@ void NodeManager::move_node(AbstractNode* at_move, AbstractNode* to_move){
                 });
             }
         };
-        
-        typename decltype(nodes_)::node_type at_move_node = std::move(at_move->relation_manager()->nodes_.extract(at_move->relation_manager()->nodes_.find(at_move)));
-        //swap node unique ptrs
-        if(at_move->relation_manager()!=to_move->relation_manager())
-            at_move->relation_manager()->nodes_.insert(std::move(to_move->relation_manager()->nodes_.extract(to_move->relation_manager()->nodes_.find(to_move))));
-
+        //temporaly saving further removed node
+        std::unique_ptr<AbstractNode> at_move_node = std::move(at_move->relation_manager()->nodes_.extract(
+                at_move->relation_manager()->nodes_.find(at_move)).value());
+        //move to local nodes container temporaly before merge (for safety)
+        std::unique_ptr<AbstractNode> to_move_node = std::move(to_move->relation_manager()->nodes_.extract(
+                get_node(to_move->relation_manager(),to_move)).value());
         //swap references
-        if(at_move->relation_manager()->references_.contains(at_move)){
+        if(to_move->has_references()){
+            for(const ReferenceNode* ref:to_move->relation_manager()->references_.at(to_move))
+                __erase_reference__(to_move,ref);
+        }
+        if(at_move->has_references()){
             for(const ReferenceNode* ref:at_move->relation_manager()->references_.at(at_move))
                 ref->relation_manager()->childs_.at(ref).at(0)=to_move;
-            at_move->relation_manager()->references_[to_move].swap(at_move->relation_manager()->references_.at(at_move));
+            at_move->relation_manager()->references_[to_move].swap(to_move->relation_manager()->references_[to_move]);
+            assert(at_move->relation_manager()->references_.at(at_move).empty());//must be empty
             at_move->relation_manager()->references_.erase(at_move);
+            if(at_move->relation_manager()!=to_move->relation_manager())
+                to_move->relation_manager()->references_.erase(to_move);
         }
-        if(to_move->relation_manager()->references_.contains(to_move)){
-            AbstractNode* empty_node = add_node(to_move->relation_manager(),std::make_unique<EmptyNode>());
-            for(const ReferenceNode* ref:to_move->relation_manager()->references_.at(to_move))
-                ref->relation_manager()->childs_.at(ref).at(0)=empty_node;
-            to_move->relation_manager()->references_[empty_node].swap(to_move->relation_manager()->references_.at(to_move));
-            to_move->relation_manager()->references_.erase(to_move);
-        }
-
+        assert(!at_move->has_references());
         //swap childs
-        NodeManager::release_childs(at_move);
         if(to_move->has_childs()){
             if(at_move->relation_manager()!=to_move->relation_manager())
-                std::swap(at_move->relation_manager()->childs_[to_move],
+                std::swap(loc_childs_,
                     to_move->relation_manager()->childs_.at(to_move));
-            for(size_t i = 0;i<to_move->relation_manager()->childs_.at(to_move).size();++i)
-                update_child(to_move->relation_manager()->childs_.at(to_move).at(i),to_move);
+            std::for_each(loc_childs_.begin(),loc_childs_.end(),[](){
+                update_child(child,to_move);
+            });
         }
 
         //swap owners
@@ -490,6 +495,10 @@ void NodeManager::move_node(AbstractNode* at_move, AbstractNode* to_move){
         at_move->relation_manager()->owner_.at(at_move).parent = to_move->relation_manager()->owner_.at(to_move).parent;
 
         at_move->set_relation_manager(to_move->relation_manager());
+
+        if(at_move->relation_manager()!=to_move->relation_manager())
+            loc_nodes_.insert(std::move(to_move->relation_manager()->nodes_.extract(get_node(to_move->relation_manager(),to_move)).value()));
+        NodeManager::release_childs(to_move);
     }
 }
 

@@ -31,7 +31,6 @@ AbstractNode* AbstractNode::child(size_t id) const{
 AbstractNode* AbstractNode::child(size_t id){
     return rel_mng_->child(this,id);
 }
-
 bool AbstractNode::has_owner() const{
     return rel_mng_->has_owner(this);
 }
@@ -183,23 +182,23 @@ const References_t& AbstractNode::references() const{
 bool AbstractNode::is_reference_of(AbstractNode* node) const{
     return rel_mng_->is_reference_of(this,node);
 }
-AbstractNode* AbstractNode::insert_back(std::unique_ptr<AbstractNode>&& node){
+AbstractNode* AbstractNode::__insert_back__(std::unique_ptr<AbstractNode>&& node){
     return AbstractNodeNMProxy::__insert_back_internal__(this,std::move(node));
 }
-AbstractNode* AbstractNode::insert(size_t id,std::unique_ptr<AbstractNode>&& node){
+AbstractNode* AbstractNode::__insert__(size_t id,std::unique_ptr<AbstractNode>&& node){
     return AbstractNodeNMProxy::__insert_internal__(this,id,std::move(node));
 }
-AbstractNode* AbstractNode::replace(size_t id,std::unique_ptr<AbstractNode>&& node){
+AbstractNode* AbstractNode::__replace__(size_t id,std::unique_ptr<AbstractNode>&& node){
     return AbstractNodeNMProxy::__replace_internal__(this,id,std::move(node));
 }
 AbstractNode* AbstractNode::insert_back_ref(AbstractNode* ref_child){
-    return insert_back(rel_mng_->make_node<ReferenceNode>(ref_child));
+    return __insert_back__(rel_mng_->make_node<ReferenceNode>(ref_child));
 }
 AbstractNode* AbstractNode::insert_ref(size_t id,AbstractNode* ref_child){
-    return insert(id,rel_mng_->make_node<ReferenceNode>(ref_child));
+    return __insert__(id,rel_mng_->make_node<ReferenceNode>(ref_child));
 }
 AbstractNode* AbstractNode::replace_ref(size_t id,AbstractNode* ref_child){
-    return replace(id,rel_mng_->make_node<ReferenceNode>(ref_child));
+    return __replace__(id,rel_mng_->make_node<ReferenceNode>(ref_child));
 }
 void AbstractNode::print_text(std::ostream& stream) const{
 }
@@ -211,16 +210,16 @@ INFO_NODE AbstractNode::child(const std::vector<int>::const_iterator& first,cons
 }
 #include "data.h"
 AbstractNode* AbstractNode::__insert_back_string_node__(const std::string& string){
-    return insert_back(std::move(rel_mng_->make_node<StringNode>(string)));
+    return __insert_back__(std::move(rel_mng_->make_node<StringNode>(string)));
 }
 AbstractNode* AbstractNode::__insert_back_string_node__(std::string&& string){
-    return insert_back(std::move(rel_mng_->make_node<StringNode>(std::move(string))));
+    return __insert_back__(std::move(rel_mng_->make_node<StringNode>(std::move(string))));
 }
 AbstractNode* AbstractNode::__insert_back_value_node__(const Value_t& val){
-    return insert_back(std::move(rel_mng_->make_node<ValueNode>(val)));
+    return __insert_back__(std::move(rel_mng_->make_node<ValueNode>(val)));
 }
 AbstractNode* AbstractNode::__insert_back_value_node__(Value_t&& val){
-    return insert_back(std::move(rel_mng_->make_node<ValueNode>(std::move(val))));
+    return __insert_back__(std::move(rel_mng_->make_node<ValueNode>(std::move(val))));
 }
 bool AbstractNode::is_refered_by(const AbstractNode* ref_owner) noexcept{
     return NodeManager::is_refered_by(ref_owner,this);
@@ -256,12 +255,12 @@ AbstractNode* AbstractNode::copy_paste(const AbstractNode* other){
     return this;
 }
 
-AbstractNode* AbstractNode::cut_paste(AbstractNode* other) noexcept{
+AbstractNode* AbstractNode::cut_paste(AbstractNode* other){
     try{
         if(!other)
             throw kernel::FatalError("Nullptr node argument", kernel::codes::NULLPTR_AT_NODE_ARG);
         if(other!=this){
-            rel_mng_->swap_node(this,other);
+            rel_mng_->move_node(this,other);
             caller_ = other->caller_;
         }
     }

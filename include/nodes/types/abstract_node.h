@@ -76,10 +76,14 @@ public:
     AbstractNode(const AbstractNode& other, NodeManager* mng);
     AbstractNode(AbstractNode&& other, NodeManager* mng);
     AbstractNode* copy_paste(const AbstractNode* other);
-    AbstractNode* cut_paste(AbstractNode* other) noexcept;
+    AbstractNode* cut_paste(AbstractNode* other);
 
     AbstractNode* child(size_t id) const;
     AbstractNode* child(size_t id);
+    template<typename T>
+    T* child(size_t id);
+    template<typename T>
+    const T* child(size_t id) const;
     INFO_NODE child(const std::vector<int>::const_iterator& first,const std::vector<int>::const_iterator& last);
     
     // template<typename T>
@@ -179,16 +183,16 @@ protected:
     AbstractNode(size_t, NodeManager*);
     virtual bool __is_not_cycled__(const AbstractNode*) const;
 private:
-    AbstractNode* insert_back(std::unique_ptr<AbstractNode>&& new_child);
+    AbstractNode* __insert_back__(std::unique_ptr<AbstractNode>&& new_child);
     //insert before value at id
-    AbstractNode* insert(size_t,std::unique_ptr<AbstractNode>&& new_child);
-    AbstractNode* replace(size_t,std::unique_ptr<AbstractNode>&& new_child);
+    AbstractNode* __insert__(size_t,std::unique_ptr<AbstractNode>&& new_child);
+    AbstractNode* __replace__(size_t,std::unique_ptr<AbstractNode>&& new_child);
     AbstractNode* __insert_back_string_node__(const std::string& string);
     AbstractNode* __insert_back_string_node__(std::string&& string);
     AbstractNode* __insert_back_value_node__(const Value_t& val);
     AbstractNode* __insert_back_value_node__(Value_t&& val);
-    INFO_NODE child(const std::vector<size_t>& indexes, const AbstractNode* caller) const;
-    INFO_NODE child(const std::vector<size_t>& indexes, AbstractNode* caller);
+    INFO_NODE __child__(const std::vector<size_t>& indexes, const AbstractNode* caller) const;
+    INFO_NODE __child__(const std::vector<size_t>& indexes, AbstractNode* caller);
 };
 
 // template<typename T>
@@ -270,4 +274,19 @@ requires (std::is_base_of_v<AbstractNode,T> &&
 )
 T* AbstractNode::replace(size_t id,ARGS&&... arg){
     return static_cast<T*>(AbstractNodeNMProxy::__replace_internal__<T,ARGS...>(this,id,std::forward<ARGS>(arg)...));
+}
+
+template<typename T>
+T* AbstractNode::child(size_t id){
+    T* res = dynamic_cast<T*>(child(id));
+    if(res)
+        return res;
+    else return nullptr;
+}
+template<typename T>
+const T* AbstractNode::child(size_t id) const{
+    const T* res = dynamic_cast<const T*>(child(id));
+    if(res)
+        return res;
+    else return nullptr;
 }
