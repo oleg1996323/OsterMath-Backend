@@ -88,11 +88,24 @@ class NodeManager{
     static AbstractNode* insert_back_copy(AbstractNode* at_insert_back, AbstractNode* inserted);
     static AbstractNode* insert_back_ref(ReferenceNode* node,AbstractNode* new_child);
 
+    static AbstractNode* insert_move(AbstractNode* at_insertion,size_t id,AbstractNode* to_insert);
+    static AbstractNode* insert_copy(AbstractNode* at_insertion,size_t id,AbstractNode* to_insert);
+    static AbstractNode* replace_move(AbstractNode* at_replacing,size_t id,AbstractNode* to_replace);
+    static AbstractNode* replace_copy(AbstractNode* at_replacing,size_t id,AbstractNode* to_replace);
+    static std::pair<Childs_t::const_iterator,Childs_t::const_iterator> insert_back_move(AbstractNode* at_insertion,Childs_t::const_iterator to_move_first,Childs_t::const_iterator to_move_last);
+    static std::pair<Childs_t::const_iterator,Childs_t::const_iterator> insert_back_copy(AbstractNode* at_insertion,Childs_t::const_iterator to_copy_first,Childs_t::const_iterator to_copy_last);
+    static std::pair<Childs_t::const_iterator,Childs_t::const_iterator> insert_move(AbstractNode* at_insertion,size_t id, Childs_t::const_iterator to_move_first,Childs_t::const_iterator to_move_last);
+    static std::pair<Childs_t::const_iterator,Childs_t::const_iterator> insert_copy(AbstractNode* at_insertion,size_t id, Childs_t::const_iterator to_copy_first,Childs_t::const_iterator to_copy_last);
+    static std::pair<Childs_t::const_iterator,Childs_t::const_iterator> replace_move(AbstractNode* at_replacing,size_t id, Childs_t::const_iterator to_move_first,Childs_t::const_iterator to_move_last);
+    static std::pair<Childs_t::const_iterator,Childs_t::const_iterator> replace_copy(AbstractNode* at_replacing,size_t id, Childs_t::const_iterator to_copy_first,Childs_t::const_iterator to_copy_last);
+    static std::pair<Childs_t::const_iterator,Childs_t::const_iterator> insert_back_empty_nodes(AbstractNode* at_insertion, size_t count);
+    static std::pair<Childs_t::const_iterator,Childs_t::const_iterator> insert_empty_nodes(AbstractNode* at_insertion, size_t pos, size_t count);
+    static std::pair<Childs_t::const_iterator,Childs_t::const_iterator> replace_by_empty_nodes(AbstractNode* at_insertion, size_t pos, size_t count);
+
     static void delete_node(const AbstractNode* node);
     static bool has_references(const AbstractNode* node) noexcept;
     static bool is_reference_of(const AbstractNode* from, AbstractNode* node);
     static bool has_owner(const AbstractNode* node) noexcept;
-    static void refresh_parent_links(const AbstractNode* node) noexcept;
     static std::set<const VariableNode*> refer_to_vars(const AbstractNode* node) noexcept;
     static std::set<const AbstractNode*> refer_to_node_of_type(const AbstractNode* node, NODE_TYPE type) noexcept;
     static bool has_childs(const AbstractNode* node) noexcept;
@@ -102,6 +115,8 @@ class NodeManager{
     static void swap_node(AbstractNode* lhs, AbstractNode* rhs);
     static void move_node(AbstractNode* at_move, AbstractNode* to_move);
     static void copy_node(AbstractNode* to_replace_by_copy, const AbstractNode* to_copy);
+    static std::pair<Childs_t::const_iterator,Childs_t::const_iterator> move_nodes(Childs_t::const_iterator at_move_first, Childs_t::const_iterator to_move_first, Childs_t::const_iterator to_move_last);
+    static std::pair<Childs_t::const_iterator,Childs_t::const_iterator> copy_nodes(Childs_t::const_iterator at_copy_first, Childs_t::const_iterator to_copy_first, Childs_t::const_iterator to_copy_last);
     static bool is_modifying(NodeManager* from);
     bool is_empty() const{
         return owner_.empty()

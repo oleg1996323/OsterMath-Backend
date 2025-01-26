@@ -26,10 +26,14 @@ AbstractNode::AbstractNode(NodeManager* rel_mng):
 rel_mng_(rel_mng){}
 
 AbstractNode* AbstractNode::child(size_t id) const{
-    return rel_mng_->child(this,id);
+    if(has_child(0))
+        return rel_mng_->child(this,id);
+    else return nullptr;
 }
 AbstractNode* AbstractNode::child(size_t id){
-    return rel_mng_->child(this,id);
+    if(has_child(0))
+        return rel_mng_->child(this,id);
+    else return nullptr;
 }
 bool AbstractNode::has_owner() const{
     return rel_mng_->has_owner(this);
@@ -45,7 +49,6 @@ AbstractNode::AbstractNode(size_t sz, NodeManager* mng){
 
 void AbstractNode::refresh() const{
     execute();
-    refresh_parent_links();
     caller_ = true;
     for(auto ref:references())
         ref->refresh();
@@ -140,7 +143,7 @@ bool AbstractNode::is_not_cycled() const{
     }
     else {
         for(auto ref:references()){
-            if(!ref->__is_not_cycled__(this))
+            if(!ref->owner().parent->__is_not_cycled__(this))
                 return false;
         }
         return true;
@@ -155,7 +158,7 @@ bool AbstractNode::__is_not_cycled__(const AbstractNode* node_cycled_search) con
     }
     else {
         for(auto ref:references()){
-            if(!ref->__is_not_cycled__(node_cycled_search))
+            if(!ref->owner().parent->__is_not_cycled__(node_cycled_search))
                 return false;
         }
         return true;
@@ -170,10 +173,6 @@ std::set<const VariableNode*> AbstractNode::refer_to_vars() const{
 
 std::set<const AbstractNode*> AbstractNode::refer_to_node_of_type(NODE_TYPE t) const{
     return rel_mng_->refer_to_node_of_type(this,t);
-}
-
-void AbstractNode::refresh_parent_links() const{
-    relation_manager()->refresh_parent_links(this);
 }
 
 const References_t& AbstractNode::references() const{
@@ -242,30 +241,37 @@ caller_(other.caller_)
 {}
 
 //only copies childs. The owner and references will be set manually by insert/replace methods
-AbstractNode* AbstractNode::copy_paste(const AbstractNode* other){
+void AbstractNode::copy_paste(const AbstractNode* other){
     try{
         if(!other)
             throw kernel::FatalError("Nullptr node argument", kernel::codes::NULLPTR_AT_NODE_ARG);
         if(other!=this){
-            rel_mng_->copy_node(this,other);
+            rel_mng_->copy_node(const_cast<AbstractNode*>(other),this);
             caller_ = other->caller_;
         }
     }
     catch(const kernel::FatalError& err){}
-    return this;
 }
 
-AbstractNode* AbstractNode::cut_paste(AbstractNode* other){
+void AbstractNode::cut_paste(AbstractNode* other){
     try{
         if(!other)
             throw kernel::FatalError("Nullptr node argument", kernel::codes::NULLPTR_AT_NODE_ARG);
         if(other!=this){
-            rel_mng_->move_node(this,other);
+            rel_mng_->move_node(other,this);
             caller_ = other->caller_;
         }
     }
     catch(const kernel::FatalError& err){}
-    return this;
+}
+
+void copy_paste(AbstractNode* copy_from, AbstractNode* paste_to){
+    if(copy_from && paste_to && copy_from!=paste_to)
+        copy_from->copy_paste(paste_to);
+}
+void cut_paste(AbstractNode* cut_from, AbstractNode* paste_to){
+    if(cut_from && paste_to && cut_from!=paste_to)
+        cut_from->cut_paste(paste_to);
 }
 
 void AbstractNode::erase_child(size_t id){
@@ -273,7 +279,72 @@ void AbstractNode::erase_child(size_t id){
         rel_mng_->erase_child(this,id);
     else throw std::invalid_argument("Invalid id for child delete");
 }
-
 void AbstractNode::erase_childs(size_t first_id, size_t last_id){
     rel_mng_->erase_childs(this,first_id,last_id);
+}
+AbstractNode* AbstractNode::insert_back_move(AbstractNode* to_move){
+    return rel_mng_->insert_back_move(this,to_move);
+}
+AbstractNode* AbstractNode::insert_back_copy(AbstractNode* to_copy){
+    return rel_mng_->insert_back_copy(this,to_copy);
+}
+AbstractNode* AbstractNode::insert_move(AbstractNode* to_move, size_t id){
+    return rel_mng_->insert_move(this,id,to_move);
+}
+AbstractNode* AbstractNode::insert_copy(AbstractNode* to_copy, size_t id){
+    return rel_mng_->insert_copy(this,id,to_copy);
+}
+AbstractNode* AbstractNode::replace_move(AbstractNode* to_move,size_t id){
+    return rel_mng_->replace_move(this,id,to_move);
+}
+AbstractNode* AbstractNode::replace_copy(AbstractNode* to_copy, size_t id){
+    return rel_mng_->replace_copy(this,id,to_copy);
+}
+AbstractNode* insert_back_move(AbstractNode* at_insertion, AbstractNode* to_insert) noexcept{
+    if(at_insertion && to_insert)
+        return at_insertion->insert_back_move(to_insert);
+    else return nullptr;
+}
+AbstractNode* insert_back_copy(AbstractNode* at_insertion,AbstractNode* to_insert){
+    if(at_insertion && to_insert)
+        return at_insertion->insert_back_copy(to_insert);
+    else return nullptr;
+}
+AbstractNode* insert_move(AbstractNode* at_insertion, size_t id, AbstractNode* to_insert) noexcept{
+    if(at_insertion && to_insert)
+        return at_insertion->insert_move(to_insert,id);
+    else return nullptr;
+}
+AbstractNode* insert_copy(AbstractNode* at_insertion, size_t id,AbstractNode* to_insert){
+    if(at_insertion && to_insert)
+        return at_insertion->insert_copy(to_insert,id);
+    else return nullptr;
+}
+AbstractNode* replace_move(AbstractNode* at_insertion, size_t id, AbstractNode* to_insert) noexcept{
+    if(at_insertion && to_insert)
+        return at_insertion->replace_move(to_insert,id);
+    else return nullptr;
+}
+AbstractNode* replace_copy(AbstractNode* at_insertion, size_t id,AbstractNode* to_insert){
+    if(at_insertion && to_insert)
+        return at_insertion->replace_copy(to_insert,id);
+    else return nullptr;
+}
+std::pair<Childs_t::const_iterator, Childs_t::const_iterator> AbstractNode::insert_back_move(Childs_t::const_iterator to_move_first,Childs_t::const_iterator to_move_last){
+    return NodeManager::insert_back_move(this,to_move_first,to_move_last);
+}
+std::pair<Childs_t::const_iterator, Childs_t::const_iterator> AbstractNode::insert_back_copy(Childs_t::const_iterator to_copy_first,Childs_t::const_iterator to_copy_last){
+    return NodeManager::insert_back_copy(this,to_copy_first,to_copy_last);
+}
+std::pair<Childs_t::const_iterator, Childs_t::const_iterator> AbstractNode::insert_move(size_t id, Childs_t::const_iterator to_move_first,Childs_t::const_iterator to_move_last){
+    return NodeManager::insert_move(this,id,to_move_first,to_move_last);
+}
+std::pair<Childs_t::const_iterator, Childs_t::const_iterator> AbstractNode::insert_copy(size_t id, Childs_t::const_iterator to_copy_first,Childs_t::const_iterator to_copy_last){
+    return NodeManager::insert_copy(this,id,to_copy_first,to_copy_last);
+}
+std::pair<Childs_t::const_iterator, Childs_t::const_iterator> AbstractNode::replace_move(size_t id, Childs_t::const_iterator to_move_first,Childs_t::const_iterator to_move_last){
+    return NodeManager::replace_move(this,id,to_move_first,to_move_last);
+}
+std::pair<Childs_t::const_iterator, Childs_t::const_iterator> AbstractNode::replace_copy(size_t id, Childs_t::const_iterator to_copy_first,Childs_t::const_iterator to_copy_last){
+    return NodeManager::replace_copy(this,id,to_copy_first,to_copy_last);
 }

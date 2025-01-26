@@ -12,8 +12,7 @@ TYPE_VAL EmptyNode::type_val() const{
     return TYPE_VAL::UNKNOWN;
 }
 EmptyNode::~EmptyNode(){
-    //std::cout<<"EmptyNode deleted: "<<this<<std::endl;
-    //rel_mng_-> call delete method for destructed node
+    std::cout<<"EmptyNode deleted: "<<this<<std::endl;
     if(rel_mng_)
         rel_mng_->delete_node(this);
 }
@@ -27,7 +26,8 @@ Result EmptyNode::execute() const{
 }
 
 Result EmptyNode::execute_for_array_variables(const execute_for_array_variables_t& structure) const{
-    return std::make_shared<exceptions::InvalidTypeOfArgument>("objective numeric-result node");
+    return std::make_shared<exceptions::InvalidTypeOfArgument>("valuable numeric-result node");
+    //TODO: add templated exception texts
 }
 
 bool EmptyNode::is_empty() const{

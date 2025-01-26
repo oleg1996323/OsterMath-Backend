@@ -15,7 +15,7 @@ enum class BINARY_OP{
 
 #include "node_manager.h"
 using namespace node_range_operation;
-class BinaryNode:public AbstractNode{
+class BinaryNode final:public AbstractNode{
     BINARY_OP operation_;
     friend UnaryNode;
     friend MultiArgumentNode;

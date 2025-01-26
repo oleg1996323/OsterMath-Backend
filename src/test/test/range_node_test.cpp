@@ -227,27 +227,26 @@ TEST(RangeFunctionNode_test,TwinEmptyArraysVars){
     multiplication->insert_back<ValueNode>(1);
 
     ArrayNode* arr_1 = A_var->node()->insert_back<ArrayNode>(1000);
-    ArrayNode* arr_2 = nullptr;
     ArrayNode* arr_3 = B_var->node()->insert_back<ArrayNode>(1000);
-    for(int i=0;i<1000;++i){
-        //if(count<1000)
-        if(!arr_2)
+    {
+        LOG_DURATION("Filling time");
+        for(int i=0;i<1000;++i){
+            ArrayNode* arr_2;
             arr_2 = arr_1->insert_back<ArrayNode>(1000); //same_values
-        else arr_1->insert_back_ref(arr_2);
-    }
-    for(int i=0;i<1000;++i){
-        //if(count<1000)
-        if(!arr_2)
-            arr_2 = arr_1->insert_back<ArrayNode>(1000);
-        else arr_1->insert_back_ref(arr_2);
-        arr_3->insert_back<ValueNode>(i); //same_values
+            arr_3->insert_back<ValueNode>(i);
+            if(i!=999)
+                arr_2->insert_back<ValueNode>(i);
+        }
     }
     sum_func->set_variable_order(A_var->node(),2);
     prod_func->set_variable_order(A_var->node(),1);
     
     sum_func->set_variable_order(B_var->node(),1);
     //not defined index for B variable
-    EXPECT_TRUE(sum_func->execute().is_error());
+    {
+        LOG_DURATION("Execution time");
+        EXPECT_TRUE(sum_func->execute().is_error());
+    }
     std::cout<<"Range_Node result: "<<sum_func->get_result()<<std::endl;
     if(sum_func->cached_result().is_error())
         std::cout<<sum_func->cached_result().get_exception()->get_prompt()<<std::endl;

@@ -17,7 +17,7 @@ ReferenceNode::ReferenceNode(const ReferenceNode& other,NodeManager* mng):Abstra
         relation_manager()->insert_back_ref(this,other.child(0));
 }
 ReferenceNode::~ReferenceNode(){
-    //std::cout<<"ReferenceNode deleted: "<<this<<std::endl;
+    std::cout<<"ReferenceNode deleted: "<<this<<std::endl;
     if(has_childs())
         ReferenceNodeNMProxy::__delete_reference_from_child__(this);
     rel_mng_->delete_node(this);
@@ -57,9 +57,17 @@ void ReferenceNode::print_text(std::ostream& stream) const{
     //     stream<<id;
     stream<<")"<<std::endl;
 }
+#include "core/settings.h"
+#include "var_node.h"
+#include "types.h"
 void ReferenceNode::print_result(std::ostream& stream) const{
-    if(childs().size()==1)
-        childs().at(0)->print_result(stream);
+    if(has_childs()){
+        assert(childs().size()==1);
+        if(child(0)->type()==NODE_TYPE::VARIABLE && !kernel::settings::Model::show_through_var_nodes())
+            stream<<child<VariableNode>(0)->variable()->name();
+        else
+            child(0)->print_result(stream);
+    }
 }
 #include "test/log_duration.h"
 Result ReferenceNode::execute_for_array_variables(const execute_for_array_variables_t& structure) const{

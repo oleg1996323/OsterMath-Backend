@@ -23,7 +23,7 @@ ArrayNode::ArrayNode(ArrayNode&& arr,NodeManager* mng):AbstractNode(arr,mng){
 }
 
 ArrayNode::~ArrayNode(){
-    //std::cout<<"ArrayNode deleted: "<<this<<std::endl;
+    std::cout<<"ArrayNode deleted: "<<this<<std::endl;
     if(rel_mng_)
         rel_mng_->delete_node(this);
 }
@@ -143,16 +143,18 @@ TYPE_VAL ArrayNode::type_val() const{
 #include "val_node.h"
 #include "func_node.h"
 #include "range_node.h"
-
-//discard from arraynode to one value (string,value_t or other)
-AbstractNode* discard(){
-
+#include "empty_node.h"
+//discard from arraynode to its child
+AbstractNode* ArrayNode::discard(){
+    if(has_child(0)){
+        AbstractNode* res = child(0);
+        rel_mng_->move_node(this,res);
+        return res;
+    }
+    else return owner().parent->replace<EmptyNode>(owner().id);
 }
-
 #include "core/system.h"
 #include "core/sys_exceptions.h"
-#include "array_node.h"
-
 ArrayNode* ArrayNodeNMProxy::__implementation__(AbstractNode* val){
     ArrayNode* array = nullptr;
     try{

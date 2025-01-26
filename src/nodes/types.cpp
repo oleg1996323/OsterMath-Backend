@@ -29,7 +29,6 @@ void VariableBase::set_name(std::string_view name){
 #include "arithmetic_types.h"
 
 void VariableBase::refresh() const{
-    node_->refresh_parent_links();
     node_->refresh();
 }
 

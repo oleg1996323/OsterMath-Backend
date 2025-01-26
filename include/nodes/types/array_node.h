@@ -26,7 +26,7 @@ ArrayNode* ArrayNodeNMProxy::__implement_by__(T* val){
     return __implementation__(val);
 }
 
-class ArrayNode:public AbstractNode{
+class ArrayNode final:public AbstractNode{
     mutable Result cache_;
 public:
     typedef AbstractNode* value_type;

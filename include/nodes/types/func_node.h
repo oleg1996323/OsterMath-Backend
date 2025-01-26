@@ -46,7 +46,7 @@ class FunctionNode:public AbstractNode{
         return cache_;
     }
     FUNCTION_OP operation() const;
-    virtual void flush_cache() const override{
+    virtual void flush_cache() const override final{
         cache_ = std::monostate();
     }
     private:

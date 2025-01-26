@@ -18,7 +18,7 @@ array_type_function(other.array_type_function){
 }
 
 FunctionNode::~FunctionNode(){
-    //std::cout<<"FunctionNode deleted: "<<this<<std::endl;
+    std::cout<<"FunctionNode deleted: "<<this<<std::endl;
     if(rel_mng_)
         rel_mng_->delete_node(this);
 }

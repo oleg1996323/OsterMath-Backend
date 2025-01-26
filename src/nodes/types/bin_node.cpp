@@ -6,7 +6,7 @@
 #include "aux_functions.h"
 
 BinaryNode::~BinaryNode(){
-    //std::cout<<"BinaryNode deleted: "<<this<<std::endl;
+    std::cout<<"BinaryNode deleted: "<<this<<std::endl;
     if(rel_mng_)
         rel_mng_->delete_node(this);
 }

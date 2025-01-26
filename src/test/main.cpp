@@ -7,6 +7,10 @@
 #include "test/testing.h"
 #include "include/test/test_log.h"
 
+#include <gtest/gtest.h>
+#include "string_node.h"
+#include "core/settings.h"
+#include "core/system.h"
 #ifdef DEBUG
 
 exceptions::EXCEPTION_TYPE exception_handler(std::function<void()> function){
@@ -20,10 +24,7 @@ exceptions::EXCEPTION_TYPE exception_handler(std::function<void()> function){
     }
 }
 
-#include <gtest/gtest.h>
-#include "string_node.h"
-#include "core/settings.h"
-#include "core/system.h"
+
 
 int main(int argc, char **argv){
     //std::cout<<sizeof(char)<<std::endl;
@@ -61,21 +62,24 @@ int main(int argc, char **argv){
 
 #else 
 
-int main(){
-    DataPool pool("main");
-    pool.add_data("any");
-    BaseData* data = pool.get("any");
-    data->setstream(std::cin);
-    //data->get("__I__")->get<ArithmeticTree>().print();
-    try{
-        data->get("I")->set_stream(std::cout);
-        data->get("I")->print_result();
-        std::cout<<std::endl;
-    }
-    catch(const std::invalid_argument& err){
-        std::cout<<err.what()<<std::endl;
-    }
-    return 0;
+int main(int argc, char **argv){
+    // DataPool pool("main");
+    // pool.add_data("any");
+    // BaseData* data = pool.get("any");
+    // data->setstream(std::cin);
+    // //data->get("__I__")->get<ArithmeticTree>().print();
+    // try{
+    //     data->get("I")->set_stream(std::cout);
+    //     data->get("I")->print_result();
+    //     std::cout<<std::endl;
+    // }
+    // catch(const std::invalid_argument& err){
+    //     std::cout<<err.what()<<std::endl;
+    // }
+    // return 0;
+    ::testing::InitGoogleTest(&argc, argv);
+    
+    return RUN_ALL_TESTS();
 }
 
 #endif

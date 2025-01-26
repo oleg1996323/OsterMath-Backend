@@ -79,8 +79,8 @@ Result VariableNode::execute_for_array_variables(const execute_for_array_variabl
     if(structure.contains(this)){
         const AbstractNode* found_node;
         {
-            //LOG_DURATION("first_node_not_var_by_ids");
-            found_node = first_node_not_var_by_ids(this,structure.at(this).sz_depth_measure);
+            //LOG_DURATION("first_node_not_var_or_ref_by_ids");
+            found_node = first_node_not_var_or_ref_by_ids(this,structure.at(this).sz_depth_measure);
         }
         // if(!found_node)
         //     throw std::runtime_error(std::string("Not found child node in array type variable ")+this->var_->name());

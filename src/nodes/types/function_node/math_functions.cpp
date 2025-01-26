@@ -29,10 +29,10 @@ Result node_function::functions::math::Sum(const FunctionNode* node){
         for(const AbstractNode* array:node->childs()){
             while(true)
             {
-                const AbstractNode* node = first_node_not_var(array);
+                const AbstractNode* node = first_node_not_var_or_ref(array);
                 for(size_t depth=0; depth<sz_depth_measure.dimensions();++depth){
                     //std::cout<<"Iterator: "<<sz_depth_measure.current_iterator(depth)<<std::endl;
-                    node = first_node_not_var(node->child(sz_depth_measure.current_iterator(depth)));
+                    node = first_node_not_var_or_ref(node->child(sz_depth_measure.current_iterator(depth)));
                 }
                 //std::cout<<"Iterator: "<<sz_depth_measure.seq_iterator(array_depth-1)<<std::endl;
                 result+=node->execute().get<Value_t>();
@@ -76,10 +76,10 @@ Result node_function::functions::math::SumProduct(const FunctionNode* node){
         for(const AbstractNode* array:node->childs()){
             while(true)
             {
-                const AbstractNode* node = first_node_not_var(array);
+                const AbstractNode* node = first_node_not_var_or_ref(array);
                 for(size_t depth=0; depth<sz_depth_measure.dimensions();++depth){
                     //std::cout<<"Iterator: "<<sz_depth_measure.current_iterator(depth)<<std::endl;
-                    node = first_node_not_var(node->child(sz_depth_measure.current_iterator(depth)));
+                    node = first_node_not_var_or_ref(node->child(sz_depth_measure.current_iterator(depth)));
                 }
                 //std::cout<<"Iterator: "<<sz_depth_measure.seq_iterator(array_depth-1)<<std::endl;
                 value_vector.at(sz_depth_measure.seq_iterator(sz_depth_measure.dimensions()-1))*=node->execute().get<Value_t>();
@@ -121,10 +121,10 @@ Result node_function::functions::math::Product(const FunctionNode* node){
 
         for(const AbstractNode* array:node->childs()){
             while(true){
-                const AbstractNode* node = first_node_not_var(array);
+                const AbstractNode* node = first_node_not_var_or_ref(array);
                 for(size_t depth=0; depth<sz_depth_measure.dimensions();++depth){
                     //std::cout<<"Iterator: "<<sz_depth_measure.current_iterator(depth)<<std::endl;
-                    node = first_node_not_var(node->child(sz_depth_measure.current_iterator(depth)));
+                    node = first_node_not_var_or_ref(node->child(sz_depth_measure.current_iterator(depth)));
                 }
                 //std::cout<<"Iterator: "<<sz_depth_measure.seq_iterator(array_depth-1)<<std::endl;
                 result*=node->execute().get<Value_t>();

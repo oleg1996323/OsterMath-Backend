@@ -27,7 +27,7 @@ public:
         VariableNode* var_1 = var_1_base->node();
         VariableNode* var_2 = var_2_base->node();
         VariableNode* var_3 = var_3_base->node();
-        EXPECT_FALSE(first_node_not_var(var_1));
+        EXPECT_FALSE(first_node_not_var_or_ref(var_1));
         ArrayNode* arr_1 = var_1->insert_back<ArrayNode>(5);
         arr_1->insert_back_ref(var_2);
         ArrayNode* arr_2 = var_2->insert_back<ArrayNode>(5);
@@ -415,15 +415,15 @@ protected:
     Initial_Filled_ArrayNode fixture_;
 };
 
-TEST_F(ComplexNode_1,Find_first_node_not_variable){
+TEST_F(ComplexNode_1,Find_first_node_not_var_or_refiable){
     try{
-        auto node = first_node_not_var(node_1_.node_1());
+        auto node = first_node_not_var_or_ref(node_1_.node_1());
         EXPECT_TRUE(node);
         EXPECT_EQ(node->type(),NODE_TYPE::ARRAY);
         EXPECT_EQ(node,node_1_.node_1()->child(0));
-        node = first_node_not_var(node->child(0));
+        node = first_node_not_var_or_ref(node->child(0));
         EXPECT_TRUE(node);
-        node = first_node_not_var(node->child(0));
+        node = first_node_not_var_or_ref(node->child(0));
         EXPECT_TRUE(node);
         EXPECT_EQ(node->type(),NODE_TYPE::VALUE);
     }
@@ -438,13 +438,13 @@ TEST_F(ComplexNode_1,Find_first_node_not_variable){
     //var.insert_back()
 }
 
-TEST(AuxiliaryFunctions,Find_first_node_not_variable_by_ids){
+TEST(AuxiliaryFunctions,Find_first_node_not_var_or_refiable_by_ids){
     std::string bd_name = "bd";
     std::shared_ptr<BaseData> bd = std::make_shared<BaseData>(bd_name);
     auto var_1= bd->add_variable("Var_1");
     auto var_2 = bd->add_variable("Var_2");
     auto var_3 = bd->add_variable("Var_3");
-    EXPECT_FALSE(first_node_not_var(var_1->node()));
+    EXPECT_FALSE(first_node_not_var_or_ref(var_1->node()));
     ArrayNode* arr_1 = var_1->node()->insert_back<ArrayNode>(5);
     arr_1->insert_back_ref(var_2->node());
     for(int i = 0;i<4;++i){
@@ -457,11 +457,11 @@ TEST(AuxiliaryFunctions,Find_first_node_not_variable_by_ids){
     }
     var_3->node()->insert_back<ValueNode>(1);
     std::vector<size_t> tmp_1{0,0};
-    auto node = first_node_not_var_by_ids(var_1->node(),tmp_1.begin(),tmp_1.end()); //arr_1(initial node) -> arr_2(0) -> arr_2(0) value
+    auto node = first_node_not_var_or_ref_by_ids(var_1->node(),tmp_1.begin(),tmp_1.end()); //arr_1(initial node) -> arr_2(0) -> arr_2(0) value
     EXPECT_TRUE(node);
     EXPECT_TRUE(node->type()==NODE_TYPE::VALUE);
     tmp_1 = {4};
-    node = first_node_not_var_by_ids(var_1->node(),tmp_1.begin(),tmp_1.end()); //arr_1(initial node) -> arr_2(4) value
+    node = first_node_not_var_or_ref_by_ids(var_1->node(),tmp_1.begin(),tmp_1.end()); //arr_1(initial node) -> arr_2(4) value
     EXPECT_TRUE(node);
     EXPECT_TRUE(node->type()==NODE_TYPE::VALUE);
 }

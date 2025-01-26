@@ -19,19 +19,19 @@ public:
     EmptyNode(const EmptyNode& other):AbstractNode(other){}
     EmptyNode(EmptyNode&& other):AbstractNode(other){}
     ~EmptyNode();
-    virtual TYPE_VAL type_val() const override;    
-    virtual NODE_TYPE type() const override;
+    virtual TYPE_VAL type_val() const override final;    
+    virtual NODE_TYPE type() const override final;
     virtual Result execute() const override;
     virtual Result execute_for_array_variables(const execute_for_array_variables_t&) const override;
-    inline virtual Result cached_result() const{
+    inline virtual Result cached_result() const override final{
         return std::monostate();
     }
-    virtual bool is_numeric() const override;
-    virtual bool is_string() const override;
-    virtual bool is_array() const override;
-    virtual bool is_empty() const override;
+    virtual bool is_numeric() const override final;
+    virtual bool is_string() const override final;
+    virtual bool is_array() const override final;
+    virtual bool is_empty() const override final;
     virtual void print_text(std::ostream& stream) const override;
     virtual void print_result(std::ostream& stream) const override;
-protected:
+private:
     virtual bool __is_not_cycled__(const AbstractNode*) const override;
 };

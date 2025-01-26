@@ -45,12 +45,12 @@ namespace functions{
         bool all_string(const Childs_t& arrays);
         bool has_cyclic_references(const AbstractNode* checked) noexcept;
         bool has_cyclic_references(const AbstractNode* node) noexcept;
-        const AbstractNode* first_node_not_var(const AbstractNode* node) noexcept;
-        AbstractNode* first_node_not_var(AbstractNode* node) noexcept;
-        AbstractNode* first_node_not_var_by_ids(AbstractNode* node, const std::vector<size_t>::const_iterator& first,const std::vector<size_t>::const_iterator& last) noexcept;
-        AbstractNode* first_node_not_var_by_ids(AbstractNode* node, const SizeDepthMeasure& seq_iterators) noexcept;
-        const AbstractNode* first_node_not_var_by_ids(const AbstractNode* node, const std::vector<size_t>::const_iterator& first,const std::vector<size_t>::const_iterator& last) noexcept;
-        const AbstractNode* first_node_not_var_by_ids(const AbstractNode* node, const SizeDepthMeasure& seq_iterators) noexcept;
+        const AbstractNode* first_node_not_var_or_ref(const AbstractNode* node) noexcept;
+        AbstractNode* first_node_not_var_or_ref(AbstractNode* node) noexcept;
+        AbstractNode* first_node_not_var_or_ref_by_ids(AbstractNode* node, const std::vector<size_t>::const_iterator& first,const std::vector<size_t>::const_iterator& last) noexcept;
+        AbstractNode* first_node_not_var_or_ref_by_ids(AbstractNode* node, const SizeDepthMeasure& seq_iterators) noexcept;
+        const AbstractNode* first_node_not_var_or_ref_by_ids(const AbstractNode* node, const std::vector<size_t>::const_iterator& first,const std::vector<size_t>::const_iterator& last) noexcept;
+        const AbstractNode* first_node_not_var_or_ref_by_ids(const AbstractNode* node, const SizeDepthMeasure& seq_iterators) noexcept;
 
         const ArrayNode* to_array_node(const AbstractNode* node) noexcept;
         const ValueNode* to_value_node(const AbstractNode* node) noexcept;
@@ -89,13 +89,13 @@ bool functions::auxiliary::check_type_container_nodes(CHECK_VAL check, CONT<T> a
 template<typename T>
 SizeDepthMeasure functions::auxiliary::init_sz_depth_measure(T array){
     SizeDepthMeasure sz_depth_measure;
-    auto node = first_node_not_var(array);
+    auto node = first_node_not_var_or_ref(array);
     if(!array)
         return sz_depth_measure;
     while(node->type()==NODE_TYPE::ARRAY && node->childs().size()!=0){
         sz_depth_measure.push_depth(node->childs().size());
         std::vector<size_t> tmp{0};
-        node = first_node_not_var_by_ids(node,tmp.begin(),tmp.end());
+        node = first_node_not_var_or_ref_by_ids(node,tmp.begin(),tmp.end());
     }
     return sz_depth_measure;
 }

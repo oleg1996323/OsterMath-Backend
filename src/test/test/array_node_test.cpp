@@ -89,17 +89,25 @@ TEST_F(DataBaseDefault,MoveConstructor){
     for(const auto& val:values)
         arr_1->insert_back<ValueNode>(val);
     ArrayNode* arr_2 = var_2->node()->insert_back<ArrayNode>(10);
-    arr_1->cut_paste(arr_2);
+    for(int i =10;i<100;i+=10){
+        arr_2->insert_back<ValueNode>(i);
+    }
+    cut_paste(arr_1,arr_2);
     EXPECT_TRUE(arr_1);
-    EXPECT_EQ(arr_1->size(),0);
-    EXPECT_EQ(arr_2->size(),10);
-    for(auto iter = arr_2->begin();iter!=arr_2->end();++iter){
-        EXPECT_TRUE(check_arguments(TYPE_VAL::VALUE,arr_2->child(iter-arr_2->begin())));
+    EXPECT_FALSE(var_1->node()->child(0));
+    EXPECT_EQ(arr_1->size(),10);
+    EXPECT_FALSE(var_1->node()->child(0));
+    EXPECT_EQ(var_2->node()->child(0),arr_1);
+    int i = 0;
+    for(AbstractNode* child:*arr_1){
+        EXPECT_TRUE(check_arguments(TYPE_VAL::VALUE,child));
+        EXPECT_EQ(child->execute().get_value(),i);
+        ++i;
     }
     }
     BaseData::get_anonymous_relation_manager()->log_state();
 }
-TEST_F(DataBaseDefault,Operator_Eq_copy){
+TEST_F(DataBaseDefault,Copy_paste_1){
     {
     std::cout<<"Run test operator equal copy"<<std::endl;
     EXPECT_TRUE(std::is_copy_constructible_v<ArrayNode>);
@@ -110,15 +118,19 @@ TEST_F(DataBaseDefault,Operator_Eq_copy){
     ArrayNode* arr_2 = var_2->node()->insert_back<ArrayNode>(2);
     arr_2->insert_back<ValueNode>(2);
     arr_2->insert_back<ValueNode>(3);
-    arr_1->copy_paste(arr_2);
+    copy_paste(arr_1,arr_2);
     EXPECT_TRUE(arr_2);
-    EXPECT_EQ(arr_1->size(),2);
-    EXPECT_EQ(arr_1->childs().capacity(),2);
+    EXPECT_EQ(arr_1->size(),1);
+    EXPECT_EQ(arr_2->size(),1);
+    EXPECT_EQ(arr_1->childs().capacity(),1);
+    EXPECT_EQ(arr_2->childs().capacity(),1);
+    EXPECT_NE(arr_2->child(0),arr_1->child(0));
+    EXPECT_EQ(arr_2->child(0)->execute().get_value(),arr_1->child(0)->execute().get_value());
     }
     BaseData::get_anonymous_relation_manager()->log_state();
     //EXPECT_EQ(arr_1->child(0)->execute().get_value(),2);
 }
-TEST_F(DataBaseDefault,Operator_Eq_copy_2){
+TEST_F(DataBaseDefault,Copy_paste_2){
     {
     std::cout<<"Run test operator equal"<<std::endl;
     EXPECT_TRUE(std::is_move_constructible_v<ArrayNode>);
@@ -128,9 +140,9 @@ TEST_F(DataBaseDefault,Operator_Eq_copy_2){
     arr_1->insert_back<ValueNode>(2);
     ArrayNode* arr_2 = var->node()->insert_back<ArrayNode>(2);
     arr_2->insert_back<ValueNode>(1);
-    size_t sz = arr_2->size();
-    size_t cap = arr_2->childs().size();
-    arr_1->copy_paste(arr_2);
+    size_t sz = arr_1->size();
+    size_t cap = arr_2->childs().capacity();
+    copy_paste(arr_1,arr_2);
     EXPECT_EQ(arr_1->child(0)->execute().get_value(),arr_2->child(0)->execute().get_value());
     EXPECT_TRUE(arr_1);
     EXPECT_EQ(arr_1->size(),sz);
@@ -138,7 +150,7 @@ TEST_F(DataBaseDefault,Operator_Eq_copy_2){
     }
     BaseData::get_anonymous_relation_manager()->log_state();
 }
-TEST_F(DataBaseDefault,Operator_Eq_move){
+TEST_F(DataBaseDefault,Cut_paste){
     {
     std::cout<<"Run test operator equal"<<std::endl;
     EXPECT_TRUE(std::is_move_constructible_v<ArrayNode>);
@@ -148,14 +160,14 @@ TEST_F(DataBaseDefault,Operator_Eq_move){
     arr_1->insert_back<ValueNode>(2);
     ArrayNode* arr_2 = var->node()->insert_back<ArrayNode>(2);
     arr_2->insert_back<ValueNode>(10);
-    size_t sz = arr_2->size();
-    size_t cap = arr_2->childs().capacity();
-    arr_2->cut_paste(arr_1);
+    size_t sz = arr_1->size();
+    size_t cap = arr_1->childs().capacity();
+    cut_paste(arr_1,arr_2);
     EXPECT_FALSE(!var->node()->has_childs());
-    EXPECT_EQ(arr_1->child(0)->execute().get_value(),10);
-    EXPECT_TRUE(arr_1);
-    EXPECT_EQ(arr_1->size(),sz);
-    EXPECT_EQ(arr_1->childs().capacity(),cap);
+    EXPECT_FALSE(root_->child(0));
+    EXPECT_EQ(var->node()->child(0)->child(0)->execute(),arr_1->child(0)->execute());
+    EXPECT_EQ(var->node()->child<ArrayNode>(0)->size(),sz);
+    EXPECT_EQ(var->node()->child<ArrayNode>(0)->childs().capacity(),cap);
     }
     BaseData::get_anonymous_relation_manager()->log_state();
 }
@@ -172,14 +184,13 @@ TEST_F(DataBaseDefault,Array_implement_by){
     EXPECT_EQ(arr_2->owner().parent,arr_1);
     size_t cap = arr_2->childs().capacity();
     size_t nodes_before = arr_1->relation_manager()->nodes().size();
-    size_t sz_arr_2_before = arr_2->size();
-    arr_1->cut_paste(arr_2);
-    EXPECT_EQ(nodes_before - sz_2 -1,arr_1->relation_manager()->nodes().size());
-    EXPECT_EQ(arr_1->relation_manager()->nodes().find(arr_2),arr_1->relation_manager()->nodes().end());
+    cut_paste(arr_2,arr_1); //delete arr_1 + 9 his childs (except the arr_2 which is implemented by val)
+    EXPECT_EQ(nodes_before - sz_2,arr_2->relation_manager()->nodes().size());
+    EXPECT_EQ(arr_2->relation_manager()->nodes().find(arr_1),arr_2->relation_manager()->nodes().end());
     //EXPECT_EQ(arr_1->child(0)->execute().get_value(),2);
-    EXPECT_TRUE(arr_1);
-    EXPECT_EQ(arr_1->size(),sz_arr_2_before);
-    EXPECT_EQ(arr_1->childs().capacity(),cap);
+    EXPECT_EQ(arr_2->childs().size(),1);
+    EXPECT_EQ(arr_2->childs().capacity(),cap);
+    EXPECT_EQ(arr_2->owner().parent,root_);
 }
 TEST_F(DataBaseDefault,Type_Numeric_Array){
     std::cout<<"Run test operator equal"<<std::endl;
@@ -349,3 +360,4 @@ TEST_F(DataBaseDefault,StringRectangleF){
     arr->print_result(std::cout);
     EXPECT_EQ("[\"1\"; \"2\"; 2]",arr->get_result());
 }
+//TODO: add test for discard
