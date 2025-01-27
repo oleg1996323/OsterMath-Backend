@@ -17,7 +17,7 @@ ReferenceNode::ReferenceNode(const ReferenceNode& other,NodeManager* mng):Abstra
         relation_manager()->insert_back_ref(this,other.child(0));
 }
 ReferenceNode::~ReferenceNode(){
-    std::cout<<"ReferenceNode deleted: "<<this<<std::endl;
+    //std::cout<<"ReferenceNode deleted: "<<this<<std::endl;
     if(has_childs())
         ReferenceNodeNMProxy::__delete_reference_from_child__(this);
     rel_mng_->delete_node(this);

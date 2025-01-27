@@ -23,7 +23,7 @@ ArrayNode::ArrayNode(ArrayNode&& arr,NodeManager* mng):AbstractNode(arr,mng){
 }
 
 ArrayNode::~ArrayNode(){
-    std::cout<<"ArrayNode deleted: "<<this<<std::endl;
+    //std::cout<<"ArrayNode deleted: "<<this<<std::endl;
     if(rel_mng_)
         rel_mng_->delete_node(this);
 }

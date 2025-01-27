@@ -267,9 +267,6 @@ TEST(NodeTest,TestInsert_1){
         EXPECT_EQ(arr_1->child(i)->owner().parent,arr_1);
     arr_1->print_text(std::cout);
 }
-TEST(NodeTest,TestInsert_2){
-
-}
 TEST(NodeTest,TestInsert_move_1){
     std::shared_ptr<BaseData> bd = std::make_shared<BaseData>("any");
     VariableBase* A = bd->add_variable("A");
@@ -307,12 +304,34 @@ TEST(NodeTest,TestInsert_move_2){
     insert_move(arr_1,5,arr_2->child(9));
     size_t nodes_after = bd_A->relation_manager()->nodes().size()+bd_B->relation_manager()->nodes().size();
     EXPECT_EQ(nodes_before,nodes_after);
-    EXPECT_EQ(arr_1->child(5)->execute(),9);
+    EXPECT_EQ(arr_1->child(5)->execute(),C->node()->execute());
+    EXPECT_EQ(arr_1->child(5)->type(),NODE_TYPE::REF);
     EXPECT_EQ(arr_2->childs().size(),9);
     EXPECT_EQ(arr_1->childs().size(),11);
 }
 TEST(NodeTest,TestInsert_copy_1){
-    
+        std::shared_ptr<BaseData> bd_A = std::make_shared<BaseData>("A");
+    std::shared_ptr<BaseData> bd_B = std::make_shared<BaseData>("B");
+    VariableBase* A = bd_A->add_variable("A");
+    VariableBase* B = bd_B->add_variable("B");
+    VariableBase* C = bd_B->add_variable("C");
+    C->node()->insert_back_ref(B->node());
+    ArrayNode* arr_1 = A->node()->insert_back<ArrayNode>(10);
+    ArrayNode* arr_2 = B->node()->insert_back<ArrayNode>(10);
+    for(int i=0;i<10;++i){
+        arr_1->insert_back<ValueNode>(i);
+        if(i!=9)
+            arr_2->insert_back<ValueNode>(i);
+        else arr_2->insert_back_ref(C->node());
+    }
+    size_t nodes_before = bd_A->relation_manager()->nodes().size()+bd_B->relation_manager()->nodes().size();
+    insert_copy(arr_1,5,arr_2->child(9));
+    size_t nodes_after = bd_A->relation_manager()->nodes().size()+bd_B->relation_manager()->nodes().size();
+    EXPECT_EQ(nodes_before,nodes_after);
+    EXPECT_EQ(arr_1->child(5)->execute(),C->node()->execute());
+    EXPECT_EQ(arr_1->child(5)->type(),NODE_TYPE::REF);
+    EXPECT_EQ(arr_2->childs().size(),10);
+    EXPECT_EQ(arr_1->childs().size(),11);
 }
 TEST(NodeTest,TestInsert_copy_2){
     

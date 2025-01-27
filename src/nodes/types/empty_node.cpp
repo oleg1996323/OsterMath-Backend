@@ -12,7 +12,7 @@ TYPE_VAL EmptyNode::type_val() const{
     return TYPE_VAL::UNKNOWN;
 }
 EmptyNode::~EmptyNode(){
-    std::cout<<"EmptyNode deleted: "<<this<<std::endl;
+    //std::cout<<"EmptyNode deleted: "<<this<<std::endl;
     if(rel_mng_)
         rel_mng_->delete_node(this);
 }

@@ -51,7 +51,6 @@ TEST_F(DataBaseDefault,Begins){
 }
 TEST_F(DataBaseDefault,Ends){
     {
-    std::cout<<"Run test begin"<<std::endl;
     ArrayNode* arr = root_->insert_back<ArrayNode>(0);
     EXPECT_EQ(arr->begin(), arr->end());
     arr->insert_back<ValueNode>(1);
@@ -61,7 +60,6 @@ TEST_F(DataBaseDefault,Ends){
 }
 TEST_F(DataBaseDefault,CopyConstructor){
     {
-    std::cout<<"Run test copy constructor"<<std::endl;
     //TODO: here error
     auto var_1 = db_->add_variable("arr_1");
     auto var_2 = db_->add_variable("arr_2");
@@ -80,7 +78,6 @@ TEST_F(DataBaseDefault,CopyConstructor){
 }
 TEST_F(DataBaseDefault,MoveConstructor){
     {
-    std::cout<<"Run test move constructor"<<std::endl;
     auto var_1 = db_->add_variable("arr_1");
     auto var_2 = db_->add_variable("arr_2");
     ArrayNode* arr_1 = var_1->node()->insert_back<ArrayNode>(10);
@@ -109,7 +106,6 @@ TEST_F(DataBaseDefault,MoveConstructor){
 }
 TEST_F(DataBaseDefault,Copy_paste_1){
     {
-    std::cout<<"Run test operator equal copy"<<std::endl;
     EXPECT_TRUE(std::is_copy_constructible_v<ArrayNode>);
     auto var_1 = db_->add_variable("arr_1");
     auto var_2 = db_->add_variable("arr_2");
@@ -132,7 +128,6 @@ TEST_F(DataBaseDefault,Copy_paste_1){
 }
 TEST_F(DataBaseDefault,Copy_paste_2){
     {
-    std::cout<<"Run test operator equal"<<std::endl;
     EXPECT_TRUE(std::is_move_constructible_v<ArrayNode>);
     VariableBase* var = db_->add_variable("arr_2");
     ArrayNode* arr_1 = root_->insert_back<ArrayNode>(1);
@@ -152,7 +147,6 @@ TEST_F(DataBaseDefault,Copy_paste_2){
 }
 TEST_F(DataBaseDefault,Cut_paste){
     {
-    std::cout<<"Run test operator equal"<<std::endl;
     EXPECT_TRUE(std::is_move_constructible_v<ArrayNode>);
     VariableBase* var = db_->add_variable("arr_2");
     ArrayNode* arr_1 = root_->insert_back<ArrayNode>(1);

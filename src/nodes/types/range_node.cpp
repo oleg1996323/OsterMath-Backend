@@ -20,7 +20,7 @@ NODE_TYPE RangeOperationNode::type() const{
     return NODE_TYPE::RANGEOP;
 }
 RangeOperationNode::~RangeOperationNode(){
-    std::cout<<"RangeOperationNode deleted: "<<this<<std::endl;
+    //std::cout<<"RangeOperationNode deleted: "<<this<<std::endl;
     if(rel_mng_)
         rel_mng_->delete_node(this);
 }
