@@ -281,7 +281,7 @@ TEST(NodeTest,TestInsert_move_1){
         arr_2->insert_back<ValueNode>(i);
     }
     size_t nodes_before = bd->relation_manager()->nodes().size();
-    arr_1->insert_move(arr_2->child(9),5);
+    insert_move(arr_1,5,arr_2->child(9));
     size_t nodes_after = bd->relation_manager()->nodes().size();
     EXPECT_EQ(nodes_before,nodes_after);
     EXPECT_EQ(arr_1->child(5)->execute(),9);
@@ -304,7 +304,7 @@ TEST(NodeTest,TestInsert_move_2){
         else arr_2->insert_back_ref(C->node());
     }
     size_t nodes_before = bd_A->relation_manager()->nodes().size()+bd_B->relation_manager()->nodes().size();
-    arr_1->insert_move(arr_2->child(9),5);
+    insert_move(arr_1,5,arr_2->child(9));
     size_t nodes_after = bd_A->relation_manager()->nodes().size()+bd_B->relation_manager()->nodes().size();
     EXPECT_EQ(nodes_before,nodes_after);
     EXPECT_EQ(arr_1->child(5)->execute(),9);
@@ -328,7 +328,7 @@ TEST(NodeTest,TestReplace_move_1){
         arr_2->insert_back<ValueNode>(i);
     }
     size_t nodes_before = bd->relation_manager()->nodes().size();
-    arr_1->replace_move(arr_2->child(9),5);
+    replace_move(arr_1,5,arr_2->child(9));
     size_t nodes_after = bd->relation_manager()->nodes().size();
     EXPECT_EQ(nodes_before,nodes_after+1); // 1 ValueNode is deleted (replaced by another)
     EXPECT_EQ(arr_1->child(5)->execute(),9);
@@ -393,7 +393,7 @@ TEST(NodeTest,TestInsert_back_move_range){
         arr_1->insert_back<ValueNode>(i);
         arr_2->insert_back<ValueNode>(i);
     }
-    arr_1->insert_back_move(arr_2->begin(),arr_2->end());
+    insert_back_move(arr_1,arr_2->begin(),arr_2->end());
     EXPECT_TRUE(arr_2);
     EXPECT_EQ(arr_2->childs().size(),0);
 }
@@ -407,7 +407,7 @@ TEST(NodeTest,TestInsert_back_copy_range){
         arr_1->insert_back<ValueNode>(i);
         arr_2->insert_back<ValueNode>(i);
     }
-    arr_1->insert_back_copy(arr_2->begin(),arr_2->end());
+    insert_back_copy(arr_1,arr_2->begin(),arr_2->end());
 }
 TEST(NodeTest,TestInsert_move_range){
     std::shared_ptr<BaseData> bd = std::make_shared<BaseData>("any");
@@ -419,7 +419,7 @@ TEST(NodeTest,TestInsert_move_range){
         arr_1->insert_back<ValueNode>(i);
         arr_2->insert_back<ValueNode>(i);
     }
-    arr_1->insert_move(5, arr_2->begin(),arr_2->end());
+    insert_move(arr_1,5, arr_2->begin(),arr_2->end());
 }
 TEST(NodeTest,TestInsert_copy_range){
     std::shared_ptr<BaseData> bd = std::make_shared<BaseData>("any");
@@ -431,7 +431,7 @@ TEST(NodeTest,TestInsert_copy_range){
         arr_1->insert_back<ValueNode>(i);
         arr_2->insert_back<ValueNode>(i);
     }
-    arr_1->insert_copy(5, arr_2->begin(),arr_2->end());
+    insert_copy(arr_1,5, arr_2->begin(),arr_2->end());
 }
 TEST(NodeTest,TestReplace_move_range){
     std::shared_ptr<BaseData> bd = std::make_shared<BaseData>("any");
@@ -450,7 +450,7 @@ TEST(NodeTest,TestReplace_move_range){
     const size_t id_at = 5;
     size_t nodes_before = bd->relation_manager()->nodes().size();
     size_t arr_1_sz_before = arr_1->size();
-    arr_1->replace_move(id_at, arr_2->begin(),arr_2->end());
+    replace_move(arr_1,id_at, arr_2->begin(),arr_2->end());
     EXPECT_EQ(arr_1->childs().size(),nodes_before-bd->variables().size()-(arr_1_sz_before-id_at));
     for(size_t i=0;i<nodes_before-bd->variables().size()-(arr_1_sz_before-id_at);++i){
         if(i<id_at)
@@ -473,5 +473,5 @@ TEST(NodeTest,TestReplace_copy_range){
         arr_1->insert_back<ValueNode>(i);
         arr_2->insert_back<ValueNode>(i);
     }
-    arr_1->replace_copy(5,arr_2->begin(),arr_2->end());
+    replace_copy(arr_1,5,arr_2->begin(),arr_2->end());
 }

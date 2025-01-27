@@ -207,23 +207,9 @@ void AbstractNode::print_result(std::ostream& stream) const{
 INFO_NODE AbstractNode::child(const std::vector<int>::const_iterator& first,const std::vector<int>::const_iterator& last){
     return rel_mng_->child(this,first,last);
 }
-#include "data.h"
-AbstractNode* AbstractNode::__insert_back_string_node__(const std::string& string){
-    return __insert_back__(std::move(rel_mng_->make_node<StringNode>(string)));
-}
-AbstractNode* AbstractNode::__insert_back_string_node__(std::string&& string){
-    return __insert_back__(std::move(rel_mng_->make_node<StringNode>(std::move(string))));
-}
-AbstractNode* AbstractNode::__insert_back_value_node__(const Value_t& val){
-    return __insert_back__(std::move(rel_mng_->make_node<ValueNode>(val)));
-}
-AbstractNode* AbstractNode::__insert_back_value_node__(Value_t&& val){
-    return __insert_back__(std::move(rel_mng_->make_node<ValueNode>(std::move(val))));
-}
 bool AbstractNode::is_refered_by(const AbstractNode* ref_owner) noexcept{
     return NodeManager::is_refered_by(ref_owner,this);
 }
-
 #include "func_node.h"
 #include "bin_node.h"
 #include "range_node.h"
@@ -282,69 +268,51 @@ void AbstractNode::erase_child(size_t id){
 void AbstractNode::erase_childs(size_t first_id, size_t last_id){
     rel_mng_->erase_childs(this,first_id,last_id);
 }
-AbstractNode* AbstractNode::insert_back_move(AbstractNode* to_move){
-    return rel_mng_->insert_back_move(this,to_move);
-}
-AbstractNode* AbstractNode::insert_back_copy(AbstractNode* to_copy){
-    return rel_mng_->insert_back_copy(this,to_copy);
-}
-AbstractNode* AbstractNode::insert_move(AbstractNode* to_move, size_t id){
-    return rel_mng_->insert_move(this,id,to_move);
-}
-AbstractNode* AbstractNode::insert_copy(AbstractNode* to_copy, size_t id){
-    return rel_mng_->insert_copy(this,id,to_copy);
-}
-AbstractNode* AbstractNode::replace_move(AbstractNode* to_move,size_t id){
-    return rel_mng_->replace_move(this,id,to_move);
-}
-AbstractNode* AbstractNode::replace_copy(AbstractNode* to_copy, size_t id){
-    return rel_mng_->replace_copy(this,id,to_copy);
-}
-AbstractNode* insert_back_move(AbstractNode* at_insertion, AbstractNode* to_insert) noexcept{
-    if(at_insertion && to_insert)
-        return at_insertion->insert_back_move(to_insert);
+AbstractNode* insert_back_move(AbstractNode* at_insertion, AbstractNode* to_move) noexcept{
+    if(at_insertion && to_move)
+        return NodeManager::insert_back_move(at_insertion,to_move);
     else return nullptr;
 }
-AbstractNode* insert_back_copy(AbstractNode* at_insertion,AbstractNode* to_insert){
-    if(at_insertion && to_insert)
-        return at_insertion->insert_back_copy(to_insert);
+AbstractNode* insert_back_copy(AbstractNode* at_insertion,AbstractNode* to_copy){
+    if(at_insertion && to_copy)
+        return NodeManager::insert_back_copy(at_insertion,to_copy);
     else return nullptr;
 }
-AbstractNode* insert_move(AbstractNode* at_insertion, size_t id, AbstractNode* to_insert) noexcept{
-    if(at_insertion && to_insert)
-        return at_insertion->insert_move(to_insert,id);
+AbstractNode* insert_move(AbstractNode* at_insertion, size_t id, AbstractNode* to_move) noexcept{
+    if(at_insertion && to_move)
+        return NodeManager::insert_move(at_insertion,id,to_move);
     else return nullptr;
 }
-AbstractNode* insert_copy(AbstractNode* at_insertion, size_t id,AbstractNode* to_insert){
-    if(at_insertion && to_insert)
-        return at_insertion->insert_copy(to_insert,id);
+AbstractNode* insert_copy(AbstractNode* at_insertion, size_t id,AbstractNode* to_copy){
+    if(at_insertion && to_copy)
+        return NodeManager::insert_copy(at_insertion,id,to_copy);
     else return nullptr;
 }
-AbstractNode* replace_move(AbstractNode* at_insertion, size_t id, AbstractNode* to_insert) noexcept{
-    if(at_insertion && to_insert)
-        return at_insertion->replace_move(to_insert,id);
+AbstractNode* replace_move(AbstractNode* to_replace, size_t id, AbstractNode* to_move) noexcept{
+    if(to_replace && to_move)
+        return NodeManager::replace_move(to_replace,id,to_move);
     else return nullptr;
 }
-AbstractNode* replace_copy(AbstractNode* at_insertion, size_t id,AbstractNode* to_insert){
-    if(at_insertion && to_insert)
-        return at_insertion->replace_copy(to_insert,id);
+AbstractNode* replace_copy(AbstractNode* to_replace, size_t id,AbstractNode* to_copy){
+    if(to_replace && to_copy)
+        return NodeManager::replace_copy(to_replace,id,to_copy);
     else return nullptr;
 }
-std::pair<Childs_t::const_iterator, Childs_t::const_iterator> AbstractNode::insert_back_move(Childs_t::const_iterator to_move_first,Childs_t::const_iterator to_move_last){
-    return NodeManager::insert_back_move(this,to_move_first,to_move_last);
+Childs_Iter_t insert_back_move(AbstractNode* at_insert,Childs_t::const_iterator to_move_first,Childs_t::const_iterator to_move_last){
+    return NodeManager::insert_back_move(at_insert,to_move_first,to_move_last);
 }
-std::pair<Childs_t::const_iterator, Childs_t::const_iterator> AbstractNode::insert_back_copy(Childs_t::const_iterator to_copy_first,Childs_t::const_iterator to_copy_last){
-    return NodeManager::insert_back_copy(this,to_copy_first,to_copy_last);
+Childs_Iter_t insert_back_copy(AbstractNode* at_insert,Childs_t::const_iterator to_copy_first,Childs_t::const_iterator to_copy_last){
+    return NodeManager::insert_back_copy(at_insert,to_copy_first,to_copy_last);
 }
-std::pair<Childs_t::const_iterator, Childs_t::const_iterator> AbstractNode::insert_move(size_t id, Childs_t::const_iterator to_move_first,Childs_t::const_iterator to_move_last){
-    return NodeManager::insert_move(this,id,to_move_first,to_move_last);
+Childs_Iter_t insert_move(AbstractNode* at_insert,size_t id, Childs_t::const_iterator to_move_first,Childs_t::const_iterator to_move_last){
+    return NodeManager::insert_move(at_insert,id,to_move_first,to_move_last);
 }
-std::pair<Childs_t::const_iterator, Childs_t::const_iterator> AbstractNode::insert_copy(size_t id, Childs_t::const_iterator to_copy_first,Childs_t::const_iterator to_copy_last){
-    return NodeManager::insert_copy(this,id,to_copy_first,to_copy_last);
+Childs_Iter_t insert_copy(AbstractNode* at_insert,size_t id, Childs_t::const_iterator to_copy_first,Childs_t::const_iterator to_copy_last){
+    return NodeManager::insert_copy(at_insert,id,to_copy_first,to_copy_last);
 }
-std::pair<Childs_t::const_iterator, Childs_t::const_iterator> AbstractNode::replace_move(size_t id, Childs_t::const_iterator to_move_first,Childs_t::const_iterator to_move_last){
-    return NodeManager::replace_move(this,id,to_move_first,to_move_last);
+Childs_Iter_t replace_move(AbstractNode* to_replace,size_t id, Childs_t::const_iterator to_move_first,Childs_t::const_iterator to_move_last){
+    return NodeManager::replace_move(to_replace,id,to_move_first,to_move_last);
 }
-std::pair<Childs_t::const_iterator, Childs_t::const_iterator> AbstractNode::replace_copy(size_t id, Childs_t::const_iterator to_copy_first,Childs_t::const_iterator to_copy_last){
-    return NodeManager::replace_copy(this,id,to_copy_first,to_copy_last);
+Childs_Iter_t replace_copy(AbstractNode* to_replace,size_t id, Childs_t::const_iterator to_copy_first,Childs_t::const_iterator to_copy_last){
+    return NodeManager::replace_copy(to_replace,id,to_copy_first,to_copy_last);
 }

@@ -20,6 +20,8 @@ class StringNode;
 class NodeManager;
 class BaseData;
 
+typedef std::pair<Childs_t::const_iterator, Childs_t::const_iterator> Childs_Iter_t;
+
 enum class NODE_TYPE{
     UNARY,
     BINARY,
@@ -122,20 +124,6 @@ public:
     )
     T* replace(size_t id,ARGS&&... arg);
 
-    AbstractNode* insert_back_move(AbstractNode* to_move);
-    std::pair<Childs_t::const_iterator, Childs_t::const_iterator> insert_back_move(Childs_t::const_iterator to_move_first,Childs_t::const_iterator to_move_last);
-    AbstractNode* insert_back_copy(AbstractNode* to_copy);
-    //TODO: make nodes erasing by iterator (not individually)
-    std::pair<Childs_t::const_iterator, Childs_t::const_iterator> insert_back_copy(Childs_t::const_iterator to_copy_first,Childs_t::const_iterator to_copy_last);
-    AbstractNode* insert_move(AbstractNode* to_move, size_t id);
-    std::pair<Childs_t::const_iterator, Childs_t::const_iterator> insert_move(size_t id, Childs_t::const_iterator to_move_first,Childs_t::const_iterator to_move_last);
-    AbstractNode* insert_copy(AbstractNode* to_copy, size_t id);
-    std::pair<Childs_t::const_iterator, Childs_t::const_iterator> insert_copy(size_t id, Childs_t::const_iterator to_copy_first,Childs_t::const_iterator to_copy_last);
-    AbstractNode* replace_move(AbstractNode* to_move,size_t id);
-    std::pair<Childs_t::const_iterator, Childs_t::const_iterator> replace_move(size_t id, Childs_t::const_iterator to_move_first,Childs_t::const_iterator to_move_last);
-    AbstractNode* replace_copy(AbstractNode* to_copy, size_t id);
-    std::pair<Childs_t::const_iterator, Childs_t::const_iterator> replace_copy(size_t id, Childs_t::const_iterator to_copy_first,Childs_t::const_iterator to_copy_last);
-
     AbstractNode* insert_back_ref(AbstractNode* ref_child);
     //insert before value at id
     AbstractNode* insert_ref(size_t,AbstractNode* new_child);
@@ -167,8 +155,8 @@ public:
     }
     void erase_child(size_t id);
     void erase_childs(size_t first_id, size_t last_id);
-    void set_relation_manager(const NodeManager* manager){
-        rel_mng_ = const_cast<NodeManager*>(manager);
+    void set_relation_manager(NodeManager* manager) const{
+        rel_mng_ = manager;
     }
 
     virtual Result execute_for_array_variables(const execute_for_array_variables_t&) const;
@@ -193,14 +181,22 @@ protected:
     AbstractNode(size_t, NodeManager*);
     virtual bool __is_not_cycled__(const AbstractNode*) const;
 private:
+friend AbstractNode* insert_back_move(AbstractNode* at_insertion, AbstractNode* to_insert) noexcept;
+friend AbstractNode* insert_back_copy(AbstractNode* at_insertion,AbstractNode* to_insert);
+friend AbstractNode* insert_move(AbstractNode* at_insertion, size_t id, AbstractNode* to_insert) noexcept;
+friend AbstractNode* insert_copy(AbstractNode* at_insertion, size_t id,AbstractNode* to_insert);
+friend AbstractNode* replace_move(AbstractNode* at_replace, size_t id, AbstractNode* to_replace) noexcept;
+friend AbstractNode* replace_copy(AbstractNode* at_replace, size_t id,AbstractNode* to_replace);
+friend Childs_Iter_t insert_back_move(AbstractNode* at_insertion,Childs_t::const_iterator to_move_first,Childs_t::const_iterator to_move_last);
+friend Childs_Iter_t insert_back_copy(AbstractNode* at_insertion,Childs_t::const_iterator to_copy_first,Childs_t::const_iterator to_copy_last);
+friend Childs_Iter_t insert_move(AbstractNode* at_insertion,size_t id, Childs_t::const_iterator to_move_first,Childs_t::const_iterator to_move_last);
+friend Childs_Iter_t insert_copy(AbstractNode* at_insertion,size_t id, Childs_t::const_iterator to_copy_first,Childs_t::const_iterator to_copy_last);
+friend Childs_Iter_t replace_move(AbstractNode* at_insertion,size_t id, Childs_t::const_iterator to_move_first,Childs_t::const_iterator to_move_last);
+friend Childs_Iter_t replace_copy(AbstractNode* at_insertion,size_t id, Childs_t::const_iterator to_copy_first,Childs_t::const_iterator to_copy_last);
     AbstractNode* __insert_back__(std::unique_ptr<AbstractNode>&& new_child);
     //insert before value at id
     AbstractNode* __insert__(size_t,std::unique_ptr<AbstractNode>&& new_child);
     AbstractNode* __replace__(size_t,std::unique_ptr<AbstractNode>&& new_child);
-    AbstractNode* __insert_back_string_node__(const std::string& string);
-    AbstractNode* __insert_back_string_node__(std::string&& string);
-    AbstractNode* __insert_back_value_node__(const Value_t& val);
-    AbstractNode* __insert_back_value_node__(Value_t&& val);
     INFO_NODE __child__(const std::vector<size_t>& indexes, const AbstractNode* caller) const;
     INFO_NODE __child__(const std::vector<size_t>& indexes, AbstractNode* caller);
 };
@@ -215,8 +211,14 @@ AbstractNode* insert_back_move(AbstractNode* at_insertion, AbstractNode* to_inse
 AbstractNode* insert_back_copy(AbstractNode* at_insertion,AbstractNode* to_insert);
 AbstractNode* insert_move(AbstractNode* at_insertion, size_t id, AbstractNode* to_insert) noexcept;
 AbstractNode* insert_copy(AbstractNode* at_insertion, size_t id,AbstractNode* to_insert);
-AbstractNode* replace_move(AbstractNode* at_insertion, size_t id, AbstractNode* to_insert) noexcept;
-AbstractNode* replace_copy(AbstractNode* at_insertion, size_t id,AbstractNode* to_insert);
+AbstractNode* replace_move(AbstractNode* at_replace, size_t id, AbstractNode* to_replace) noexcept;
+AbstractNode* replace_copy(AbstractNode* at_replace, size_t id,AbstractNode* to_replace);
+Childs_Iter_t insert_back_move(AbstractNode* at_insertion,Childs_t::const_iterator to_move_first,Childs_t::const_iterator to_move_last);
+Childs_Iter_t insert_back_copy(AbstractNode* at_insertion,Childs_t::const_iterator to_copy_first,Childs_t::const_iterator to_copy_last);
+Childs_Iter_t insert_move(AbstractNode* at_insertion,size_t id, Childs_t::const_iterator to_move_first,Childs_t::const_iterator to_move_last);
+Childs_Iter_t insert_copy(AbstractNode* at_insertion,size_t id, Childs_t::const_iterator to_copy_first,Childs_t::const_iterator to_copy_last);
+Childs_Iter_t replace_move(AbstractNode* at_insertion,size_t id, Childs_t::const_iterator to_move_first,Childs_t::const_iterator to_move_last);
+Childs_Iter_t replace_copy(AbstractNode* at_insertion,size_t id, Childs_t::const_iterator to_copy_first,Childs_t::const_iterator to_copy_last);
 
 template<typename T, typename... ARGS>
 AbstractNode* AbstractNodeNMProxy::__insert_back_internal__(AbstractNode* node, ARGS&&... val){
