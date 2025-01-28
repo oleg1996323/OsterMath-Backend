@@ -138,31 +138,25 @@ bool AbstractNode::refer_to_var(std::string_view var_name) const{
 }
 
 bool AbstractNode::is_not_cycled() const{
-    if(references().empty()){
-        return true;
+    for(auto ref:references()){
+        if(!ref->owner().parent->__is_not_cycled__(this))
+            return false;
     }
-    else {
-        for(auto ref:references()){
-            if(!ref->owner().parent->__is_not_cycled__(this))
-                return false;
-        }
-        return true;
-    }
+    if(type()!=NODE_TYPE::VARIABLE && !owner().parent->__is_not_cycled__(this))
+        return false;
+    return true;
 }
 
 bool AbstractNode::__is_not_cycled__(const AbstractNode* node_cycled_search) const{
     if(this == node_cycled_search)
         return false;
-    if(references().empty()){
-        return true;
+    for(auto ref:references()){
+        if(!ref->owner().parent->__is_not_cycled__(node_cycled_search))
+            return false;
     }
-    else {
-        for(auto ref:references()){
-            if(!ref->owner().parent->__is_not_cycled__(node_cycled_search))
-                return false;
-        }
-        return true;
-    }
+    if(type()!=NODE_TYPE::VARIABLE && !owner().parent->__is_not_cycled__(this))
+        return false;
+    return true;
 }
 
 #include "aux_functions.h"

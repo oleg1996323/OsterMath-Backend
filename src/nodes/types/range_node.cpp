@@ -31,7 +31,11 @@ Result RangeOperationNode::execute() const{
         cache_ =  std::make_shared<exceptions::Exception>("Missing expression at range node");
         return cache_;
     }
-    if(has_cyclic_references(this)){
+    // if(has_cyclic_references(this)){
+    //     cache_=std::make_shared<exceptions::CyclicReference>("");
+    //     return cache_;
+    // }
+    if(!is_not_cycled()){
         cache_=std::make_shared<exceptions::CyclicReference>("");
         return cache_;
     }

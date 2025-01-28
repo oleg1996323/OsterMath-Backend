@@ -325,10 +325,15 @@ TEST(NodeTest,TestInsert_copy_1){
         else arr_2->insert_back_ref(C->node());
     }
     size_t nodes_before = bd_A->relation_manager()->nodes().size()+bd_B->relation_manager()->nodes().size();
+    EXPECT_FALSE(arr_1->child(5)->execute().is_error());
+    AbstractNode* child_5_before = arr_1->child(5);
     insert_copy(arr_1,5,arr_2->child(9));
     size_t nodes_after = bd_A->relation_manager()->nodes().size()+bd_B->relation_manager()->nodes().size();
-    EXPECT_EQ(nodes_before,nodes_after);
-    EXPECT_EQ(arr_1->child(5)->execute(),C->node()->execute());
+    EXPECT_EQ(nodes_before,nodes_after-1); //only 1 REF is copyied and inserted
+    EXPECT_EQ(child_5_before,arr_1->child(6));
+    EXPECT_TRUE(arr_1->child(5)->execute().is_error());
+    EXPECT_TRUE(C->node()->execute().is_error());
+    EXPECT_FALSE(arr_1->child(6)->execute().is_error());
     EXPECT_EQ(arr_1->child(5)->type(),NODE_TYPE::REF);
     EXPECT_EQ(arr_2->childs().size(),10);
     EXPECT_EQ(arr_1->childs().size(),11);

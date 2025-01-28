@@ -26,7 +26,7 @@ Result ReferenceNode::execute() const{
     assert(has_child(0));
     if(is_not_cycled())
         return child(0)->execute();
-    else return exceptions::CyclicReference("");
+    else return std::make_shared<exceptions::CyclicReference>("");
 }
 bool ReferenceNode::is_empty() const{
     return childs().size()==0;

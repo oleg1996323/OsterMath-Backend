@@ -80,7 +80,7 @@ TEST(RangeFunctionNode_test,Example_2){
     std::cout<<"Run test Example 2"<<std::endl;
     std::shared_ptr<BaseData> bd = std::make_shared<BaseData>("BD");
     auto root_ = bd->add_variable("root");
-    const int node_count = 100;
+    const int node_count = 1000;
     
     RangeOperationNode* sum_func = root_->node()->insert_back<RangeOperationNode>(RANGE_OP::SUM);
     BinaryNode* adding = sum_func->set_expression<BinaryNode>(BINARY_OP::ADD);
@@ -255,18 +255,18 @@ TEST(RangeFunctionNode_test,NotArrayVar){
     //SUM_I(#B+PROD_I(#A*1;#A;1);#A;2;#B;1)
     std::cout<<"Run test not array variable"<<std::endl;
     std::shared_ptr<BaseData> bd = std::make_shared<BaseData>("BD");
-    std::unique_ptr<RangeOperationNode> sum_func = bd->make_node<RangeOperationNode>(RANGE_OP::SUM);
-    std::unique_ptr<RangeOperationNode> prod_func = bd->make_node<RangeOperationNode>(RANGE_OP::PROD);
-    
-    std::unique_ptr<BinaryNode> adding = bd->make_node<BinaryNode>(BINARY_OP::ADD);
-    std::unique_ptr<BinaryNode> multiplication = bd->make_node<BinaryNode>(BINARY_OP::MUL);
-    
-
+    auto var = bd->add_variable("var");
     VariableBase* A_var = bd->add_variable("A");
-    A_var->node()->insert_back<ValueNode>(1);
+    VariableBase* B_var = bd->add_variable("B");
+    RangeOperationNode* sum_func = var->node()->insert_back<RangeOperationNode>(RANGE_OP::SUM);
+    BinaryNode* adding = sum_func->set_expression<BinaryNode>(BINARY_OP::ADD);
+    adding->insert_back_ref(B_var->node());
+    RangeOperationNode* prod_func = adding->insert_back<RangeOperationNode>(RANGE_OP::PROD);
+    BinaryNode* multiplication = prod_func->set_expression<BinaryNode>(BINARY_OP::MUL);
+    multiplication->insert_back_ref(A_var->node());
+    multiplication->insert_back<ValueNode>(1);
     
-    sum_func->set_expression(A_var->node());
-
+    A_var->node()->insert_back<ValueNode>(1);
     EXPECT_TRUE(sum_func->execute().is_error());
     std::cout<<"Range_Node result: "<<sum_func->get_result()<<std::endl;
     if(sum_func->cached_result().is_error())
