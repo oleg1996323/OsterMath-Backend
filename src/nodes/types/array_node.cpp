@@ -17,7 +17,7 @@ ArrayNode::ArrayNode(const ArrayNode& arr,NodeManager* mng):AbstractNode(arr,mng
 }
 ArrayNode::ArrayNode(ArrayNode&& arr,NodeManager* mng):AbstractNode(arr,mng){
     if(this!=&arr){
-        rel_mng_->swap_node(this,&arr);
+        rel_mng_->move_node(this,&arr);
         std::swap(cache_,arr.cache_);
     }
 }

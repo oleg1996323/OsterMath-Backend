@@ -26,6 +26,7 @@ class BinaryNode final:public AbstractNode{
     BinaryNode(const BinaryNode& other,NodeManager* mng):AbstractNode(other),operation_(other.operation_){
         if(this!=&other)
             rel_mng_->copy_node(this,&other);
+            
     }
     BinaryNode(BinaryNode&& other, NodeManager* mng):AbstractNode(other),operation_(other.operation_){
         if(this!=&other)

@@ -184,10 +184,59 @@ AbstractNode* NodeManager::insert_move(AbstractNode* at_insertion,size_t id,Abst
     move_node(tmp,to_insert);
     return to_insert;
 }
+#include "array_node.h"
+#include "bin_node.h"
+#include "range_node.h"
+#include "ref_node.h"
+#include "string_node.h"
+#include "val_node.h"
+#include "unary_node.h"
 AbstractNode* NodeManager::insert_copy(AbstractNode* at_insertion,size_t id,AbstractNode* to_insert){
-    AbstractNode* tmp = at_insertion->insert<EmptyNode>(id);
-    copy_node(tmp,to_insert);
-    return to_insert;
+    AbstractNode* tmp;
+    assert(to_insert->type()!=NODE_TYPE::VARIABLE);
+    switch(to_insert->type()){
+        case NODE_TYPE::ARRAY:{
+            tmp = at_insertion->insert<ArrayNode>(id,*static_cast<const ArrayNode*>(to_insert));
+            break;
+        }
+        case NODE_TYPE::BINARY:{
+            tmp = at_insertion->insert<BinaryNode>(id,*static_cast<const BinaryNode*>(to_insert));
+            break;
+        }
+        case NODE_TYPE::FUNCTION:{
+            tmp = at_insertion->insert<FunctionNode>(id,*static_cast<const FunctionNode*>(to_insert));
+            break;
+        }
+        case NODE_TYPE::RANGEOP:{
+            tmp = at_insertion->insert<RangeOperationNode>(id,*static_cast<const RangeOperationNode*>(to_insert));
+            break;
+        }
+        case NODE_TYPE::REF:{
+            tmp = at_insertion->insert<ReferenceNode>(id,*static_cast<const ReferenceNode*>(to_insert));
+            break;
+        }
+        case NODE_TYPE::STRING:{
+            tmp = at_insertion->insert<StringNode>(id,*static_cast<const StringNode*>(to_insert));
+            break;
+        }
+        case NODE_TYPE::UNARY:{
+            tmp = at_insertion->insert<UnaryNode>(id,*static_cast<const UnaryNode*>(to_insert));
+            break;
+        }
+        case NODE_TYPE::UNDEF:{
+            tmp = at_insertion->insert<EmptyNode>(id,*static_cast<const EmptyNode*>(to_insert));
+            break;
+        }
+        case NODE_TYPE::VALUE:{
+            tmp = at_insertion->insert<ValueNode>(id,*static_cast<const ValueNode*>(to_insert));
+            break;
+        }
+        default:{
+            throw std::runtime_error("Unable to insert");
+            break;
+        }
+    }
+    return tmp;
 }
 Childs_Iter_t NodeManager::insert_move(AbstractNode* at_insertion,size_t id, Childs_t::const_iterator to_move_first,Childs_t::const_iterator to_move_last){
     static const Childs_Iter_t empty;
@@ -874,7 +923,7 @@ void NodeManager::copy_node(AbstractNode* to_replace_by_copy, const AbstractNode
     }
     release_childs(to_replace_by_copy);
     for(size_t id=0;id<tmp_nodes.size();++id)
-        replace(to_replace_by_copy,std::move(tmp_nodes.at(id)));
+        insert_back(to_replace_by_copy,std::move(tmp_nodes.at(id)));
 }
 ReferenceNode* NodeManager::__erase_reference__(const AbstractNode* from_node, ReferenceNode* ref) noexcept{
     auto found = from_node->relation_manager()->references_.at(from_node).find(ref);

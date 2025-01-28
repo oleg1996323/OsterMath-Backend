@@ -90,8 +90,7 @@ public:
 
     template<typename T, typename... ARGS>
     requires (std::is_base_of_v<AbstractNode,T> &&
-    !std::is_same_v<T,VariableNode> &&
-    !std::is_same_v<T,ReferenceNode> 
+    !std::is_same_v<T,VariableNode> 
     #ifndef DEBUG
     //&&
     //!std::is_same_v<T,UnaryNode> &&
@@ -102,8 +101,7 @@ public:
 
     template<typename T, typename... ARGS>
     requires (std::is_base_of_v<AbstractNode,T> &&
-    !std::is_same_v<T,VariableNode> &&
-    !std::is_same_v<T,ReferenceNode> 
+    !std::is_same_v<T,VariableNode> 
     #ifndef DEBUG
     //&&
     //!std::is_same_v<T,UnaryNode> &&
@@ -114,8 +112,7 @@ public:
 
     template<typename T, typename... ARGS>
     requires (std::is_base_of_v<AbstractNode,T> &&
-    !std::is_same_v<T,VariableNode> &&
-    !std::is_same_v<T,ReferenceNode> 
+    !std::is_same_v<T,VariableNode> 
     #ifndef DEBUG
     //&&
     //!std::is_same_v<T,UnaryNode> &&
@@ -248,8 +245,7 @@ AbstractNode* AbstractNodeNMProxy::__replace_internal__(AbstractNode* node, size
 
 template<typename T, typename... ARGS>
 requires (std::is_base_of_v<AbstractNode,T> &&
-!std::is_same_v<T,VariableNode> &&
-!std::is_same_v<T,ReferenceNode> 
+!std::is_same_v<T,VariableNode> 
 #ifndef DEBUG
     //&&
     //!std::is_same_v<T,UnaryNode> &&
@@ -262,8 +258,7 @@ T* AbstractNode::insert_back(ARGS&&... arg){
 
 template<typename T, typename... ARGS>
 requires (std::is_base_of_v<AbstractNode,T> &&
-!std::is_same_v<T,VariableNode> &&
-!std::is_same_v<T,ReferenceNode> 
+!std::is_same_v<T,VariableNode>
 #ifndef DEBUG
 //&&
 //!std::is_same_v<T,UnaryNode> &&
@@ -276,8 +271,7 @@ T* AbstractNode::insert(size_t id,ARGS&&... arg){
 
 template<typename T, typename... ARGS>
 requires (std::is_base_of_v<AbstractNode,T> &&
-!std::is_same_v<T,VariableNode> &&
-!std::is_same_v<T,ReferenceNode> 
+!std::is_same_v<T,VariableNode>
 #ifndef DEBUG
 //&&
 //!std::is_same_v<T,UnaryNode> &&

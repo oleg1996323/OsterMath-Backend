@@ -24,7 +24,9 @@ ReferenceNode::~ReferenceNode(){
 }
 Result ReferenceNode::execute() const{
     assert(has_child(0));
-    return child(0)->execute();
+    if(is_not_cycled())
+        return child(0)->execute();
+    else return exceptions::CyclicReference("");
 }
 bool ReferenceNode::is_empty() const{
     return childs().size()==0;

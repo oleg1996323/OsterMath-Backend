@@ -16,8 +16,8 @@ using namespace node_range_operation;
 class EmptyNode:public AbstractNode{
 public:
     EmptyNode(NodeManager* mng = nullptr);
-    EmptyNode(const EmptyNode& other):AbstractNode(other){}
-    EmptyNode(EmptyNode&& other):AbstractNode(other){}
+    EmptyNode(const EmptyNode& other,NodeManager* mng):AbstractNode(other,mng){}
+    EmptyNode(EmptyNode&& other,NodeManager* mng):AbstractNode(other,mng){}
     ~EmptyNode();
     virtual TYPE_VAL type_val() const override final;    
     virtual NODE_TYPE type() const override final;
