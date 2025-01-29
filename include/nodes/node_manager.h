@@ -98,9 +98,6 @@ class NodeManager{
     static std::pair<Childs_t::const_iterator,Childs_t::const_iterator> insert_copy(AbstractNode* at_insertion,size_t id, Childs_t::const_iterator to_copy_first,Childs_t::const_iterator to_copy_last);
     static std::pair<Childs_t::const_iterator,Childs_t::const_iterator> replace_move(AbstractNode* at_replacing,size_t id, Childs_t::const_iterator to_move_first,Childs_t::const_iterator to_move_last);
     static std::pair<Childs_t::const_iterator,Childs_t::const_iterator> replace_copy(AbstractNode* at_replacing,size_t id, Childs_t::const_iterator to_copy_first,Childs_t::const_iterator to_copy_last);
-    static std::pair<Childs_t::const_iterator,Childs_t::const_iterator> insert_back_empty_nodes(AbstractNode* at_insertion, size_t count);
-    static std::pair<Childs_t::const_iterator,Childs_t::const_iterator> insert_empty_nodes(AbstractNode* at_insertion, size_t pos, size_t count);
-    static std::pair<Childs_t::const_iterator,Childs_t::const_iterator> replace_by_empty_nodes(AbstractNode* at_insertion, size_t pos, size_t count);
 
     static void delete_node(const AbstractNode* node);
     static bool has_references(const AbstractNode* node) noexcept;
@@ -115,6 +112,8 @@ class NodeManager{
     static void swap_node(AbstractNode* lhs, AbstractNode* rhs);
     static void move_node(AbstractNode* at_move, AbstractNode* to_move);
     static void copy_node(AbstractNode* to_replace_by_copy, const AbstractNode* to_copy);
+    static std::unique_ptr<AbstractNode> extract_node(AbstractNode* node);
+    static std::vector<std::unique_ptr<AbstractNode>> extract_nodes(Childs_t::const_iterator,Childs_t::const_iterator);
     static std::pair<Childs_t::const_iterator,Childs_t::const_iterator> move_nodes(Childs_t::const_iterator at_move_first, Childs_t::const_iterator to_move_first, Childs_t::const_iterator to_move_last);
     static std::pair<Childs_t::const_iterator,Childs_t::const_iterator> copy_nodes(Childs_t::const_iterator at_copy_first, Childs_t::const_iterator to_copy_first, Childs_t::const_iterator to_copy_last);
     static bool is_modifying(NodeManager* from);
