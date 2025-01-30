@@ -124,15 +124,26 @@ class NodeManager{
         && nodes_.empty();
     }
     static bool is_directly_owned_by(const AbstractNode* owner, const AbstractNode* node) noexcept;
-    template<typename T>
-    static std::unique_ptr<T>&& make_node(T&& node_val,NodeManager* rel_mng){
-        node_val.set_relation_manager(rel_mng);
-        return std::make_unique<T>(std::forward<T>(node_val),rel_mng);
+    template<typename T, typename... ARGS>
+    static std::unique_ptr<T>&& make_node(NodeManager* rel_mng,ARGS&&... node_val){
+        std::unique_ptr<T> n_res;
+        if constexpr((std::is_lvalue_reference_v<ARGS...> && std::is_const_v<ARGS...>) || std::is_rvalue_reference_v<ARGS...>){
+            n_res = std::make_unique<T>(std::forward<ARGS>(node_val)...);
+            n_res->set_relation_manager(rel_mng);
+        }
+        else{
+            n_res = std::make_unique<T>(std::forward<ARGS>(node_val)...,rel_mng);
+        }
+        return n_res;
     }
     static bool is_refered_by(const AbstractNode* ref_owner, const AbstractNode* refered) noexcept;
     template<typename T, typename... ARGS>
     std::unique_ptr<T> make_node(ARGS&&... node_val){
-        std::unique_ptr<T> n_res = std::make_unique<T>(std::forward<ARGS>(node_val)...,(NodeManager*)this);
+        std::unique_ptr<T> n_res;
+        if constexpr((std::is_lvalue_reference_v<ARGS...> && std::is_const_v<ARGS...>) || std::is_rvalue_reference_v<ARGS...>)
+            n_res = std::make_unique<T>(std::forward<ARGS>(node_val)...);
+        else
+            n_res = std::make_unique<T>(std::forward<ARGS>(node_val)...,(NodeManager*)this);
         return n_res;
     }
     protected:
@@ -146,6 +157,7 @@ class NodeManager{
     static const std::unique_ptr<AbstractNode>& get_node(NodeManager*, const AbstractNode*);
     void __clear__();
     void __safe_merge__(NodeManager* from) noexcept;
+    static Childs_t& __childs__(const AbstractNode* node);
     static ReferenceNode* __erase_reference__(const AbstractNode* from_node, ReferenceNode* ref) noexcept;
     static ReferenceNode* __add_reference__(const AbstractNode* node_to_add, ReferenceNode* ref_node) noexcept;
     static void __add_owner__(const AbstractNode* node_to_add, const AbstractNode* owner, int index) noexcept;

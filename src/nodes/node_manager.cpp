@@ -263,6 +263,11 @@ void NodeManager::__safe_merge__(NodeManager* from) noexcept{
     owner_.merge(from->owner_);
     from->__clear__();
 }
+Childs_t& NodeManager::__childs__(const AbstractNode* node){
+    if(node->has_childs())
+        return node->relation_manager()->childs_.at(node);
+    else throw std::runtime_error("Node has not childs");
+}
 void NodeManager::__clear__(){
     nodes_.clear();
     references_.clear();
@@ -316,9 +321,6 @@ Childs_Iter_t NodeManager::insert_back_move(AbstractNode* at_insertion,Childs_t:
 }
 Childs_Iter_t NodeManager::insert_back_copy(AbstractNode* at_insertion,Childs_t::const_iterator to_copy_first,Childs_t::const_iterator to_copy_last){
     return insert_copy(at_insertion,at_insertion->childs().size(),to_copy_first,to_copy_last);
-}
-Childs_Iter_t NodeManager::insert_back_empty_nodes(AbstractNode* at_insertion, size_t count){
-    return insert_empty_nodes(at_insertion,at_insertion->childs().size(),count);
 }
 #include "func_node.h"
 AbstractNode* NodeManager::insert_back(AbstractNode* node,std::unique_ptr<AbstractNode>&& new_child){
@@ -451,18 +453,93 @@ AbstractNode* NodeManager::insert_copy(AbstractNode* at_insertion,size_t id,Abst
 Childs_Iter_t NodeManager::insert_move(AbstractNode* at_insertion,size_t id, Childs_t::const_iterator to_move_first,Childs_t::const_iterator to_move_last){
     static const Childs_Iter_t empty;
     if(id==0 || (at_insertion->has_childs() && at_insertion->childs().size()>=id)){
-        Childs_Iter_t tmp_empty_nodes = insert_empty_nodes(at_insertion,id,std::distance(to_move_first,to_move_last));
+        
+        
         return move_nodes(tmp_empty_nodes.first,to_move_first,to_move_last);
     }
     else return empty;
 }
 Childs_Iter_t NodeManager::insert_copy(AbstractNode* at_insertion,size_t id, Childs_t::const_iterator to_copy_first,Childs_t::const_iterator to_copy_last){
     static const Childs_Iter_t empty;
-    if(id==0 || (at_insertion->has_childs() && at_insertion->childs().size()>=id)){
-        Childs_Iter_t tmp_empty_nodes = insert_empty_nodes(at_insertion,id,std::distance(to_copy_first,to_copy_last));
-        return copy_nodes(tmp_empty_nodes.first,to_copy_first,to_copy_last);
+    switch(at_insertion->type()){
+        case NODE_TYPE::ARRAY:
+            break;
+        case NODE_TYPE::FUNCTION:{
+            const Childs_t& childs = at_insertion->childs();
+            if(!static_cast<FunctionNode*>(at_insertion)->is_array_function() && (size_t)(to_copy_last-to_copy_first+id)>childs.capacity()-childs.size()){
+                throw std::logic_error("Invalid inserting. Prompt: Unvalailable to insert node to full defined function node");
+            }
+            break;
+        }
+        case NODE_TYPE::VARIABLE:
+        case NODE_TYPE::REF:
+        case NODE_TYPE::RANGEOP:
+        case NODE_TYPE::UNARY:
+        case NODE_TYPE::BINARY:
+        case NODE_TYPE::VALUE:
+        case NODE_TYPE::STRING:
+        case NODE_TYPE::UNDEF:
+        case NODE_TYPE::CUSTOM:{
+            //will be added further at next version with lambda functions
+            throw std::logic_error("Invalid inserting. Prompt: Unvalailable to insert back child to this type of node");
+            return empty;
+            break;
+        }
     }
-    else return empty;
+    std::vector<std::unique_ptr<AbstractNode>> copied;
+    std::vector<AbstractNode*> copied_ptr;
+    if(id==0 || (at_insertion->has_childs() && at_insertion->childs().size()>=id)){
+        for(AbstractNode* node:std::ranges::subrange(to_copy_first,to_copy_last)){
+            switch(node->type()){
+            case NODE_TYPE::ARRAY:{
+                copied_ptr.push_back(copied.emplace_back(std::move(make_node<ArrayNode>(at_insertion->relation_manager(),*static_cast<const ArrayNode*>(node)))).get());
+                break;
+            }
+            case NODE_TYPE::BINARY:{
+                copied_ptr.push_back(copied.emplace_back(std::move(make_node<ArrayNode>(at_insertion->relation_manager(),*static_cast<const BinaryNode*>(node)))).get());
+                break;
+            }
+            case NODE_TYPE::FUNCTION:{
+                copied_ptr.push_back(copied.emplace_back(std::move(make_node<ArrayNode>(at_insertion->relation_manager(),*static_cast<const FunctionNode*>(node)))).get());
+                break;
+            }
+            case NODE_TYPE::RANGEOP:{
+                copied_ptr.push_back(copied.emplace_back(std::move(make_node<ArrayNode>(at_insertion->relation_manager(),*static_cast<const RangeOperationNode*>(node)))).get());
+                break;
+            }
+            case NODE_TYPE::REF:{
+                copied_ptr.push_back(copied.emplace_back(std::move(make_node<ArrayNode>(at_insertion->relation_manager(),*static_cast<const ReferenceNode*>(node)))).get());
+                break;
+            }
+            case NODE_TYPE::STRING:{
+                copied_ptr.push_back(copied.emplace_back(std::move(make_node<ArrayNode>(at_insertion->relation_manager(),*static_cast<const StringNode*>(node)))).get());
+                break;
+            }
+            case NODE_TYPE::UNARY:{
+                copied_ptr.push_back(copied.emplace_back(std::move(make_node<ArrayNode>(at_insertion->relation_manager(),*static_cast<const UnaryNode*>(node)))).get());
+                break;
+            }
+            case NODE_TYPE::UNDEF:{
+                copied_ptr.push_back(copied.emplace_back(std::move(make_node<ArrayNode>(at_insertion->relation_manager(),*static_cast<const EmptyNode*>(node)))).get());
+                break;
+            }
+            case NODE_TYPE::VALUE:{
+                copied_ptr.push_back(copied.emplace_back(std::move(make_node<ArrayNode>(at_insertion->relation_manager(),*static_cast<const ValueNode*>(node)))).get());
+                break;
+            }
+            default:{
+                throw std::runtime_error("Unable to insert");
+                break;
+            }
+            }
+        }
+        Childs_t& childs = __childs__(at_insertion);
+        childs.insert(childs.begin()+id,copied_ptr.begin(),copied_ptr.end());
+        for(std::unique_ptr<AbstractNode>& node:copied)
+            at_insertion->relation_manager()->nodes_.insert(std::move(node));
+        return Childs_Iter_t{childs.begin()+id,childs.begin()+id+copied.size()};
+    }
+    return empty;
 }
 AbstractNode* NodeManager::replace_move(AbstractNode* at_replacing,size_t id,AbstractNode* to_replace){
     if(at_replacing->has_child(id))
@@ -475,6 +552,7 @@ AbstractNode* NodeManager::replace_copy(AbstractNode* at_replacing,size_t id,Abs
     return to_replace;
 }
 Childs_Iter_t NodeManager::replace_move(AbstractNode* at_replacing,size_t id, Childs_t::const_iterator to_move_first,Childs_t::const_iterator to_move_last){
+    //TODO
     static const Childs_Iter_t empty;
     if(at_replacing->childs().size()>=id){
         auto& childs = at_replacing->childs();
@@ -483,6 +561,7 @@ Childs_Iter_t NodeManager::replace_move(AbstractNode* at_replacing,size_t id, Ch
     else return empty;
 }
 Childs_Iter_t NodeManager::replace_copy(AbstractNode* at_replacing,size_t id, Childs_t::const_iterator to_copy_first,Childs_t::const_iterator to_copy_last){
+    //TODO
     static const Childs_Iter_t empty;
     if(at_replacing->childs().size()>=id){
         auto& childs = at_replacing->childs();
@@ -630,6 +709,8 @@ Childs_Iter_t NodeManager::move_nodes(Childs_t::const_iterator at_move_first, Ch
 }
 Childs_Iter_t NodeManager::copy_nodes(Childs_t::const_iterator at_copy_first, Childs_t::const_iterator to_copy_first, Childs_t::const_iterator to_copy_last){
     static Childs_Iter_t empty;
+    auto childs = std::ranges::subrange(to_copy_first,to_copy_last);
+    
     if(*at_copy_first && *to_copy_first && *to_copy_last && 
         (*at_copy_first)->owner().parent->childs().end()<to_copy_last &&
         (*at_copy_first)->owner().parent->childs().begin()>to_copy_first)
