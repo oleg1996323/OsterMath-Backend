@@ -451,13 +451,37 @@ AbstractNode* NodeManager::insert_copy(AbstractNode* at_insertion,size_t id,Abst
     return tmp;
 }
 Childs_Iter_t NodeManager::insert_move(AbstractNode* at_insertion,size_t id, Childs_t::const_iterator to_move_first,Childs_t::const_iterator to_move_last){
+    //TODO move in same 
     static const Childs_Iter_t empty;
-    if(id==0 || (at_insertion->has_childs() && at_insertion->childs().size()>=id)){
-        
-        
-        return move_nodes(tmp_empty_nodes.first,to_move_first,to_move_last);
+    std::vector<std::unique_ptr<AbstractNode>> moved;
+    std::vector<AbstractNode*> moved_ptr;
+    switch(at_insertion->type()){
+        case NODE_TYPE::ARRAY:
+            Childs_t& at_childs = __childs__(at_insertion);
+            at_childs.
+            break;
+        case NODE_TYPE::FUNCTION:{
+            const Childs_t& childs = at_insertion->childs();
+            if(!static_cast<FunctionNode*>(at_insertion)->is_array_function() && (size_t)(to_copy_last-to_copy_first+id)>childs.capacity()-childs.size()){
+                throw std::logic_error("Invalid inserting. Prompt: Unvalailable to insert node to full defined function node");
+            }
+            break;
+        }
+        case NODE_TYPE::VARIABLE:
+        case NODE_TYPE::REF:
+        case NODE_TYPE::RANGEOP:
+        case NODE_TYPE::UNARY:
+        case NODE_TYPE::BINARY:
+        case NODE_TYPE::VALUE:
+        case NODE_TYPE::STRING:
+        case NODE_TYPE::UNDEF:
+        case NODE_TYPE::CUSTOM:{
+            //will be added further at next version with lambda functions
+            throw std::logic_error("Invalid inserting. Prompt: Unvalailable to insert back child to this type of node");
+            return empty;
+            break;
+        }
     }
-    else return empty;
 }
 Childs_Iter_t NodeManager::insert_copy(AbstractNode* at_insertion,size_t id, Childs_t::const_iterator to_copy_first,Childs_t::const_iterator to_copy_last){
     static const Childs_Iter_t empty;

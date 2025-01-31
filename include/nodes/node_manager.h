@@ -125,7 +125,7 @@ class NodeManager{
     }
     static bool is_directly_owned_by(const AbstractNode* owner, const AbstractNode* node) noexcept;
     template<typename T, typename... ARGS>
-    static std::unique_ptr<T>&& make_node(NodeManager* rel_mng,ARGS&&... node_val){
+    static std::unique_ptr<T> make_node(NodeManager* rel_mng,ARGS&&... node_val){
         std::unique_ptr<T> n_res;
         if constexpr((std::is_lvalue_reference_v<ARGS...> && std::is_const_v<ARGS...>) || std::is_rvalue_reference_v<ARGS...>){
             n_res = std::make_unique<T>(std::forward<ARGS>(node_val)...);
