@@ -114,8 +114,8 @@ class NodeManager{
     static void copy_node(AbstractNode* to_replace_by_copy, const AbstractNode* to_copy);
     static std::unique_ptr<AbstractNode> extract_node(AbstractNode* node);
     static std::vector<std::unique_ptr<AbstractNode>> extract_nodes(Childs_t::const_iterator,Childs_t::const_iterator);
-    static std::pair<Childs_t::const_iterator,Childs_t::const_iterator> move_nodes(Childs_t::const_iterator at_move_first, Childs_t::const_iterator to_move_first, Childs_t::const_iterator to_move_last);
-    static std::pair<Childs_t::const_iterator,Childs_t::const_iterator> copy_nodes(Childs_t::const_iterator at_copy_first, Childs_t::const_iterator to_copy_first, Childs_t::const_iterator to_copy_last);
+    static std::pair<Childs_t::const_iterator,Childs_t::const_iterator> move_nodes(AbstractNode* at_move, size_t id, Childs_t::const_iterator to_move_first, Childs_t::const_iterator to_move_last) noexcept;
+    static std::pair<Childs_t::const_iterator,Childs_t::const_iterator> copy_nodes(AbstractNode* at_move, size_t id, Childs_t::const_iterator to_copy_first, Childs_t::const_iterator to_copy_last);
     static bool is_modifying(NodeManager* from);
     bool is_empty() const{
         return owner_.empty()
