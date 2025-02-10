@@ -2,16 +2,14 @@
     "configurations": [
         {
             "name": "CMake",
-            "compileCommands": "${config:cmake.buildDirectory}/compile_commands.json",
+            "compileCommands": [
+                "${config:cmake.buildDirectory}/compile_commands.json"
+            ],
             "configurationProvider": "ms-vscode.cmake-tools",
-            "cppStandard": "c++20",
-            "cStandard": "c17",
+            "cppStandard": "c++23",
+            "cStandard": "c23",
             "intelliSenseMode": "linux-gcc-x64",
-            "compilerPath": "/usr/bin/g++",
-            "compilerArgs": [],
-            "defines": [
-                "CMAKE_BUILD_TYPE=Debug"
-            ]
+            "compilerArgs": []
         },
         {
             "name": "Release",
@@ -19,10 +17,12 @@
                 "${workspaceFolder}/**"
             ],
             "defines": [],
-            "cStandard": "c17",
-            "cppStandard": "c++20",
+            "cStandard": "c23",
+            "cppStandard": "c++23",
             "intelliSenseMode": "linux-clang-x64",
-            "compileCommands": "${workspaceFolder}/compile_commands.json"
+            "compileCommands": [
+                "${workspaceFolder}/compile_commands.json"
+            ]
         }
     ],
     "version": 4

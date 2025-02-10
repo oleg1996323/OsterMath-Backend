@@ -1,13 +1,10 @@
-cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.22 FATAL_ERROR)
 project(ostermath_be)
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_COMPILER "/usr/bin/g++")
-
+message(STATUS "Build type ${CMAKE_BUILD_TYPE}")
 if(NOT CMAKE_BUILD_TYPE)
     message(FATAL_ERROR "Not defined config")
 endif()
-
 set(Boost_USE_STATIC_LIBS        ON)  # only find static libs
 set(Boost_USE_DEBUG_LIBS        OFF)  # ignore debug libs and
 set(Boost_USE_RELEASE_LIBS       ON)  # only find release libs

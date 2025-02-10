@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 project(detect_type_function)
-set(CMAKE_CXX_COMPILER "/usr/bin/g++")
-set(CMAKE_CXX_STANDARD 20)
 if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     set(
         CMAKE_CXX_FLAGS_DEBUG

@@ -540,35 +540,35 @@ Childs_Iter_t NodeManager::insert_copy(AbstractNode* at_insertion,size_t id, Chi
                 break;
             }
             case NODE_TYPE::BINARY:{
-                copied_ptr.push_back(copied.emplace_back(std::move(make_node<ArrayNode>(at_insertion->relation_manager(),*static_cast<const BinaryNode*>(node)))).get());
+                copied_ptr.push_back(copied.emplace_back(std::move(make_node<BinaryNode>(at_insertion->relation_manager(),*static_cast<const BinaryNode*>(node)))).get());
                 break;
             }
             case NODE_TYPE::FUNCTION:{
-                copied_ptr.push_back(copied.emplace_back(std::move(make_node<ArrayNode>(at_insertion->relation_manager(),*static_cast<const FunctionNode*>(node)))).get());
+                copied_ptr.push_back(copied.emplace_back(std::move(make_node<FunctionNode>(at_insertion->relation_manager(),*static_cast<const FunctionNode*>(node)))).get());
                 break;
             }
             case NODE_TYPE::RANGEOP:{
-                copied_ptr.push_back(copied.emplace_back(std::move(make_node<ArrayNode>(at_insertion->relation_manager(),*static_cast<const RangeOperationNode*>(node)))).get());
+                copied_ptr.push_back(copied.emplace_back(std::move(make_node<RangeOperationNode>(at_insertion->relation_manager(),*static_cast<const RangeOperationNode*>(node)))).get());
                 break;
             }
             case NODE_TYPE::REF:{
-                copied_ptr.push_back(copied.emplace_back(std::move(make_node<ArrayNode>(at_insertion->relation_manager(),*static_cast<const ReferenceNode*>(node)))).get());
+                copied_ptr.push_back(copied.emplace_back(std::move(make_node<ReferenceNode>(at_insertion->relation_manager(),*static_cast<const ReferenceNode*>(node)))).get());
                 break;
             }
             case NODE_TYPE::STRING:{
-                copied_ptr.push_back(copied.emplace_back(std::move(make_node<ArrayNode>(at_insertion->relation_manager(),*static_cast<const StringNode*>(node)))).get());
+                copied_ptr.push_back(copied.emplace_back(std::move(make_node<StringNode>(at_insertion->relation_manager(),*static_cast<const StringNode*>(node)))).get());
                 break;
             }
             case NODE_TYPE::UNARY:{
-                copied_ptr.push_back(copied.emplace_back(std::move(make_node<ArrayNode>(at_insertion->relation_manager(),*static_cast<const UnaryNode*>(node)))).get());
+                copied_ptr.push_back(copied.emplace_back(std::move(make_node<UnaryNode>(at_insertion->relation_manager(),*static_cast<const UnaryNode*>(node)))).get());
                 break;
             }
             case NODE_TYPE::UNDEF:{
-                copied_ptr.push_back(copied.emplace_back(std::move(make_node<ArrayNode>(at_insertion->relation_manager(),*static_cast<const EmptyNode*>(node)))).get());
+                copied_ptr.push_back(copied.emplace_back(std::move(make_node<EmptyNode>(at_insertion->relation_manager(),*static_cast<const EmptyNode*>(node)))).get());
                 break;
             }
             case NODE_TYPE::VALUE:{
-                copied_ptr.push_back(copied.emplace_back(std::move(make_node<ArrayNode>(at_insertion->relation_manager(),*static_cast<const ValueNode*>(node)))).get());
+                copied_ptr.push_back(copied.emplace_back(std::move(make_node<ValueNode>(at_insertion->relation_manager(),*static_cast<const ValueNode*>(node)))).get());
                 break;
             }
             default:{
